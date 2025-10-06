@@ -98,10 +98,10 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
         </AnimatePresence>
 
         <div className="flex flex-col h-full pt-16">
-          {/* Logo */}
-          <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+          {/* Logo - REMOVED for task */}
+          {/* <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
             <img src={logo} alt="Logo" className="h-10 object-contain" />
-          </div>
+          </div> */}
 
           {/* Navigation Items */}
           <nav className="flex-1 pt-6 px-4">

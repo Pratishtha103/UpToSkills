@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import InputField from './InputField';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import {Link} from 'react-router-dom';
+import {Phone, Mail } from 'lucide-react';
+import { FaLinkedin } from "react-icons/fa";
 import useSubmitContactForm from '../../hooks/useSubmitContactForm'; 
 
 const Contact = () => {
@@ -36,9 +38,9 @@ const Contact = () => {
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-            <MapPin className="text-orange-500 mx-auto mb-4" size={40} />
-            <h3 className="text-xl font-semibold mb-2">Visit Us Daily:</h3>
-            <p className="text-gray-600">Palam, New Delhi, Delhi 110077</p>
+            <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
+            <h3 className="text-xl font-semibold mb-2">Get to know us:</h3>
+            <Link target="_blank" to="https://www.linkedin.com/company/uptoskills/posts/?feedView=all" className="text-gray-600">https://www.linkedin.com/company/uptoskills</Link>
           </div>
           <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
             <Phone className="text-orange-500 mx-auto mb-4" size={40} />

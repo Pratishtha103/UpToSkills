@@ -23,7 +23,7 @@ export default function Header({ onMenuClick }) {
   const toggleTheme = () => setIsDarkMode(prev => !prev);
 
   const handleNotificationsClick = () => navigate('/dashboard/notifications');
-  const handleProfileClick = () => navigate('/dashboard/profile');
+  const handleProfileClick = () => navigate('/mentor-dashboard/profile');
 
   // NEW helper that either calls parent callback OR dispatches a global event
   const handleMenuClick = () => {

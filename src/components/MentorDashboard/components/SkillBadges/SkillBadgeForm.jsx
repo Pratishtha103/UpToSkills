@@ -7,11 +7,11 @@ import Sidebar from '../Sidebar';
 const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
-    student_id: '',
-    badge_name: '',
-    badge_description: '',
-    verified: false,
-  });
+  student_name: '', // CHANGED TO student_name
+  badge_name: '',
+  badge_description: '',
+  verified: false,
+});
 
   const toggleSidebar = () => {
     setIsOpen((prev) => !prev);
@@ -53,12 +53,12 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
             <h2 className="text-2xl font-semibold mb-6 dark:text-white">Add New Skill Badge</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <label className="block dark:text-white">
-                Student ID:
+                Student Name: 
                 <input
-                  type="number"
-                  placeholder="Student ID"
-                  name="student_id"
-                  value={formData.student_id}
+                  type="text" // CHANGED
+                  placeholder="Student Name" // CHANGED
+                  name="student_name" // CHANGED
+                  value={formData.student_name} // CHANGED
                   onChange={handleChange}
                   required
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-极 dark:text-white"

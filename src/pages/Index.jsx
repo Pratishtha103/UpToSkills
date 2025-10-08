@@ -260,10 +260,10 @@ export default function Index() {
             <InterviewsSection />
           </section>
 
-          {/* Footer */}
+          {/* Footer
           <footer className="text-center py-8 border-t border-border mt-12">
             <p className="text-muted-foreground">© 2024 UptoSkill. Empowering the next generation of talent.</p>
-          </footer>
+          </footer> */}
         </div>
 
         {/* Student Profile Modal */}

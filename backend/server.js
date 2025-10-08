@@ -32,6 +32,10 @@ const PORT = process.env.PORT || 5000;
 
 const path = require('path');
 
+app.post('/api/test', (req, res) => {
+    res.status(200).send("Test route working!");
+})
+
 // Serve uploads folder correctly
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

@@ -47,6 +47,7 @@ const pool = require('../config/database');
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
+        is_verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);

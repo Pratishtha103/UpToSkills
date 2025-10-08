@@ -27,18 +27,16 @@ const LoginForm = () => {
     }));
   };
 
-  // ✅ Entire function below updated to include hardcoded admin login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Added for hardcoded admin login
+    // ✅ Hardcoded admin login
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
       role: "admin",
     };
 
-    // ✅ Check if entered credentials match admin
     if (
       formData.email === hardcodedAdmin.email &&
       formData.password === hardcodedAdmin.password &&
@@ -52,15 +50,14 @@ const LoginForm = () => {
         role: hardcodedAdmin.role,
       };
 
-      // ✅ Save dummy admin session
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
 
-      navigate("/adminPanel");
-      return; // ✅ Stop execution here for admin
+      navigate("/adminPanel", { state: { updated: true } });
+      return;
     }
 
-    // 🧠 Otherwise, continue with normal login flow
+    // ✅ Regular login flow
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -70,35 +67,36 @@ const LoginForm = () => {
 
       alert(response.data.message || "Login successful");
 
-      // Save token and role
-      if (response.data.token) localStorage.setItem("token", response.data.token);
+      // Save token
+      if (response.data.token)
+        localStorage.setItem("token", response.data.token);
+
       const roleToSave = response.data.user?.role || formData.role;
+
       localStorage.setItem("role", roleToSave);
-    
-      // Save user details
+
+      // ✅ Save full user object for WelcomeSection
       if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("id", response.data.user.id);
-        
-        // Save student-specific data
+
         if (roleToSave === "student") {
           localStorage.setItem("studentId", response.data.user.id);
         }
-        
-        // Save mentor detail for mentor
+
         if (roleToSave === "mentor") {
           localStorage.setItem("mentor", JSON.stringify(response.data.user));
         }
       }
 
-      if (roleToSave === "mentor" && response.data.user) {
-        localStorage.setItem("mentor", JSON.stringify(response.data.user));
-      }
-
-      if (roleToSave === "admin") navigate("/adminPanel");
+      // ✅ Navigate based on role (pass { state: { updated: true } } to refresh dashboard)
+      if (roleToSave === "admin") navigate("/adminPanel", { state: { updated: true } });
       else if (roleToSave === "student" || roleToSave === "learner")
-        navigate("/dashboard");
-      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
-      else if (roleToSave === "company") navigate("/company");
+        navigate("/dashboard", { state: { updated: true } });
+      else if (roleToSave === "mentor")
+        navigate("/mentor-dashboard", { state: { updated: true } });
+      else if (roleToSave === "company")
+        navigate("/company", { state: { updated: true } });
       else navigate("/login");
     } catch (err) {
       const message =

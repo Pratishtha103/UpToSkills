@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 // src/components/MentorDashboard/components/SkillBadges/SkillBadgeForm.jsx
 
 import React, { useState } from 'react';
-
 import Header from '../Header';
 import Sidebar from '../Sidebar';
+import Footer from '../Footer'; // Added Footer from incoming changes
 
 // Define the 6 fixed badge names with unique colors/styles
 const FIXED_BADGES = [
@@ -16,7 +15,8 @@ const FIXED_BADGES = [
     { name: 'Mentorship Star', icon: '🎓', color: 'border-purple-500 bg-purple-50 dark:bg-purple-950/50' },
 ];
 
-const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
+// NOTE: Merged props to use the original prop name convention: setIsDarkMode
+const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => { 
     const [isOpen, setIsOpen] = useState(true);
     const [formData, setFormData] = useState({
         student_name: '',
@@ -24,13 +24,14 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
         badge_description: '',
         verified: false,
     });
-    const [submissionStatus, setSubmissionStatus] = useState(null);
+    // State to track submission status for UI feedback (from HEAD)
+    const [submissionStatus, setSubmissionStatus] = useState(null); 
 
     const toggleSidebar = () => {
         setIsOpen((prev) => !prev);
     };
 
-    // Function to set the badge name when a card is clicked
+    // Function to set the badge name when a card is clicked (from HEAD)
     const selectBadge = (badgeName) => {
         setFormData(prev => ({ 
             ...prev, 
@@ -46,6 +47,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
         }));
     };
     
+    // Merged handleSubmit logic (using full error handling and token from HEAD)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmissionStatus('submitting');
@@ -59,109 +61,13 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
             alert('Authentication Error: Mentor token not found. Please log in again.');
             return;
         }
-=======
-import React, { useState } from "react";
-import Header from "../Header";
-import Sidebar from "../Sidebar";
-import Footer from "../Footer";
-
-const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [formData, setFormData] = useState({
-    student_name: "",
-    badge_name: "",
-    badge_description: "",
-    verified: false,
-  });
-
-  const toggleSidebar = () => setIsOpen((prev) => !prev);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:5000/api/skill-badges", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert("Badge added successfully!");
-        setFormData({
-          student_name: "",
-          badge_name: "",
-          badge_description: "",
-          verified: false,
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  return (
-    <div className="mt-14 flex min-h-screen">
-      <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onMenuClick={toggleSidebar} />
-      {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-
-      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
-        <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">
-          <div className="p-6 bg-white rounded-lg w-full max-w-xl shadow-md dark:bg-gray-800">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Add New Skill Badge</h2>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <label className="block dark:text-white">
-                Student Name:
-                <input
-                  type="text"
-                  name="student_name"
-                  placeholder="Student Name"
-                  value={formData.student_name}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </label>
-
-              <label className="block dark:text-white">
-                Badge Name:
-                <input
-                  type="text"
-                  name="badge_name"
-                  placeholder="Badge Name"
-                  value={formData.badge_name}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </label>
-
-              <label className="block dark:text-white">
-                Badge Description:
-                <textarea
-                  name="badge_description"
-                  placeholder="Badge Description"
-                  value={formData.badge_description}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                ></textarea>
-              </label>
->>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
 
         try {
             const response = await fetch('http://localhost:5000/api/skill-badges', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'x-auth-token': token, // <-- CRITICAL: Send the token here!
+                    'x-auth-token': token, // Send the token here!
                 },
                 body: JSON.stringify(formData)
             });
@@ -175,7 +81,6 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                 setFormData({ student_name: '', badge_name: '', badge_description: '', verified: false });
             } else {
                 setSubmissionStatus('error');
-                // Display specific error message from the backend if available
                 console.error("Backend Error:", data.message || "Unknown error during badge creation.");
                 alert(`Failed to add badge. Server response: ${data.message || 'Check browser console for details.'}`); 
             }
@@ -186,20 +91,28 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
         }
     };
 
-<<<<<<< HEAD
+    // Find the currently selected badge for display (from HEAD)
     const selectedBadge = FIXED_BADGES.find(b => b.name === formData.badge_name);
 
 
     return (
-        <div className={`dashboard-container${isDarkMode ? ' dark' : ''}`}>
-            {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-            <div className={`main-content${isOpen ? '' : ' full-width'}`}>
-                <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-                <div className="min-h-screen flex items-center justify-center px-4 py-10">
-                    <div className="pt-24 p-6 bg-white rounded-lg w-full max-w-2xl shadow-md dark:bg-gray-700">
-                        <h2 className="text-2xl font-semibold mb-6 dark:text-white">Award a Skill Badge</h2>
+        // Reverting to the simpler, non-conflicting container class
+        <div className={`flex min-h-screen transition-all duration-300 ${isDarkMode ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+            
+            <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? 'lg:ml-64' : 'ml-0'}`}>
+                
+                <Header 
+                    onMenuClick={toggleSidebar} 
+                    isDarkMode={isDarkMode} 
+                    toggleDarkMode={() => setIsDarkMode(prev => !prev)} 
+                />
+
+                <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">
+                    <div className="p-6 bg-white rounded-lg w-full max-w-2xl shadow-md dark:bg-gray-800">
+                        <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Award a Skill Badge</h2>
                         
-                        {/* NEW BADGE SELECTION GALLERY */}
+                        {/* 1. BADGE SELECTION GALLERY (From HEAD) */}
                         <div className="mb-6">
                             <h3 className="text-lg font-medium mb-3 dark:text-white">1. Select Badge Type:</h3>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -214,21 +127,19 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                                                 : 'border-transparent hover:border-blue-400'
                                             }`}
                                     >
-                                        <div className="text-3xl mb-1">{badge.icon}</div>
+                                        <div className1="text-3xl mb-1">{badge.icon}</div>
                                         <p className="text-sm font-semibold dark:text-gray-100">{badge.name}</p>
                                     </div>
                                 ))}
                             </div>
                             {formData.badge_name && (
                                 <p className="mt-3 text-md text-blue-600 dark:text-blue-400">
-                                    **Badge Selected:** {selectedBadge.icon} {selectedBadge.name}
+                                    **Badge Selected:** {selectedBadge?.icon} {selectedBadge?.name}
                                 </p>
                             )}
                         </div>
-                        {/* END NEW BADGE SELECTION GALLERY */}
                         
-                        
-                        {/* FORM APPEARS ONLY AFTER BADGE IS SELECTED */}
+                        {/* 2. AWARD DETAILS FORM (From HEAD, conditionally rendered after selection) */}
                         {formData.badge_name && (
                             <form className="space-y-4" onSubmit={handleSubmit}>
                                 
@@ -244,7 +155,7 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                                         value={formData.student_name}
                                         onChange={handleChange}
                                         required
-                                        className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                        className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     />
                                 </label>
 
@@ -257,7 +168,7 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                                         value={formData.badge_description}
                                         onChange={handleChange}
                                         required
-                                        className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                        className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     ></textarea>
                                 </label>
 
@@ -300,24 +211,11 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                             </form>
                         )}
                     </div>
-                </div>
+                </main>
+                <Footer isDarkMode={isDarkMode} />
             </div>
         </div>
     );
-=======
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Submit
-              </button>
-            </form>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
->>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
 };
 
 export default SkillBadgeForm;

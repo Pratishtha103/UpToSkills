@@ -1,71 +1,36 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from 'react';
-
-function WelcomeSection() {
-  // 1. Initialize state for the user's name
-  const [name, setName] = useState("Learner");
-
-  useEffect(() => {
-    // 2. Fetch the data from the correct key: "user"
-    const userDataString = localStorage.getItem("user");
-    
-    // 3. Safely parse and update the name state
-    if (userDataString) {
-      try {
-        // Your LoginForm saves student data to the 'user' key
-        const userData = JSON.parse(userDataString);
-        
-        // Use the 'name' property (from full_name or company_name set in auth.js)
-        // or fall back to a safe default.
-        setName(userData.name || "Learner"); 
-
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
-        setName("Learner");
-      }
-    } else {
-        // If no user data is found (e.g., before the token is saved on login), 
-        // keep the default "Learner". No fetching/protected calls are made here.
-        setName("Learner");
-    }
-  }, []); 
-=======
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+// Import useLocation from the incoming code to handle name refreshing
+import { useLocation } from "react-router-dom"; 
 
 function WelcomeSection() {
   const [name, setName] = useState("Learner");
-  const location = useLocation();
+  const location = useLocation(); // Keep this hook from the incoming code
 
-  // Run on first load and whenever login updates
+  // Merged useEffect logic: Use the cleaner approach from the incoming code
+  // and make it run on location.state change (after login/navigation).
   useEffect(() => {
+    // Safely retrieve and parse the 'user' object from localStorage
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    
+    // Check if the 'name' property exists in the stored user data
     if (storedUser.name) {
       setName(storedUser.name);
     } else {
+      // Fallback to the default if the data is not found or incomplete
       setName("Learner");
     }
-  }, [location.state]); // ✅ runs again when coming from login
->>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
+  }, [location.state]); // Dependency array: Re-run when navigation state changes
 
   return (
     <div className="welcome-section">
       <div className="welcome-content">
         <section className="p-6 rounded-2xl mb-8 transition-all duration-300 bg-gray-100 dark:bg-[#1e293b]">
           <h2 className="text-3xl font-bold mb-2 transition-colors text-gray-800 dark:text-white">
-<<<<<<< HEAD
-            Hey {name}. {/* Use the state variable here */}
+            Hey {name}! {/* Keep the Hey {name} format from HEAD/Incoming */}
           </h2>
 
           <p className="text-base leading-relaxed mb-2 transition-colors text-gray-700 dark:text-gray-300">
-            Your learning journey continues — and so does your path to real-world opportunities. 
-=======
-            Hey {name}!
-          </h2>
-
-          <p className="text-base leading-relaxed mb-2 transition-colors text-gray-700 dark:text-gray-300">
-            Your learning journey continues — and so does your path to real-world opportunities.  
->>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
+            Your learning journey continues — and so does your path to real-world opportunities.
             Earn badges, showcase projects, and get noticed by recruiters.
           </p>
 

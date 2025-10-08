@@ -48,8 +48,8 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
       {/* Header with dark mode props */}
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-      {/* Sidebar */}
-      <Sidebar />
+  {/* Sidebar */}
+  <Sidebar isDarkMode={isDarkMode} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">

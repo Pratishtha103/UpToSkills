@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Footer from "../AboutPage/Footer";
 
 export default function EditProfile() {
   const [formData, setFormData] = useState({
@@ -12,10 +13,9 @@ export default function EditProfile() {
   });
 
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token"); // get JWT token
-
-  // Fetch existing profile on mount
+  // Fetch existing profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -32,7 +32,9 @@ export default function EditProfile() {
             industry: data.industry || "",
             contact: data.contact || "",
             logo: null,
-            logoPreview: data.logo_url ? `http://localhost:5000${data.logo_url}` : null,
+            logoPreview: data.logo_url
+              ? `http://localhost:5000${data.logo_url}`
+              : null,
           });
         }
       } catch (err) {
@@ -97,108 +99,108 @@ export default function EditProfile() {
   if (loading) return <p className="text-center mt-6">Loading...</p>;
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-xl mt-10">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
-        {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
-      </h2>
+    <div className="flex flex-col min-h-screen">
+      {/* Main Content */}
+      <main className="flex-grow flex justify-center items-start p-6">
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
+          <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+            {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
+          </h2>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6"
-        encType="multipart/form-data"
-      >
-        {/* Company Name */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Company Name
-          </label>
-          <input
-            type="text"
-            name="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            required
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Logo */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Company Logo
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleLogoChange}
-            className="w-full border rounded-lg px-3 py-2"
-          />
-          {formData.logoPreview && (
-            <img
-              src={formData.logoPreview}
-              alt="Logo Preview"
-              className="mt-4 h-28 object-contain rounded-lg border"
-            />
-          )}
-        </div>
-
-        {/* Website */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Website URL
-          </label>
-          <input
-            type="url"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Industry */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Industry Type
-          </label>
-          <select
-            name="industry"
-            value={formData.industry}
-            onChange={handleChange}
-            required
-            className="w-full border rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            encType="multipart/form-data"
           >
-            <option value="">Select industry</option>
-            <option value="IT">IT / Technology</option>
-            <option value="Finance">Finance</option>
-            <option value="Healthcare">Healthcare</option>
-            <option value="Education">Education</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+            {/* Company Name */}
+            <div>
+              <label className="block font-semibold mb-2">Company Name</label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        {/* Contact */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Company Contact
-          </label>
-          <input
-            type="text"
-            name="contact"
-            value={formData.contact}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+            {/* Company Logo */}
+            <div>
+              <label className="block font-semibold mb-2">Company Logo</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              {formData.logoPreview && (
+                <img
+                  src={formData.logoPreview}
+                  alt="Logo Preview"
+                  className="mt-4 h-28 object-contain rounded-lg border"
+                />
+              )}
+            </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
-        >
-          Save Details
-        </button>
-      </form>
+            {/* Website */}
+            <div>
+              <label className="block font-semibold mb-2">Website URL</label>
+              <input
+                type="url"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Industry */}
+            <div>
+              <label className="block font-semibold mb-2">Industry Type</label>
+              <select
+                name="industry"
+                value={formData.industry}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select industry</option>
+                <option value="IT">IT / Technology</option>
+                <option value="Finance">Finance</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <label className="block font-semibold mb-2">Company Contact</label>
+              <input
+                type="text"
+                name="contact"
+                value={formData.contact}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+            >
+              Save Details
+            </button>
+          </form>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full">
+        <Footer />
+      </footer>
     </div>
   );
 }

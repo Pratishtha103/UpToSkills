@@ -44,13 +44,13 @@ const students = [
   },
 ];
 
-const ProjectsProgress = () => {
+const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
   return (
     <div className="mt-14 flex">
 
-      <Header/>
+      <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isDarkMode={isDarkMode} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">

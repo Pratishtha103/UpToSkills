@@ -5,21 +5,30 @@ import {
   LayoutDashboard,
   User,
   FolderOpen,
-  Bell,
   LogOut,
   X,
-  Award,
   ViewIcon,
+  Book,
+  Info,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
 
+
+// Sidebar Items
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
+<<<<<<< HEAD
   { id: "skillbadges", label: "Skill Badges", icon: Award, path: "/student/skill-badges" },
   // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" }
+=======
+  { id: "projectshowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
+  // ✅ New About Us section
+  { id: "aboutus", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
+>>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
@@ -71,14 +80,14 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar Panel */}
+      {/* Sidebar */}
       <motion.aside
         className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-2xl z-40 overflow-hidden transition-colors duration-300"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Close Button (Mobile only) */}
+        {/* Close Button (mobile only) */}
         <AnimatePresence>
           {isOpen && !isDesktop && (
             <motion.button
@@ -97,22 +106,18 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
         </AnimatePresence>
 
         <div className="flex flex-col h-full pt-16">
-          {/* Navigation Items */}
+          {/* Navigation */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-1">
               {sidebarItems.map((item, index) => (
                 <Link key={item.id} to={item.path}>
                   <motion.button
-                    className={`
-                      sidebar-item w-full flex items-center gap-4 p-4 rounded-2xl 
-                      transition-all duration-200 ease-out relative overflow-hidden
-                      group cursor-pointer select-none
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none
                       ${
                         activeItem === item.id
                           ? "bg-primary text-white shadow-xl shadow-primary/30 dark:bg-gray-800 dark:text-white"
                           : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-                      }
-                    `}
+                      }`}
                     onClick={() => {
                       setActiveItem(item.id);
                       if (!isDesktop) setIsOpen(false);
@@ -124,66 +129,22 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                       duration: 0.3,
                       ease: "easeOut",
                     }}
-                    whileHover={{
-                      x: 8,
-                      scale: 1.03,
-                      transition: { duration: 0.15, ease: "easeOut" },
-                    }}
-                    whileTap={{
-                      scale: 0.97,
-                      transition: { duration: 0.1, ease: "easeInOut" },
-                    }}
+                    whileHover={{ x: 8, scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    {/* Icon */}
-                    <motion.div
-                      className="relative z-10 flex items-center justify-center"
-                      whileHover={{
-                        rotate: activeItem === item.id ? 0 : 5,
-                        scale: 1.15,
-                        transition: { duration: 0.15 },
-                      }}
-                      whileTap={{
-                        scale: 0.9,
-                        transition: { duration: 0.1 },
-                      }}
-                    >
-                      <item.icon
-                        className={`w-6 h-6 transition-all duration-200 ${
-                          activeItem === item.id
-                            ? "text-white drop-shadow-md"
-                            : "text-gray-700 dark:text-gray-300 group-hover:text-primary dark:group-hover:text-primary/80"
-                        }`}
-                      />
-                    </motion.div>
-
-                    {/* Active indicator */}
-                    {activeItem === item.id && (
-                      <motion.div
-                        className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full dark:bg-white/90"
-                        layoutId="activeIndicator"
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                          duration: 0.2,
-                        }}
-                      />
-                    )}
-
-                    {/* Text */}
+                    <item.icon
+                      className={`w-6 h-6 transition-all duration-200 ${
+                        activeItem === item.id
+                          ? "text-white drop-shadow-md"
+                          : "text-gray-700 dark:text-gray-300 group-hover:text-primary"
+                      }`}
+                    />
                     <motion.span
-                      className={`
-                        font-bold relative z-10 transition-all duration-200
-                        ${
-                          activeItem === item.id
-                            ? "text-white drop-shadow-md tracking-wide"
-                            : "text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
-                        }
-                      `}
-                      whileHover={{
-                        x: 3,
-                        transition: { duration: 0.15 },
-                      }}
+                      className={`font-bold relative z-10 transition-all duration-200 ${
+                        activeItem === item.id
+                          ? "text-white tracking-wide"
+                          : "text-gray-800 dark:text-gray-200"
+                      }`}
                     >
                       {item.label}
                     </motion.span>
@@ -193,11 +154,44 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
             </div>
           </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+          {/* Footer */}
+          <div className="p-4 border-t text-center">
+            <p className="font-semibold text-sm mb-2 text-gray-500">
+              Connect With Us
+            </p>
+            <div className="flex justify-center gap-4 mb-3">
+              <FaLinkedin
+                size={22}
+                className="cursor-pointer hover:text-[#0A66C2] transition"
+                onClick={() =>
+                  window.open(
+                    "https://www.linkedin.com/company/uptoskills/posts/?feedView=all",
+                    "_blank"
+                  )
+                }
+              />
+              <FaInstagram
+                size={22}
+                className="cursor-pointer hover:text-[#E1306C] transition"
+                onClick={() =>
+                  window.open("https://www.instagram.com/uptoskills", "_blank")
+                }
+              />
+              <FaYoutube
+                size={22}
+                className="cursor-pointer hover:text-[#FF0000] transition"
+                onClick={() =>
+                  window.open(
+                    "https://youtube.com/@uptoskills9101?si=YvRk51dq0exU-zLv",
+                    "_blank"
+                  )
+                }
+              />
+            </div>
+
             <motion.button
               onClick={handleLogout}
-              className="sidebar-item w-full text-red-500 dark:text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg transition-colors duration-200"
+              className="w-full text-red-500 flex items-center justify-center gap-2 p-2 rounded-lg transition-all"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >

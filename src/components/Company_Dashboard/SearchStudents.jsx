@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft } from "lucide-react";
+import SearchFilters from "./SearchFilters";
 
 /**
  * SearchStudents (ESLint-safe)
@@ -14,6 +15,7 @@ export default function SearchStudents() {
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ name: "", domain: "All Domains" });
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -41,61 +43,111 @@ export default function SearchStudents() {
     fetchStudents();
   }, []); // no external dependencies
 
-  // Client-side filtering: depends explicitly on searchQuery and students
+  // Client-side filtering: depends explicitly on searchQuery, filters, and students
   useEffect(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) {
-      setFilteredStudents(students);
-      return;
+    let filtered = students;
+
+    // Apply name filter
+    if (filters.name.trim()) {
+      const nameQuery = filters.name.trim().toLowerCase();
+      filtered = filtered.filter((s) => {
+        const name =
+          (s.student_name || s.full_name || s.name || s.displayName || "")
+            .toString()
+            .toLowerCase();
+        return name.includes(nameQuery);
+      });
     }
 
-    const filtered = students.filter((s) => {
-      const name =
-        (s.student_name || s.full_name || s.name || s.displayName || "")
-          .toString()
-          .toLowerCase();
-
-      // Normalize domains: array, JSON string, comma-separated string, or plain string
-      let domains = "";
-      try {
-        if (Array.isArray(s.domains_of_interest)) {
-          domains = s.domains_of_interest.join(" ");
-        } else if (typeof s.domains_of_interest === "string") {
-          const trimmed = s.domains_of_interest.trim();
-          if (trimmed.startsWith("[")) {
-            try {
-              const parsed = JSON.parse(trimmed);
-              domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
-            } catch {
+    // Apply domain filter
+    if (filters.domain !== "All Domains") {
+      filtered = filtered.filter((s) => {
+        // Normalize domains: array, JSON string, comma-separated string, or plain string
+        let domains = "";
+        try {
+          if (Array.isArray(s.domains_of_interest)) {
+            domains = s.domains_of_interest.join(" ");
+          } else if (typeof s.domains_of_interest === "string") {
+            const trimmed = s.domains_of_interest.trim();
+            if (trimmed.startsWith("[")) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
+              } catch {
+                domains = trimmed;
+              }
+            } else {
               domains = trimmed;
             }
+          } else if (Array.isArray(s.domainsOfInterest)) {
+            domains = s.domainsOfInterest.join(" ");
+          } else if (s.domainsOfInterest && typeof s.domainsOfInterest === "string") {
+            domains = s.domainsOfInterest;
           } else {
-            domains = trimmed;
+            domains = "";
           }
-        } else if (Array.isArray(s.domainsOfInterest)) {
-          domains = s.domainsOfInterest.join(" ");
-        } else if (s.domainsOfInterest && typeof s.domainsOfInterest === "string") {
-          domains = s.domainsOfInterest;
-        } else {
+        } catch {
           domains = "";
         }
-      } catch {
-        domains = "";
-      }
 
-      const ai = (s.ai_skill_summary || s.ai_skills || s.ai || "").toString().toLowerCase();
-      const others = (s.othersDomain || s.others_domain || "").toString().toLowerCase();
+        const others = (s.othersDomain || s.others_domain || "").toString().toLowerCase();
+        const combinedDomains = domains.toLowerCase() + " " + others;
+        // Check if the selected domain is included in the combined domains string
+        return combinedDomains.includes(filters.domain.toLowerCase());
+      });
+    }
 
-      return (
-        name.includes(q) ||
-        domains.toString().toLowerCase().includes(q) ||
-        ai.includes(q) ||
-        others.includes(q)
-      );
-    });
+    // Apply search query filter
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      filtered = filtered.filter((s) => {
+        const name =
+          (s.student_name || s.full_name || s.name || s.displayName || "")
+            .toString()
+            .toLowerCase();
+
+        // Normalize domains for search
+        let domains = "";
+        try {
+          if (Array.isArray(s.domains_of_interest)) {
+            domains = s.domains_of_interest.join(" ");
+          } else if (typeof s.domains_of_interest === "string") {
+            const trimmed = s.domains_of_interest.trim();
+            if (trimmed.startsWith("[")) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
+              } catch {
+                domains = trimmed;
+              }
+            } else {
+              domains = trimmed;
+            }
+          } else if (Array.isArray(s.domainsOfInterest)) {
+            domains = s.domainsOfInterest.join(" ");
+          } else if (s.domainsOfInterest && typeof s.domainsOfInterest === "string") {
+            domains = s.domainsOfInterest;
+          } else {
+            domains = "";
+          }
+        } catch {
+          domains = "";
+        }
+
+        const ai = (s.ai_skill_summary || s.ai_skills || s.ai || "").toString().toLowerCase();
+        const others = (s.othersDomain || s.others_domain || "").toString().toLowerCase();
+
+        return (
+          name.includes(q) ||
+          domains.toString().toLowerCase().includes(q) ||
+          ai.includes(q) ||
+          others.includes(q)
+        );
+      });
+    }
 
     setFilteredStudents(filtered);
-  }, [searchQuery, students]); // explicit deps
+  }, [searchQuery, filters, students]); // explicit deps
 
   const fetchStudentDetails = async (studentId) => {
     if (!studentId) return;
@@ -131,6 +183,14 @@ export default function SearchStudents() {
   const handleBackToList = () => {
     setSelectedStudent(null);
     setStudentDetails(null);
+  };
+
+  const onFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const onClearFilters = () => {
+    setFilters({ name: "", domain: "All Domains" });
   };
 
   // ---------- STUDENT DETAILS VIEW ----------
@@ -262,6 +322,12 @@ export default function SearchStudents() {
   return (
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
+        <SearchFilters
+          filters={filters}
+          onFilterChange={onFilterChange}
+          onClearFilters={onClearFilters}
+        />
+
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />

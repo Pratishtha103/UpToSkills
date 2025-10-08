@@ -7,26 +7,39 @@ const pool = require('../config/database');
 // ===============================
 router.get("/search-students", async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, domain } = req.query;
 
-    if (!q || q.trim() === "") {
-      return res.status(400).json({
-        success: false,
-        message: "Search query is required",
-      });
-    }
-
-    const query = `
-      SELECT 
+    let query = `
+      SELECT
         u.id AS user_detail_id,
         u.student_id,
-        u.full_name AS student_name
+        u.full_name AS student_name,
+        u.domains_of_interest,
+        u.ai_skill_summary,
+        u.others_domain
       FROM user_details u
-      WHERE LOWER(u.full_name) LIKE LOWER($1)
-      ORDER BY u.full_name ASC
-      LIMIT 20
+      WHERE 1=1
     `;
-    const values = [`%${q}%`];
+    const values = [];
+    let paramIndex = 1;
+
+    if (q && q.trim() !== "") {
+      query += ` AND LOWER(u.full_name) LIKE LOWER($${paramIndex})`;
+      values.push(`%${q}%`);
+      paramIndex++;
+    }
+
+    if (domain && domain !== "All Domains") {
+      query += ` AND (
+        LOWER(u.domains_of_interest) LIKE LOWER($${paramIndex}) OR
+        LOWER(u.others_domain) LIKE LOWER($${paramIndex}) OR
+        LOWER(u.ai_skill_summary) LIKE LOWER($${paramIndex})
+      )`;
+      values.push(`%${domain}%`);
+      paramIndex++;
+    }
+
+    query += ` ORDER BY u.full_name ASC LIMIT 20`;
 
     const result = await pool.query(query, values);
 
@@ -50,16 +63,19 @@ router.get("/search-students", async (req, res) => {
 router.get("/all-students", async (req, res) => {
   try {
     const query = `
-      SELECT 
+      SELECT
         u.id AS user_detail_id,
         u.student_id,
-        u.full_name AS student_name
+        u.full_name AS student_name,
+        u.domains_of_interest,
+        u.ai_skill_summary,
+        u.others_domain
       FROM user_details u
       ORDER BY u.full_name ASC
     `;
-    
+
     const result = await pool.query(query);
-    
+
     res.status(200).json({
       success: true,
       data: result.rows,

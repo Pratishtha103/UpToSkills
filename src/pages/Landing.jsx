@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
+import logo from "../assets/logo.jpg";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -90,8 +91,8 @@ export default function Landing() {
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <img
-            src="/uptoskill.jpeg"
-            alt="Uptoskills Logo"
+            src={logo}
+            alt="Upto To Skills logo"          
             className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
@@ -223,9 +224,11 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white text-center py-6 text-sm">
-        <p>©2025 Uptoskills. Built by learners.</p>
-      </footer>
+      <footer
+      className="w-full text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+    >
+      <p>© 2025 Uptoskills. Built by learners.</p>
+    </footer>
 
       {/* Chatbot */}
       <Chatbot />

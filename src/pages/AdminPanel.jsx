@@ -1,4 +1,6 @@
-import { useState } from "react";
+// src/pages/AdminPanel.jsx
+
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import AdminNavbar from "../components/AdminPanelDashboard/AdminNavbar";
@@ -9,18 +11,31 @@ import Company from "../components/AdminPanelDashboard/Company";
 import StudentsTable from "../components/AdminPanelDashboard/StudentsTable";
 import CompaniesTable from "../components/AdminPanelDashboard/CompaniesTable";
 import MentorsTable from "../components/AdminPanelDashboard/MentorsTable";
+import Mentors from "../components/AdminPanelDashboard/Mentors";
 import Project from "../components/AdminPanelDashboard/Project";
 import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
 import AdminNotifications from "../components/AdminPanelDashboard/AdminNotifications";
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
+import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
+
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Dark/Light mode state
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Load dark mode from localStorage on mount
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("uptoskills-theme");
+    return savedTheme ? JSON.parse(savedTheme) : false;
+  });
+
+  // Save dark mode setting whenever it changes
+  useEffect(() => {
+    localStorage.setItem("uptoskills-theme", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  // Toggle dark/light theme
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
   const renderActiveModule = () => {
@@ -35,11 +50,23 @@ function AdminPanel() {
       case "students":
         return <Students isDarkMode={isDarkMode} />;
       case "students_table":
-        return <StudentsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
+        return (
+          <StudentsTable
+            isDarkMode={isDarkMode}
+            onNavigateSection={(s) => setActiveSection(s)}
+          />
+        );
+      case "mentors":
+        return <Mentors isDarkMode={isDarkMode} />;
       case "companies":
         return <Company isDarkMode={isDarkMode} />;
       case "companies_table":
-        return <CompaniesTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
+        return (
+          <CompaniesTable
+            isDarkMode={isDarkMode}
+            onNavigateSection={(s) => setActiveSection(s)}
+          />
+        );
       case "projects":
         return <Project isDarkMode={isDarkMode} />;
       case "analytics":
@@ -47,13 +74,25 @@ function AdminPanel() {
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
       case "programs":
-        return <ProgramsAdmin isDarkMode={isDarkMode} onNavigateSection={(s)=>setActiveSection(s)} />;
+        return (
+          <ProgramsAdmin
+            isDarkMode={isDarkMode}
+            onNavigateSection={(s) => setActiveSection(s)}
+          />
+        );
       case "mentors_table":
-        return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
+        return (
+          <MentorsTable
+            isDarkMode={isDarkMode}
+            onNavigateSection={(s) => setActiveSection(s)}
+          />
+        );
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
-      case "courses": 
-        return <Programs isDarkMode={isDarkMode}/>
+      case "courses":
+        return <Programs isDarkMode={isDarkMode} />;
+      case "courses_table":
+        return <CoursesTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       default:
         return <DashboardMain isDarkMode={isDarkMode} />;
     }
@@ -64,7 +103,9 @@ function AdminPanel() {
   return (
     <div
       className={`flex min-h-screen transition-colors duration-500 ${
-        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+        isDarkMode
+          ? "bg-gray-900 text-gray-100"
+          : "bg-gray-50 text-gray-900"
       }`}
     >
       {/* Sidebar */}
@@ -90,7 +131,7 @@ function AdminPanel() {
           toggleTheme={toggleTheme}
         />
 
-        {/* Content */}
+        {/* Main Admin Content */}
         <main className="pt-20 px-4 sm:px-6 py-6">
           <motion.section
             className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${
@@ -123,20 +164,19 @@ function AdminPanel() {
             </motion.p>
           </motion.section>
 
-        {/* Active Module */}
+          {/* Dynamic section render */}
           {renderActiveModule()}
         </main>
 
-        {/* Footer */}
-        <footer
-          className={`text-center py-8 border-t mt-12 transition-all duration-500 ${
-            isDarkMode
-              ? "border-gray-700 text-gray-400"
-              : "border-gray-300 text-gray-600"
-          }`}
-        >
-          <p>© 2025 UptoSkills Team. All rights reserved. ✨</p>
-        </footer>
+       <footer
+  className={`w-full text-center py-4 text-sm border-t transition-colors duration-300 ${
+    isDarkMode
+      ? "bg-gray-900 text-gray-300 border-gray-700"
+      : "bg-gray-100 text-gray-700 border-gray-300"
+  }`}
+>
+  <p>© 2025 Uptoskills. Built by learners.</p>
+</footer>
       </div>
     </div>
   );

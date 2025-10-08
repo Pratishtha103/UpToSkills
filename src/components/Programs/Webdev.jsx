@@ -150,7 +150,12 @@ const enrollStudent = async (studentId) => {
         {/* Skills Card */}
         <div className="max-w-4xl mx-auto bg-white/60 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-blue-100 mb-12 transform transition hover:scale-[1.01]">
           <p className="text-gray-700">
-            <span className="font-bold text-blue-600">Skills:</span> HTML, CSS, JavaScript • React, Angular, or Vue • Responsive Design • Git & Deployment • Hosting Basics
+            <span className="font-bold text-blue-600">Skills:</span>{" "}
+            {course?.skills && course.skills.length > 0 ? (
+              course.skills.join(', ')
+            ) : (
+              "No skills listed"
+            )}
           </p>
         </div>
 

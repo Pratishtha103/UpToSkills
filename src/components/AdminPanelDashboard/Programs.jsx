@@ -220,7 +220,6 @@ export default function Programs({ onCoursesUpdate }) {
               />
             )}
           </div>
-
           <button
             type="submit"
             disabled={isSubmitting}

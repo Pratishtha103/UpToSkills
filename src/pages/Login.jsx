@@ -45,7 +45,7 @@ const LoginForm = () => {
       alert("Admin login successful");
 
       const adminUser = {
-        name: "SmartCart Admin",
+        name: "Admin",
         email: hardcodedAdmin.email,
         role: hardcodedAdmin.role,
       };

@@ -29,7 +29,7 @@ const sidebarItems = [
     { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
     
     // Kept the Lucide Bell icon
-    { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
+    // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
     
     // Removed duplicate entries for Project Showcase and About Us
     { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },

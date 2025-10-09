@@ -44,7 +44,12 @@ const LoginForm = () => {
       if (response.data.token) localStorage.setItem("token", response.data.token);
       const roleToSave = response.data.user?.role || formData.role;
       localStorage.setItem("role", roleToSave);
-
+    
+      // Save user detail for mentor
+      if (roleToSave === "mentor" && response.data.user) {
+      localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      }
+      
       // redirect based on role
       const role = response.data.user?.role || formData.role;
       if (role === "admin") navigate("/adminPanel");

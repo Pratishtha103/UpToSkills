@@ -1,9 +1,11 @@
+// src/components/Student_Dashboard/myProjects/ProjectSubmissionForm.jsx
+
 import React, { useState } from "react";
 import Footer from "../../Student_Dashboard/dashboard/Footer";
 
 function ProjectSubmissionForm() {
   const [formData, setFormData] = useState({
-    student_id: "",
+    student_mail_id: "",
     title: "",
     description: "",
     tech_stack: "",
@@ -33,8 +35,9 @@ function ProjectSubmissionForm() {
 
       if (response.ok) {
         setShowModal(true);
+        // Clear the form data upon successful submission
         setFormData({
-          student_id: "",
+          student_mail_id: "",
           title: "",
           description: "",
           tech_stack: "",
@@ -43,21 +46,26 @@ function ProjectSubmissionForm() {
           github_pr_link: "",
         });
       } else {
-        alert("Failed to submit project");
+        const errorData = await response.json();
+        alert(`Failed to submit project: ${errorData.message || 'Server error'}`);
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 
   const closeModal = () => setShowModal(false);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-tr from-blue-100 to-indigo-200 dark:from-gray-900 dark:to-gray-800">
+    // Outer flex container that handles the entire layout (content + footer)
+    <div className="flex flex-col min-h-screen">
       
-      {/* Main Content */}
-      <div className="flex-grow flex items-center justify-center px-4 py-10">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-200 dark:border-gray-700 relative transition-all duration-500">
+      {/* Main Content Wrapper - Use flex-grow to take up available space */}
+      <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        
+        {/* Card Container - max-w-3xl for wider card and mx-auto for centering */}
+        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700 relative transition-all duration-500">
           
           {/* Header */}
           <h2 className="text-3xl font-extrabold text-center mb-4 text-indigo-700 dark:text-indigo-400">
@@ -67,14 +75,14 @@ function ProjectSubmissionForm() {
             Submit your project details below.
           </p>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Form - Use space-y-4 for slightly better spacing on a large form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             {[
               {
-                label: "Student ID",
-                name: "student_id",
-                type: "number",
-                placeholder: "Your Student ID",
+                label: "Student Mail ID",
+                name: "student_mail_id",
+                type: "email",
+                placeholder: "Your Student Mail ID (e.g., student@mail.com)",
               },
               {
                 label: "Project Title",
@@ -102,7 +110,7 @@ function ProjectSubmissionForm() {
                 <input
                   type={field.type}
                   name={field.name}
-                  value={formData[field.name]}
+                  value={formData[field.name] || ''}
                   onChange={handleChange}
                   placeholder={field.placeholder}
                   className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm"
@@ -144,7 +152,7 @@ function ProjectSubmissionForm() {
             </div>
 
             {/* Open Source */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center pt-2 space-x-3">
               <input
                 type="checkbox"
                 name="is_open_source"
@@ -159,7 +167,7 @@ function ProjectSubmissionForm() {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition duration-300 shadow-lg hover:shadow-indigo-400 dark:hover:shadow-indigo-800"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition duration-300 shadow-lg hover:shadow-indigo-400 dark:hover:shadow-indigo-800 mt-6"
             >
               🚀 Submit Project
             </button>
@@ -167,9 +175,9 @@ function ProjectSubmissionForm() {
 
           {/* Success Modal */}
           {showModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-xl w-full max-w-md transform scale-100 transition-all border border-gray-200 dark:border-gray-700">
-                <h3 className="text-xl font-bold text-center text-green-600 dark:text-green-400 mb-4">
+                <h3 className="text-2xl font-bold text-center text-green-600 dark:text-green-400 mb-4">
                   ✅ Project Submitted!
                 </h3>
                 <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
@@ -186,8 +194,8 @@ function ProjectSubmissionForm() {
           )}
         </div>
       </div>
-
-      {/* Footer */}
+      
+      {/* Footer is now a sibling of the main content wrapper */}
       <Footer />
     </div>
   );

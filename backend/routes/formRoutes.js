@@ -1,12 +1,13 @@
 const express = require('express');
-const multer = require('multer');
-const { createProgram, getPrograms, getProgramById } = require('../controllers/programs.controller');
+const { sendContactEmail } = require('../controllers/form.controller'); // Import the controller function
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
-router.post('/', upload.single('resume'), createProgram);
-router.get('/', getPrograms);
-router.get('/:id', getProgramById);
+/**
+ * @route POST /api/forms/contact
+ * @desc Handle contact form submission and send email
+ * @access Public
+ */
+router.post('/contact', sendContactEmail);
 
 module.exports = router;

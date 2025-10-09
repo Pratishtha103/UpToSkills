@@ -1,35 +1,79 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import Chatbot from '../components/Contact_Page/Chatbot';
+import { useNavigate } from "react-router-dom";
+import Chatbot from "../components/Contact_Page/Chatbot";
 
-export default function App() {
+export default function Landing() {
+  const navigate = useNavigate();
+
+  // Get user from localStorage
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  // Redirect logged-in users automatically based on role
+  useEffect(() => {
+    if (user) {
+      if (user.role === "learner") navigate("/dashboard");
+      else if (user.role === "company") navigate("/company");
+      else if (user.role === "mentor") navigate("/mentor-dashboard");
+    }
+  }, [user, navigate]);
+
+  // Handle feature-based navigation
+  const handleNavigation = (role) => {
+    if (!user) return navigate("/login"); // Not logged in
+    if (role === "learner" && user.role === "learner") navigate("/dashboard");
+    else if (role === "company" && user.role === "company") navigate("/company");
+    else if (role === "mentor" && user.role === "mentor") navigate("/mentor-dashboard");
+    else navigate("/login"); // Role mismatch
+  };
+
+  // Features section data
+  const features = [
+    {
+      title: "For Learners",
+      icon: "https://static.thenounproject.com/png/7914064-512.png",
+      desc: "Sharpen your tech skills with projects and peer sessions.",
+      role: "learner",
+    },
+    {
+      title: "For Companies",
+      icon: "https://cdn-icons-png.flaticon.com/512/2858/2858749.png",
+      desc: "Hire pre-vetted, job-ready talent from our community.",
+      role: "company",
+    },
+    {
+      title: "For Mentors",
+      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
+      desc: "Provide guidance and mentorship opportunities.",
+      role: "mentor",
+    },
+  ];
+
   return (
     <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
 
       {/* Header */}
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          <Link to="/" aria-label="Uptoskills Home">
-            <img
-              src="/uptoskill.jpeg"
-              alt="Uptoskills Logo"
-              className="h-10 transition-transform hover:scale-110"
-            />
-          </Link>
-
+          <img
+            src="/uptoskill.jpeg"
+            alt="Uptoskills Logo"
+            className="h-10 transition-transform hover:scale-110 cursor-pointer"
+            onClick={() => navigate("/")}
+          />
           <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
             {["Home", "About", "Programs", "Contact"].map((link, i) => {
-              const path =
-                link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+              const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
               return (
-                <Link
+                <span
                   key={i}
-                  to={path}
-                  className="relative group hover:text-[#00BDA6]"
+                  className="relative group hover:text-[#00BDA6] cursor-pointer"
+                  onClick={() => navigate(path)}
                 >
                   {link}
                   <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#00BDA6] group-hover:w-full transition-all duration-300" />
-                </Link>
+                </span>
               );
             })}
           </nav>
@@ -54,16 +98,18 @@ export default function App() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="/login">
-                <button className="bg-gradient-to-r from-[#00BDA6] to-[#1BBC9B] hover:from-[#f97316] hover:to-[#fb923c] text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-500 w-full sm:w-auto">
-                   Login
-                </button>
-              </a>
-              <a href="/register">
-                <button className="bg-gradient-to-r from-[#f97316] to-[#fb923c] hover:from-[#00BDA6] hover:to-[#1BBC9B] text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-500 w-full sm:w-auto">
-                   Register
-                </button>
-              </a>
+              <button
+                className="bg-gradient-to-r from-[#00BDA6] to-[#1BBC9B] hover:from-[#f97316] hover:to-[#fb923c] text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-500 w-full sm:w-auto"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+              <button
+                className="bg-gradient-to-r from-[#f97316] to-[#fb923c] hover:from-[#00BDA6] hover:to-[#1BBC9B] text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-500 w-full sm:w-auto"
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </button>
             </div>
           </motion.div>
 
@@ -77,7 +123,6 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.9 }}
             />
-
             <motion.img
               src="https://img.freepik.com/free-vector/programming-concept-illustration_114360-1351.jpg"
               alt="Secondary Hero"
@@ -86,7 +131,6 @@ export default function App() {
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 1 }}
             />
-
             <motion.img
               src="https://img.freepik.com/free-vector/college-project-concept-illustration_114360-7793.jpg"
               alt="Floating Hero"
@@ -103,28 +147,12 @@ export default function App() {
       <section className="py-20 px-6 md:px-16 bg-white text-center">
         <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {[
-            {
-              title: "For Learners",
-              icon: "https://static.thenounproject.com/png/7914064-512.png",
-              desc: "Sharpen your tech skills with projects and peer sessions.",
-            },
-            {
-              title: "For Companies",
-              icon: "https://cdn-icons-png.flaticon.com/512/2858/2858749.png",
-              desc: "Hire pre-vetted, job-ready talent from our community.",
-            },
-            {
-              title: "Success Stories",
-              icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
-              desc: "Real journeys of learners growing into tech professionals.",
-            },
-          ].map((box, i) => (
+          {features.map((box, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.06 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition 
+              onClick={() => handleNavigation(box.role)}
+              className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition 
                 bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B] 
                 hover:from-[#f97316] hover:to-[#fb923c]"
             >

@@ -173,7 +173,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
             : "bg-white border border-gray-200"
         }`}
       >
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
+        {/* <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
           <h3
             className={`text-lg font-semibold ${
               isDarkMode ? "text-white" : "text-gray-800"
@@ -181,9 +181,9 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
           >
             Top Programs
           </h3>
-        </div>
+        </div> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
+         {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto      px-6">
           {courses.length === 0 && !loading && (
             <p className="text-gray-600 dark:text-gray-300 col-span-full text-center">
               No courses available. Please add a course.
@@ -204,10 +204,10 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
                   alt={course.title}
                   className="w-full h-48 object-cover"
                 />
-              )}
+              )} */}
 
               {/* === Card Content === */}
-              <div className="p-4">
+              {/* <div className="p-4">
                 <h3
                   className={`text-lg font-bold mb-2 ${
                     isDarkMode
@@ -270,7 +270,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </section>
     </main>
   );

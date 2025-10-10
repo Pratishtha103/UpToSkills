@@ -15,7 +15,6 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-  // Fetch existing profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -86,7 +85,6 @@ export default function EditProfile() {
 
       if (res.data.success) {
         alert("Profile saved successfully!");
-        console.log("Response:", res.data.data);
       } else {
         alert("Failed to save profile.");
       }
@@ -121,7 +119,7 @@ export default function EditProfile() {
                 value={formData.companyName}
                 onChange={handleChange}
                 required
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
             </div>
 
@@ -132,7 +130,7 @@ export default function EditProfile() {
                 type="file"
                 accept="image/*"
                 onChange={handleLogoChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
               />
               {formData.logoPreview && (
                 <img
@@ -151,7 +149,7 @@ export default function EditProfile() {
                 name="website"
                 value={formData.website}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
             </div>
 
@@ -182,7 +180,7 @@ export default function EditProfile() {
                 name="contact"
                 value={formData.contact}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
             </div>
 
@@ -196,11 +194,7 @@ export default function EditProfile() {
           </form>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full">
-        <Footer />
-      </footer>
+      <Footer />
     </div>
   );
 }

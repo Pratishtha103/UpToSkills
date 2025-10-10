@@ -124,13 +124,13 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
       <header className="mb-6">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold">Programs</h1>
+            <h1 className="text-3xl font-extrabold">Courses</h1>
             <p className={`mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Overview of all courses and quick actions.</p>
           </div>
 
           <div className="flex items-center gap-3">
             <button onClick={() => onNavigateSection && onNavigateSection('dashboard')} className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'} shadow-sm border`}>← Back</button>
-            <button onClick={() => onNavigateSection && onNavigateSection('courses')} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">New Program</button>
+            <button onClick={() => onNavigateSection && onNavigateSection('courses')} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">New Course</button>
           </div>
         </div>
 

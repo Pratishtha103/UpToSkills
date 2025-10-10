@@ -177,9 +177,120 @@ const searchStudentsByQuery = async (req, res) => {
   }
 };
 
+/**
+ * ✅ Get complete student details with all activities
+ * Route: /api/students/:id/details
+ * Returns profile, projects, badges, enrollments, and attendance
+ */
+const getStudentDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get basic profile info
+    const profileQuery = `
+      SELECT
+        s.id,
+        s.full_name,
+        s.email,
+        s.phone,
+        s.created_at,
+        u.full_name AS profile_full_name,
+        u.contact_number,
+        u.linkedin_url,
+        u.github_url,
+        u.why_hire_me,
+        u.profile_completed,
+        u.ai_skill_summary,
+        u.domains_of_interest,
+        u.others_domain,
+        u.created_at AS profile_created_at,
+        u.updated_at AS profile_updated_at
+      FROM students s
+      LEFT JOIN user_details u ON s.id = u.student_id
+      WHERE s.id = $1;
+    `;
+
+    // Get projects
+    const projectsQuery = `
+      SELECT 
+        id, title, description, tech_stack, contributions,
+        is_open_source, github_pr_link, created_at, updated_at
+      FROM projects
+      WHERE student_id = $1
+      ORDER BY created_at DESC;
+    `;
+
+    // Get skill badges
+    const badgesQuery = `
+      SELECT 
+        sb.id, sb.name, sb.description, sb.is_verified,
+        stb.awarded_at
+      FROM student_badges stb
+      JOIN skill_badges sb ON stb.badge_id = sb.id
+      WHERE stb.student_id = $1
+      ORDER BY stb.awarded_at DESC;
+    `;
+
+    // Get enrollments
+    const enrollmentsQuery = `
+      SELECT 
+        e.id, e.enrolled_at, e.status,
+        c.title AS course_name, c.description AS course_description
+      FROM enrollments e
+      JOIN courses c ON e.course_id = c.id
+      WHERE e.student_id = $1
+      ORDER BY e.enrolled_at DESC;
+    `;
+
+    // Get attendance
+    const attendanceQuery = `
+      SELECT date, status, created_at
+      FROM attendance
+      WHERE student_id = $1
+      ORDER BY date DESC
+      LIMIT 30;
+    `;
+
+    // Execute all queries
+    const [profileResult, projectsResult, badgesResult, enrollmentsResult, attendanceResult] = await Promise.all([
+      pool.query(profileQuery, [id]),
+      pool.query(projectsQuery, [id]),
+      pool.query(badgesQuery, [id]),
+      pool.query(enrollmentsQuery, [id]),
+      pool.query(attendanceQuery, [id])
+    ]);
+
+    if (profileResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    const studentDetails = {
+      profile: profileResult.rows[0],
+      projects: projectsResult.rows,
+      badges: badgesResult.rows,
+      enrollments: enrollmentsResult.rows,
+      attendance: attendanceResult.rows,
+      stats: {
+        totalProjects: projectsResult.rows.length,
+        totalBadges: badgesResult.rows.length,
+        totalEnrollments: enrollmentsResult.rows.length,
+        attendanceRate: attendanceResult.rows.length > 0 
+          ? ((attendanceResult.rows.filter(a => a.status === 'present').length / attendanceResult.rows.length) * 100).toFixed(1)
+          : 0
+      }
+    };
+
+    return res.status(200).json({ success: true, data: studentDetails });
+  } catch (err) {
+    console.error('getStudentDetails error:', err);
+    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+};
+
 module.exports = {
   getStudents,
   getStudentById,
   searchStudents,
   searchStudentsByQuery,
+  getStudentDetails,
 };

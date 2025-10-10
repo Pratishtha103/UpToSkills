@@ -7,7 +7,8 @@ const {
   getStudents,
   getStudentById,
   searchStudents,
-  searchStudentsByQuery
+  searchStudentsByQuery,
+  getStudentDetails
 } = require('../controllers/students.controller');
 
 // Route: get student count (keeps your existing count route)
@@ -64,6 +65,9 @@ router.get('/all-students', getStudents);
 
 // Keep root route (getStudents) at /api/students/
 router.get('/', getStudents);
+
+// Get complete student details with all activities
+router.get('/:id/details', getStudentDetails);
 
 // Provide "student/:id" alias (used by your frontend code) -> maps to getStudentById
 router.get('/student/:id', getStudentById);

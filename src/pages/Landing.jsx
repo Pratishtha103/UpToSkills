@@ -141,6 +141,7 @@ export default function Landing() {
 
           {/* Animated Illustrations */}
           <div className="relative flex justify-center items-center">
+            {/* 1. Main Hero (Kept as is - The reference animation) */}
             <motion.img
               src="https://img.freepik.com/free-vector/online-world-concept-illustration_114360-1206.jpg"
               alt="Main Hero"
@@ -149,21 +150,25 @@ export default function Landing() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.9 }}
             />
+
+            {/* 2. Secondary Hero (Animation changed to match Main Hero) */}
             <motion.img
               src="https://img.freepik.com/free-vector/programming-concept-illustration_114360-1351.jpg"
               alt="Secondary Hero"
               className="absolute top-[-40px] right-[-30px] w-40 md:w-48 shadow-xl rounded-lg z-0 opacity-80"
-              initial={{ scale: 0.9, rotate: -5, opacity: 0 }}
-              animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 1 }}
+              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
+              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid
+              transition={{ delay: 0.6, duration: 0.9 }} // Kept delay, matched duration
             />
+
+            {/* 3. Floating Hero (Animation changed to match Main Hero) */}
             <motion.img
               src="https://img.freepik.com/free-vector/college-project-concept-illustration_114360-7793.jpg"
               alt="Floating Hero"
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: [20, 0, 20], opacity: 1 }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
+              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid (REMOVES REPEAT)
+              transition={{ delay: 0.9, duration: 0.9 }} // Added delay, matched duration (REMOVES REPEAT: INFINITY)
             />
           </div>
         </div>

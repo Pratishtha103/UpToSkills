@@ -38,8 +38,11 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const location = useLocation();
-  if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
-  return children;
+  return children; // disable login protection
+
+  //if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
+  //return children;
+
 }
 
 function App() {
@@ -115,8 +118,7 @@ function App() {
               <Dashboard_Project />
             </ProtectedRoute>
           } />
-
-          {/* keep login/register public so users can authenticate */}
+           {/* keep login/register public so users can authenticate */}
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
 
@@ -171,11 +173,11 @@ function App() {
               <Webdev />
             // </ProtectedRoute>
           } />
-          <Route path='/data-science' element={
+          {/* {/* <Route path='/data-science' element={
             // <ProtectedRoute>
               <Datascience />
             // </ProtectedRoute>
-          } />
+          } /> */}
           <Route path='/cloud-computing' element={
             // <ProtectedRoute>
               <Cloudcompute />
@@ -202,5 +204,8 @@ function App() {
     </QueryClientProvider>
   );
 }
-
 export default App;
+
+         
+
+          

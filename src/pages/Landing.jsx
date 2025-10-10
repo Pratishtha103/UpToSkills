@@ -1,6 +1,6 @@
 // src/pages/Landing.jsx
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
@@ -13,39 +13,34 @@ export default function Landing() {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  // State to track selected role in dropdown (default student)
+  // Track selected role (default student)
   const [selectedRole, setSelectedRole] = useState("student");
 
-  // Allow visiting home page even if logged in, so remove auto redirect from useEffect
-  // We only redirect when clicking the "What We Offer" boxes
-
-  // Handle feature-based navigation with role selection
+  // Handle role-based navigation
   const handleNavigation = (role) => {
-    // If logged in
     if (user) {
-      // If user is student/learner and clicked learner, go to student dashboard
-      if (role === "learner" && (user.role === "student" || user.role === "learner")) {
+      const userRole = user.role?.toLowerCase();
+
+      // Student/Learner → Dashboard
+      if (role === "learner" && (userRole === "student" || userRole === "learner")) {
         navigate("/dashboard");
         return;
       }
-      // If user is company and clicked company, go to company dashboard
-      else if (role === "company" && user.role === "company") {
+
+      // Company → Company Dashboard
+      if (role === "company" && userRole === "company") {
         navigate("/company");
         return;
       }
-      // If user is mentor and clicked mentor, go to mentor dashboard
-      else if (role === "mentor" && user.role === "mentor") {
+
+      // Mentor → Mentor Dashboard
+      if (role === "mentor" && userRole === "mentor") {
         navigate("/mentor-dashboard");
-        return;
-      }
-      // Role mismatch or other roles - fallback to login
-      else {
-        navigate("/login");
         return;
       }
     }
 
-    // If not logged in, go to login page with appropriate role preset
+    // If user not logged in, redirect to login with role pre-selected
     let loginRole = "student";
     if (role === "company") loginRole = "company";
     else if (role === "mentor") loginRole = "mentor";
@@ -55,14 +50,13 @@ export default function Landing() {
     navigate("/login", { state: { role: loginRole } });
   };
 
-  // Handle dropdown role change and navigate to login with role preset
+  // Dropdown handler
   const handleRoleChange = (e) => {
     const role = e.target.value;
     setSelectedRole(role);
     navigate("/login", { state: { role } });
   };
 
-  // Features section data
   const features = [
     {
       title: "For Learners",
@@ -72,13 +66,13 @@ export default function Landing() {
     },
     {
       title: "For Companies",
-      icon: "https://img.icons8.com/?size=100&id=103932&format=png&color=000000",
+      icon: "https://img.icons8.com/?size=100&id=113856&format=png&color=000000",
       desc: "Hire pre-vetted, job-ready talent from our community.",
       role: "company",
     },
     {
       title: "For Mentors",
-      icon: "https://img.icons8.com/?size=100&id=X1vxi3fL5Dvz&format=png&color=000000",
+      icon: "https://img.icons8.com/?size=100&id=mBzT9ySeO_go&format=png&color=000000",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },
@@ -86,7 +80,6 @@ export default function Landing() {
 
   return (
     <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
-
       {/* Header */}
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
@@ -170,7 +163,7 @@ export default function Landing() {
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: [20, 0, 20], opacity: 1 }}
-              transition={{ repeat: 0, duration: 1, ease: "easeInOut" }}
+              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
             />
           </div>
         </div>
@@ -224,11 +217,9 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer
-      className="w-full text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-    >
-      <p>© 2025 Uptoskills. Built by learners.</p>
-    </footer>
+      <footer className="bg-gray-900 text-white text-center py-6 text-sm">
+        <p>©2025 Uptoskills. Built by learners.</p>
+      </footer>
 
       {/* Chatbot */}
       <Chatbot />

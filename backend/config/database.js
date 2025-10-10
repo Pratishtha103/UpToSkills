@@ -6,7 +6,7 @@ const pool = new Pool({
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
   user: process.env.DB_USER || process.env.ADMIN_DB_USER,
-  password: process.env.DB_PASSWORD || process.env.ADMIN_DB_PASSWORD,
+  password: String(process.env.DB_PASSWORD) || String(process.env.ADMIN_DB_PASSWORD),
   // Ensure DB_PORT is an integer if required by pg
   port: parseInt(process.env.DB_PORT, 10) || 5432, 
   ssl: process.env.DB_SSLMODE === 'require' ? { 
@@ -19,7 +19,6 @@ const pool = new Pool({
 // The pool will connect lazily when a query is executed.
 
 // Optional: A safe, async connection test function if you want to run it on server startup:
-
 async function testDbConnection() {
   try {
     const client = await pool.connect();

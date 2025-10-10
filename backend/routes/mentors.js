@@ -1,48 +1,44 @@
 // routes/mentors.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require('../config/database');
+const pool = require("../config/database");
 
-// GET total mentors
-router.get('/count', async (req, res) => {
+// ✅ GET all mentors (with email joined from mentors table)
+router.get("/", async (req, res) => {
   try {
-    const result = await pool.query('SELECT COUNT(*)::int AS total_mentors FROM mentors');
-    res.json({ totalMentors: result.rows[0].total_mentors });
+    const result = await pool.query(`
+      SELECT 
+        md.id,
+        md.full_name,
+        md.username,
+        md.contact_number AS phone,
+        md.linkedin_url,
+        md.github_url,
+        md.about_me,
+        md.expertise_domains,
+        md.others_domain,
+        m.email
+      FROM mentor_details md
+      LEFT JOIN mentors m ON md.mentor_id = m.id
+      ORDER BY md.id DESC
+    `);
+
+    res.json(result.rows);
   } catch (err) {
-    console.error('❌ Error fetching mentor count:', err.message);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("❌ Error fetching mentors list:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
-// GET all mentors (list)
-router.get('/', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, full_name, email, phone FROM mentors ORDER BY id DESC'
-    );
-    // return an array of mentor rows
-    return res.json(result.rows);
-  } catch (err) {
-    console.error('❌ Error fetching mentors list:', err.message);
-    // Fallback sample data so frontend can function while DB is unreachable
-    const sample = [
-      { id: 1, full_name: 'John Doe', email: 'john.doe@example.com', phone: '+1 555-1234' },
-      { id: 2, full_name: 'Jane Smith', email: 'jane.smith@example.com', phone: '+1 555-5678' },
-      { id: 3, full_name: 'Aisha Khan', email: 'aisha.khan@example.com', phone: '+91 98765 43210' },
-    ];
-    return res.json(sample);
-  }
-});
-
-// DELETE mentor by id
-router.delete('/:id', async (req, res) => {
+// ✅ DELETE mentor by id
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM mentors WHERE id = $1', [id]);
-    return res.json({ message: 'Mentor deleted' });
+    await pool.query("DELETE FROM mentor_details WHERE id = $1", [id]);
+    res.json({ message: "Mentor deleted successfully" });
   } catch (err) {
-    console.error('❌ Error deleting mentor:', err.message);
-    return res.status(500).json({ message: 'Server Error' });
+    console.error("❌ Error deleting mentor:", err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 

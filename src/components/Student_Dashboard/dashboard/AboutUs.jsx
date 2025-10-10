@@ -7,6 +7,20 @@ import { FaLinkedin, FaPhone, FaEnvelope, FaUsers } from "react-icons/fa";
 
 export default function AboutUs() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // detect dark mode from body or system preference
+    const checkDark = () =>
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -19,7 +33,11 @@ export default function AboutUs() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-gray-100">
+    <div
+      className={`flex min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
+    >
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
@@ -36,15 +54,25 @@ export default function AboutUs() {
         >
           <div className="max-w-6xl mx-auto">
             {/* About Section */}
-            <div className="bg-gray-800/60 rounded-2xl p-8 shadow-md border border-gray-700">
+            <div
+              className={`rounded-2xl p-8 shadow-md border transition-colors duration-300 ${
+                isDarkMode
+                  ? "bg-gray-800/60 border-gray-700"
+                  : "bg-white border-gray-200"
+              }`}
+            >
               <div className="flex items-center gap-3 mb-6">
                 <FaUsers className="text-orange-500 text-3xl" />
                 <h1 className="text-3xl font-bold">About UptoSkill</h1>
               </div>
 
-              <p className="text-gray-300 mb-6">
-                Empowering students to build skills, collaborate, and grow through
-                real-world projects and personalized mentorship.
+              <p
+                className={`mb-6 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Empowering students to build skills, collaborate, and grow
+                through real-world projects and personalized mentorship.
               </p>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -53,27 +81,44 @@ export default function AboutUs() {
                   <h2 className="text-orange-500 font-semibold text-xl mb-3">
                     Our Mission
                   </h2>
-                  <p className="text-gray-300 mb-4">
-                    UptoSkill connects ambitious students with professional mentors,
-                    enabling hands-on project experience, valuable insights, and
-                    growth-oriented learning opportunities.
+                  <p
+                    className={`mb-4 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    UptoSkill connects ambitious students with professional
+                    mentors, enabling hands-on project experience, valuable
+                    insights, and growth-oriented learning opportunities.
                   </p>
 
                   <h3 className="text-lg font-semibold mb-2">
                     What students can do
                   </h3>
-                  <ul className="list-disc list-inside space-y-2 text-gray-300">
+                  <ul
+                    className={`list-disc list-inside space-y-2 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
                     <li>Collaborate with experienced mentors on real projects.</li>
                     <li>Gain feedback to improve technical and soft skills.</li>
                     <li>
-                      Build an impressive portfolio with industry-level guidance.
+                      Build an impressive portfolio with industry-level
+                      guidance.
                     </li>
                   </ul>
-                  <hr className="border-gray-600 my-4" />
-                  <p className="text-gray-400 text-sm">
-                    We believe in practical learning and teamwork. UptoSkill helps
-                    students develop confidence and employable skills through
-                    mentorship, structured learning, and collaboration.
+                  <hr
+                    className={`my-4 ${
+                      isDarkMode ? "border-gray-600" : "border-gray-300"
+                    }`}
+                  />
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    We believe in practical learning and teamwork. UptoSkill
+                    helps students develop confidence and employable skills
+                    through mentorship, structured learning, and collaboration.
                   </p>
                 </div>
 
@@ -82,20 +127,32 @@ export default function AboutUs() {
                   <h2 className="text-orange-500 font-semibold text-xl mb-3">
                     Values & Approach
                   </h2>
-                  <p className="text-gray-300 mb-4">
-                    We value experiential learning that drives growth. UptoSkill is
-                    designed to make student learning interactive, collaborative,
-                    and career-focused.
+                  <p
+                    className={`mb-4 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    We value experiential learning that drives growth. UptoSkill
+                    is designed to make student learning interactive,
+                    collaborative, and career-focused.
                   </p>
 
-                  <div className="bg-gray-700/60 p-4 rounded-xl">
+                  <div
+                    className={`p-4 rounded-xl transition-colors ${
+                      isDarkMode ? "bg-gray-700/60" : "bg-gray-100"
+                    }`}
+                  >
                     <h3 className="font-semibold text-orange-400 mb-1">
                       Why students choose UptoSkill
                     </h3>
-                    <p className="text-gray-300 text-sm">
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       UptoSkill empowers students to explore new domains, get
-                      guidance from experts, and build a strong foundation for their
-                      future careers.
+                      guidance from experts, and build a strong foundation for
+                      their future careers.
                     </p>
                   </div>
                 </div>
@@ -110,7 +167,11 @@ export default function AboutUs() {
               <h2 className="text-3xl font-bold mt-2 mb-4">
                 We’re here to Help You
               </h2>
-              <p className="text-gray-400 max-w-3xl mx-auto mb-10">
+              <p
+                className={`max-w-3xl mx-auto mb-10 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
                 Got a project in mind? We’d love to hear about it. Take a few
                 minutes to fill out our project form so we can get to know you
                 and understand your project.
@@ -122,37 +183,69 @@ export default function AboutUs() {
                   href="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                  className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
                 >
                   <FaLinkedin
                     className="text-orange-500 mx-auto mb-4"
                     size={40}
                   />
-                  <h3 className="text-lg font-semibold mb-2">Get to Know Us:</h3>
-                  <p className="text-gray-400">www.LinkedIn.com</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Get to Know Us:
+                  </h3>
+                  <p
+                    className={`${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    www.LinkedIn.com
+                  </p>
                 </a>
 
                 {/* Phone */}
                 <a
                   href="tel:+919319772294"
-                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                  className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
                 >
                   <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
                   <h3 className="text-lg font-semibold mb-2">Phone Us 24/7:</h3>
-                  <p className="text-gray-400">+91 (931) 977 2294</p>
+                  <p
+                    className={`${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    +91 (931) 977 2294
+                  </p>
                 </a>
 
                 {/* Email */}
                 <a
-                  href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
-                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                  href="mailto:info@uptoskills.com"
+                  className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
                 >
                   <FaEnvelope
                     className="text-orange-500 mx-auto mb-4"
                     size={40}
                   />
                   <h3 className="text-lg font-semibold mb-2">Mail Us 24/7:</h3>
-                  <p className="text-gray-400">info@uptoskills.com</p>
+                  <p
+                    className={`${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    info@uptoskills.com
+                  </p>
                 </a>
               </div>
             </section>

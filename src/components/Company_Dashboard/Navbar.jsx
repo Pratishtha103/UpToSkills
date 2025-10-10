@@ -5,6 +5,7 @@ import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/darkLogo.jpg";
+import { Link } from "react-router-dom";
 
 export default function Navbar({ onMenuClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -51,14 +52,14 @@ export default function Navbar({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 // **Dynamically set the src based on the theme**
                 src={isDarkMode ? darkLogo : logo} 
                 alt="UptoSkill Logo"
                 className="object-contain w-25 h-25"
               />
-            </div>
+            </Link>
           </motion.div>
         </div>
 

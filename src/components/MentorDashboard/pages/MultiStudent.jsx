@@ -233,7 +233,15 @@ const MultiStudent = ({ isDarkMode, setIsDarkMode }) => {
         </main>
 
         {/* Assuming Footer handles its own dark mode internally */}
-        <Footer />
+        <footer
+  className={`w-full text-center py-4 text-sm border-t transition-colors duration-300 ${
+    isDarkMode
+      ? "bg-gray-900 text-gray-300 border-gray-700"
+      : "bg-gray-100 text-gray-700 border-gray-300"
+  }`}
+>
+  <p>© 2025 Uptoskills. Built by learners.</p>
+</footer>
       </div>
     </div>
   );

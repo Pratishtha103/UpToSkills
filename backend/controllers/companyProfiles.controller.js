@@ -48,7 +48,7 @@ const getMyCompanyProfile = async (req, res) => {
     const companyId = req.user.id;
 
     const result = await pool.query(
-      `SELECT c.id AS company_id, c.company_name, c.email, c.phone,
+      `SELECT c.id AS company_id, c.company_name, c.username,c.email, c.phone,
               cp.id AS profile_id, cp.name, cp.website, cp.industry, cp.contact, cp.logo_url, cp.created_at, cp.updated_at
        FROM companies c
        LEFT JOIN company_profiles cp ON cp.company_id = c.id
@@ -64,6 +64,7 @@ const getMyCompanyProfile = async (req, res) => {
     const merged = {
       company_id: row.company_id,
       company_name: row.company_name,
+      username: row.username,
       email: row.email,
       phone: row.phone,
       profile_id: row.profile_id,
@@ -93,6 +94,7 @@ const addOrUpdateCompanyProfile = async (req, res) => {
     }
 
     const companyId = req.user.id;
+    const username = req.body.username || null;
     const name = req.body.name || req.body.companyName || null;
     const website = req.body.website || null;
     const industry = req.body.industry || null;
@@ -123,7 +125,7 @@ const addOrUpdateCompanyProfile = async (req, res) => {
       // INSERT new profile
       result = await pool.query(
         `INSERT INTO company_profiles (company_id, name, website, industry, contact, logo_url, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW(),$7)
          RETURNING *`,
         [companyId, name, website, industry, contact, logo_url]
       );

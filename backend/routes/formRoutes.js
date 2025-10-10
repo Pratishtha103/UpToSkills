@@ -1,8 +1,8 @@
 const express = require('express');
 const multer = require('multer');
+// CORRECTED: programs.controller (plural) and form.controller (new)
 const { createProgram, getPrograms, getProgramById } = require('../controllers/programs.controller');
-// FIX: Using the convention 'form.controller'
-const { sendContactEmail } = require('../controllers/form.controller'); 
+const { sendContactEmail } = require('../controllers/form.controller');
 
 const router = express.Router();
 

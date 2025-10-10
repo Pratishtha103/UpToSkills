@@ -225,8 +225,6 @@ const DashboardMain = () => {
         </ul>
       </section>
 
-      {/* Footer */}
-      <Footer />
     </main>
   );
 };

@@ -26,6 +26,11 @@ const searchStudent = require('./routes/searchStudents');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const path = require('path');
+
+// Serve uploads folder correctly
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Middleware
 app.use(cors({
     origin: 'http://localhost:3000', // React frontend port

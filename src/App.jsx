@@ -18,6 +18,7 @@ import MentorDashboardRoutes from './pages/MentorDashboardRoutes';
 import AdminPanel from './pages/AdminPanel';
 import ProgramsPage from './pages/ProgramsPage';
 import Chatbot from './components/Contact_Page/Chatbot';
+import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 
 // About Page components
 import Header from './components/AboutPage/Header';
@@ -62,6 +63,7 @@ function App() {
 
           {/* ===== Company Dashboard Routes ===== */}
           <Route path="/company" element={<CompanyDashboardHome />} />
+          <Route path="/company-profile" element={<CompanyProfilePage />} />
 
           {/* ===== Catch-All Routes ===== */}
           <Route path="/company/*" element={<CompanyNotFound />} />

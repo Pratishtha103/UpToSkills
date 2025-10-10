@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { Bell, Settings, User, Sun, Moon, Menu } from 'lucide-react';
 import { Button } from '../Company_Dashboard/ui/button';
 import logo from '../../assets/uptoskills_logo.png'
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ onMenuClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -81,7 +83,8 @@ export default function Navbar({ onMenuClick }) {
 
           {/* User Profile */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon"
+            onClick={() => navigate("/company-profile")}>
               <User className="w-5 h-5" />
             </Button>
           </motion.div>

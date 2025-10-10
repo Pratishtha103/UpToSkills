@@ -5,9 +5,9 @@ import Footer from '../components/AboutPage/Footer';
 
 const ProgramsPage = () => {
   return (
-    <div>
+    <div className='min-h-screen flex flex-col'>
       <Header />
-      <main>
+      <main className='flex-grow'>
         <ProgramsSection />
       </main>
       <Footer />

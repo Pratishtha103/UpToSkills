@@ -52,8 +52,27 @@ const pool = require('../config/database');
     `);
 
     await pool.query(`
+      CREATE TABLE IF NOT EXISTS programs (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT,
+        phone VARCHAR(15),
+        education TEXT,
+        programexp TEXT,
+        course TEXT,
+        resume_path TEXT,
+        resume_data BYTEA,
+        resume_mime TEXT,
+        resume_filename TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
+        program_id INTEGER REFERENCES programs(id),
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -135,6 +154,7 @@ const pool = require('../config/database');
         awarded_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+
 
     console.log('✅ All tables checked/created successfully');
   } catch (err) {

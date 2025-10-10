@@ -1,13 +1,19 @@
 const express = require('express');
-const { sendContactEmail } = require('../controllers/form.controller'); // Import the controller function
+const multer = require('multer');
+const { createProgram, getPrograms, getProgramById } = require('../controllers/programs.controller');
+// FIX: Using the convention 'form.controller'
+const { sendContactEmail } = require('../controllers/form.controller'); 
 
 const router = express.Router();
 
-/**
- * @route POST /api/forms/contact
- * @desc Handle contact form submission and send email
- * @access Public
- */
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Original Program/Upload Routes
+router.post('/', upload.single('resume'), createProgram);
+router.get('/', getPrograms);
+router.get('/:id', getProgramById);
+
+// New Contact Form Route
 router.post('/contact', sendContactEmail);
 
 module.exports = router;

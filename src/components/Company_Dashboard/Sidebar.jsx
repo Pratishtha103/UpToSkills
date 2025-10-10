@@ -124,7 +124,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                   className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 group cursor-pointer select-none
                     ${
                       activeItem === item.id
-                        ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl"
+                        ? "bg-gradient-to-r from-primary to-primary/90 text-white dark:text-gray-900 shadow-xl" // 👈 FIXED TEXT COLOR
                         : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:text-gray-300 dark:hover:from-gray-800"
                     }`}
                   initial={{ opacity: 0, x: -10 }}
@@ -136,7 +136,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                   <div className="relative z-10 flex items-center justify-center">
                     <item.icon
                       className={`w-6 h-6 ${
-                        activeItem === item.id ? "text-white" : "text-gray-600 dark:text-gray-300"
+                        activeItem === item.id ? "text-white dark:text-gray-900" : "text-gray-600 dark:text-gray-300" // 👈 FIXED ICON COLOR
                       }`}
                     />
                   </div>
@@ -151,7 +151,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
 
                   <span
                     className={`font-bold relative z-10 ${
-                      activeItem === item.id ? "text-white" : ""
+                      activeItem === item.id ? "text-white dark:text-gray-900" : "" // 👈 FIXED TEXT COLOR
                     }`}
                   >
                     {item.label}
@@ -161,7 +161,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
             </div>
           </nav>
 {/* Social Media and Logout */}
-          <div className={`p-4 border-t  text-center`}>
+          <div className={`p-4 border-t text-center`}>
             <p className="font-semibold text-sm mb-2 text-gray-500">Connect With Us</p>
             <div className="flex justify-center gap-4 mb-3">
               <FaLinkedin
@@ -188,7 +188,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
            <motion.button
            onClick={handleLogout}
            className={`w-full text-red-500 flex items-center justify-center gap-2 p-2 rounded-lg transition-all`}
-            whileHover={{ x: 4 }}
+           whileHover={{ x: 4 }}
              whileTap={{ scale: 0.98 }}
            >
             <LogOut className="w-5 h-5" />

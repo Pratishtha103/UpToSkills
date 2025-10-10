@@ -37,7 +37,7 @@ export default function Navbar({ onMenuClick }) {
           {/* Hamburger Menu */}
           <motion.button
             aria-label="Toggle sidebar"
-            className="p-2 rounded-md hover:bg-gray-100"
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onMenuClick}
@@ -45,7 +45,7 @@ export default function Navbar({ onMenuClick }) {
             <Menu className="w-6 h-6 text-gray-900 dark:text-white" />
           </motion.button>
 
-          {/* Logo */}
+          {/* Logo - 🌟 FIX APPLIED HERE 🌟 */}
           <motion.div
             className="flex items-center gap-2"
             whileHover={{ scale: 1.05 }}
@@ -53,7 +53,8 @@ export default function Navbar({ onMenuClick }) {
           >
             <div className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={logo}
+                // **Dynamically set the src based on the theme**
+                src={isDarkMode ? darkLogo : logo} 
                 alt="UptoSkill Logo"
                 className="object-contain w-25 h-25"
               />
@@ -63,7 +64,8 @@ export default function Navbar({ onMenuClick }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          {/* Notifications */}
+          
+        {/* Notifications */}
           {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5 relative z-10" />
@@ -72,10 +74,9 @@ export default function Navbar({ onMenuClick }) {
               </span>
             </Button>
           </motion.div> */}
-
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost"  size="icon" onClick={toggleTheme}>
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
               {isDarkMode ? (
                 <Sun className="w-5 h-5 text-white" />
               ) : (
@@ -99,3 +100,13 @@ export default function Navbar({ onMenuClick }) {
     </motion.nav>
   );
 }
+
+{/* Notifications */}
+          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-5 h-5 relative z-10" />
+              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
+                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
+              </span>
+            </Button>
+          </motion.div> */}

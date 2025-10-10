@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -8,7 +6,11 @@ const path = require('path');
 // Database connection
 const pool = require('./config/database');
 
-// Import routes
+// Initialize Express app FIRST
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Import routers
 const userProfileRoutes = require('./routes/userProfile');
 const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
@@ -19,19 +21,14 @@ const statsRoutes = require("./routes/stats");
 const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
-const companiesRoutes = require('./routes/companies.route');
+const companiesRouter = require("./routes/searchcompanies");       // Use the one companies router consistently
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
 const coursesRoutes = require('./routes/courses.route');
-
-// ✅ Import the interviews route
 const interviewRoutes = require('./routes/interviews');
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware
+// Middleware setup
 app.use(cors({
     origin: 'http://localhost:3000', // React frontend
     credentials: true
@@ -42,27 +39,25 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// API Routes
-app.use('/api', userProfileRoutes);
+// Mount routes in proper order
 app.use('/api/auth', authRoutes);
+app.use('/api', userProfileRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/mentor_projects', mentorProjectRoutes);
-app.use('/api/companies', companiesRoutes);
 app.use('/api/mentorreviews', mentorReviewRoutes);
-app.use('/api/students', studentsRoutes);
-app.use('/api/mentors', mentorsRoutes);
 app.use('/api/company-profiles', companyProfilesRoutes);
-app.use("/api/testimonials", testimonialsRouter);
-app.use("/api/stats", statsRoutes);
-app.use('/api/students', searchStudent);
+app.use('/api/testimonials', testimonialsRouter);
+app.use('/api/stats', statsRoutes);
+app.use('/api/students', studentsRoutes);
+app.use('/api/searchStudents', searchStudent);
+app.use('/api/mentors', mentorsRoutes);
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
-
-// ✅ Connect the interviews route
+app.use('/api/companies', companiesRouter);                 // Companies routes here
 app.use('/api/interviews', interviewRoutes);
 
-// Health check
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -71,7 +66,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// 404 handler
+// 404 handler for unmatched routes
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
@@ -79,7 +74,7 @@ app.use('*', (req, res) => {
     });
 });
 
-// Global error handler
+// Global error handler middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -89,7 +84,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
+// Start the server last
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`🌐 Health check: http://localhost:${PORT}/health`);

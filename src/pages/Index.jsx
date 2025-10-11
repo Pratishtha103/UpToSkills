@@ -142,7 +142,17 @@ export default function Index() {
 
   // ================= VIEWS =================
   if (currentView === "notifications") {
-    return <CompanyNotificationsPage />;
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} onItemClick={handleSidebarClick} />
+        <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}>
+          <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
+          <main className="flex-1 pt-16">
+            <CompanyNotificationsPage/>
+          </main>
+        </div>
+      </div>
+    );
   }
 
   if (currentView === "search") {

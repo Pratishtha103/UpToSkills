@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../../Company_Dashboard/ui/button";
-import { Input } from "../../Company_Dashboard/ui/input";
-import logo from "../../../assets/logo.jpg";
+import { Bell, Search, Sun, Moon, Menu } from "lucide-react";
+import { Button } from "../Company_Dashboard/ui/button";
+import { Input } from "../Company_Dashboard/ui/input";
+import logo from "../../assets/uptoskills_logo.jpg";
 
-export default function Header({ onMenuClick }) {
-  const navigate = useNavigate();
+export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -21,14 +19,6 @@ export default function Header({ onMenuClick }) {
 
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
-  };
-
-  const handleNotificationsClick = () => {
-    navigate("/dashboard/notifications");
-  };
-
-  const handleProfileClick = () => {
-    navigate("/dashboard/profile");
   };
 
   return (
@@ -69,16 +59,16 @@ export default function Header({ onMenuClick }) {
           </motion.div>
         </div>
 
-        {/* Search Bar (hidden on small screens) */}
+        {/* Search Bar (hidden on small screens)
         <div className="hidden md:flex items-center max-w-md w-full mx-4 sm:mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search assignments, projects..."
+              placeholder="Search students, analytics..."
               className="pl-10 w-full"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
@@ -88,7 +78,7 @@ export default function Header({ onMenuClick }) {
               variant="ghost"
               size="icon"
               className="relative"
-              onClick={handleNotificationsClick}
+              onClick={onNotificationsClick}
             >
               <Bell className="w-5 h-5 relative z-10" />
               <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
@@ -105,20 +95,6 @@ export default function Header({ onMenuClick }) {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
-            </Button>
-          </motion.div>
-
-          {/* Settings */}
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-5 h-5" />
-            </Button>
-          </motion.div>
-
-          {/* User Profile */}
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" onClick={handleProfileClick}>
-              <User className="w-5 h-5" />
             </Button>
           </motion.div>
         </div>

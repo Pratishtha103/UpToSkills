@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../../Company_Dashboard/ui/button";
-import { Input } from "../../Company_Dashboard/ui/input";
-import logo from "../../../assets/logo.jpg";
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Bell, Settings, User, Search, Sun, Moon, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../../Company_Dashboard/ui/button';
+import { Input } from '../../Company_Dashboard/ui/input';
+import logo from '../../../assets/uptoskills_logo.png'
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
@@ -13,22 +13,22 @@ export default function Header({ onMenuClick }) {
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
-      root.classList.add("dark");
+      root.classList.add('dark');
     } else {
-      root.classList.remove("dark");
+      root.classList.remove('dark');
     }
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode(prev => !prev);
   };
 
   const handleNotificationsClick = () => {
-    navigate("/dashboard/notifications");
+    navigate('/dashboard/notifications');
   };
 
   const handleProfileClick = () => {
-    navigate("/dashboard/profile");
+    navigate('/dashboard/profile');
   };
 
   return (
@@ -84,9 +84,9 @@ export default function Header({ onMenuClick }) {
         <div className="flex items-center gap-2">
           {/* Notifications */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="icon"
+            <Button 
+              variant="ghost" 
+              size="icon" 
               className="relative"
               onClick={handleNotificationsClick}
             >
@@ -100,11 +100,7 @@ export default function Header({ onMenuClick }) {
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </Button>
           </motion.div>
 

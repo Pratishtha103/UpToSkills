@@ -4,7 +4,7 @@ import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
 import { Input } from "../../Company_Dashboard/ui/input";
-import logo from "../../../assets/logo.jpg";
+import logo from "../../../assets/uptoskills_logo.jpg";
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();

@@ -2,28 +2,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../../../assets/logo.jpg"; // <-- adjust this path if needed
+import logo from "./logo.png"; // <-- adjust this path if needed
 import { X, Home, Users, Folder, LogOut } from "lucide-react";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
-  {
-    name: "Students",
-    icon: <Users size={18} />,
-    path: "/mentor-dashboard/multi-student",
-  },
-  {
-    name: "Projects",
-    icon: <Folder size={18} />,
-    path: "/mentor-dashboard/open-source-contributions",
-  },
+  { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
+  { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
 ];
 
-const Sidebar = ({
-  children,
-  isOpen: controlledIsOpen,
-  setIsOpen: controlledSetIsOpen,
-}) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -69,8 +57,7 @@ const Sidebar = ({
     toggleHandlerRef.current = () => setOpen(!isOpen);
   }, [isOpen]);
   useEffect(() => {
-    const handler = () =>
-      toggleHandlerRef.current && toggleHandlerRef.current();
+    const handler = () => toggleHandlerRef.current && toggleHandlerRef.current();
     window.addEventListener("toggleSidebar", handler);
     return () => window.removeEventListener("toggleSidebar", handler);
   }, []);
@@ -78,8 +65,9 @@ const Sidebar = ({
   const handleLogout = () => {
     const lastRole = localStorage.getItem("role") || "mentor";
     localStorage.clear();
-    navigate("/login", { state: { role: lastRole } });
+    navigate("/login", { state: { role: lastRole } }); 
   };
+
 
   return (
     <>
@@ -140,21 +128,13 @@ const Sidebar = ({
                     duration: 0.22,
                     ease: "easeOut",
                   }}
-                  whileHover={{
-                    x: 6,
-                    scale: 1.02,
-                    transition: { duration: 0.12 },
-                  }}
+                  whileHover={{ x: 6, scale: 1.02, transition: { duration: 0.12 } }}
                   whileTap={{ scale: 0.98 }}
                 >
                   {/* Icon */}
                   <div className="relative z-10 flex items-center justify-center">
                     {React.cloneElement(item.icon, {
-                      className: `w-5 h-5 transition-all duration-200 ${
-                        activeItem === item.name
-                          ? "text-white"
-                          : "text-gray-600 group-hover:text-gray-800"
-                      }`,
+                      className: `w-5 h-5 transition-all duration-200 ${activeItem === item.name ? "text-white" : "text-gray-600 group-hover:text-gray-800"}`,
                     })}
                   </div>
 
@@ -163,19 +143,11 @@ const Sidebar = ({
                     <motion.div
                       className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
                       layoutId="activeIndicator"
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 30,
-                      }}
+                      transition={{ type: "spring", stiffness: 420, damping: 30 }}
                     />
                   )}
 
-                  <span
-                    className={`font-semibold relative z-10 ${
-                      activeItem === item.name ? "text-white" : "text-gray-800"
-                    }`}
-                  >
+                  <span className={`font-semibold relative z-10 ${activeItem === item.name ? "text-white" : "text-gray-800"}`}>
                     {item.name}
                   </span>
                 </motion.button>
@@ -198,13 +170,7 @@ const Sidebar = ({
       </motion.aside>
 
       {/* shift content when desktop and open */}
-      <div
-        className={`transition-all duration-300 ${
-          isOpen && isDesktop ? "ml-64" : "ml-0"
-        }`}
-      >
-        {children}
-      </div>
+      <div className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"}`}>{children}</div>
     </>
   );
 };

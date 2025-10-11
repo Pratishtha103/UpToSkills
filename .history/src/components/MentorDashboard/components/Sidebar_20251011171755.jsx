@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../../../assets/logo.jpg"; // <-- adjust this path if needed
+import logo from "./logo.jpg"; // <-- adjust this path if needed
 import { X, Home, Users, Folder, LogOut } from "lucide-react";
 
 const sidebarItems = [

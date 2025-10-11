@@ -1,15 +1,17 @@
-// src/components/MentorDashboard/components/MentorDashboardLayouts.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// Correct default import (no curly braces)
+// Pages
 import MentorDashboardPage from "../pages/MentorDashboardPage";
 import ProjectsProgress from "../pages/ProjectsProgress";
 import OpenSourceContributions from "../pages/OpenSourceContributions";
 import Feedback from "../pages/Feedback";
 import MultiStudent from "../pages/MultiStudent";
+import MentorProfilePage from "../components/MentorProfilePage";
+import MentorEditProfilePage from "./MentorEditProfilePage";
 
-function MentorDashboardRoutes() {
+
+export default function MentorDashboardRoutes() {
   return (
     <Routes>
       <Route index element={<MentorDashboardPage />} />
@@ -17,8 +19,8 @@ function MentorDashboardRoutes() {
       <Route path="open-source-contributions" element={<OpenSourceContributions />} />
       <Route path="feedback" element={<Feedback />} />
       <Route path="multi-student" element={<MultiStudent />} />
+      <Route path="profile" element={<MentorProfilePage />} />
+      <Route path="edit-profile" element={<MentorEditProfilePage/>} />
     </Routes>
   );
 }
-
-export default MentorDashboardRoutes;

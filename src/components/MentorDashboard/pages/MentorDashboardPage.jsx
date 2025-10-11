@@ -30,7 +30,7 @@ const MentorDashboardPage = () => {
   }, []);
 
   return (
-    <div className="mt-4 flex ">
+    <div className="mt-14 flex min-h-screen">
       {/* Sidebar */}
       <Sidebar />
 
@@ -40,23 +40,35 @@ const MentorDashboardPage = () => {
         <Header />
 
         {/* Dashboard Cards */}
-        <div className="flex-1 p-8 bg-gray-50 pt-20">
+        <div className="flex-1 p-8 bg-gray-50">
           <h1 className="text-4xl font-bold mb-8 text-center">Mentor Dashboard</h1>
-        </div>
-        <div className="flex flex-wrap justify-center gap-6">
-          <DashboardCard
-            icon=""
-            title="Total Students"
-            description=" "
-            onClick={() => navigate("projects-progress")}
-          />
-          <DashboardCard
-            icon=""
-            title="Total Mentors"
-            description=" "
-            onClick={() => navigate("open-source-contributions")}
-          />
-          
+
+          <div className="flex flex-wrap justify-center gap-6">
+            <DashboardCard
+              icon="🎓"
+              title="Total Students"
+              description={`${totalStudents} students enrolled`}
+              onClick={() => navigate("projects-progress")}
+            />
+            <DashboardCard
+              icon="🧑‍🏫"
+              title="Total Mentors"
+              description={`${totalMentors} mentors registered`}
+              onClick={() => navigate("open-source-contributions")}
+            />
+            <DashboardCard
+              icon="📝"
+              title="Feedback & Approvals"
+              description="Give personalized feedback and approve submitted milestones with ease."
+              onClick={() => navigate("feedback")}
+            />
+            <DashboardCard
+              icon="👥"
+              title="Multi-Student View"
+              description="Easily toggle between multiple students to evaluate and mentor efficiently."
+              onClick={() => navigate("multi-student")}
+            />
+          </div>
         </div>
       </div>
     </div>

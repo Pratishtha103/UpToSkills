@@ -181,7 +181,13 @@
   border-image: linear-gradient(to right, orange 50%, hsl(var(--primary)) 50%, hsl(var(--primary)) 100%);
   border-image-slice: 1;
 }
-  
+  .scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
   .sidebar-item {
     @apply flex items-center gap-3 px-4 py-3 text-sidebar-foreground rounded-lg;
     transition: var(--transition-smooth);

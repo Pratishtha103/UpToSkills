@@ -1,4 +1,5 @@
 // server.js
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -21,9 +22,15 @@ const mentorsRoutes = require('./routes/mentors');
 const companiesRoutes = require('./routes/companies.route');
 const searchStudent = require('./routes/searchStudents');
 
+const formRoute = require('./routes/formRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const path = require('path');
+
+// Serve uploads folder correctly
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware
 app.use(cors({
@@ -51,6 +58,7 @@ app.use("/api/stats", statsRoutes);
 
 app.use('/api/students', searchStudent);
 
+app.use('/api/form', formRoute);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

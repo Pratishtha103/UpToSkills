@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 function verifyToken(req, res, next) {
   try {
-    // Expect header like: Authorization: Bearer <token>
+    // Accept both lowercase and uppercase header key
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     if (!authHeader) {
       return res.status(401).json({ success: false, message: 'Authorization header missing' });
@@ -17,11 +17,18 @@ function verifyToken(req, res, next) {
 
     const token = parts[1];
     const decoded = jwt.verify(token, JWT_SECRET);
-    // your existing auth.js (in routes) signs { user: { id, email, role, name } }
+
+    // Your auth.js signs payload with { user: { id, role, ... } }
     req.user = decoded.user || decoded;
+
+    // Ensure id exists
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: 'Invalid token payload' });
+    }
+
     next();
   } catch (err) {
-    console.error('Token verify error:', err.message || err);
+    console.error('Token verify error:', err && err.message ? err.message : err);
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 }

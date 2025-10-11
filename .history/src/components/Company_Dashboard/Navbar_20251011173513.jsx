@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, Settings, User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
-import logo from "../../assets/logo.jpg";
+import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ onMenuClick }) {

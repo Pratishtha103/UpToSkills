@@ -59,7 +59,7 @@ export default function Header({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <div className="w-15 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={logo}
                 alt="UptoSkill Logo"
@@ -105,6 +105,13 @@ export default function Header({ onMenuClick }) {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
+            </Button>
+          </motion.div>
+
+          {/* Settings */}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Settings className="w-5 h-5" />
             </Button>
           </motion.div>
 

@@ -4,6 +4,8 @@ import Footer from '../AboutPage/Footer';
 import axios from 'axios';
 
 const Webdev = () => {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -11,9 +13,11 @@ const Webdev = () => {
         education: "",
         programexp: "",
         course: "web-development",
+        date: currentDate,
+        time: currentTime,
     });
     const [resume, setResume] = useState(null);
-
+    
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -191,6 +195,7 @@ const Webdev = () => {
                                         Upload Resume
                                     </label>
                                     <input
+                                        required
                                         type="file"
                                         id="resume"
                                         name="resume"
@@ -214,6 +219,11 @@ const Webdev = () => {
                                         <option value="web-development">Web Development</option>
                                     </select>
                                 </div>
+                                {/* Date */}
+                                {/* <div className="text-sm text-gray-500">
+                                    <p>Application Date: {formData.date}</p>
+                                    <p>Application Time: {formData.time}</p>
+                                </div> */}
                             </div>
 
                             <button

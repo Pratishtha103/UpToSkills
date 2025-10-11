@@ -1,7 +1,9 @@
-// Sidebar.jsx
+// src/components/Sidebar.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
+
+import logo from "../../../assets/logo.jpg"; // <-- adjust this path if needed
 
 import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
 
@@ -21,23 +23,25 @@ const sidebarItems = [
     name: "Edit Profile",
     icon: <Edit3 size={18} />,
     path: "/mentor-dashboard/edit-profile",
-  },
+  }, // <-- added
 ];
 
 const Sidebar = ({
   children,
   isOpen: controlledIsOpen,
   setIsOpen: controlledSetIsOpen,
-  isDarkMode,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [activeItem, setActiveItem] = useState("Dashboard");
+
+  // internal open state (used when not controlled)
   const [internalOpen, setInternalOpen] = useState(true);
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalOpen;
 
+  // track desktop breakpoint safely (avoid reading window during SSR/hydration)
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const check = () => {
@@ -58,7 +62,7 @@ const Sidebar = ({
     }
   };
 
-  // Sync active item to route
+  // sync active item to route (handles exact or nested paths)
   useEffect(() => {
     const currentItem =
       sidebarItems.find((item) => item.path === location.pathname) ||
@@ -66,7 +70,7 @@ const Sidebar = ({
     if (currentItem) setActiveItem(currentItem.name);
   }, [location.pathname]);
 
-  // global toggle handler
+  // global toggle handler (use ref to avoid stale closures)
   const toggleHandlerRef = useRef();
   useEffect(() => {
     toggleHandlerRef.current = () => setOpen(!isOpen);
@@ -84,20 +88,12 @@ const Sidebar = ({
     navigate("/login", { state: { role: lastRole } });
   };
 
-  const bgColor = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200";
-  const hoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
-  const activeGradient =
-    "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30";
-
   return (
     <>
       <AnimatePresence>{!isControlled && !isOpen && null}</AnimatePresence>
 
       <motion.aside
-        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden ${bgColor}`}
+        className="fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden bg-white"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.28 }}
@@ -107,11 +103,7 @@ const Sidebar = ({
           {isOpen && !isDesktop && (
             <motion.button
               key="close-btn"
-              className={`absolute top-4 right-4 z-50 p-2 ${
-                isDarkMode
-                  ? "text-white hover:text-gray-300"
-                  : "text-black hover:text-gray-700"
-              }`}
+              className="absolute top-4 right-4 z-50 p-2 text-black hover:text-gray-700"
               onClick={() => setOpen(false)}
               aria-label="Close Sidebar"
               initial={{ opacity: 0, y: -10 }}
@@ -125,6 +117,11 @@ const Sidebar = ({
         </AnimatePresence>
 
         <div className="flex flex-col h-full pt-16">
+          {/* Logo - REMOVED for task */}
+          {/* <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+            <img src={logo} alt="Logo" className="h-10 object-contain" />
+          </div> */}
+
           {/* Navigation Items */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-2">
@@ -132,7 +129,12 @@ const Sidebar = ({
                 <motion.button
                   key={item.name}
                   className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none
-                    ${activeItem === item.name ? activeGradient : hoverBg}`}
+                    ${
+                      activeItem === item.name
+                        ? "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }
+                  `}
                   onClick={() => {
                     setActiveItem(item.name);
                     navigate(item.path);
@@ -158,8 +160,6 @@ const Sidebar = ({
                       className: `w-5 h-5 transition-all duration-200 ${
                         activeItem === item.name
                           ? "text-white"
-                          : isDarkMode
-                          ? "text-gray-300 group-hover:text-white"
                           : "text-gray-600 group-hover:text-gray-800"
                       }`,
                     })}
@@ -180,11 +180,7 @@ const Sidebar = ({
 
                   <span
                     className={`font-semibold relative z-10 ${
-                      activeItem === item.name
-                        ? "text-white"
-                        : isDarkMode
-                        ? "text-gray-300"
-                        : "text-gray-800"
+                      activeItem === item.name ? "text-white" : "text-gray-800"
                     }`}
                   >
                     {item.name}
@@ -194,10 +190,10 @@ const Sidebar = ({
             </div>
           </nav>
 
-          <div className={`p-4 border-t ${borderColor}`}>
+          <div className="p-4 border-t border-gray-200">
             <motion.button
               onClick={handleLogout}
-              className={`w-full text-red-500 hover:bg-red-50 flex items-center gap-3 p-2 rounded-lg`}
+              className="w-full text-red-500 hover:bg-red-50 flex items-center gap-3 p-2 rounded-lg"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >

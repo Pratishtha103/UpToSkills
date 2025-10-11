@@ -1,3 +1,4 @@
+// Header.jsx (only small additions)
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
@@ -19,27 +20,32 @@ export default function Header({ onMenuClick }) {
     }
   }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-  };
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
-  const handleNotificationsClick = () => {
-    navigate("/dashboard/notifications");
-  };
+  const handleNotificationsClick = () => navigate("/dashboard/notifications");
+  const handleProfileClick = () => navigate("/mentor-dashboard/profile");
 
-  const handleProfileClick = () => {
-    navigate("/dashboard/profile");
+  // NEW helper that either calls parent callback OR dispatches a global event
+  const handleMenuClick = () => {
+    if (typeof onMenuClick === "function") {
+      onMenuClick();
+    } else {
+      // fallback: dispatch a global event so a listening Sidebar can toggle itself
+      window.dispatchEvent(new CustomEvent("toggleSidebar"));
+    }
   };
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300"
+      className={`fixed top-0 left-0 right-0 z-50  backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300 ${
+        isDarkMode ? "bg - black" : "bg - white" / 60
+      }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       style={{ WebkitBackdropFilter: "blur(16px)" }}
     >
-      <div className="flex items-center justify-between px-4 sm:px-6 py-4 pb-1">
+      <div className="flex items-center justify-between px-4 bg-black sm:px-6 py-4 pb-1">
         {/* Left: Hamburger + Logo */}
         <div className="flex items-center gap-3">
           {/* Hamburger Menu */}
@@ -48,7 +54,7 @@ export default function Header({ onMenuClick }) {
             className="p-2 rounded-md hover:bg-gray-100"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={onMenuClick}
+            onClick={handleMenuClick} // <-- use fallback here
           >
             <Menu className="w-6 h-6 text-gray-700" />
           </motion.button>
@@ -59,11 +65,11 @@ export default function Header({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <div className="w-15 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={logo}
                 alt="UptoSkill Logo"
-                className="object-contain w-25 h-25"
+                className="object-contain w-25 h-10"
               />
             </div>
           </motion.div>
@@ -105,6 +111,13 @@ export default function Header({ onMenuClick }) {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
+            </Button>
+          </motion.div>
+
+          {/* Settings */}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Settings className="w-5 h-5" />
             </Button>
           </motion.div>
 

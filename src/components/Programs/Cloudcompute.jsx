@@ -4,6 +4,8 @@ import Footer from '../AboutPage/Footer';
 import axios from 'axios';
 
 const Cloudcompute = () => {
+  const currentDate = new Date().toLocaleDateString();
+  const currentTime = new Date().toLocaleTimeString();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +13,8 @@ const Cloudcompute = () => {
     education: "",
     programexp: "",
     course: "cloud-computing",
+    date: currentDate,
+    time: currentTime,
   });
   const [resume, setResume] = useState(null);
 
@@ -190,6 +194,7 @@ const Cloudcompute = () => {
                     Upload Resume
                   </label>
                   <input
+                    required
                     type="file"
                     id="resume"
                     name="resume"

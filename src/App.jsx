@@ -25,6 +25,11 @@ import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
+import Webdev from './components/Programs/Webdev';
+import Datascience from './components/Programs/Datascience';
+import Cloudcompute from './components/Programs/Cloudcompute';
+import Cybersecurity from './components/Programs/Cybersecurity';
+import Thankyou from './components/Programs/Thankyou';
 
 const queryClient = new QueryClient();
 
@@ -78,9 +83,16 @@ function App() {
           {/* ===== Mentor Dashboard Page routes ===== */}
           <Route path="/mentor-dashboard/*" element={<MentorDashboardRoutes />} />
           
-
           {/* ===== Admin Panel page routes ===== */}
           <Route path ="/adminPanel" element={<AdminPanel />} />
+          {/* ===== Programs page routes ===== */}
+
+          <Route path='/web-dev' element={<Webdev/>}/>
+          <Route path='/data-science' element={<Datascience/>}/>
+          <Route path='/cloud-computing' element={<Cloudcompute/>}/>
+          <Route path='/cybersecurity' element={<Cybersecurity/>}/>
+          <Route path='/thankyou' element={<Thankyou/>}/>
+
         </Routes>
       </Router>
     </QueryClientProvider>

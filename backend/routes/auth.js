@@ -157,4 +157,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ---------------- SETUP ADMIN TABLE ----------------
+router.get('/setup-admin-table', async (req, res) => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS admins (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `;
+
+  try {
+    await pool.query(createTableQuery);
+    res.json({ success: true, message: "✅ Admins table created (or already exists)" });
+  } catch (error) {
+    console.error("❌ Error creating admins table:", error);
+    res.status(500).json({ success: false, message: "Error creating admins table" });
+  }
+});
+
 module.exports = router;

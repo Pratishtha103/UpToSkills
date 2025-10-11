@@ -8,7 +8,7 @@ import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
-const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
+const MentorDashboardPage = () => {
   const navigate = useNavigate();
 
   // State for counts
@@ -30,30 +30,18 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
   }, []);
 
   return (
-    <div
-      className={`mt-14 flex min-h-screen ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
-      }`}
-    >
+    <div className="mt-14 flex min-h-screen">
       {/* Sidebar */}
-      <Sidebar isDarkMode={isDarkMode} />
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <Header />
 
         {/* Dashboard Cards */}
-        <div
-          className={`flex-1 p-8 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
-        >
-          <h1
-            className={`text-4xl font-bold mb-8 text-center ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Mentor Dashboard
-          </h1>
+        <div className="flex-1 p-8 bg-gray-50">
+          <h1 className="text-4xl font-bold mb-8 text-center">Mentor Dashboard</h1>
 
           <div className="flex flex-wrap justify-center gap-6">
             <DashboardCard
@@ -61,28 +49,24 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
               title="Total Students"
               description={`${totalStudents} students enrolled`}
               onClick={() => navigate("projects-progress")}
-              isDarkMode={isDarkMode}
             />
             <DashboardCard
               icon="🧑‍🏫"
               title="Total Mentors"
               description={`${totalMentors} mentors registered`}
               onClick={() => navigate("open-source-contributions")}
-              isDarkMode={isDarkMode}
             />
             <DashboardCard
               icon="📝"
               title="Feedback & Approvals"
               description="Give personalized feedback and approve submitted milestones with ease."
               onClick={() => navigate("feedback")}
-              isDarkMode={isDarkMode}
             />
             <DashboardCard
               icon="👥"
               title="Multi-Student View"
               description="Easily toggle between multiple students to evaluate and mentor efficiently."
               onClick={() => navigate("multi-student")}
-              isDarkMode={isDarkMode}
             />
           </div>
         </div>

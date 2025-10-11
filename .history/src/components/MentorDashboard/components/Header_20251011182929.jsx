@@ -1,29 +1,47 @@
+// Header.jsx
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Search, Sun, Moon, Menu } from "lucide-react";
-import { Button } from "../Company_Dashboard/ui/button";
-import { Input } from "../Company_Dashboard/ui/input";
-import logo from "../../assets/logo.jpg";
+import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../../Company_Dashboard/ui/button";
+import { Input } from "../../Company_Dashboard/ui/input";
+import logo from "../../../assets/logo.jpg";
+import darkLogo from "../../../assets/darkLogo.jpg";
 
-export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export default function Header({ onMenuClick }) {
+  const navigate = useNavigate();
 
+  // Apply dark mode to root and save preference
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
     } else {
       root.classList.remove("dark");
+      localStorage.setItem("darkMode", "false");
     }
   }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
+
+  const handleNotificationsClick = () => navigate("/dashboard/notifications");
+  const handleProfileClick = () => navigate("/mentor-dashboard/profile");
+
+  // Menu toggle helper
+  const handleMenuClick = () => {
+    if (typeof onMenuClick === "function") {
+      onMenuClick();
+    } else {
+      window.dispatchEvent(new CustomEvent("toggleSidebar"));
+    }
   };
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300"
+      className={`fixed top-0 left-0 right-0 z-50 ${
+        isDarkMode ? "bg-black text-white" : "bg-white/60 text-gray-900"
+      } backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -35,12 +53,12 @@ export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
           {/* Hamburger Menu */}
           <motion.button
             aria-label="Toggle sidebar"
-            className="p-2 rounded-md hover:bg-gray-100"
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={onMenuClick}
+            onClick={handleMenuClick}
           >
-            <Menu className="w-6 h-6 text-gray-700" />
+            <Menu className="w-6 h-6" />
           </motion.button>
 
           {/* Logo */}
@@ -49,26 +67,26 @@ export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <div className="w-15 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={logo}
+                src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
-                className="object-contain w-25 h-25"
+                className="object-contain w-25 h-10"
               />
             </div>
           </motion.div>
         </div>
 
-        {/* Search Bar (hidden on small screens)
+        {/* Search Bar (hidden on small screens) */}
         <div className="hidden md:flex items-center max-w-md w-full mx-4 sm:mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search students, analytics..."
+              placeholder="Search assignments, projects..."
               className="pl-10 w-full"
             />
           </div>
-        </div> */}
+        </div>
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
@@ -78,7 +96,7 @@ export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
               variant="ghost"
               size="icon"
               className="relative"
-              onClick={onNotificationsClick}
+              onClick={handleNotificationsClick}
             >
               <Bell className="w-5 h-5 relative z-10" />
               <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
@@ -95,6 +113,20 @@ export default function AdminNavbar({ onMenuClick, onNotificationsClick }) {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
+            </Button>
+          </motion.div>
+
+          {/* Settings */}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon">
+              <Settings className="w-5 h-5" />
+            </Button>
+          </motion.div>
+
+          {/* User Profile */}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="ghost" size="icon" onClick={handleProfileClick}>
+              <User className="w-5 h-5" />
             </Button>
           </motion.div>
         </div>

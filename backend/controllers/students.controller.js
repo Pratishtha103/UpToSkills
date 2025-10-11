@@ -65,7 +65,43 @@ const getStudentById = async (req, res) => {
   }
 };
 
+
+const searchStudents = async (req, res) => {
+  try {
+    const { name } = req.params;
+    const query = `
+      SELECT
+        s.id,
+        COALESCE(u.full_name, s.full_name) AS full_name,
+        s.email,
+        s.phone,
+        u.ai_skill_summary,
+        u.domains_of_interest,
+        u.others_domain,
+        u.profile_completed,
+        s.created_at
+      FROM students s
+      LEFT JOIN user_details u ON s.id = u.student_id
+      WHERE LOWER(s.full_name) LIKE LOWER($1)
+         OR LOWER(u.full_name) LIKE LOWER($1)
+      ORDER BY s.created_at DESC;
+    `;
+
+    const result = await pool.query(query, [`%${name}%`]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'No students found' });
+    }
+
+    return res.status(200).json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('searchStudents error:', err);
+    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+};
+
+
 module.exports = {
   getStudents,
   getStudentById,
+  searchStudents,
 };

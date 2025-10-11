@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import Header from '../AboutPage/Header';
 import Footer from '../AboutPage/Footer';
 import axios from 'axios';
+import { time } from 'framer-motion';
 
 const Datascience = () => {
+  const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +14,8 @@ const Datascience = () => {
     education: "",
     programexp: "",
     course: "data-science",
+    date: currentDate,
+    time: currentTime,
   });
   const [resume, setResume] = useState(null);
 
@@ -189,6 +194,7 @@ const Datascience = () => {
                     Upload Resume
                   </label>
                   <input
+                    required
                     type="file"
                     id="resume"
                     name="resume"

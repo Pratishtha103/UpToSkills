@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const createProgram = async (req, res) => {
-  const { name, email, phone, education, programexp, course } = req.body;
+  const { name, email, phone, education, programexp, course,date,time } = req.body;
 
   if (!name || !email || !phone || !education || !programexp || !course) {
     return res.status(400).json({ success: false, message: 'All fields are required' });
@@ -12,6 +12,12 @@ const createProgram = async (req, res) => {
   if (req.file && req.file.mimetype !== 'application/pdf') {
     return res.status(400).json({ success: false, message: 'Please upload a PDF resume' });
   }
+  // pool.query('ALTER TABLE programs ADD COLUMN IF NOT EXISTS date TEXT', (err) => {
+  //   if (err) throw err; // Handle the error appropriately.
+  // });
+  // pool.query('ALTER TABLE programs ADD COLUMN IF NOT EXISTS time TEXT', (err) => {
+  //   if (err) throw err; // Handle the error appropriately.
+  // });
 
   let resumePath = null;
   if (req.file?.buffer) {
@@ -28,9 +34,9 @@ const createProgram = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO programs (name, email, phone, education, programexp, course, resume_path, resume_data, resume_mime, resume_filename)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [name, email, phone, education, programexp, course, resumePath, req.file?.buffer || null, req.file?.mimetype || null, req.file?.originalname || null]
+      `INSERT INTO programs (name, email, phone, education, programexp, course, resume_path, resume_data, resume_mime, resume_filename,date,time)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11,$12) RETURNING *`,
+      [name, email, phone, education, programexp, course, resumePath, req.file?.buffer || null, req.file?.mimetype || null, req.file?.originalname || null,date,time]
     );
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {

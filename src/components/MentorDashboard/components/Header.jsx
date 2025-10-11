@@ -118,12 +118,12 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
             </Button>
           </motion.div>
 
-          {/* Settings */}
+          {/* Settings
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
             </Button>
-          </motion.div>
+          </motion.div> */}
 
           {/* User Profile */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>

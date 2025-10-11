@@ -64,6 +64,8 @@ const pool = require('../config/database');
         resume_data BYTEA,
         resume_mime TEXT,
         resume_filename TEXT,
+        date TEXT,
+        time TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );

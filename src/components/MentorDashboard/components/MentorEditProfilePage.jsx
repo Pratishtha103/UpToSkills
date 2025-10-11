@@ -1,139 +1,247 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
-import StudentProfileForm from "./StudentProfileForm";
-import DomainsOfInterest from "./DomainsOfInterest";
+import Sidebar from "../../MentorDashboard/components/Sidebar";
+import Header from "../../MentorDashboard/components/Header";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const predefinedDomains = [
+  "AI & Machine Learning",
+  "Data Science",
+  "Web Development",
+  "App Development",
+  "Cybersecurity",
+  "Cloud Computing",
+  "Blockchain",
+  "UI/UX Design",
+  "DevOps",
+];
 
 const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [domainsOfInterest, setDomainsOfInterest] = useState([]); // reused UI
-  const [othersDomain, setOthersDomain] = useState("");
-  const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: "",
+    contact_number: "",
+    linkedin_url: "",
+    github_url: "",
+    about_me: "",
+    expertise_domains: [],
+    others_domain: "",
+  });
 
-  // Fetch mentor profile and map mentor fields -> student-shaped formData
+  const token = localStorage.getItem("token");
+
   const fetchProfile = useCallback(async () => {
-    setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No auth token found");
-
+      setLoading(true);
       const res = await axios.get("http://localhost:5000/api/mentor/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const d = (res.data && (res.data.data || res.data)) || {};
-
-      // Map mentor response to the student-form fields that StudentProfileForm expects
+      const data = res.data?.data || {};
       setFormData({
-        full_name: d.profile_full_name || d.mentor_name || "",
-        contact_number: d.contact_number || d.mentor_phone || "",
-        linkedin_url: d.linkedin_url || "",
-        github_url: d.github_url || "",
-        // map mentor about_me -> why_hire_me field used by the student form
-        why_hire_me: d.about_me || d.why_hire_me || "",
-        // no direct ai_skill_summary for mentor; keep existing or blank
-        ai_skill_summary: d.ai_skill_summary || "",
-        profile_completed: typeof d.profile_completed === "boolean" ? d.profile_completed : false,
+        full_name: data.full_name || "",
+        contact_number: data.phone || "",
+        linkedin_url: data.linkedin_url || "",
+        github_url: data.github_url || "",
+        about_me: data.about_me || "",
+        expertise_domains: data.expertise_domains || [],
+        others_domain: data.others_domain || "",
       });
-
-      // map mentor expertise_domains -> domainsOfInterest (student form format)
-      setDomainsOfInterest(d.expertise_domains || d.domains_of_interest || []);
-      setOthersDomain(d.others_domain || d.othersDomain || "");
     } catch (err) {
-      console.error("Error fetching profile:", err);
+      console.error(err);
+      toast.error("Failed to load mentor profile.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const toggleSidebar = () => setIsOpen((prev) => !prev);
+  const saveProfile = async () => {
+    try {
+      setSaving(true);
+      const res = await axios.post(
+        "http://localhost:5000/api/mentor/profile",
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-  const handleDomainChange = (domain, value) => {
-    if (domain === "others") {
-      setOthersDomain(value);
-      return;
-    }
-
-    setDomainsOfInterest((prev) => {
-      if (value && !prev.includes(domain)) {
-        return [...prev, domain];
-      } else if (!value) {
-        return prev.filter((d) => d !== domain);
+      if (res.data?.success) {
+        toast.success("Profile updated successfully!");
+        // Clear input fields after save
+        setFormData({
+          full_name: "",
+          contact_number: "",
+          linkedin_url: "",
+          github_url: "",
+          about_me: "",
+          expertise_domains: [],
+          others_domain: "",
+        });
+      } else {
+        toast.error("Failed to update profile.");
       }
-      return prev;
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error while saving profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleDomainToggle = (domain) => {
+    const exists = formData.expertise_domains.includes(domain);
+    setFormData({
+      ...formData,
+      expertise_domains: exists
+        ? formData.expertise_domains.filter((d) => d !== domain)
+        : [...formData.expertise_domains, domain],
     });
   };
 
-  const handleFormSubmit = async (formValues) => {
-    // The UI is student-shaped. Map student-shaped values -> mentor-shaped payload
-    const payload = {
-      full_name: formValues.full_name,
-      contact_number: formValues.contact_number,
-      linkedin_url: formValues.linkedin_url,
-      github_url: formValues.github_url,
-      // map student why_hire_me or ai_skill_summary -> mentor about_me
-      about_me: formValues.why_hire_me || formValues.ai_skill_summary || "",
-      // map domainsOfInterest -> expertise_domains
-      expertise_domains: domainsOfInterest,
-      // map othersDomain -> others_domain
-      others_domain: othersDomain,
-    };
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No auth token found");
-
-      const response = await axios.post("http://localhost:5000/api/mentor/profile", payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data && response.data.success) {
-        alert("Profile saved successfully!");
-        fetchProfile();
-      } else {
-        alert(`Error saving profile: ${response.data?.message || "Unknown error"}`);
-      }
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Network error: Could not connect to server");
-    }
+  const handleSaveButtonClick = (e) => {
+    e.preventDefault();
+    saveProfile();
   };
 
   return (
-    <div className={`flex h-screen dashboard-container${isDarkMode ? " dark" : ""}`}>
+    <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <div className="flex-1 flex flex-col transition-all duration-300">
+        <Header
+          onMenuClick={() => setIsOpen(!isOpen)}
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
 
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${isOpen ? "" : "lg:ml-0"}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-
-        <div className="flex-1 overflow-y-auto pt-16 p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Edit Profile</h1>
+        <div className="flex-1 overflow-y-auto pt-16 p-6 bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Mentor Profile
+              </h2>
+              {saving && (
+                <span className="text-sm text-gray-500 dark:text-gray-300 italic">
+                  Saving...
+                </span>
+              )}
+            </div>
 
             {loading ? (
               <div className="flex justify-center items-center h-40">
                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  {/* Reuse your existing StudentProfileForm (no UI change) */}
-                  <StudentProfileForm formData={formData || {}} setFormData={setFormData} onSubmit={handleFormSubmit} />
+              <form className="space-y-6" onSubmit={handleSaveButtonClick}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium dark:text-white">Full Name</label>
+                    <input
+                      type="text"
+                      name="full_name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                      className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium dark:text-white">Contact Number</label>
+                    <input
+                      type="text"
+                      name="contact_number"
+                      value={formData.contact_number}
+                      onChange={handleChange}
+                      placeholder="Enter your 10-digit phone number"
+                      className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium dark:text-white">LinkedIn URL</label>
+                    <input
+                      type="text"
+                      name="linkedin_url"
+                      value={formData.linkedin_url}
+                      onChange={handleChange}
+                      placeholder="https://linkedin.com/in/yourprofile"
+                      className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium dark:text-white">GitHub URL</label>
+                    <input
+                      type="text"
+                      name="github_url"
+                      value={formData.github_url}
+                      onChange={handleChange}
+                      placeholder="https://github.com/yourusername"
+                      className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium dark:text-white">About Me</label>
+                    <textarea
+                      name="about_me"
+                      value={formData.about_me}
+                      onChange={handleChange}
+                      rows={4}
+                      placeholder="Write a short bio about yourself"
+                      className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <DomainsOfInterest selectedDomains={domainsOfInterest} onChange={handleDomainChange} othersValue={othersDomain} />
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 dark:text-white">Expertise Domains</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {predefinedDomains.map((domain) => (
+                      <button
+                        key={domain}
+                        type="button"
+                        onClick={() => handleDomainToggle(domain)}
+                        className={`px-4 py-2 rounded-full border transition ${
+                          formData.expertise_domains.includes(domain)
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-gray-100 dark:bg-gray-700 dark:text-white"
+                        }`}
+                      >
+                        {domain}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input
+                    type="text"
+                    name="others_domain"
+                    value={formData.others_domain}
+                    onChange={handleChange}
+                    placeholder="Add a custom domain..."
+                    className="w-full mt-4 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
                 </div>
-              </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition"
+                  >
+                    Save Profile
+                  </button>
+                </div>
+              </form>
             )}
           </div>
         </div>

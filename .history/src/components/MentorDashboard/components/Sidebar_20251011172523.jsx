@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import logo from "../../../assets/logo.jpg"; // <-- adjust this path if needed
-
-import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
+import { X, Home, Users, Folder, LogOut } from "lucide-react";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
@@ -19,11 +18,15 @@ const sidebarItems = [
     icon: <Folder size={18} />,
     path: "/mentor-dashboard/open-source-contributions",
   },
-  {
-    name: "Edit Profile",
-    icon: <Edit3 size={18} />,
-    path: "/mentor-dashboard/edit-profile",
-  }, // <-- added
+
+import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
+
+const sidebarItems = [
+  { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
+  { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
+  { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
+  { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" }, // <-- added
+
 ];
 
 const Sidebar = ({

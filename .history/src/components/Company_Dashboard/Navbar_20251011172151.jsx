@@ -1,17 +1,14 @@
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, Settings, User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.jpg";
-=======
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, Settings, User, Sun, Moon, Menu } from 'lucide-react';
 import { Button } from '../Company_Dashboard/ui/button';
 import logo from '../../assets/uptoskills_logo.png'
 import { useNavigate } from "react-router-dom";
->>>>>>> efcac3041e825432b0847b28d14134235d7b97a4
 
 export default function Navbar({ onMenuClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);

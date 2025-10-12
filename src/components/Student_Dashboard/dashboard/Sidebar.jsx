@@ -46,11 +46,10 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const handleLogout = () => {
-    const lastRole = localStorage.getItem("role") || "student"; 
-    localStorage.clear(); 
-    navigate("/login", { state: { role: lastRole } }); 
+    const lastRole = localStorage.getItem("role") || "student";
+    localStorage.clear();
+    navigate("/login", { state: { role: lastRole } });
   };
-
 
   return (
     <>
@@ -71,7 +70,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
 
       {/* Sidebar Panel */}
       <motion.aside
-        className="fixed top-0 left-0 h-full w-64 bg-sidebar shadow-2xl z-40 overflow-hidden"
+        className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-2xl z-40 overflow-hidden transition-colors duration-300"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.3 }}
@@ -81,7 +80,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
           {isOpen && !isDesktop && (
             <motion.button
               key="close-btn"
-              className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
               onClick={toggleSidebar}
               aria-label="Close Sidebar"
               initial={{ opacity: 0, y: -10 }}
@@ -107,8 +106,8 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                       group cursor-pointer select-none
                       ${
                         activeItem === item.id
-                          ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl shadow-primary/30"
-                          : "hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 text-gray-700 hover:text-gray-900"
+                          ? "bg-primary text-white shadow-xl shadow-primary/30 dark:bg-gray-800 dark:text-white"
+                          : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                       }
                     `}
                     onClick={() => {
@@ -149,7 +148,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                         className={`w-6 h-6 transition-all duration-200 ${
                           activeItem === item.id
                             ? "text-white drop-shadow-md"
-                            : "text-gray-600 group-hover:text-primary"
+                            : "text-gray-700 dark:text-gray-300 group-hover:text-primary dark:group-hover:text-primary/80"
                         }`}
                       />
                     </motion.div>
@@ -157,7 +156,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                     {/* Active indicator */}
                     {activeItem === item.id && (
                       <motion.div
-                        className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
+                        className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full dark:bg-white/90"
                         layoutId="activeIndicator"
                         transition={{
                           type: "spring",
@@ -175,7 +174,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                         ${
                           activeItem === item.id
                             ? "text-white drop-shadow-md tracking-wide"
-                            : "text-gray-700 group-hover:text-gray-900"
+                            : "text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
                         }
                       `}
                       whileHover={{
@@ -192,10 +191,10 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
           </nav>
 
           {/* Logout Button */}
-          <div className="p-4 border-t border-sidebar-border">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <motion.button
               onClick={handleLogout}
-              className=" sidebar-item w-full text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg"
+              className="sidebar-item w-full text-red-500 dark:text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg transition-colors duration-200"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >

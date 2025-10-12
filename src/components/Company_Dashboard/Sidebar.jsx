@@ -39,7 +39,7 @@ const sidebarItems = [
 export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
   const [activeItem, setActiveItem] = useState("dashboard");
   const [isDesktop, setIsDesktop] = useState(false);
-    const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkScreen = () => {
@@ -56,32 +56,11 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
-  // helper to scroll to section id with optional header offset
-  const scrollToSection = (id, offsetSelector = ".site-header", fallback = 80) => {
-    if (typeof window === "undefined") return;
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    // compute header offset if present
-    const headerEl = document.querySelector(offsetSelector);
-    const headerOffset = headerEl ? headerEl.offsetHeight : fallback;
-
-    const elementPosition = el.getBoundingClientRect().top + window.scrollY;
-    const offsetPosition = elementPosition - headerOffset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    });
-  };
-
-
   const handleLogout = () => {
-    const lastRole = localStorage.getItem("role") || "company"; 
-    localStorage.clear(); 
-    navigate("/login", { state: { role: lastRole } }); 
+    const lastRole = localStorage.getItem("role") || "company";
+    localStorage.clear();
+    navigate("/login", { state: { role: lastRole } });
   };
-
 
   return (
     <>
@@ -102,7 +81,7 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
 
       {/* Sidebar Panel */}
       <motion.aside
-        className="fixed top-0 left-0 h-full w-64 bg-sidebar shadow-2xl z-40 overflow-hidden"
+        className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 shadow-2xl z-40 overflow-hidden border-r border-gray-200 dark:border-gray-700"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.3 }}
@@ -112,7 +91,7 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
           {isOpen && !isDesktop && (
             <motion.button
               key="close-btn"
-              className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               onClick={toggleSidebar}
               aria-label="Close Sidebar"
               initial={{ opacity: 0, y: -10 }}
@@ -120,7 +99,7 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <LogOut size={24} />
+              <X size={24} />
             </motion.button>
           )}
         </AnimatePresence>
@@ -136,48 +115,29 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
                     sidebar-item w-full flex items-center gap-4 p-4 rounded-2xl 
                     transition-all duration-200 ease-out relative overflow-hidden
                     group cursor-pointer select-none
-                    ${activeItem === item.id
-                      ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl shadow-primary/30"
-                      : "hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 text-gray-700 hover:text-gray-900"
+                    ${
+                      activeItem === item.id
+                        ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl shadow-primary/30 dark:from-gray-800 dark:to-gray-700 dark:text-white dark:shadow-none"
+                        : "hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 text-gray-700 hover:text-gray-900 dark:hover:from-gray-800 dark:hover:to-gray-700 dark:text-gray-300 dark:hover:text-white"
                     }
                   `}
                   onClick={() => {
                     setActiveItem(item.id);
                     if (onItemClick) onItemClick(item.id);
 
-                    // Handle notifications click
-                    if (item.id === "notifications") {
-                      if (onItemClick) {
-                        onItemClick(item.id);
-                      }
-                      // Close on mobile
-                      if (!isDesktop) setIsOpen(false);
-                      return;
-                    }
-                    if (item.id === "edit-profile") {
-                      if (onItemClick) onItemClick(item.id);
+                    if (item.id === "notifications" || item.id === "edit-profile") {
                       if (!isDesktop) setIsOpen(false);
                       return;
                     }
 
-                    // Dashboard -> scroll to top
                     if (item.id === "dashboard") {
-                      if (typeof window !== "undefined") {
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }
 
-                    // Interviews -> scroll to section with header offset
                     if (item.id === "interviews") {
-                      // Change '.site-header' selector if your header class differs
-                      if (typeof scrollToSection === "function") {
-                        scrollToSection("upcoming-interviews", ".site-header", 80);
-                      } else {
-                        console.warn("scrollToSection function is not defined");
-                      }
+                      scrollToSection("upcoming-interviews", ".site-header", 80);
                     }
 
-                    // Close on mobile
                     if (!isDesktop) setIsOpen(false);
                   }}
                   initial={{ opacity: 0, x: -20 }}
@@ -211,17 +171,18 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
                     }}
                   >
                     <item.icon
-                      className={`w-6 h-6 transition-all duration-200 ${activeItem === item.id
+                      className={`w-6 h-6 transition-all duration-200 ${
+                        activeItem === item.id
                           ? "text-white drop-shadow-md"
-                          : "text-gray-600 group-hover:text-primary"
-                        }`}
+                          : "text-gray-600 group-hover:text-primary dark:text-gray-300 dark:group-hover:text-white"
+                      }`}
                     />
                   </motion.div>
 
-                  {/* Active indicator – left side */}
+                  {/* Active indicator */}
                   {activeItem === item.id && (
                     <motion.div
-                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
+                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white dark:bg-primary rounded-r-full"
                       layoutId="activeIndicator"
                       transition={{
                         type: "spring",
@@ -236,9 +197,10 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
                   <motion.span
                     className={`
                       font-bold relative z-10 transition-all duration-200
-                      ${activeItem === item.id
-                        ? "text-white drop-shadow-md tracking-wide"
-                        : "text-gray-700 group-hover:text-gray-900"
+                      ${
+                        activeItem === item.id
+                          ? "text-white drop-shadow-md tracking-wide"
+                          : "text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-white"
                       }
                     `}
                     whileHover={{ x: 3, transition: { duration: 0.15 } }}
@@ -251,10 +213,10 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
           </nav>
 
           {/* Logout */}
-          <div className="p-4 border-t border-sidebar-border">
-           <motion.button
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <motion.button
               onClick={handleLogout}
-              className=" sidebar-item w-full text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg"
+              className="sidebar-item w-full text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >

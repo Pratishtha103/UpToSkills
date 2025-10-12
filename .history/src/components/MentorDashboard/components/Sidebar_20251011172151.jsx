@@ -2,50 +2,25 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-<<<<<<< HEAD
-import logo from "../../../assets/logo.jpg"; // <-- adjust this path if needed
-import { X, Home, Users, Folder, LogOut } from "lucide-react";
-
-const sidebarItems = [
-  { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
-  {
-    name: "Students",
-    icon: <Users size={18} />,
-    path: "/mentor-dashboard/multi-student",
-  },
-  {
-    name: "Projects",
-    icon: <Folder size={18} />,
-    path: "/mentor-dashboard/open-source-contributions",
-  },
-=======
-import logo from "./logo.png"; // <-- adjust this path if needed
 import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
+import logo from "../../../assets/logo.jpg"; // adjust path if needed
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
   { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
   { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
-  { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" }, // <-- added
->>>>>>> efcac3041e825432b0847b28d14134235d7b97a4
+  { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
 ];
 
-const Sidebar = ({
-  children,
-  isOpen: controlledIsOpen,
-  setIsOpen: controlledSetIsOpen,
-}) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [activeItem, setActiveItem] = useState("Dashboard");
-
-  // internal open state (used when not controlled)
   const [internalOpen, setInternalOpen] = useState(true);
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalOpen;
 
-  // track desktop breakpoint safely (avoid reading window during SSR/hydration)
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const check = () => {
@@ -60,13 +35,13 @@ const Sidebar = ({
 
   const setOpen = (v) => {
     if (isControlled) {
-      if (typeof controlledSetIsOpen === "function") controlledSetIsOpen(v);
+      controlledSetIsOpen?.(v);
     } else {
       setInternalOpen(v);
     }
   };
 
-  // sync active item to route (handles exact or nested paths)
+  // sync active item to route
   useEffect(() => {
     const currentItem =
       sidebarItems.find((item) => item.path === location.pathname) ||
@@ -74,14 +49,14 @@ const Sidebar = ({
     if (currentItem) setActiveItem(currentItem.name);
   }, [location.pathname]);
 
-  // global toggle handler (use ref to avoid stale closures)
+  // global toggle handler
   const toggleHandlerRef = useRef();
   useEffect(() => {
     toggleHandlerRef.current = () => setOpen(!isOpen);
   }, [isOpen]);
+
   useEffect(() => {
-    const handler = () =>
-      toggleHandlerRef.current && toggleHandlerRef.current();
+    const handler = () => toggleHandlerRef.current?.();
     window.addEventListener("toggleSidebar", handler);
     return () => window.removeEventListener("toggleSidebar", handler);
   }, []);
@@ -121,11 +96,6 @@ const Sidebar = ({
         </AnimatePresence>
 
         <div className="flex flex-col h-full pt-16">
-          {/* Logo - REMOVED for task */}
-          {/* <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
-            <img src={logo} alt="Logo" className="h-10 object-contain" />
-          </div> */}
-
           {/* Navigation Items */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-2">
@@ -137,8 +107,7 @@ const Sidebar = ({
                       activeItem === item.name
                         ? "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30"
                         : "text-gray-700 hover:bg-gray-100"
-                    }
-                  `}
+                    }`}
                   onClick={() => {
                     setActiveItem(item.name);
                     navigate(item.path);
@@ -146,47 +115,27 @@ const Sidebar = ({
                   }}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: index * 0.02,
-                    duration: 0.22,
-                    ease: "easeOut",
-                  }}
-                  whileHover={{
-                    x: 6,
-                    scale: 1.02,
-                    transition: { duration: 0.12 },
-                  }}
+                  transition={{ delay: index * 0.02, duration: 0.22, ease: "easeOut" }}
+                  whileHover={{ x: 6, scale: 1.02, transition: { duration: 0.12 } }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Icon */}
                   <div className="relative z-10 flex items-center justify-center">
                     {React.cloneElement(item.icon, {
                       className: `w-5 h-5 transition-all duration-200 ${
-                        activeItem === item.name
-                          ? "text-white"
-                          : "text-gray-600 group-hover:text-gray-800"
+                        activeItem === item.name ? "text-white" : "text-gray-600 group-hover:text-gray-800"
                       }`,
                     })}
                   </div>
 
-                  {/* Active indicator */}
                   {activeItem === item.name && (
                     <motion.div
                       className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
                       layoutId="activeIndicator"
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 30,
-                      }}
+                      transition={{ type: "spring", stiffness: 420, damping: 30 }}
                     />
                   )}
 
-                  <span
-                    className={`font-semibold relative z-10 ${
-                      activeItem === item.name ? "text-white" : "text-gray-800"
-                    }`}
-                  >
+                  <span className={`font-semibold relative z-10 ${activeItem === item.name ? "text-white" : "text-gray-800"}`}>
                     {item.name}
                   </span>
                 </motion.button>
@@ -208,12 +157,7 @@ const Sidebar = ({
         </div>
       </motion.aside>
 
-      {/* shift content when desktop and open */}
-      <div
-        className={`transition-all duration-300 ${
-          isOpen && isDesktop ? "ml-64" : "ml-0"
-        }`}
-      >
+      <div className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"}`}>
         {children}
       </div>
     </>

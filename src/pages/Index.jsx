@@ -197,27 +197,59 @@ export default function Index() {
           <motion.section className="hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 items-center">
               <div>
-                <motion.h1 className="text-3xl sm:text-4xl font-bold mb-8 select-none" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                  Welcome to{" "}
-                  <span className="bg-gradient-to-r from-[#01BDA5] via-[#43cea2] to-[#FF824C] bg-clip-text text-transparent font-extrabold drop-shadow-lg">
-                    UptoSkill
-                  </span>{" "}
-                  Hiring Dashboard
-                </motion.h1>
-                <motion.p className="text-base sm:text-xl text-white/90 mb-4 select-none" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                  Discover talented students, schedule interviews, and build your dream team with our comprehensive hiring platform.
-                </motion.p>
-                <motion.div className="flex flex-wrap gap-4" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                  <Button variant="logo" size="lg" className="glass-button text-white border-white/30 hover:border-white/50">
-                    <Target className="w-5 h-5 mr-2" />
-                    Start Hiring
-                  </Button>
-                  <Button variant="glass" size="lg" className="border-white/30 hover:border-white/50">
-                    <TrendingUp className="w-5 h-5 mr-2" />
-                    Learn More
-                  </Button>
-                </motion.div>
-              </div>
+  <motion.h1
+    className="text-3xl sm:text-4xl font-bold mb-8 select-none 
+               text-gray-800 dark:text-white"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.2 }}
+  >
+    Welcome to{" "}
+    <span className="bg-gradient-to-r from-[#01BDA5] via-[#43cea2] to-[#FF824C] bg-clip-text text-transparent font-extrabold drop-shadow-lg">
+      UptoSkill
+    </span>{" "}
+    Hiring Dashboard
+  </motion.h1>
+
+  <motion.p
+    className="text-base sm:text-xl mb-4 select-none 
+               text-gray-600 dark:text-gray-300"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3 }}
+  >
+    Discover talented students, schedule interviews, and build your dream team
+    with our comprehensive hiring platform.
+  </motion.p>
+
+  <motion.div
+    className="flex flex-wrap gap-4"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.4 }}
+  >
+    <Button
+      variant="logo"
+      size="lg"
+      className="glass-button text-gray-800 dark:text-white 
+                 border-gray-300 dark:border-white/30 hover:border-gray-500 dark:hover:border-white/50"
+    >
+      <Target className="w-5 h-5 mr-2" />
+      Start Hiring
+    </Button>
+
+    <Button
+      variant="glass"
+      size="lg"
+      className="border-gray-300 dark:border-white/30 
+                 hover:border-gray-500 dark:hover:border-white/50
+                 text-gray-800 dark:text-white"
+    >
+      <TrendingUp className="w-5 h-5 mr-2" />
+      Learn More
+    </Button>
+  </motion.div>
+</div>
 
               <div className="hidden lg:block">
                 <div style={{ width: 320, height: 200 }} className="bg-white/3 rounded-2xl flex items-center justify-center">
@@ -236,7 +268,7 @@ export default function Index() {
             <motion.h2 className="text-2xl font-bold text-foreground mb-6" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
               Hiring Overview
             </motion.h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 dark:text-foreground-white ">
               <StatCard title="Total Students Available" value={students.length} subtitle="+12% from last month" icon={Users} color="primary" delay={0.1} />
               <StatCard title="Interviews Scheduled" value="24" subtitle="This week" icon={CalIcon} color="secondary" delay={0.2} />
               <StatCard title="Mentored Students" value="156" subtitle="Active mentorships" icon={UserCheck} color="success" delay={0.3} />
@@ -269,12 +301,7 @@ export default function Index() {
           <section className="mb-8">
             <InterviewsSection />
           </section>
-
-          {/* Footer
-          <footer className="text-center py-8 border-t border-border mt-12">
-            <p className="text-muted-foreground">© 2024 UptoSkill. Empowering the next generation of talent.</p>
-          </footer> */}
-        </div>
+          </div>
 
         {/* Student Profile Modal */}
         <StudentProfileModal

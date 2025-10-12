@@ -18,8 +18,9 @@ function NoticeBoard() {
         Notice Board
       </motion.h2>
       
+      {/* Main Card */}
       <motion.div
-        className="stat-card p-6"
+        className="p-6 rounded-2xl shadow-md bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 transition-all duration-300"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -39,13 +40,13 @@ function NoticeBoard() {
           {notices.map((notice, index) => (
             <motion.div
               key={index}
-              className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+              className="flex items-center gap-4 p-4 rounded-xl bg-gray-100 dark:bg-[#1e293b] hover:bg-gray-200 dark:hover:bg-[#334155] transition-colors cursor-pointer"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
               whileHover={{ x: 4 }}
             >
-              <div className="p-2 rounded-xl bg-gradient-primary">
+              <div className="p-2 rounded-xl bg-gradient-to-r from-primary to-primary/80">
                 <notice.icon className="w-5 h-5 text-white" />
               </div>
               <span className="font-medium text-foreground">{notice.text}</span>

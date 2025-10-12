@@ -35,7 +35,7 @@ export default function StatCard({
   return (
     <motion.div
       ref={divRef}
-      className="relative stat-card rounded-xl bg-white overflow-hidden p-4 border border-gray-200 transition-all duration-300 ease-out"
+      className="relative stat-card rounded-xl bg-white dark:bg-gray-800 overflow-hidden p-4 border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-out"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
@@ -50,17 +50,32 @@ export default function StatCard({
         style={{
           opacity,
           background: `radial-gradient(circle at ${position.x}px ${position.y}px, rgba(0,102,255,0.3), transparent 80%)`,
-          transition: "background 0.1s ease-out", // smooth glow movement
+          transition: "background 0.1s ease-out",
         }}
       />
 
       {/* 📊 Card Content */}
       <div className="flex items-center justify-between relative z-10">
         <div>
-          <p className="text-muted-foreground text-sm font-medium mb-1">{title}</p>
-          <p className="text-3xl font-bold text-foreground mb-1">{displayValue}</p>
-          {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
+          {/* Title */}
+          <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">
+            {title}
+          </p>
+
+          {/* Main Value */}
+          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+            {displayValue}
+          </p>
+
+          {/* Subtitle */}
+          {subtitle && (
+            <p className="text-gray-500 dark:text-gray-300 text-sm">
+              {subtitle}
+            </p>
+          )}
         </div>
+
+        {/* Icon Container */}
         <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
           {Icon ? <Icon className="w-6 h-6" /> : null}
         </div>

@@ -1,84 +1,87 @@
-import { motion } from 'framer-motion'
-import { Card } from '../Company_Dashboard/ui/card'
-import { Button } from '../Company_Dashboard/ui/button'
-import { Badge } from '../Company_Dashboard/ui/badge'
-import { Calendar, Clock, Video, Phone, MoreHorizontal } from 'lucide-react'
+import { motion } from "framer-motion";
+import { Card } from "../Company_Dashboard/ui/card";
+import { Button } from "../Company_Dashboard/ui/button";
+import { Badge } from "../Company_Dashboard/ui/badge";
+import { Calendar, Clock, Video, Phone, MoreHorizontal } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
-/* Mock data & helpers                                                        */
+/* Mock data (replace with API later)                                         */
 /* -------------------------------------------------------------------------- */
 
 const mockInterviews = [
   {
-    id: '1',
-    candidateName: 'Sarah Johnson',
-    position: 'React Developer',
-    date: '2024-07-20',
-    time: '10:00 AM',
-    type: 'video',
-    status: 'scheduled',
+    id: "1",
+    candidateName: "Sarah Johnson",
+    position: "React Developer",
+    date: "2024-07-20",
+    time: "10:00 AM",
+    type: "video",
+    status: "scheduled",
   },
   {
-    id: '2',
-    candidateName: 'Mike Chen',
-    position: 'Data Scientist',
-    date: '2024-07-20',
-    time: '2:00 PM',
-    type: 'video',
-    status: 'scheduled',
+    id: "2",
+    candidateName: "Mike Chen",
+    position: "Data Scientist",
+    date: "2024-07-20",
+    time: "2:00 PM",
+    type: "video",
+    status: "scheduled",
   },
   {
-    id: '3',
-    candidateName: 'Emily Rodriguez',
-    position: 'UI/UX Designer',
-    date: '2024-07-21',
-    time: '11:30 AM',
-    type: 'phone',
-    status: 'scheduled',
+    id: "3",
+    candidateName: "Emily Rodriguez",
+    position: "UI/UX Designer",
+    date: "2024-07-21",
+    time: "11:30 AM",
+    type: "phone",
+    status: "scheduled",
   },
-]
+];
+
+/* -------------------------------------------------------------------------- */
+/* Styling Helpers                                                            */
+/* -------------------------------------------------------------------------- */
 
 const statusColors = {
-  scheduled: 'bg-primary text-primary-foreground',
-  completed: 'bg-success text-success-foreground',
-  cancelled: 'bg-destructive text-destructive-foreground',
-}
+  scheduled: "bg-primary text-primary-foreground",
+  completed: "bg-success text-success-foreground",
+  cancelled: "bg-destructive text-destructive-foreground",
+};
 
 const typeIcons = {
   video: Video,
   phone: Phone,
-  'in-person': Calendar,
-}
+  "in-person": Calendar,
+};
 
 /* -------------------------------------------------------------------------- */
-/* Component                                                                  */
+/* Main Component                                                             */
 /* -------------------------------------------------------------------------- */
 
 export default function InterviewsSection() {
   return (
     <motion.div
-      id="upcoming-interviews" 
-      className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+      id="upcoming-interviews"
+      className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-100 transition-all"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-foreground ">
-          
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">
           Upcoming Interviews
         </h2>
-        <Button className="w-full sm:w-auto btn-primary">
-          <Calendar className="w-6 h-6" />
+        <Button className="w-full sm:w-auto flex items-center gap-2">
+          <Calendar className="w-5 h-5" />
           Schedule New Interview
         </Button>
       </div>
 
-      {/* Interview cards */}
+      {/* Interview Cards */}
       <div className="grid gap-4">
         {mockInterviews.map((interview, index) => {
-          const TypeIcon = typeIcons[interview.type]
+          const TypeIcon = typeIcons[interview.type];
 
           return (
             <motion.div
@@ -88,32 +91,25 @@ export default function InterviewsSection() {
               transition={{ delay: index * 0.1 }}
             >
               <Card
-                className="p-4 h-full flex flex-col border-2 border-transparent transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_4px_rgba(59,130,246,0.5)] bg-gray-100  hover:bg-gray-150 rounded-2xl "
-                style={{ borderStyle: 'solid',  }}
+                className="p-4 h-full flex flex-col border-2 border-transparent transition-all duration-300 bg-gray-50 dark:bg-gray-800 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_4px_rgba(59,130,246,0.4)] rounded-2xl"
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderTopColor = '#F97316'
-                  e.currentTarget.style.borderLeftColor = '#F97316'
-                  e.currentTarget.style.borderBottomColor = '#3B82F6'
-                  e.currentTarget.style.borderRightColor = '#3B82F6'
+                  e.currentTarget.style.borderColor = "#3B82F6";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderTopColor = 'transparent'
-                  e.currentTarget.style.borderLeftColor = 'transparent'
-                  e.currentTarget.style.borderBottomColor = 'transparent'
-                  e.currentTarget.style.borderRightColor = 'transparent'
+                  e.currentTarget.style.borderColor = "transparent";
                 }}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  {/* Candidate info */}
+                  {/* Candidate Info */}
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
                       {interview.candidateName
-                        .split(' ')
+                        .split(" ")
                         .map((n) => n[0])
-                        .join('')}
+                        .join("")}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground text-base sm:text-lg">
+                      <h3 className="font-semibold text-foreground dark:text-white text-base sm:text-lg">
                         {interview.candidateName}
                       </h3>
                       <p className="text-muted-foreground text-sm">
@@ -122,9 +118,9 @@ export default function InterviewsSection() {
                     </div>
                   </div>
 
-                  {/* Date, time, status & actions */}
+                  {/* Date, Time, Status, Buttons */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full lg:w-auto">
-                    {/* Date & time */}
+                    {/* Date & Time */}
                     <div className="flex flex-col text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
@@ -165,9 +161,9 @@ export default function InterviewsSection() {
                 </div>
               </Card>
             </motion.div>
-          )
+          );
         })}
       </div>
     </motion.div>
-  )
+  );
 }

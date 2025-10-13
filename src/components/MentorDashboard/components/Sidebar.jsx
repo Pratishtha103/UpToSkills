@@ -2,12 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-<<<<<<< Updated upstream
-import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
-=======
-
 import { X, Home, Users, Folder, LogOut, Edit3, Award } from "lucide-react";
->>>>>>> Stashed changes
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },

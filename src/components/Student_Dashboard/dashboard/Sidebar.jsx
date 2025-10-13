@@ -12,50 +12,11 @@ import {
 import { useEffect, useState } from "react";
 
 const sidebarItems = [
-<<<<<<< Updated upstream
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    id: "profile",
-    label: "Edit Profile",
-    icon: User,
-    path: "/dashboard/edit-profile",
-  },
-  {
-    id: "projects",
-    label: "Submit Projects",
-    icon: FolderOpen,
-    path: "/dashboard/my-projects",
-  },
-  {
-    id: "viewproject",
-    label: "View Project",
-    icon: FolderOpen,
-    path: "/projectshowcase",
-  },
-  {
-    id: "badges",
-    label: "Skill Badges",
-    icon: Award,
-    path: "/dashboard/skill-badges",
-  },
-  {
-    id: "notifications",
-    label: "Notifications",
-    icon: Bell,
-    path: "/dashboard/notifications",
-  },
-=======
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "My Projects", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "View Project", icon: FolderOpen, path: "/projectshowcase" },
   { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
->>>>>>> Stashed changes
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {

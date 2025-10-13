@@ -45,7 +45,7 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
           </h1>
           <p
             className={`text-center ${
-              isDarkMode ? "text-gray-200" : "text-gray-600"
+              isDarkMode ? "text-gray-300" : "text-gray-800"
             } mb-8 max-w-3xl mx-auto`}
           >
             Monitor, review and approve your student’s commits, pull requests,
@@ -54,27 +54,9 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
 
           <section className="mb-10">
             <div className="overflow-x-auto">
-              <table
-                className={`min-w-full ${
-                  isDarkMode
-                    ? "text-gray-200 bg-gray-900 border border-gray-700"
-                    : "text-gray-600 bg-white border border-gray-200 "
-                }   shadow-md rounded-xl overflow-hidden`}
-              >
-                <thead
-                  className={`${
-                    isDarkMode
-                      ? "text-gray-200 bg-gray-900 border border-gray-700"
-                      : "text-gray-600 bg-white border border-gray-200 "
-                  }  text-sm uppercase tracking-wide`}
-                >
-                  <tr
-                    className={`${
-                      isDarkMode
-                        ? "text-gray-200 bg-gray-900 border border-gray-700"
-                        : "text-gray-600 bg-white border border-gray-200 "
-                    } `}
-                  >
+              <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-xl overflow-hidden">
+                <thead className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide">
+                  <tr>
                     <th className="px-6 py-4 text-left">Project Title</th>
                     <th className="px-6 py-4 text-left">Total Students</th>
                   </tr>
@@ -100,24 +82,12 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
                     projects.map((proj) => (
                       <tr
                         key={proj.id}
-                        className={`${
-                          isDarkMode
-                            ? "text-gray-200 bg-gray-900 border border-gray-700"
-                            : "text-gray-600 bg-white border border-gray-200 "
-                        } hover:bg-gray-50 transition duration-200 ease-in-out`}
+                        className="hover:bg-gray-50 transition duration-200 ease-in-out"
                       >
-                        <td
-                          className={`px-6 py-4 font-medium ${
-                            isDarkMode ? "text-gray-200 " : "text-gray-600  "
-                          } `}
-                        >
+                        <td className="px-6 py-4 font-medium text-gray-800">
                           {proj.project_title}
                         </td>
-                        <td
-                          className={`px-6 py-4 ${
-                            isDarkMode ? "text-gray-200 " : "text-gray-600 "
-                          } `}
-                        >
+                        <td className="px-6 py-4 text-gray-600">
                           {proj.total_students}
                         </td>
                       </tr>

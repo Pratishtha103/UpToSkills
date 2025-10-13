@@ -3,10 +3,10 @@ import Sidebar from "../components/Student_Dashboard/dashboard/Sidebar";
 import Header from "../components/Student_Dashboard/dashboard/Header";
 import WelcomeSection from "../components/Student_Dashboard/dashboard/WelcomeSection";
 import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
-// import NoticeBoard from "../components/Student_Dashboard/dashboard/NoticeBoard";
-// import ChartSection from "../components/Student_Dashboard/dashboard/ChartSection";
-// import AssignmentsSection from "../components/Student_Dashboard/dashboard/AssignmentsSection";
-// import BottomProfileMessages from "../components/Student_Dashboard/dashboard/BottomProfileMessages";
+import NoticeBoard from "../components/Student_Dashboard/dashboard/NoticeBoard";
+import ChartSection from "../components/Student_Dashboard/dashboard/ChartSection";
+import AssignmentsSection from "../components/Student_Dashboard/dashboard/AssignmentsSection";
+import BottomProfileMessages from "../components/Student_Dashboard/dashboard/BottomProfileMessages";
 import Footer from "../components/Student_Dashboard/dashboard/Footer";
 
 const StudentDashboard = () => {
@@ -44,7 +44,9 @@ const StudentDashboard = () => {
   return (
     <div
       className={`flex min-h-screen transition-all duration-300 dark:bg-gray-800  ${
-        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+        isDarkMode
+          ? "-[#0f172a] text-white"
+          : "-[#f8fafc] text-gray-900"
       }`}
     >
       <Sidebar isOpen={isSidebarVisible} setIsOpen={setSidebarVisible} />
@@ -53,17 +55,14 @@ const StudentDashboard = () => {
           isSidebarVisible ? "lg:ml-64" : "ml-0"
         }`}
       >
-        <Header
-          onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
-          toggleDarkMode={toggleDarkMode}
-        />
+        <Header onMenuClick={() => setSidebarVisible(!isSidebarVisible)} toggleDarkMode={toggleDarkMode} />
         <div className="pt-24 px-4 sm:px-6 py-6 space-y-6">
           <WelcomeSection />
           <StatsGrid />
-          {/* <NoticeBoard />
+          <NoticeBoard />
           <ChartSection />
           <AssignmentsSection />
-          <BottomProfileMessages /> */}
+          <BottomProfileMessages />
         </div>
         <Footer />
       </div>

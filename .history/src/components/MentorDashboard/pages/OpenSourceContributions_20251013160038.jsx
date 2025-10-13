@@ -100,24 +100,12 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
                     projects.map((proj) => (
                       <tr
                         key={proj.id}
-                        className={`${
-                          isDarkMode
-                            ? "text-gray-200 bg-gray-900 border border-gray-700"
-                            : "text-gray-600 bg-white border border-gray-200 "
-                        } hover:bg-gray-50 transition duration-200 ease-in-out`}
+                        className="hover:bg-gray-50 transition duration-200 ease-in-out"
                       >
-                        <td
-                          className={`px-6 py-4 font-medium ${
-                            isDarkMode ? "text-gray-200 " : "text-gray-600  "
-                          } `}
-                        >
+                        <td className="px-6 py-4 font-medium text-gray-800">
                           {proj.project_title}
                         </td>
-                        <td
-                          className={`px-6 py-4 ${
-                            isDarkMode ? "text-gray-200 " : "text-gray-600 "
-                          } `}
-                        >
+                        <td className="px-6 py-4 text-gray-600">
                           {proj.total_students}
                         </td>
                       </tr>

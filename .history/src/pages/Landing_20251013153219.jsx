@@ -46,7 +46,7 @@ export default function Landing() {
     },
     {
       title: "For Mentors",
-      icon: "https://static.thenounproject.com/png/2217264-200.png",
+      icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhj9mVOdrcmMi2WCCj7uWIDqb-jGOIAyTigL7cmgYzwAlxmz8387L3RVvfjX5QG8IimKI&usqp=CAU",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },

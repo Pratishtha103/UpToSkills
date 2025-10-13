@@ -122,12 +122,6 @@ export default function Header({ onMenuClick }) {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={handleProfileClick}>
               <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
             </Button>

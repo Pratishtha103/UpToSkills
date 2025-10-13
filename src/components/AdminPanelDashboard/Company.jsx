@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Building2, Users, Trash2, Sun, Moon } from "lucide-react";
+import { Building2, Users, Trash2 } from "lucide-react";
 
 export default function Company({ isDarkMode }) {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // 🌗 Apply dark or light mode to document root
+  // Apply dark or light mode to document root
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
@@ -17,7 +16,7 @@ export default function Company({ isDarkMode }) {
     }
   }, [isDarkMode]);
 
-  // 🔁 Fetch companies
+  // Fetch companies
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
@@ -40,7 +39,7 @@ export default function Company({ isDarkMode }) {
     fetchCompanies();
   }, []);
 
-  // 🗑️ Remove company
+  // Remove company
   const handleRemoveCompany = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to remove this company?"
@@ -86,20 +85,6 @@ export default function Company({ isDarkMode }) {
         >
           Manage Companies
         </motion.h2>
-
-        {/* 🌗 Theme Toggle */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsDarkMode((prev) => !prev)}
-          className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
-        >
-          {isDarkMode ? (
-            <Sun className="w-5 h-5" />
-          ) : (
-            <Moon className="w-5 h-5" />
-          )}
-        </motion.button>
       </div>
 
       {/* Company Cards */}

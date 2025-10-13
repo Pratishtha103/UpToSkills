@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
-// Removed: import { motion } from "framer-motion";
 import { FolderOpen, User, Users, Plus, Trash2, Award } from "lucide-react";
 
-function Project({ isDarkMode }) {
+export default function Project({ isDarkMode }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectMentor, setNewProjectMentor] = useState("");
   const [newProjectStudents, setNewProjectStudents] = useState("");
 
+  // Apply dark or light mode globally
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
+  }, [isDarkMode]);
+
+  // Fetch all projects
   useEffect(() => {
     fetch("http://localhost:5000/api/mentor_projects")
       .then((res) => res.json())
@@ -19,8 +26,12 @@ function Project({ isDarkMode }) {
       .catch(() => setLoading(false));
   }, []);
 
+  // Add Project
   const addProject = async () => {
-    if (!newProjectTitle || !newProjectMentor || !newProjectStudents) return;
+    if (!newProjectTitle || !newProjectMentor || !newProjectStudents) {
+      alert("Please fill out all fields before adding a project.");
+      return;
+    }
 
     try {
       const res = await fetch("http://localhost:5000/api/mentor_projects", {
@@ -45,6 +56,7 @@ function Project({ isDarkMode }) {
     }
   };
 
+  // Delete Project
   const removeProject = async (id) => {
     if (!window.confirm("Are you sure you want to delete this project?"))
       return;
@@ -52,13 +64,12 @@ function Project({ isDarkMode }) {
     try {
       const res = await fetch(
         `http://localhost:5000/api/mentor_projects/${id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       const data = await res.json();
-      if (data.success) setProjects((prev) => prev.filter((p) => p.id !== id));
-      else alert(data.message || "Failed to delete project");
+      if (data.success) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      } else alert(data.message || "Failed to delete project");
     } catch (err) {
       console.error(err);
       alert("Error deleting project");
@@ -71,49 +82,48 @@ function Project({ isDarkMode }) {
         isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
       }`}
     >
-      {/* Add Project Form */}
+      {/* Add New Project Form */}
       <div
-        className={`stat-card p-6 rounded-2xl shadow-md transition-colors duration-300 ${
+        className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
           isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
         }`}
       >
-        {/* Title now inherits color from parent div (text-white/text-gray-900) */}
-        <h3 className="text-xl font-bold mb-4 transition-colors duration-300">
-          Add New Project
-        </h3>
+        <h3 className="text-xl font-bold mb-4">Add New Project</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          {[
-            {
-              value: newProjectTitle,
-              onChange: (e) => setNewProjectTitle(e.target.value),
-              placeholder: "Project Title",
-            },
-            {
-              value: newProjectMentor,
-              onChange: (e) => setNewProjectMentor(e.target.value),
-              placeholder: "Mentor Name",
-            },
-            {
-              value: newProjectStudents,
-              onChange: (e) => setNewProjectStudents(e.target.value),
-              placeholder: "Number of Students",
-              type: "number",
-            },
-          ].map((input, idx) => (
-            <input
-              key={idx}
-              type={input.type || "text"}
-              placeholder={input.placeholder}
-              value={input.value}
-              onChange={input.onChange}
-              className={`rounded-md p-2 border w-full transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
-                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-              }`}
-            />
-          ))}
+          <input
+            type="text"
+            placeholder="Project Title"
+            value={newProjectTitle}
+            onChange={(e) => setNewProjectTitle(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
+          <input
+            type="text"
+            placeholder="Mentor Name"
+            value={newProjectMentor}
+            onChange={(e) => setNewProjectMentor(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
+          <input
+            type="number"
+            placeholder="Number of Students"
+            value={newProjectStudents}
+            onChange={(e) => setNewProjectStudents(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
         </div>
 
         <button
@@ -128,29 +138,29 @@ function Project({ isDarkMode }) {
         </button>
       </div>
 
-      {/* Projects Grid */}
+      {/*  Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading
           ? Array.from({ length: 6 }).map((_, idx) => (
-              <div // Skeleton loader
+              <div
                 key={idx}
-                className={`stat-card p-6 animate-pulse rounded-lg ${
+                className={`p-6 rounded-lg animate-pulse ${
                   isDarkMode ? "bg-gray-800" : "bg-white"
                 }`}
               />
             ))
           : projects.map((project) => (
-              <div // Project Card (Standard div)
+              <div
                 key={project.id}
-                className={`stat-card p-6 rounded-lg transition-colors duration-300 ${
+                className={`p-6 rounded-lg shadow-md transition-colors duration-300 ${
                   isDarkMode
-                    ? "bg-gray-800 text-white" // Sets card BG and main text color
+                    ? "bg-gray-800 text-white"
                     : "bg-white text-gray-900"
                 }`}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div
-                    className={`p-3 rounded-2xl flex-shrink-0 transition-colors duration-300 ${
+                    className={`p-3 rounded-2xl flex-shrink-0 ${
                       isDarkMode
                         ? "bg-gradient-to-r from-gray-700 to-gray-600"
                         : "bg-gradient-to-r from-blue-500 to-blue-600"
@@ -158,33 +168,21 @@ function Project({ isDarkMode }) {
                   >
                     <FolderOpen className="w-6 h-6 text-white" />
                   </div>
-                  {/* Title inherits color */}
-                  <h3 className="text-lg font-bold transition-colors duration-300">
+                  <h3 className="text-lg font-bold">
                     {project.project_title}
                   </h3>
                 </div>
 
-                {/* Secondary details with slightly subdued color */}
                 <div
-                  className={`flex flex-col gap-2 mb-4 text-sm transition-colors duration-300 ${
+                  className={`flex flex-col gap-2 mb-4 text-sm ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  <div
-                    className={`flex items-center gap-2 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    {/* Icon inherits color from the text-gray-300/700 parent */}
+                  <div className="flex items-center gap-2">
                     <User className="w-4 h-4" />
                     Mentor: {project.mentor_name}
                   </div>
-                  <div
-                    className={`flex items-center gap-2 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    {/* Icon inherits color from the text-gray-300/700 parent */}
+                  <div className="flex items-center gap-2">
                     <Users className="w-4 h-4" />
                     {project.total_students}{" "}
                     {project.total_students === 1 ? "Student" : "Students"}
@@ -219,5 +217,3 @@ function Project({ isDarkMode }) {
     </main>
   );
 }
-
-export default Project;

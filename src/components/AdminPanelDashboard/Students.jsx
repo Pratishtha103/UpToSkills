@@ -1,6 +1,7 @@
+// src/components/AdminPanelDashboard/Students.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { User, Search, Linkedin, Trash2, Loader2, Users } from "lucide-react";
+import { User, Search, Loader2, Users } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api/students";
 
@@ -52,6 +53,7 @@ const Students = ({ isDarkMode }) => {
     }
   };
 
+  // Search functionality
   useEffect(() => {
     const timeout = setTimeout(async () => {
       if (!searchTerm.trim()) {
@@ -75,23 +77,24 @@ const Students = ({ isDarkMode }) => {
 
   return (
     <div
-      className={`${
+      className={`min-h-screen p-4 sm:p-8 font-inter transition-colors duration-500 ${
         isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-      } min-h-screen p-4 sm:p-8 font-inter`}
+      }`}
     >
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        {/* Header */}
         <div className="text-4xl font-extrabold flex items-center gap-3">
           <Users className="w-8 h-8 text-indigo-500" />
           Manage Students
         </div>
 
-        {/* Search */}
+        {/* Search Bar */}
         <div
-          className={`${
+          className={`p-4 shadow-md rounded-lg border transition-colors duration-300 ${
             isDarkMode
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-300"
-          } stat-card p-4 shadow-md rounded-lg border`}
+          }`}
         >
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -100,11 +103,11 @@ const Students = ({ isDarkMode }) => {
               placeholder="Search students..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`${
+              className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${
                 isDarkMode
-                  ? "bg-gray-700 text-gray-100 placeholder-gray-400"
-                  : "bg-white text-gray-900 placeholder-gray-400"
-              } w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none`}
+                  ? "bg-gray-700 text-gray-100 border-gray-600 placeholder-gray-400"
+                  : "bg-white text-gray-900 border-gray-300 placeholder-gray-400"
+              }`}
             />
             {searching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -120,7 +123,9 @@ const Students = ({ isDarkMode }) => {
             Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={idx}
-                className="stat-card p-6 animate-pulse rounded-lg shadow-lg"
+                className={`rounded-lg shadow-md p-6 animate-pulse ${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                }`}
               ></div>
             ))
           ) : students.length > 0 ? (
@@ -128,11 +133,11 @@ const Students = ({ isDarkMode }) => {
               <motion.div
                 key={student.id}
                 layout
-                className={`${
+                className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
                   isDarkMode
                     ? "bg-gray-800 text-gray-100"
                     : "bg-white text-gray-900"
-                } stat-card p-6 rounded-lg shadow-md hover:shadow-lg transition-all`}
+                }`}
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
@@ -150,15 +155,15 @@ const Students = ({ isDarkMode }) => {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => handleDelete(student.id)}
                     disabled={isDeleting === student.id}
-                    className={`${
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
                       isDeleting === student.id
-                        ? "bg-red-200 text-red-700 cursor-not-allowed"
+                        ? "bg-red-300 text-red-800 cursor-not-allowed"
                         : "bg-red-500 text-white hover:bg-red-600"
-                    } inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm`}
+                    }`}
                   >
                     {isDeleting === student.id ? "Deleting..." : "Delete"}
                   </button>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const adminNotificationsData = [
   {
@@ -29,42 +29,64 @@ const adminNotificationsData = [
   },
 ];
 
-const AdminNotifications = () => {
+export default function AdminNotifications({ isDarkMode }) {
   const [hoveredId, setHoveredId] = useState(null);
 
+  // Sync dark mode globally
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
+  }, [isDarkMode]);
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-        Notifications
-      </h2>
+    <main
+      className={`p-6 min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      <h2 className="text-2xl font-bold mb-6">Notifications</h2>
+
       <div className="flex flex-col gap-4">
         {adminNotificationsData.map((notification) => (
           <div
             key={notification.id}
             onMouseEnter={() => setHoveredId(notification.id)}
             onMouseLeave={() => setHoveredId(null)}
-            className={`
-              flex justify-between items-center p-4 rounded-lg border border-gray-200 dark:border-gray-700
-              bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-default
+            className={`flex justify-between items-center p-4 rounded-xl border transition-all duration-200 cursor-default shadow-sm
+              ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-700 text-gray-100"
+                  : "bg-white border-gray-200 text-gray-900"
+              }
               ${hoveredId === notification.id ? "shadow-lg" : ""}
             `}
           >
+            {/* Left Section */}
             <div className="flex flex-col">
-              <h3 className="text-gray-900 dark:text-gray-100 font-semibold text-base mb-1">
+              <h3 className="font-semibold text-base mb-1">
                 {notification.title}
               </h3>
-              <p className="text-gray-500 dark:text-gray-300 text-sm">
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
                 {notification.message}
               </p>
             </div>
-            <span className="text-gray-400 dark:text-gray-400 text-xs ml-4 flex-shrink-0 whitespace-nowrap">
+
+            {/* Right Section - Time */}
+            <span
+              className={`text-xs ml-4 flex-shrink-0 whitespace-nowrap ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
               {notification.time}
             </span>
           </div>
         ))}
       </div>
-    </div>
+    </main>
   );
-};
-
-export default AdminNotifications;
+}

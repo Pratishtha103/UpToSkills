@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import Header from '../dashboard/Header';
-import Sidebar from '../dashboard/Sidebar';
+import Header from '../Header';
+import Sidebar from '../Sidebar';
 // import RightSidebar from '../dashboard/RightSidebar';
 
 const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
@@ -25,12 +25,23 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Submitted Data:', formData);
-
-    // TODO: Replace with actual API POST request if needed
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch('http://localhost:5000/api/skill-badges', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    const data = await response.json();
+    if (data.success) {
+      alert('Badge added successfully!');
+      setFormData({ student_id: '', badge_name: '', badge_description: '', verified: false });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
 
   return (
     <div className={`dashboard-container${isDarkMode ? ' dark' : ''}`}>

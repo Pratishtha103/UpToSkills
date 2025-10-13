@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Landing from './pages/Landing';
@@ -6,7 +6,7 @@ import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
 import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';
-import SkillBadgeForm from './components/Student_Dashboard/SkillBadges/SkillBadgeForm';
+import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';
 import RegistrationForm from './pages/Register';
@@ -26,7 +26,15 @@ import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
 
 function App() {
+<<<<<<< Updated upstream
   const queryClient = new QueryClient();
+=======
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+>>>>>>> Stashed changes
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -48,8 +56,18 @@ function App() {
               </div>
             } />
 
+<<<<<<< Updated upstream
             {/* Programs */}
             <Route path="/programs" element={<ProgramsPage />} />
+=======
+          {/* =====  Student Dashboard Routes  ===== */}
+          <Route path="/dashboard" element={<Student_Dashboard />} />
+          <Route path="/dashboard/profile" element={<UserProfilePage />} />
+          <Route path="/dashboard/edit-profile" element={<EditProfilePage />} />
+          <Route path="/dashboard/my-projects" element={<MyProjects />} />
+          <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+>>>>>>> Stashed changes
 
             {/* Student Dashboard */}
             <Route path="/dashboard" element={<Student_Dashboard />} />

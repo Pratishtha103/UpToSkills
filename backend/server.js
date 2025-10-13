@@ -23,6 +23,7 @@ const companiesRoutes = require('./routes/companies.route');
 const searchStudent = require('./routes/searchStudents');
 
 const formRoute = require('./routes/formRoutes');
+const testimonialsRouter = require('./routes/testimonials');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -54,11 +55,14 @@ app.use('/api/students', studentsRoutes);
 app.use('/api/mentors', mentorsRoutes);
 app.use('/api/company-profiles', companyProfilesRoutes);
 
+
 app.use("/api/stats", statsRoutes);
 
 app.use('/api/students', searchStudent);
 
 app.use('/api/form', formRoute);
+app.use('/api/testimonials', testimonialsRouter);
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {

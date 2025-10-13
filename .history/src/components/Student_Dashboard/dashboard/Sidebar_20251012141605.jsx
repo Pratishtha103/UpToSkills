@@ -13,42 +13,12 @@ import {
 import { useEffect, useState } from "react";
 
 const sidebarItems = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    id: "profile",
-    label: "Edit Profile",
-    icon: User,
-    path: "/dashboard/edit-profile",
-  },
-  {
-    id: "projects",
-    label: "Submit Projects",
-    icon: FolderOpen,
-    path: "/dashboard/my-projects",
-  },
-  {
-    id: "viewproject",
-    label: "View Project",
-    icon: FolderOpen,
-    path: "/projectshowcase",
-  },
-  {
-    id: "badges",
-    label: "Skill Badges",
-    icon: Award,
-    path: "/dashboard/skill-badges",
-  },
-  {
-    id: "notifications",
-    label: "Notifications",
-    icon: Bell,
-    path: "/dashboard/notifications",
-  },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
+  { id: "projects", label: "My Projects", icon: FolderOpen, path: "/dashboard/my-projects" },
+  { id: "viewproject", label: "View Project", icon: FolderOpen, path: "/projectshowcase" },
+  { id: "badges", label: "Skill Badges", icon: Award, path: "/dashboard/skill-badges" },
+  { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
@@ -69,9 +39,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   }, [setIsOpen]);
 
   useEffect(() => {
-    const currentItem = sidebarItems.find(
-      (item) => item.path === location.pathname
-    );
+    const currentItem = sidebarItems.find((item) => item.path === location.pathname);
     if (currentItem) setActiveItem(currentItem.id);
   }, [location.pathname]);
 

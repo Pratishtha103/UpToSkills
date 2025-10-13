@@ -14,7 +14,7 @@ const sidebarItems = [
   {
     name: "Projects",
     icon: <Folder size={18} />,
-    path: "/mentor-dashboard/open-source-contributions",
+    path: "/mentor-dashboard/",
   },
   {
     name: "Edit Profile",
@@ -93,12 +93,8 @@ const Sidebar = ({
     ? "bg-gray-700 text-white"
     : "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30";
 
-  // New logout button hover color logic for Dark Mode
-  const logoutHoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-red-50";
-
   return (
     <>
-      {/* Mobile Overlay (Only needed if you want a backdrop, currently not implemented) */}
       <AnimatePresence>{!isControlled && !isOpen && null}</AnimatePresence>
 
       <motion.aside
@@ -189,8 +185,7 @@ const Sidebar = ({
           <div className={`p-4 border-t ${borderColor}`}>
             <motion.button
               onClick={handleLogout}
-              // --- MODIFIED LINE BELOW ---
-              className={`w-full text-red-500 ${logoutHoverBg} flex items-center gap-3 p-2 rounded-lg transition-all duration-200`}
+              className={`w-full text-red-500 hover:bg-red-50 flex items-center gap-3 p-2 rounded-lg`}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >

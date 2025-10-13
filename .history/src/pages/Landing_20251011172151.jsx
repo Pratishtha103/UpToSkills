@@ -23,10 +23,8 @@ export default function Landing() {
   const handleNavigation = (role) => {
     if (!user) return navigate("/login"); // Not logged in
     if (role === "learner" && user.role === "learner") navigate("/dashboard");
-    else if (role === "company" && user.role === "company")
-      navigate("/company");
-    else if (role === "mentor" && user.role === "mentor")
-      navigate("/mentor-dashboard");
+    else if (role === "company" && user.role === "company") navigate("/company");
+    else if (role === "mentor" && user.role === "mentor") navigate("/mentor-dashboard");
     else navigate("/login"); // Role mismatch
   };
 
@@ -46,7 +44,7 @@ export default function Landing() {
     },
     {
       title: "For Mentors",
-      icon: "https://static.thenounproject.com/png/2217264-200.png",
+      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },
@@ -54,6 +52,7 @@ export default function Landing() {
 
   return (
     <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
+
       {/* Header */}
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
@@ -65,8 +64,7 @@ export default function Landing() {
           />
           <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
             {["Home", "About", "Programs", "Contact"].map((link, i) => {
-              const path =
-                link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+              const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
               return (
                 <span
                   key={i}
@@ -147,9 +145,7 @@ export default function Landing() {
 
       {/* Features Section */}
       <section className="py-20 px-6 md:px-16 bg-white text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-10">
-          What We Offer
-        </h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div

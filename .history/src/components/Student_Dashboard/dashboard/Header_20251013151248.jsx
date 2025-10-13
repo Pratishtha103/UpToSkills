@@ -76,7 +76,7 @@ export default function Header({ onMenuClick }) {
           >
             <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={isDarkMode ? darkLogo : logo}
+                src={dark ? darkLogo : logo}
                 alt="UptoSkill Logo"
                 className="object-contain w-36 h-25"
               />

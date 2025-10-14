@@ -7,6 +7,7 @@ import {
   LogOut,
   X,
   Bell,
+  BookOpen,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ const sidebarItems = [
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "programs", label: "Programs", icon: BookOpen },
 ];
 
 export default function AdminSidebar({

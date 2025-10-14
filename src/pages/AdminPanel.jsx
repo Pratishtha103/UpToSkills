@@ -6,6 +6,9 @@ import AdminSidebar from "../components/AdminPanelDashboard/AdminSidebar";
 import DashboardMain from "../components/AdminPanelDashboard/DashboardMain";
 import Students from "../components/AdminPanelDashboard/Students";
 import Company from "../components/AdminPanelDashboard/Company";
+import StudentsTable from "../components/AdminPanelDashboard/StudentsTable";
+import CompaniesTable from "../components/AdminPanelDashboard/CompaniesTable";
+import MentorsTable from "../components/AdminPanelDashboard/MentorsTable";
 import Project from "../components/AdminPanelDashboard/Project";
 import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
@@ -22,17 +25,28 @@ function AdminPanel() {
   const renderActiveModule = () => {
     switch (activeSection) {
       case "dashboard":
-        return <DashboardMain isDarkMode={isDarkMode} />;
+        return (
+          <DashboardMain
+            isDarkMode={isDarkMode}
+            onNavigateSection={(section) => setActiveSection(section)}
+          />
+        );
       case "students":
         return <Students isDarkMode={isDarkMode} />;
+      case "students_table":
+        return <StudentsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "companies":
         return <Company isDarkMode={isDarkMode} />;
+      case "companies_table":
+        return <CompaniesTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "projects":
         return <Project isDarkMode={isDarkMode} />;
       case "analytics":
         return <Analytics isDarkMode={isDarkMode} />;
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
+      case "mentors_table":
+        return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
       default:
@@ -104,7 +118,7 @@ function AdminPanel() {
             </motion.p>
           </motion.section>
 
-          {/* Active Module */}
+        {/* Active Module */}
           {renderActiveModule()}
         </main>
 

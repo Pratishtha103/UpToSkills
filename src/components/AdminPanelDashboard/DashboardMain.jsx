@@ -13,25 +13,22 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 
-// Import Footer
-
-
-// Dummy Data
-const courseProgressData = [
-  { name: "User Experience Design", value: 72, tasks: 120, color: "#8884d8" },
-  { name: "Basic Fundamentals", value: 48, tasks: 32, color: "#82ca9d" },
-  { name: "React Native Components", value: 15, tasks: 182, color: "#ffc658" },
-  { name: "Basic of Music Theory", value: 28, tasks: 58, color: "#ff7300" },
-];
-
+// Helper to format numbers with commas
 const formatNumber = (n) =>
-  n === null || n === undefined ? "-" : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  n === null || n === undefined
+    ? "-"
+    : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-const DashboardMain = () => {
-  const [stats, setStats] = useState({ students: null, mentors: null, companies: null });
+const DashboardMain = ({ isDarkMode = false }) => {
+  const [stats, setStats] = useState({
+    students: null,
+    mentors: null,
+    companies: null,
+  });
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
+  // Fetch stats data
   useEffect(() => {
     const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
     const url = `${API_BASE}/api/stats`;
@@ -62,22 +59,69 @@ const DashboardMain = () => {
   }, []);
 
 
+  // Courses Data
+  const topCourses = [
+    {
+      name: "Videography Basic Design Course",
+      views: "1.2K Views",
+      icon: <FaBook />,
+      color: "rgba(106, 98, 255, 0.9)",
+      bg: "rgba(106, 98, 255, 0.2)",
+    },
+    {
+      name: "Basic Front-end Development Course",
+      views: "1.5K Views",
+      icon: <FaLaptopCode />,
+      color: "rgba(255, 187, 40, 0.8)",
+      bg: "rgba(255, 187, 40, 0.2)",
+    },
+    {
+      name: "Basic Fundamentals of Photography",
+      views: "978 Views",
+      icon: <FaCamera />,
+      color: "rgba(76, 175, 80, 0.8)",
+      bg: "rgba(76, 175, 80, 0.2)",
+    },
+    {
+      name: "Advance Dribble Base Visual Design",
+      views: "765 Views",
+      icon: <FaPalette />,
+      color: "rgba(244, 67, 54, 0.8)",
+      bg: "rgba(244, 67, 54, 0.2)",
+    },
+    {
+      name: "Your First Singing Lesson",
+      views: "3.4K Views",
+      icon: <FaMicrophone />,
+      color: "rgba(0, 255, 255, 1)",
+      bg: "rgba(0, 255, 255, 0.2)",
+    },
+  ];
+
   return (
-    <main className="flex-grow p-4 sm:p-6 flex flex-col gap-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Header Section */}
+    <main
+      className={`flex-grow p-4 sm:p-6 flex flex-col gap-8 transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      {/* Header */}
       <motion.h2
-        className="text-2xl font-bold text-gray-800 dark:text-white mb-4"
+        className={`text-2xl font-bold mb-4 ${
+          isDarkMode ? "text-white" : "text-gray-800"
+        }`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
       >
         Platform Overview
       </motion.h2>
 
-      {/* Stats Cards */}
+      {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Students */}
         <motion.div
-          className="stat-card p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition"
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -85,16 +129,22 @@ const DashboardMain = () => {
             <FaUserGraduate className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-800 dark:text-white">
+            <div className="text-2xl font-bold">
               {loadingStats ? "..." : formatNumber(stats.students)}
             </div>
-            <div className="text-gray-500 dark:text-gray-400">Total Students</div>
+            <div
+              className={`text-gray-500 ${isDarkMode ? "text-gray-400" : ""}`}
+            >
+              Total Students
+            </div>
           </div>
         </motion.div>
 
         {/* Mentors */}
         <motion.div
-          className="stat-card p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition"
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -103,16 +153,22 @@ const DashboardMain = () => {
             <FaChalkboardTeacher className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-800 dark:text-white">
+            <div className="text-2xl font-bold">
               {loadingStats ? "..." : formatNumber(stats.mentors)}
             </div>
-            <div className="text-gray-500 dark:text-gray-400">Total Mentors</div>
+            <div
+              className={`text-gray-500 ${isDarkMode ? "text-gray-400" : ""}`}
+            >
+              Total Mentors
+            </div>
           </div>
         </motion.div>
 
         {/* Companies */}
         <motion.div
-          className="stat-card p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition"
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -121,15 +177,19 @@ const DashboardMain = () => {
             <FaBuilding className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-800 dark:text-white">
+            <div className="text-2xl font-bold">
               {loadingStats ? "..." : formatNumber(stats.companies)}
             </div>
-            <div className="text-gray-500 dark:text-gray-400">Total Companies</div>
+            <div
+              className={`text-gray-500 ${isDarkMode ? "text-gray-400" : ""}`}
+            >
+              Total Companies
+            </div>
           </div>
         </motion.div>
       </section>
 
-      {/* Stats Error */}
+      {/* Error Message */}
       {statsError && (
         <div className="mt-3 text-sm text-red-500">
           {statsError} — make sure your backend `/api/stats` is running.
@@ -144,51 +204,20 @@ const DashboardMain = () => {
           </h3>
         </div>
 
+        {/* Course List */}
         <ul className="space-y-3">
-          {[
-            {
-              name: "Videography Basic Design Course",
-              views: "1.2K Views",
-              icon: <FaBook />,
-              color: "rgba(106, 98, 255, 0.9)",
-              bg: "rgba(106, 98, 255, 0.2)",
-            },
-            {
-              name: "Basic Front-end Development Course",
-              views: "1.5K Views",
-              icon: <FaLaptopCode />,
-              color: "rgba(255, 187, 40, 0.8)",
-              bg: "rgba(255, 187, 40, 0.2)",
-            },
-            {
-              name: "Basic Fundamentals of Photography",
-              views: "978 Views",
-              icon: <FaCamera />,
-              color: "rgba(76, 175, 80, 0.8)",
-              bg: "rgba(76, 175, 80, 0.2)",
-            },
-            {
-              name: "Advance Dribble Base Visual Design",
-              views: "765 Views",
-              icon: <FaPalette />,
-              color: "rgba(244, 67, 54, 0.8)",
-              bg: "rgba(244, 67, 54, 0.2)",
-            },
-            {
-              name: "Your First Singing Lesson",
-              views: "3.4K Views",
-              icon: <FaMicrophone />,
-              color: "rgba(0, 255, 255, 1)",
-              bg: "rgba(0, 255, 255, 0.2)",
-            },
-          ].map((course, index) => (
+          {topCourses.map((course, index) => (
             <motion.li
               key={index}
-              className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className={`flex justify-between items-center p-4 border-b rounded-xl cursor-pointer transition-colors duration-300 ${
+                isDarkMode
+                  ? "border-gray-700 hover:bg-gray-700 text-gray-100"
+                  : "border-gray-200 hover:bg-gray-100 text-gray-800"
+              }`}
               onClick={() => handleCourseItemClick(course.name)}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center gap-3 font-medium text-gray-800 dark:text-gray-100">
+              <div className="flex items-center gap-3 font-medium">
                 <span
                   className="flex justify-center items-center text-xl rounded-md"
                   style={{
@@ -202,14 +231,15 @@ const DashboardMain = () => {
                 </span>
                 <span>{course.name}</span>
               </div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span
+                className={`${isDarkMode ? "text-gray-300" : "text-gray-500"}`}
+              >
                 {course.views}
               </span>
             </motion.li>
           ))}
         </ul>
       </section>
-
     </main>
   );
 };

@@ -1,107 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 
 const adminNotificationsData = [
   {
     id: 1,
-    title: 'New Assignment Added',
-    message: 'Your instructor has added a new assignment for the Physics course.',
-    time: '2 hours ago',
+    title: "New Assignment Added",
+    message:
+      "Your instructor has added a new assignment for the Physics course.",
+    time: "2 hours ago",
   },
   {
     id: 2,
-    title: 'New Message from Jane Cooper',
+    title: "New Message from Jane Cooper",
     message: "Hey, how's your project going? Let me know if you need help.",
-    time: '1 day ago',
+    time: "1 day ago",
   },
   {
     id: 3,
-    title: 'Milestone Completed',
-    message: 'Congratulations! You have completed the "Initial Research" milestone.',
-    time: '3 days ago',
+    title: "Milestone Completed",
+    message:
+      'Congratulations! You have completed the "Initial Research" milestone.',
+    time: "3 days ago",
   },
   {
     id: 4,
-    title: 'Upcoming Deadline',
+    title: "Upcoming Deadline",
     message: 'The deadline for "Complete Problem Set #5" is tomorrow.',
-    time: '5 days ago',
+    time: "5 days ago",
   },
 ];
 
-const styles = {
-  container: {
-    padding: '16px',
-  },
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-  item: {
-    backgroundColor: '#ffffff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    padding: '16px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-    transition: 'box-shadow 0.2s ease-in-out',
-    cursor: 'default',
-  },
-  itemHover: {
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  title: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#111827',
-    margin: '0 0 4px 0',
-  },
-  message: {
-    fontSize: '14px',
-    color: '#4b5563',
-    margin: 0,
-  },
-  time: {
-    fontSize: '12px',
-    color: '#6b7280',
-    whiteSpace: 'nowrap',
-    marginLeft: '16px',
-    flexShrink: 0,
-  },
-};
-
-const AdminNotifications = () => {
+export default function AdminNotifications({ isDarkMode }) {
   const [hoveredId, setHoveredId] = useState(null);
 
+  // Sync dark mode globally
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
+  }, [isDarkMode]);
+
   return (
-    <div style={styles.container}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#1f2937', marginBottom: '24px' }}>Notification</h2>
-      <div style={styles.list}>
+    <main
+      className={`p-6 min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      <h2 className="text-2xl font-bold mb-6">Notifications</h2>
+
+      <div className="flex flex-col gap-4">
         {adminNotificationsData.map((notification) => (
           <div
             key={notification.id}
-            style={{
-              ...styles.item,
-              ...(hoveredId === notification.id ? styles.itemHover : {}),
-            }}
             onMouseEnter={() => setHoveredId(notification.id)}
             onMouseLeave={() => setHoveredId(null)}
+            className={`flex justify-between items-center p-4 rounded-xl border transition-all duration-200 cursor-default shadow-sm
+              ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-700 text-gray-100"
+                  : "bg-white border-gray-200 text-gray-900"
+              }
+              ${hoveredId === notification.id ? "shadow-lg" : ""}
+            `}
           >
-            <div style={styles.content}>
-              <h3 style={styles.title}>{notification.title}</h3>
-              <p style={styles.message}>{notification.message}</p>
+            {/* Left Section */}
+            <div className="flex flex-col">
+              <h3 className="font-semibold text-base mb-1">
+                {notification.title}
+              </h3>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                {notification.message}
+              </p>
             </div>
-            <span style={styles.time}>{notification.time}</span>
+
+            {/* Right Section - Time */}
+            <span
+              className={`text-xs ml-4 flex-shrink-0 whitespace-nowrap ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {notification.time}
+            </span>
           </div>
         ))}
       </div>
-    </div>
+    </main>
   );
-};
-
-export default AdminNotifications;
+}

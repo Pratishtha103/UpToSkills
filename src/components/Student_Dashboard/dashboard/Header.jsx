@@ -4,7 +4,8 @@ import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
 import { Input } from "../../Company_Dashboard/ui/input";
-import logo from "../../../assets/uptoskills_logo.png";
+import logo from "../../../assets/logo.jpg";
+import darkLogo from "../../../assets/darkLogo.jpg";
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
@@ -75,9 +76,9 @@ export default function Header({ onMenuClick }) {
           >
             <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={logo}
+                src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
-                className="object-contain w-25 h-25"
+                className="object-contain w-36 h-25"
               />
             </div>
           </motion.div>
@@ -117,12 +118,6 @@ export default function Header({ onMenuClick }) {
               ) : (
                 <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200" />
               )}
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-5 h-5 text-gray-700 dark:text-gray-200" />
             </Button>
           </motion.div>
 

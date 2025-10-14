@@ -2,8 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-
-import { X, Home, Users, Folder, LogOut, Edit3 } from "lucide-react";
+import { X, Home, Users, Folder, LogOut, Edit3, Award } from "lucide-react";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
@@ -21,6 +20,11 @@ const sidebarItems = [
     name: "Edit Profile",
     icon: <Edit3 size={18} />,
     path: "/mentor-dashboard/edit-profile",
+  },
+  {
+    name: "Skill Badges",
+    icon: <Award size={18}/>,
+    path: "/mentor-dashboard/skill-badges"
   },
 ];
 
@@ -84,16 +88,22 @@ const Sidebar = ({
     navigate("/login", { state: { role: lastRole } });
   };
 
+  // Dark mode colors
   const bgColor = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200";
   const hoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
-  const activeGradient =
-    "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30";
+  const activeBg = isDarkMode
+    ? "bg-gray-700 text-white"
+    : "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30";
+
+  // New logout button hover color logic for Dark Mode
+  const logoutHoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-red-50";
 
   return (
     <>
+      {/* Mobile Overlay (Only needed if you want a backdrop, currently not implemented) */}
       <AnimatePresence>{!isControlled && !isOpen && null}</AnimatePresence>
 
       <motion.aside
@@ -107,11 +117,10 @@ const Sidebar = ({
           {isOpen && !isDesktop && (
             <motion.button
               key="close-btn"
-              className={`absolute top-4 right-4 z-50 p-2 ${
-                isDarkMode
+              className={`absolute top-4 right-4 z-50 p-2 ${isDarkMode
                   ? "text-white hover:text-gray-300"
                   : "text-black hover:text-gray-700"
-              }`}
+                }`}
               onClick={() => setOpen(false)}
               aria-label="Close Sidebar"
               initial={{ opacity: 0, y: -10 }}
@@ -132,7 +141,7 @@ const Sidebar = ({
                 <motion.button
                   key={item.name}
                   className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none
-                    ${activeItem === item.name ? activeGradient : hoverBg}`}
+                    ${activeItem === item.name ? activeBg : hoverBg}`}
                   onClick={() => {
                     setActiveItem(item.name);
                     navigate(item.path);
@@ -155,37 +164,22 @@ const Sidebar = ({
                   {/* Icon */}
                   <div className="relative z-10 flex items-center justify-center">
                     {React.cloneElement(item.icon, {
-                      className: `w-5 h-5 transition-all duration-200 ${
-                        activeItem === item.name
+                      className: `w-5 h-5 transition-all duration-200 ${activeItem === item.name
                           ? "text-white"
                           : isDarkMode
-                          ? "text-gray-300 group-hover:text-white"
-                          : "text-gray-600 group-hover:text-gray-800"
-                      }`,
+                            ? "text-gray-300 group-hover:text-white"
+                            : "text-gray-600 group-hover:text-gray-800"
+                        }`,
                     })}
                   </div>
 
-                  {/* Active indicator */}
-                  {activeItem === item.name && (
-                    <motion.div
-                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
-                      layoutId="activeIndicator"
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-
                   <span
-                    className={`font-semibold relative z-10 ${
-                      activeItem === item.name
+                    className={`font-semibold relative z-10 ${activeItem === item.name
                         ? "text-white"
                         : isDarkMode
-                        ? "text-gray-300"
-                        : "text-gray-800"
-                    }`}
+                          ? "text-gray-300"
+                          : "text-gray-800"
+                      }`}
                   >
                     {item.name}
                   </span>
@@ -197,7 +191,8 @@ const Sidebar = ({
           <div className={`p-4 border-t ${borderColor}`}>
             <motion.button
               onClick={handleLogout}
-              className={`w-full text-red-500 hover:bg-red-50 flex items-center gap-3 p-2 rounded-lg`}
+              // --- MODIFIED LINE BELOW ---
+              className={`w-full text-red-500 ${logoutHoverBg} flex items-center gap-3 p-2 rounded-lg transition-all duration-200`}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -208,11 +203,10 @@ const Sidebar = ({
         </div>
       </motion.aside>
 
-      {/* shift content when desktop and open */}
+      {/* Shift content when desktop and open */}
       <div
-        className={`transition-all duration-300 ${
-          isOpen && isDesktop ? "ml-64" : "ml-0"
-        }`}
+        className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"
+          }`}
       >
         {children}
       </div>

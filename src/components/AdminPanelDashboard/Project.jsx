@@ -1,37 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { FolderOpen, User, Users, Plus, Trash2, Award } from "lucide-react";
 
-function Project() {
-  // start empty; we'll fetch from DB
+export default function Project({ isDarkMode }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectMentor, setNewProjectMentor] = useState("");
   const [newProjectStudents, setNewProjectStudents] = useState("");
 
-  // Fetch mentor projects from backend on mount
+  // Apply dark or light mode globally
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
+  }, [isDarkMode]);
+
+  // Fetch all projects
   useEffect(() => {
     fetch("http://localhost:5000/api/mentor_projects")
       .then((res) => res.json())
       .then((data) => {
-        if (data.success) {
-          setProjects(data.data);
-        }
-        setLoading(false); // stop loading after fetch
+        if (data.success) setProjects(data.data);
+        setLoading(false);
       })
-      .catch((err) => {
-        console.error("Error fetching projects:", err);
-        setLoading(false); // stop loading even on error
-      });
+      .catch(() => setLoading(false));
   }, []);
 
+  // Add Project
   const addProject = async () => {
-  if (
-    newProjectTitle.trim() &&
-    newProjectMentor.trim() &&
-    newProjectStudents.trim()
-  ) {
+    if (!newProjectTitle || !newProjectMentor || !newProjectStudents) {
+      alert("Please fill out all fields before adding a project.");
+      return;
+    }
+
     try {
       const res = await fetch("http://localhost:5000/api/mentor_projects", {
         method: "POST",
@@ -39,206 +40,180 @@ function Project() {
         body: JSON.stringify({
           project_title: newProjectTitle,
           mentor_name: newProjectMentor,
-          total_students: parseInt(newProjectStudents, 10) || 0,
+          total_students: parseInt(newProjectStudents, 10),
         }),
       });
-
       const data = await res.json();
-
       if (data.success) {
-        // Update UI only after DB insert succeeds
         setProjects((prev) => [...prev, data.project]);
         setNewProjectTitle("");
         setNewProjectMentor("");
         setNewProjectStudents("");
-      } else {
-        alert("Failed to add project: " + (data.error || data.message));
-      }
+      } else alert(data.message || "Failed to add project");
     } catch (err) {
-      console.error("Error adding project:", err);
+      console.error(err);
       alert("Error adding project");
     }
-  }
-};
-
-
-  const updateProjectStudents = (id, newStudentCount) => {
-    setProjects(
-      projects.map((project) =>
-        project.id === id
-          ? { ...project, total_students: parseInt(newStudentCount, 10) || 0 }
-          : project
-      )
-    );
   };
 
+  // Delete Project
   const removeProject = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this project? This action cannot be undone."
-    );
-    if (!confirmDelete) return; // stop if user clicks "Cancel"
-    try {
-      const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, {
-        method: "DELETE",
-      });
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
 
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/mentor_projects/${id}`,
+        { method: "DELETE" }
+      );
       const data = await res.json();
       if (data.success) {
-        // update UI only if DB delete successful
-        setProjects((prev) => prev.filter((proj) => proj.id !== id));
-      } else {
-        alert("Failed to delete project: " + (data.error || data.message));
-      }
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      } else alert(data.message || "Failed to delete project");
     } catch (err) {
-      console.error("Error deleting project:", err);
+      console.error(err);
       alert("Error deleting project");
     }
   };
 
-
   return (
-    <main className="p-4 sm:p-6 flex flex-col gap-6">
-      <motion.h2
-        className="text-2xl font-bold text-foreground mb-6"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
+    <main
+      className={`p-4 sm:p-6 flex flex-col gap-6 transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      {/* Add New Project Form */}
+      <div
+        className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
+          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        }`}
       >
-        Manage Projects
-      </motion.h2>
+        <h3 className="text-xl font-bold mb-4">Add New Project</h3>
 
-      {/* Add Project Form */}
-      <motion.div
-        className="stat-card p-6 mb-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h3 className="text-xl font-bold text-foreground mb-4">Add New Project</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
-              Project Title
-            </label>
-            <input
-              type="text"
-              value={newProjectTitle}
-              onChange={(e) => setNewProjectTitle(e.target.value)}
-              placeholder="Enter project title..."
-              className="input-field"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
-              Mentor Name
-            </label>
-            <input
-              type="text"
-              value={newProjectMentor}
-              onChange={(e) => setNewProjectMentor(e.target.value)}
-              placeholder="Enter mentor name..."
-              className="input-field"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
-              Number of Students
-            </label>
-            <input
-              type="number"
-              value={newProjectStudents}
-              onChange={(e) => setNewProjectStudents(e.target.value)}
-              placeholder="Enter number..."
-              min="0"
-              className="input-field"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Project Title"
+            value={newProjectTitle}
+            onChange={(e) => setNewProjectTitle(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
+          <input
+            type="text"
+            placeholder="Mentor Name"
+            value={newProjectMentor}
+            onChange={(e) => setNewProjectMentor(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
+          <input
+            type="number"
+            placeholder="Number of Students"
+            value={newProjectStudents}
+            onChange={(e) => setNewProjectStudents(e.target.value)}
+            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+            }`}
+          />
         </div>
-        <motion.button
-          onClick={addProject}
-          className="btn-primary flex items-center gap-2"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Plus className="w-4 h-4" />
-          Add Project
-        </motion.button>
-      </motion.div>
 
-      {/* Projects Grid */}
+        <button
+          onClick={addProject}
+          className={`flex items-center gap-2 rounded-md px-4 py-2 font-medium transition-colors duration-300 w-fit ${
+            isDarkMode
+              ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+              : "bg-indigo-500 hover:bg-indigo-600 text-white"
+          }`}
+        >
+          <Plus className="w-4 h-4" /> Add Project
+        </button>
+      </div>
+
+      {/*  Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading
-          ? Array.from({ length: 6 }).map((_, index) => (
-            <motion.div
-              key={index}
-              className="stat-card p-6 animate-pulse bg-gray-200 rounded-lg"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <div className="h-6 w-3/4 bg-gray-300 mb-4 rounded"></div>
-              <div className="h-4 w-1/2 bg-gray-300 mb-2 rounded"></div>
-              <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
-            </motion.div>
-          ))
-          : projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              className="stat-card p-6 cursor-pointer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, y: -4 }}
-            >
-              {/* your project content stays the same */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-2xl bg-gradient-accent">
-                  <FolderOpen className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">
+          ? Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`p-6 rounded-lg animate-pulse ${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                }`}
+              />
+            ))
+          : projects.map((project) => (
+              <div
+                key={project.id}
+                className={`p-6 rounded-lg shadow-md transition-colors duration-300 ${
+                  isDarkMode
+                    ? "bg-gray-800 text-white"
+                    : "bg-white text-gray-900"
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className={`p-3 rounded-2xl flex-shrink-0 ${
+                      isDarkMode
+                        ? "bg-gradient-to-r from-gray-700 to-gray-600"
+                        : "bg-gradient-to-r from-blue-500 to-blue-600"
+                    }`}
+                  >
+                    <FolderOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold">
                     {project.project_title}
                   </h3>
                 </div>
-              </div>
 
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="w-4 h-4" />
-                  <span>Mentor: {project.mentor_name}</span>
+                <div
+                  className={`flex flex-col gap-2 mb-4 text-sm ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Mentor: {project.mentor_name}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {project.total_students}{" "}
+                    {project.total_students === 1 ? "Student" : "Students"}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="w-4 h-4" />
-                  <span>
-                    {project.total_students} {project.total_students === 1||0 ? "Student" : "Students"}
-                  </span>
-                </div>
-              </div>
 
-              <div className="flex gap-2">
-                <motion.button
-                  onClick={() => removeProject(project.id)}
-                  className="flex-1 btn-secondary flex items-center justify-center gap-2"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete
-                </motion.button>
-                <motion.button
-                  onClick={() => updateProjectStudents(project.id)}
-                  className="flex-1 btn-primary flex items-center justify-center gap-2"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Award className="w-4 h-4" />
-                  Add Student
-                </motion.button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => removeProject(project.id)}
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 transition-colors duration-300 ${
+                      isDarkMode
+                        ? "bg-red-600 hover:bg-red-500 text-white"
+                        : "bg-red-500 hover:bg-red-600 text-white"
+                    }`}
+                  >
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </button>
+
+                  <button
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 transition-colors duration-300 ${
+                      isDarkMode
+                        ? "bg-green-600 hover:bg-green-500 text-white"
+                        : "bg-green-500 hover:bg-green-600 text-white"
+                    }`}
+                  >
+                    <Award className="w-4 h-4" /> Add Student
+                  </button>
+                </div>
               </div>
-            </motion.div>
-          ))}
+            ))}
       </div>
-
     </main>
   );
 }
-
-export default Project;

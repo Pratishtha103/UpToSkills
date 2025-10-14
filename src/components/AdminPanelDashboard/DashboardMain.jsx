@@ -61,13 +61,6 @@ const DashboardMain = () => {
     };
   }, []);
 
-  const handleDropdownChange = (e, sectionName) => {
-    console.log(`Dropdown in ${sectionName} changed to:`, e.target.value);
-  };
-
-  const handleCourseItemClick = (courseName) => {
-    console.log(`Course item clicked: ${courseName}`);
-  };
 
   return (
     <main className="flex-grow p-4 sm:p-6 flex flex-col gap-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -147,16 +140,8 @@ const DashboardMain = () => {
       <section className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
         <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Top Courses
+            Top Programs
           </h3>
-          <motion.select
-            className="px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-transparent text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-            onChange={(e) => handleDropdownChange(e, "Top Courses")}
-            whileHover={{ scale: 1.02 }}
-          >
-            <option value="this_month">This Month</option>
-            <option value="last_month">Last Month</option>
-          </motion.select>
         </div>
 
         <ul className="space-y-3">

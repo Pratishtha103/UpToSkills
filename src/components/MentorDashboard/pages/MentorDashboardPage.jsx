@@ -7,6 +7,7 @@ import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import WelcomeSection from "../components/Welcome"; 
 
 const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
   const navigate = useNavigate();
@@ -47,13 +48,7 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
         <div
           className={`flex-1 p-8 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
         >
-          <h1
-            className={`text-4xl font-bold mb-8 text-center ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Mentor Dashboard
-          </h1>
+          <WelcomeSection/>
 
           <div className="flex flex-wrap justify-center gap-6">
             <DashboardCard
@@ -70,13 +65,13 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
               onClick={() => navigate("open-source-contributions")}
               isDarkMode={isDarkMode}
             />
-            <DashboardCard
+            {/* <DashboardCard
               icon="📝"
               title="Feedback & Approvals"
               description="Give personalized feedback and approve submitted milestones with ease."
               onClick={() => navigate("feedback")}
               isDarkMode={isDarkMode}
-            />
+            /> */}
             <DashboardCard
               icon="👥"
               title="Multi-Student View"

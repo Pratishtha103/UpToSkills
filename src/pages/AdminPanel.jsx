@@ -13,6 +13,7 @@ import Project from "../components/AdminPanelDashboard/Project";
 import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
 import AdminNotifications from "../components/AdminPanelDashboard/AdminNotifications";
+import Programs from "../components/AdminPanelDashboard/Programs";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -49,6 +50,8 @@ function AdminPanel() {
         return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
+      case "programs": 
+        return <Programs isDarkMode={isDarkMode}/>
       default:
         return <DashboardMain isDarkMode={isDarkMode} />;
     }

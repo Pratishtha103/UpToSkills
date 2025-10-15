@@ -45,7 +45,7 @@ export default function Header({ onMenuClick }) {
     });
   };
 
-  const handleNotificationsClick = () => navigate("/dashboard/notifications");
+  // const handleNotificationsClick = () => navigate("/dashboard/notifications");
   const handleProfileClick = () => navigate("/dashboard/profile");
 
   return (
@@ -97,7 +97,7 @@ export default function Header({ onMenuClick }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
@@ -109,7 +109,7 @@ export default function Header({ onMenuClick }) {
                 <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
               </span>
             </Button>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleDarkMode}>

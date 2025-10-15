@@ -3,45 +3,27 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import {
-  FaBook,
-  FaLaptopCode,
-  FaCamera,
-  FaPalette,
-  FaMicrophone,
   FaUserGraduate,
   FaChalkboardTeacher,
   FaBuilding,
 } from "react-icons/fa";
 
-// Dummy Data
-const courseProgressData = [
-  { name: "User Experience Design", value: 72, tasks: 120, color: "#8884d8" },
-  { name: "Basic Fundamentals", value: 48, tasks: 32, color: "#82ca9d" },
-  { name: "React Native Components", value: 15, tasks: 182, color: "#ffc658" },
-  { name: "Basic of Music Theory", value: 28, tasks: 58, color: "#ff7300" },
-];
-
-const formatNumber = (n) =>
-  n === null || n === undefined
-    ? "-"
-    : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
 const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
-  const [stats, setStats] = useState({
-    students: null,
-    mentors: null,
-    companies: null,
-  });
+  const [stats, setStats] = useState({ students: null, mentors: null, companies: null });
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch platform statistics
   useEffect(() => {
     const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
     const url = `${API_BASE}/api/stats`;
     let isMounted = true;
 
     axios
-      .get(url, { timeout: 6000 })
+      .get(url)
       .then((res) => {
         if (!isMounted) return;
         const data = res.data || {};
@@ -50,28 +32,41 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
           mentors: data.mentors ?? 0,
           companies: data.companies ?? 0,
         });
-        setLoadingStats(false);
       })
       .catch((err) => {
         if (!isMounted) return;
-        console.error("Failed to load stats:", err?.message || err);
+        console.error("Failed to load stats:", err);
         setStatsError("Unable to load stats");
-        setLoadingStats(false);
-      });
+      })
+      .finally(() => setLoadingStats(false));
 
-    return () => {
-      isMounted = false;
-    };
+    return () => (isMounted = false);
   }, []);
 
+  // Fetch courses
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/courses");
+        setCourses(response.data);
+      } catch (err) {
+        console.error("Error fetching courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const formatNumber = (num) => num?.toLocaleString("en-IN") ?? "0";
 
   return (
     <main
       className={`flex-grow p-4 sm:p-6 flex flex-col gap-8 transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+        isDarkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
-      {/* Header Section */}
+      {/* Header */}
       <motion.h2
         className={`text-2xl font-bold mb-4 ${
           isDarkMode ? "text-white" : "text-gray-800"
@@ -82,167 +77,133 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
         Platform Overview
       </motion.h2>
 
-      {/* Stats Cards */}
+      {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {/* Students */}
-        <motion.div
-          className={`stat-card p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={() => onNavigateSection && onNavigateSection('students_table')}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500">
-            <FaUserGraduate className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div
-              className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}
-            >
-              {loadingStats ? "..." : formatNumber(stats.students)}
+        {[
+          {
+            title: "Total Students",
+            value: stats.students,
+            icon: <FaUserGraduate className="w-6 h-6 text-white" />,
+            gradient: "from-blue-500 to-indigo-500",
+            onClick: () => onNavigateSection?.("students_table"),
+          },
+          {
+            title: "Total Mentors",
+            value: stats.mentors,
+            icon: <FaChalkboardTeacher className="w-6 h-6 text-white" />,
+            gradient: "from-green-500 to-emerald-500",
+            onClick: () => onNavigateSection?.("mentors_table"),
+          },
+          {
+            title: "Total Companies",
+            value: stats.companies,
+            icon: <FaBuilding className="w-6 h-6 text-white" />,
+            gradient: "from-orange-500 to-red-500",
+            onClick: () => onNavigateSection?.("companies_table"),
+          },
+        ].map((card, index) => (
+          <motion.div
+            key={index}
+            onClick={card.onClick}
+            className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-xl transition cursor-pointer ${
+              isDarkMode
+                ? "bg-gray-900 hover:bg-gray-800 border border-gray-700"
+                : "bg-white hover:bg-gray-100 border border-gray-200"
+            }`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>
+              {card.icon}
             </div>
-            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-              Total Students
+            <div>
+              <div
+                className={`text-2xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-800"
+                }`}
+              >
+                {loadingStats ? "..." : formatNumber(card.value)}
+              </div>
+              <div
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {card.title}
+              </div>
             </div>
-          </div>
-        </motion.div>
-
-        {/* Mentors */}
-        <motion.div
-          className={`stat-card p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onClick={() => onNavigateSection && onNavigateSection('mentors_table')}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500">
-            <FaChalkboardTeacher className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              {loadingStats ? "..." : formatNumber(stats.mentors)}
-            </div>
-            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-              Total Mentors
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Companies */}
-        <motion.div
-          className={`stat-card p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          onClick={() => onNavigateSection && onNavigateSection('companies_table')}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500">
-            <FaBuilding className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              {loadingStats ? "..." : formatNumber(stats.companies)}
-            </div>
-            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-              Total Companies
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        ))}
       </section>
 
-      {/* Stats Error */}
       {statsError && (
         <div className="mt-3 text-sm text-red-500">
-          {statsError} — make sure your backend `/api/stats` is running.
+          {statsError} — ensure your backend `/api/stats` is running.
         </div>
       )}
 
-      {/* Top Courses */}
-      <section className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+      {/* Top Programs */}
+      <section
+        className={`p-6 rounded-2xl shadow-md transition ${
+          isDarkMode
+            ? "bg-gray-900 border border-gray-800"
+            : "bg-white border border-gray-200"
+        }`}
+      >
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
+          <h3
+            className={`text-lg font-semibold ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
             Top Programs
           </h3>
         </div>
 
-        <ul className="space-y-3">
-          {[
-            {
-              name: "Videography Basic Design Course",
-              views: "1.2K Views",
-              icon: <FaBook />,
-              color: "rgba(106, 98, 255, 0.9)",
-              bg: "rgba(106, 98, 255, 0.2)",
-            },
-            {
-              name: "Basic Front-end Development Course",
-              views: "1.5K Views",
-              icon: <FaLaptopCode />,
-              color: "rgba(255, 187, 40, 0.8)",
-              bg: "rgba(255, 187, 40, 0.2)",
-            },
-            {
-              name: "Basic Fundamentals of Photography",
-              views: "978 Views",
-              icon: <FaCamera />,
-              color: "rgba(76, 175, 80, 0.8)",
-              bg: "rgba(76, 175, 80, 0.2)",
-            },
-            {
-              name: "Advance Dribble Base Visual Design",
-              views: "765 Views",
-              icon: <FaPalette />,
-              color: "rgba(244, 67, 54, 0.8)",
-              bg: "rgba(244, 67, 54, 0.2)",
-            },
-            {
-              name: "Your First Singing Lesson",
-              views: "3.4K Views",
-              icon: <FaMicrophone />,
-              color: "rgba(0, 255, 255, 1)",
-              bg: "rgba(0, 255, 255, 0.2)",
-            },
-          ].map((course, index) => (
-            <motion.li
-              key={index}
-              className={`flex justify-between items-center p-4 border-b rounded-xl cursor-pointer hover:transition-colors duration-300 ${
-                isDarkMode
-                  ? "border-gray-700 hover:bg-gray-700 text-gray-100"
-                  : "border-gray-200 hover:bg-gray-100 text-gray-800"
-              }`}
-              onClick={() => handleCourseItemClick(course.name)}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center gap-3 font-medium">
-                <span
-                  className="flex justify-center items-center text-xl rounded-md"
-                  style={{
-                    padding: "0.5rem",
-                    width: "2.5rem",
-                    color: course.color,
-                    backgroundColor: course.bg,
-                  }}
+        {/* Courses grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`rounded-xl p-6 animate-pulse ${
+                    isDarkMode ? "bg-gray-800" : "bg-gray-200"
+                  }`}
                 >
-                  {course.icon}
-                </span>
-                <span>{course.name}</span>
-              </div>
-              <span
-                className={`${isDarkMode ? "text-gray-300" : "text-gray-500"}`}
-              >
-                {course.views}
-              </span>
-            </motion.li>
-          ))}
-        </ul>
+                  <div
+                    className={`h-6 w-3/4 mb-3 rounded ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
+                    }`}
+                  ></div>
+                  <div
+                    className={`h-4 w-full mb-2 rounded ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
+                    }`}
+                  ></div>
+                  <div
+                    className={`h-4 w-2/3 rounded ${
+                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
+                    }`}
+                  ></div>
+                </div>
+              ))
+            : courses.map((program, index) => (
+                <div
+                  key={index}
+                  className={`p-6 rounded-xl shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-lg ${
+                    isDarkMode
+                      ? "bg-gray-800 border border-gray-700 text-gray-100"
+                      : "bg-white border border-gray-200 text-gray-800"
+                  }`}
+                >
+                  <h3 className="text-xl font-semibold mb-2">{program.title}</h3>
+                  <p className="text-gray-400 dark:text-gray-300 text-[15px] leading-snug">
+                    {program.description}
+                  </p>
+                </div>
+              ))}
+        </div>
       </section>
     </main>
   );

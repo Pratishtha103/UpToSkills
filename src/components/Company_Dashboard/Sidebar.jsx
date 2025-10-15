@@ -32,7 +32,7 @@ const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "search", label: "Search Students", icon: Search },
   { id: "interviews", label: "Interviews", icon: Calendar },
-  { id: "notifications", label: "Notifications", icon: Bell },
+  // { id: "notifications", label: "Notifications", icon: Bell },
   { id: "edit-profile", label: "Edit Profile", icon: Building2 },
 ];
 

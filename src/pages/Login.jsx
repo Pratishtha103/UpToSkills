@@ -44,10 +44,14 @@ const LoginForm = () => {
       if (response.data.token) localStorage.setItem("token", response.data.token);
       const roleToSave = response.data.user?.role || formData.role;
       localStorage.setItem("role", roleToSave);
-    
+      
+
       // Save user detail for mentor
       if (roleToSave === "mentor" && response.data.user) {
       localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      }
+      if (roleToSave === "student" && response.data.user) {
+      localStorage.setItem("student", JSON.stringify(response.data.user.name));
       }
       
       // redirect based on role

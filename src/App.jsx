@@ -84,7 +84,7 @@ function App() {
           
           <Route path ="/adminPanel" element={<AdminPanel />} />
 
-          <Route path='/web-dev' element={<Webdev/>}/>
+          <Route path='/programForm/:id' element={<Webdev/>}/>
           <Route path='/data-science' element={<Datascience/>}/>
           <Route path='/cloud-computing' element={<Cloudcompute/>}/>
           <Route path='/cybersecurity' element={<Cybersecurity/>}/>

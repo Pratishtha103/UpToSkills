@@ -19,6 +19,7 @@ const sidebarItems = [
   { id: "viewproject", label: "View Project", icon: FolderOpen, path: "/projectshowcase" },
   { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
    { id: "skillbadges", label: "Skill Badges", icon: Award, path: "/student/skill-badges" },
+  // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {

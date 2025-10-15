@@ -1,6 +1,31 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
+import { useEffect, useState } from "react";
+import axios from 'axios';
 
 const ProgramsSection = () => {
+   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Fetch all courses when component mounts
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/courses");
+        setCourses(response.data);
+        console.log(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching courses:", err);
+        setError("❌ Failed to fetch courses. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []); // empty dependency array → runs only once
   return (
     <section id="programs" className="py-8 px-4">
       <div className="max-w-6xl mx-auto text-center">
@@ -10,45 +35,45 @@ const ProgramsSection = () => {
           and mentorship from industry professionals.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
+  
             {
-              title: 'Web Development',
-              img: 'https://img.freepik.com/free-vector/coding-workshop-concept-illustration_114360-8033.jpg?semt=ais_hybrid&w=740',
-              desc: 'Build modern, responsive websites using HTML, CSS, JavaScript, and frameworks like React and Vue.',
-              link: '/web-dev'
+            //   title: 'Web Development',
+            //   img: 'https://img.freepik.com/free-vector/coding-workshop-concept-illustration_114360-8033.jpg?semt=ais_hybrid&w=740',
+            //   desc: 'Build modern, responsive websites using HTML, CSS, JavaScript, and frameworks like React and Vue.',
+            //   link: '/web-dev'
 
-            },
-            {
-              title: 'Data Science',
-              img: 'https://img.freepik.com/free-vector/data-analysis-concept-illustration_114360-8051.jpg?semt=ais_hybrid&w=740',
-              desc: 'Master data analysis, machine learning, and visualization with Python, R, and tools like TensorFlow.',
-              link: '/data-science'
-            },
-            {
-              title: 'Cloud Computing',
-              img: 'https://img.freepik.com/free-vector/cloud-computing-concept-illustration_114360-2269.jpg?semt=ais_hybrid&w=740',
-              desc: 'Gain expertise in cloud platforms like AWS, Azure, and GCP through real-world projects.',
-              link: '/cloud-computing'
-            },
-            {
-              title: 'Cybersecurity',
-              img: 'https://img.freepik.com/free-vector/cyber-security-concept_114360-2294.jpg?semt=ais_hybrid&w=740',
-              desc: 'Learn to secure systems and networks with hands-on training in ethical hacking and security protocols.',
-              link: '/cybersecurity'
-            }
-          ].map((program, index) => (
+            // },
+            // {
+            //   title: 'Data Science',
+            //   img: 'https://img.freepik.com/free-vector/data-analysis-concept-illustration_114360-8051.jpg?semt=ais_hybrid&w=740',
+            //   desc: 'Master data analysis, machine learning, and visualization with Python, R, and tools like TensorFlow.',
+            //   link: '/data-science'
+            // },
+            // {
+            //   title: 'Cloud Computing',
+            //   img: 'https://img.freepik.com/free-vector/cloud-computing-concept-illustration_114360-2269.jpg?semt=ais_hybrid&w=740',
+            //   desc: 'Gain expertise in cloud platforms like AWS, Azure, and GCP through real-world projects.',
+            //   link: '/cloud-computing'
+            // },
+            // {
+            //   title: 'Cybersecurity',
+            //   img: 'https://img.freepik.com/free-vector/cyber-security-concept_114360-2294.jpg?semt=ais_hybrid&w=740',
+            //   desc: 'Learn to secure systems and networks with hands-on training in ethical hacking and security protocols.',
+            //   link: '/cybersecurity'
+            // }
+          courses.map((program, index) => (
             <div 
               className="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:-translate-y-4 hover:shadow-lg" 
               key={index}
             >
-              <img 
-                src={program.img} 
+              {/* <img 
+                src={program.image_path} 
                 alt={program.title} 
                 className="w-full h-40 object-cover rounded-lg mb-4"
-              />
+              /> */}
               <h3 className="text-xl font-semibold mb-2">{program.title}</h3>
-              <p className="text-[#64748b] text-[15px] leading-snug mb-3">{program.desc}</p>
-              <a href={program.link} className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300">Enroll Now</a>
+              <p className="text-[#64748b] text-[15px] leading-snug mb-3">{program.description}</p>
+              <Link to={`/programForm/${program.id}`} className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300">Enroll Now</Link>
             </div>
           ))}
         </div>

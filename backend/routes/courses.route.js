@@ -2,8 +2,8 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const { addCourse, getAllCourses, ensureCoursesTable } = require("../controllers/coursesController");
-const pool = require('../config/database');
+const { addCourse, getCourseById, getAllCourses, ensureCoursesTable, enrollStudent } = require("../controllers/coursesController");
+
 const router = express.Router();
 
 // --- Multer setup for file uploads ---
@@ -47,6 +47,7 @@ router.delete("/:id", async (req, res) => {
 
 // --- Routes ---
 router.post("/", upload.single("image"), addCourse);
-router.get("/", getAllCourses);
-
+router.get("/",getAllCourses)
+router.get("/getbyid/:id", getCourseById);
+router.put("/enrollstudent/:id",enrollStudent)
 module.exports = router;

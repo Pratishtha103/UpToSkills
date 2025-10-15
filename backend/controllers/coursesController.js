@@ -9,7 +9,7 @@ const ensureCoursesTable = async () => {
       title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       image_path VARCHAR(255),
-      enroll_url TEXT,
+      enrolled integer,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -26,7 +26,7 @@ const ensureCoursesTable = async () => {
 // --- Add new course ---
 const addCourse = async (req, res) => {
   try {
-    const { title, description, enroll_url } = req.body;
+    const { title, description, enrolled } = req.body;
     let imagePath = null;
 
     if (req.file) {
@@ -35,11 +35,11 @@ const addCourse = async (req, res) => {
     }
 
     const insertQuery = `
-      INSERT INTO courses (title, description, image_path, enroll_url)
+      INSERT INTO courses (title, description, image_path, enrolled)
       VALUES ($1, $2, $3, $4)
       RETURNING *;
     `;
-    const values = [title, description, imagePath, enroll_url || null];
+    const values = [title, description, imagePath, enrolled || null];
 
     const { rows } = await pool.query(insertQuery, values);
 
@@ -69,3 +69,52 @@ module.exports = {
     addCourse,
     getAllCourses
 };
+ export const getCourseById= async (req, res)=>{
+ const { id } = req.params;
+
+  try {
+    // ✅ PostgreSQL query
+    const result = await pool.query("SELECT * FROM courses WHERE id = $1", [id]);
+
+    res.status(200).json(result.rows); // returns an array of matching rows
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Database error" });
+  }}
+ export const enrollStudent= async (req, res)=>{
+  const { id } = req.params;       // course id
+  const { studentId } = req.body;  // student id to enroll
+
+  try {
+    // 1️⃣ Get the course and enrolled students
+    const courseResult = await pool.query(
+      "SELECT enrolled FROM courses WHERE id = $1",
+      [id]
+    );
+
+    if (courseResult.rows.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const enrolled = courseResult.rows[0].enrolled || [];
+
+    // 2️⃣ Check if student is already enrolled
+    if (enrolled.includes(parseInt(studentId))) {
+      return res.status(400).json({ error: "Student already enrolled" });
+    }
+
+    // 3️⃣ Add studentId to array
+    const updatedEnrolled = [...enrolled, parseInt(studentId)];
+
+    // 4️⃣ Update the course in the database
+    await pool.query(
+      "UPDATE courses SET enrolled = $1 WHERE id = $2",
+      [updatedEnrolled, id]
+    );
+
+    res.status(200).json({ message: "Student enrolled successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  }
+}

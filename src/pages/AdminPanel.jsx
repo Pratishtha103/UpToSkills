@@ -46,8 +46,11 @@ function AdminPanel() {
         return <Analytics isDarkMode={isDarkMode} />;
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
+<<<<<<< HEAD
       case "programs":
         return <ProgramsAdmin isDarkMode={isDarkMode} onNavigateSection={(s)=>setActiveSection(s)} />;
+=======
+>>>>>>> 7c77fe807de404184ca936603d27a14bd231bfbe
       case "mentors_table":
         return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":

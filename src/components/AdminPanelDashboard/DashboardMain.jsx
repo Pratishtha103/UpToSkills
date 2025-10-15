@@ -19,11 +19,7 @@ const formatNumber = (n) =>
     ? "-"
     : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-<<<<<<< HEAD
 const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
-=======
-const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
->>>>>>> 7c77fe807de404184ca936603d27a14bd231bfbe
   const [stats, setStats] = useState({
     students: null,
     mentors: null,
@@ -143,15 +139,10 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
             <FaUserGraduate className="w-6 h-6 text-white" />
           </div>
           <div>
-<<<<<<< HEAD
-            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              {loadingStats ? '...' : formatNumber(stats.students)}
-=======
             <div
               className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}
             >
               {loadingStats ? "..." : formatNumber(stats.students)}
->>>>>>> 7c77fe807de404184ca936603d27a14bd231bfbe
             </div>
             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
               Total Students
@@ -174,12 +165,8 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
             <FaChalkboardTeacher className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-<<<<<<< HEAD
-              {loadingStats ? '...' : formatNumber(stats.mentors)}
-=======
+            <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
               {loadingStats ? "..." : formatNumber(stats.mentors)}
->>>>>>> 7c77fe807de404184ca936603d27a14bd231bfbe
             </div>
             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
               Total Mentors
@@ -202,12 +189,8 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
             <FaBuilding className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-<<<<<<< HEAD
-              {loadingStats ? '...' : formatNumber(stats.companies)}
-=======
+            <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
               {loadingStats ? "..." : formatNumber(stats.companies)}
->>>>>>> 7c77fe807de404184ca936603d27a14bd231bfbe
             </div>
             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
               Total Companies

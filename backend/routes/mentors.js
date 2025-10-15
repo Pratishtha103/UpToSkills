@@ -14,4 +14,18 @@ router.get('/count', async (req, res) => {
   }
 });
 
+// GET all mentors (list)
+router.get('/', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, full_name, email, phone FROM mentors ORDER BY id DESC'
+    );
+    // return an array of mentor rows
+    return res.json(result.rows);
+  } catch (err) {
+    console.error('❌ Error fetching mentors list:', err.message);
+    return res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;

@@ -1,27 +1,27 @@
-// src/pages/LoginForm.jsx
+// src/pages/Login.jsx
+
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
+
+  // Default role is 'student'
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: location.state?.role || "student", // set role from logout → default student
+    role: "student",
   });
-  const navigate = useNavigate();
 
-  // Restore role if saved before
   useEffect(() => {
-    const savedRole = localStorage.getItem("role");
-    if (savedRole) {
-      setFormData((prev) => ({ ...prev, role: savedRole }));
+    if (location.state?.role) {
+      setFormData((prev) => ({ ...prev, role: location.state.role }));
     }
-  }, []);
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -33,43 +33,45 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-      // optional: use a better toast instead of alert
       alert(response.data.message || "Login successful");
 
-      // Save token and role
-      if (response.data.token) localStorage.setItem("token", response.data.token);
-      const roleToSave = response.data.user?.role || formData.role;
-      localStorage.setItem("role", roleToSave);
-      
+      if (response.data.token)
+        localStorage.setItem("token", response.data.token);
 
-      // Save user detail for mentor
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+
+      const roleToSave =
+        (response.data.user?.role || formData.role).toLowerCase();
+
       if (roleToSave === "mentor" && response.data.user) {
-      localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        localStorage.setItem("mentor", JSON.stringify(response.data.user));
       }
-      if (roleToSave === "student" && response.data.user) {
-      localStorage.setItem("student", JSON.stringify(response.data.user.name));
-      }
-      
-      // redirect based on role
-      const role = response.data.user?.role || formData.role;
-      if (role === "admin") navigate("/adminPanel");
-      else if (role === "student") navigate("/dashboard");
-      else if (role === "mentor") navigate("/mentor-dashboard");
-      else if (role === "company") navigate("/company");
+
+      if (roleToSave === "admin") navigate("/adminPanel");
+      else if (roleToSave === "student" || roleToSave === "learner")
+        navigate("/dashboard");
+      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
+      else if (roleToSave === "company") navigate("/company");
       else navigate("/login");
     } catch (err) {
-      console.error("Login error:", err);
-      const message = err.response?.data?.message || err.message || "Login failed. Please try again.";
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please try again.";
       alert(message);
     }
   };
 
   return (
-    <div className="h-[100vh] items-center flex justify-center px-5 lg:px-0 bg-gray-50">
+    <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
       <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
         {/* Left Image */}
         <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
@@ -94,7 +96,10 @@ const LoginForm = () => {
             </div>
 
             <div className="w-full flex-1 mt-8">
-              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
+              <form
+                className="mx-auto max-w-xs flex flex-col gap-4"
+                onSubmit={handleSubmit}
+              >
                 {/* Role Selector */}
                 <select
                   name="role"
@@ -134,16 +139,27 @@ const LoginForm = () => {
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword((s) => !s)}
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-500" />
+                    )}
                   </div>
                 </div>
 
-                {/* Submit */}
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="mt-5 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all duration-100 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                 >
-                  <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    className="w-6 h-6 -ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                     <circle cx="8.5" cy="7" r="4" />
                     <path d="M20 8v6M23 11h-6" />
@@ -153,9 +169,11 @@ const LoginForm = () => {
 
                 {/* Sign Up */}
                 <p className="text-l text-gray-600 text-center">
-                  Don't have an account?{" "}
+                  Don’t have an account?{" "}
                   <Link to="/register">
-                    <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">Sign up</span>
+                    <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
+                      Sign up
+                    </span>
                   </Link>
                 </p>
               </form>
@@ -176,6 +194,6 @@ const LoginForm = () => {
       </div>
     </div>
   );
-};
+}
 
 export default LoginForm;

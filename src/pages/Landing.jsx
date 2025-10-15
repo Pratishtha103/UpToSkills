@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+// src/pages/Landing.jsx
+
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
@@ -10,24 +12,44 @@ export default function Landing() {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  // Redirect logged-in users automatically based on role
-  useEffect(() => {
-    if (user) {
-      if (user.role === "learner") navigate("/dashboard");
-      else if (user.role === "company") navigate("/company");
-      else if (user.role === "mentor") navigate("/mentor-dashboard");
-    }
-  }, [user, navigate]);
+  // State to track selected role in dropdown (default student)
+  const [selectedRole, setSelectedRole] = useState("student");
 
-  // Handle feature-based navigation
+  // Handle feature-based navigation with role selection and logged-in user check
   const handleNavigation = (role) => {
-    if (!user) return navigate("/login"); // Not logged in
-    if (role === "learner" && user.role === "learner") navigate("/dashboard");
-    else if (role === "company" && user.role === "company")
-      navigate("/company");
-    else if (role === "mentor" && user.role === "mentor")
-      navigate("/mentor-dashboard");
-    else navigate("/login"); // Role mismatch
+    if (user) {
+      // If user is logged in as student/learner and clicked learner, go to student dashboard
+      if (role === "learner" && (user.role === "student" || user.role === "learner")) {
+        navigate("/dashboard");
+        return;
+      }
+      // If user is logged in as company and clicked company, go to company login page
+      if (role === "company") {
+        navigate("/login", { state: { role: "company" } });
+        return;
+      }
+      // If user is logged in as mentor and clicked mentor, go to mentor login page
+      if (role === "mentor") {
+        navigate("/login", { state: { role: "mentor" } });
+        return;
+      }
+    }
+
+    // If not logged in, go to login page with appropriate role preset
+    let loginRole = "student";
+    if (role === "company") loginRole = "company";
+    else if (role === "mentor") loginRole = "mentor";
+    else if (role === "learner") loginRole = "student";
+
+    setSelectedRole(loginRole);
+    navigate("/login", { state: { role: loginRole } });
+  };
+
+  // Handle dropdown role change and navigate to login with role preset
+  const handleRoleChange = (e) => {
+    const role = e.target.value;
+    setSelectedRole(role);
+    navigate("/login", { state: { role } });
   };
 
   // Features section data
@@ -46,7 +68,7 @@ export default function Landing() {
     },
     {
       title: "For Mentors",
-      icon: "https://static.thenounproject.com/png/2217264-200.png",
+      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },
@@ -65,8 +87,7 @@ export default function Landing() {
           />
           <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
             {["Home", "About", "Programs", "Contact"].map((link, i) => {
-              const path =
-                link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+              const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
               return (
                 <span
                   key={i}
@@ -94,8 +115,7 @@ export default function Landing() {
               Learn. Connect. <br /> Grow with Peers.
             </h1>
             <p className="text-gray-600 text-lg mb-6">
-              Collaborate with passionate learners and build real-world tech
-              skills through projects.
+              Collaborate with passionate learners and build real-world tech skills through projects.
             </p>
 
             {/* Buttons */}
@@ -147,17 +167,15 @@ export default function Landing() {
 
       {/* Features Section */}
       <section className="py-20 px-6 md:px-16 bg-white text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-10">
-          What We Offer
-        </h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.06 }}
               onClick={() => handleNavigation(box.role)}
-              className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition 
-                bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B] 
+              className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition
+                bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B]
                 hover:from-[#f97316] hover:to-[#fb923c]"
             >
               <img

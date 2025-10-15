@@ -17,7 +17,7 @@ const sidebarItems = [
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "My Projects", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "View Project", icon: FolderOpen, path: "/projectshowcase" },
-  { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
+  // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
    { id: "skillbadges", label: "Skill Badges", icon: Award, path: "/student/skill-badges" },
   // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
 ];

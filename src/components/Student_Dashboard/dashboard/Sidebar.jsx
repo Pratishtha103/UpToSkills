@@ -8,6 +8,7 @@ import {
   Bell,
   LogOut,
   X,
+  Award,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -17,6 +18,7 @@ const sidebarItems = [
   { id: "projects", label: "My Projects", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "View Project", icon: FolderOpen, path: "/projectshowcase" },
   { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
+   { id: "skillbadges", label: "Skill Badges", icon: Award, path: "/student/skill-badges" },
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {

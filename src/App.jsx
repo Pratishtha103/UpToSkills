@@ -19,6 +19,7 @@ import AdminPanel from './pages/AdminPanel';
 import ProgramsPage from './pages/ProgramsPage';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
+import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 
 // About Page components
 import Header from './components/AboutPage/Header';
@@ -64,6 +65,7 @@ function App() {
           <Route path="/dashboard/my-projects" element={<MyProjects />} />
           <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+           <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
 
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />

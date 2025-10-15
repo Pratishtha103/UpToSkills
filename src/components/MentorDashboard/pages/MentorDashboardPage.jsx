@@ -56,13 +56,7 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
           </h1>
 
           <div className="flex flex-wrap justify-center gap-6">
-            <DashboardCard
-              icon="🎓"
-              title="Total Students"
-              description={`${totalStudents} students enrolled`}
-              onClick={() => navigate("projects-progress")}
-              isDarkMode={isDarkMode}
-            />
+          
             <DashboardCard
               icon="🧑‍🏫"
               title="Total Mentors"

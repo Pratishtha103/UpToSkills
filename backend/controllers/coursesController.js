@@ -1,5 +1,5 @@
-const pool = require("../config/database.js");
-const path = require("path");
+import pool from "../config/database.js";
+import path from "path";
 
 // --- Ensure table exists ---
 const ensureCoursesTable = async () => {
@@ -64,7 +64,7 @@ const getAllCourses = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
     ensureCoursesTable,
     addCourse,
     getAllCourses

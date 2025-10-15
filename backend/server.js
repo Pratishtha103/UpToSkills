@@ -16,7 +16,7 @@ const mentorReviewRoutes = require('./routes/mentorReviews');
 const companyProfilesRoutes = require('./routes/companyProfiles.route');
 
 const statsRoutes = require("./routes/stats");
-
+const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
 const companiesRoutes = require('./routes/companies.route');
@@ -53,7 +53,7 @@ app.use('/api/mentorreviews', mentorReviewRoutes);
 app.use('/api/students', studentsRoutes);
 app.use('/api/mentors', mentorsRoutes);
 app.use('/api/company-profiles', companyProfilesRoutes);
-
+app.use("/api/testimonials", testimonialsRouter);
 
 app.use("/api/stats", statsRoutes);
 

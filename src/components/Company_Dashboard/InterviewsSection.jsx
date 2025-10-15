@@ -1,14 +1,19 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Card } from "../Company_Dashboard/ui/card";
 import { Button } from "../Company_Dashboard/ui/button";
 import { Badge } from "../Company_Dashboard/ui/badge";
-import { Calendar, Clock, Video, Phone, MoreHorizontal } from "lucide-react";
+import { Input } from "../Company_Dashboard/ui/input";
+import { Label } from "../Company_Dashboard/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Company_Dashboard/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Company_Dashboard/ui/dialog";
+import { Calendar, Clock, Video, Phone, MoreHorizontal, Trash } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
 /* Mock data (replace with API later)                                         */
 /* -------------------------------------------------------------------------- */
 
-const mockInterviews = [
+let initialInterviews = [
   {
     id: "1",
     candidateName: "Sarah Johnson",
@@ -36,6 +41,15 @@ const mockInterviews = [
     type: "phone",
     status: "scheduled",
   },
+  {
+    id: "4",
+    candidateName: "David Lee",
+    position: "Full Stack Developer",
+    date: "2024-07-22",
+    time: "3:00 PM",
+    type: "in-person",
+    status: "scheduled",
+  }
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -59,6 +73,48 @@ const typeIcons = {
 /* -------------------------------------------------------------------------- */
 
 export default function InterviewsSection() {
+  const [interviews, setInterviews] = useState(() => {
+    const stored = localStorage.getItem('company_interviews');
+    return stored ? JSON.parse(stored) : initialInterviews;
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newInterview, setNewInterview] = useState({
+    candidateName: "",
+    position: "",
+    date: "",
+    time: "",
+    type: "",
+  });
+
+  // Save to localStorage whenever interviews change
+  useEffect(() => {
+    localStorage.setItem('company_interviews', JSON.stringify(interviews));
+  }, [interviews]);
+
+  const handleScheduleInterview = () => {
+    if (newInterview.candidateName && newInterview.position && newInterview.date && newInterview.time && newInterview.type) {
+      const interview = {
+        id: Date.now().toString(),
+        ...newInterview,
+        status: "scheduled",
+      };
+      initialInterviews.push(interview);
+      setInterviews([...initialInterviews]);
+      setNewInterview({
+        candidateName: "",
+        position: "",
+        date: "",
+        time: "",
+        type: "",
+      });
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleDeleteInterview = (id) => {
+    const updatedInterviews = interviews.filter((interview) => interview.id !== id);
+    setInterviews(updatedInterviews);
+  };
   return (
     <motion.div
       id="upcoming-interviews"
@@ -72,15 +128,93 @@ export default function InterviewsSection() {
         <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white">
           Upcoming Interviews
         </h2>
-        <Button className="w-full sm:w-auto flex items-center gap-2">
-          <Calendar className="w-5 h-5" />
-          Schedule New Interview
-        </Button>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full sm:w-auto flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Schedule New Interview
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Schedule New Interview</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="candidateName" className="text-right">
+                  Candidate Name
+                </Label>
+                <Input
+                  id="candidateName"
+                  value={newInterview.candidateName}
+                  onChange={(e) => setNewInterview({ ...newInterview, candidateName: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="position" className="text-right">
+                  Position
+                </Label>
+                <Input
+                  id="position"
+                  value={newInterview.position}
+                  onChange={(e) => setNewInterview({ ...newInterview, position: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="date" className="text-right">
+                  Date
+                </Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newInterview.date}
+                  onChange={(e) => setNewInterview({ ...newInterview, date: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="time" className="text-right">
+                  Time
+                </Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={newInterview.time}
+                  onChange={(e) => setNewInterview({ ...newInterview, time: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="type" className="text-right">
+                  Type
+                </Label>
+                <Select value={newInterview.type} onValueChange={(value) => setNewInterview({ ...newInterview, type: value })}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select interview type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="phone">Phone</SelectItem>
+                    <SelectItem value="in-person">In-person</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleScheduleInterview}>Schedule</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Interview Cards */}
       <div className="grid gap-4">
-        {mockInterviews.map((interview, index) => {
+        {interviews.map((interview, index) => {
           const TypeIcon = typeIcons[interview.type];
 
           return (
@@ -99,9 +233,9 @@ export default function InterviewsSection() {
                   e.currentTarget.style.borderColor = "transparent";
                 }}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                   {/* Candidate Info */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
                       {interview.candidateName
                         .split(" ")
@@ -153,8 +287,8 @@ export default function InterviewsSection() {
                       >
                         Reschedule
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <Button onClick={() => handleDeleteInterview(interview.id)} variant="ghost" size="icon" className="px-3 py-1 bg-red-600 text-white  rounded-xl hover:bg-red-700 hover:text-white">
+                        <Trash className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>

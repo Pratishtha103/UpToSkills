@@ -1,6 +1,6 @@
 // src/pages/Landing.jsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
@@ -15,22 +15,31 @@ export default function Landing() {
   // State to track selected role in dropdown (default student)
   const [selectedRole, setSelectedRole] = useState("student");
 
-  // Handle feature-based navigation with role selection and logged-in user check
+  // Allow visiting home page even if logged in, so remove auto redirect from useEffect
+  // We only redirect when clicking the "What We Offer" boxes
+
+  // Handle feature-based navigation with role selection
   const handleNavigation = (role) => {
+    // If logged in
     if (user) {
-      // If user is logged in as student/learner and clicked learner, go to student dashboard
+      // If user is student/learner and clicked learner, go to student dashboard
       if (role === "learner" && (user.role === "student" || user.role === "learner")) {
         navigate("/dashboard");
         return;
       }
-      // If user is logged in as company and clicked company, go to company login page
-      if (role === "company") {
-        navigate("/login", { state: { role: "company" } });
+      // If user is company and clicked company, go to company dashboard
+      else if (role === "company" && user.role === "company") {
+        navigate("/company");
         return;
       }
-      // If user is logged in as mentor and clicked mentor, go to mentor login page
-      if (role === "mentor") {
-        navigate("/login", { state: { role: "mentor" } });
+      // If user is mentor and clicked mentor, go to mentor dashboard
+      else if (role === "mentor" && user.role === "mentor") {
+        navigate("/mentor-dashboard");
+        return;
+      }
+      // Role mismatch or other roles - fallback to login
+      else {
+        navigate("/login");
         return;
       }
     }
@@ -76,6 +85,7 @@ export default function Landing() {
 
   return (
     <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
+
       {/* Header */}
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">

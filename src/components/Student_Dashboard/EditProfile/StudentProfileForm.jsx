@@ -1,6 +1,32 @@
 import React, { useState, useEffect } from "react";
 
-const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
+const StudentProfileForm = ({ formData, setFormData, onSubmit, isDarkMode: propIsDarkMode }) => {
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    try {
+      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
+      if (typeof window !== 'undefined') {
+        if (document.documentElement.classList.contains('dark')) return true;
+        if (localStorage.getItem('theme') === 'dark') return true;
+        if (localStorage.getItem('isDarkMode') === 'true') return true;
+      }
+    } catch (e) {}
+    return false;
+  });
+
+  React.useEffect(() => {
+    if (typeof propIsDarkMode !== 'undefined') {
+      setIsDarkMode(propIsDarkMode);
+      return;
+    }
+    const onStorage = (e) => {
+      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
+      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
+    };
+    window.addEventListener('storage', onStorage);
+    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
+  }, [propIsDarkMode]);
   // Local state mirrors parent formData for immediate UI updates
   const [localData, setLocalData] = useState({
     full_name: "",
@@ -82,12 +108,12 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
 
   return (
     <form
-      className="w-[95%] mx-auto bg-white p-6 rounded-lg shadow-md font-sans"
+      className={`w-[95%] mx-auto p-6 rounded-lg shadow-md font-sans ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
       onSubmit={handleSubmit}
     >
       {/* Full Name */}
       <div className="mb-4">
-        <label className="font-semibold mb-2 text-gray-700" htmlFor="full_name">
+        <label className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`} htmlFor="full_name">
           Full Name
         </label>
         <input
@@ -97,14 +123,14 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           value={localData.full_name || ""}
           onChange={handleChange}
           placeholder="Enter full name"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
       {/* Contact Number */}
       <div className="mb-4">
         <label
-          className="font-semibold mb-2 text-gray-700"
+          className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}
           htmlFor="contact_number"
         >
           Contact Number
@@ -116,13 +142,13 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           value={localData.contact_number || ""}
           onChange={handleChange}
           placeholder="Enter contact number"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
       {/* LinkedIn */}
       <div className="mb-4">
-        <label className="font-semibold mb-2 text-gray-700" htmlFor="linkedin_url">
+        <label className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`} htmlFor="linkedin_url">
           LinkedIn URL
         </label>
         <input
@@ -132,13 +158,13 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           value={localData.linkedin_url || ""}
           onChange={handleChange}
           placeholder="Enter LinkedIn profile URL"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
       {/* GitHub */}
       <div className="mb-4">
-        <label className="font-semibold mb-2 text-gray-700" htmlFor="github_url">
+        <label className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`} htmlFor="github_url">
           GitHub URL
         </label>
         <input
@@ -148,13 +174,13 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           value={localData.github_url || ""}
           onChange={handleChange}
           placeholder="Enter GitHub profile URL"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
       {/* Why Hire Me */}
       <div className="mb-4">
-        <label className="font-semibold mb-2 text-gray-700" htmlFor="why_hire_me">
+        <label className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`} htmlFor="why_hire_me">
           Why Hire Me
         </label>
         <textarea
@@ -164,7 +190,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           onChange={handleChange}
           placeholder="Explain why someone should hire you"
           rows="4"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
@@ -178,7 +204,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           onChange={handleChange}
           className="mr-2"
         />
-        <label className="font-semibold text-gray-700" htmlFor="profile_completed">
+        <label className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`} htmlFor="profile_completed">
           Profile Completed
         </label>
       </div>
@@ -186,7 +212,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       {/* AI Skill Summary */}
       <div className="mb-4">
         <label
-          className="font-semibold mb-2 text-gray-700"
+          className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}
           htmlFor="ai_skill_summary"
         >
           AI Skill Summary
@@ -198,13 +224,13 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
           onChange={handleChange}
           placeholder="Summarize your AI skills"
           rows="4"
-          className="p-2.5 border border-gray-300 rounded-md text-sm w-full"
+          className={`p-2.5 border rounded-md text-sm w-full ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
         />
       </div>
 
       <button
         type="submit"
-        className="bg-blue-500 text-white py-3 px-5 rounded-md font-bold hover:bg-blue-700"
+        className={`${isDarkMode ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-blue-500 text-white hover:bg-blue-700'} py-3 px-5 rounded-md font-bold`}
       >
         Save Profile
       </button>

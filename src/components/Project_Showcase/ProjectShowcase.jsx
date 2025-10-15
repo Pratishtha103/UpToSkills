@@ -19,6 +19,11 @@ import {
 
 const ProjectShowcase = () => {
   const [projects, setProjects] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark' || localStorage.getItem('isDarkMode') === 'true';
+    } catch (e) { return false; }
+  });
   // const [filters, setFilters] = useState({
   //   domain: "All",
   //   type: "All",
@@ -41,6 +46,17 @@ const ProjectShowcase = () => {
         console.error("Error fetching projects:", err);
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
+      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
+    };
+    window.addEventListener('storage', onStorage);
+    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
   }, []);
 
   // Filtering logic
@@ -145,10 +161,11 @@ const ProjectShowcase = () => {
             ))
           : projects.map((proj, idx) => (
               <ProjectCard
-                key={idx}
-                project={proj}
-                onClick={() => setSelectedProject(proj)}
-              />
+                  key={idx}
+                  project={proj}
+                  onClick={() => setSelectedProject(proj)}
+                  isDarkMode={isDarkMode}
+                />
             ))}
       </div>
 
@@ -157,6 +174,7 @@ const ProjectShowcase = () => {
         <ProjectModal
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+          isDarkMode={isDarkMode}
         />
       )}
     </>

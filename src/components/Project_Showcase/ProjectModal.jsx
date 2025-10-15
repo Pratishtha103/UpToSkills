@@ -1,67 +1,95 @@
 import React from "react";
 
-const ProjectModal = ({ project, onClose }) => {
+const ProjectModal = ({ project, onClose, isDarkMode: propIsDarkMode }) => {
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    try {
+      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
+      if (typeof document !== 'undefined') return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark' || localStorage.getItem('isDarkMode') === 'true';
+    } catch (e) {}
+    return false;
+  });
+
+  React.useEffect(() => {
+    if (typeof propIsDarkMode !== 'undefined') { setIsDarkMode(propIsDarkMode); return; }
+    const onStorage = (e) => {
+      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
+      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
+    };
+    window.addEventListener('storage', onStorage);
+    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
+  }, [propIsDarkMode]);
+
+  if (!project) return null;
+
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-      <div className="bg-white p-7 rounded-2xl shadow-lg w-[90%] max-w-md relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0" onClick={onClose} style={{ backgroundColor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.5)' }} />
+      <div className={`relative p-7 rounded-2xl shadow-lg w-[90%] max-w-4xl max-h-[90vh] overflow-y-auto ${isDarkMode ? 'bg-gray-900 border border-gray-700 text-gray-100' : 'bg-white'}`}>
 
         {/* Close Button */}
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onClose();
-          }}
-          className="absolute top-1 right-3 bg-[#9426a7] text-black px-3 py-1 hover:bg-violet-400 rounded-md text-sm"
+        <button
+          onClick={onClose}
+          className={`absolute top-3 right-3 px-3 py-1 rounded-md text-sm ${isDarkMode ? 'text-gray-300 bg-transparent' : 'text-gray-700 bg-transparent'}`}
         >
           Close
-        </a>
+        </button>
 
         {/* Modal Content */}
-        <div className="flex flex-col text-center items-center">
-          <h2 className="text-2xl text-orange-500 font-bold mb-4">{project.title}</h2>
-          <h3 className="text-lg font-medium mb-2">{project.projectType}</h3>
-          <p className="text-sm text-gray-700 mb-4">{project.description}</p>
+        <div className="flex gap-6">
+          <div className="flex-1">
+            <h2 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>{project.title}</h2>
+            <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-gray-200' : ''}`}>{project.projectType}</h3>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{project.description}</p>
 
-          {/* GitHub Button */}
-          <a
-            href={project.github || "https://github.com/dummy-project-link"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white bg-[#00b2a9] px-4 py-2 rounded text-sm hover:bg-orange-500 transition"
-          >
-            View on GitHub
-          </a>
+            {/* GitHub Button */}
+            <a
+              href={project.github || "https://github.com/dummy-project-link"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-block px-4 py-2 rounded text-sm transition ${isDarkMode ? 'text-white bg-indigo-600 hover:bg-indigo-500' : 'text-white bg-[#00b2a9] hover:bg-orange-500'}`}
+            >
+              View on GitHub
+            </a>
 
-          {/* Date and Duration in one line */}
-          {(project.date || project.duration) && (
-            <div className="flex justify-center gap-4 text-sm text-gray-700 mt-4">
-              {project.date && (
-                <p>
-                  <span className="font-semibold">Date:</span> {project.date}
-                </p>
-              )}
-              {project.duration && (
-                <p>
-                  <span className="font-semibold">Duration:</span> {project.duration}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Contributors - Centered Heading & Inline */}
-          {project.contributors && project.contributors.length > 0 && (
-            <div className="w-full mt-4 text-center">
-              <h3 className="font-semibold text-sm mb-2">Contributors</h3>
-              <div className="flex flex-wrap justify-center gap-2 text-sm text-gray-800">
-                {project.contributors.map((name, idx) => (
-                  <span key={idx} className="bg-gray-200 px-3 py-1 rounded-full">
-                    {name}
-                  </span>
-                ))}
+            {/* Date and Duration in one line */}
+            {(project.date || project.duration) && (
+              <div className={`flex justify-start gap-4 text-sm mt-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                {project.date && (
+                  <p>
+                    <span className="font-semibold">Date:</span> {project.date}
+                  </p>
+                )}
+                {project.duration && (
+                  <p>
+                    <span className="font-semibold">Duration:</span> {project.duration}
+                  </p>
+                )}
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Contributors - Centered Heading & Inline */}
+            {project.contributors && project.contributors.length > 0 && (
+              <div className="w-full mt-4 text-left">
+                <h3 className={`font-semibold text-sm mb-2 ${isDarkMode ? 'text-gray-200' : ''}`}>Contributors</h3>
+                <div className={`flex flex-wrap gap-2 text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                  {project.contributors.map((name, idx) => (
+                    <span key={idx} className={`px-3 py-1 rounded-full ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className={`w-56 h-36 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+            {project.image ? (
+              <img src={project.image} alt="project image" className="object-cover w-full h-full rounded-lg" />
+            ) : (
+              <div className={isDarkMode ? 'text-gray-400' : 'text-gray-400'}>No image</div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -54,8 +54,8 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
           
             <DashboardCard
               icon="🧑‍🏫"
-              title="Total Mentors"
-              description={`${totalMentors} mentors registered`}
+              title="Projects"
+              description={`Projects at a glance `}
               onClick={() => navigate("open-source-contributions")}
               isDarkMode={isDarkMode}
             />

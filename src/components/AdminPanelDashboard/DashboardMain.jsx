@@ -1,6 +1,7 @@
 // src/components/AdminPanelDashboard/DashboardMain.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { FaTrash } from "react-icons/fa";
 import axios from "axios";
 import {
   FaUserGraduate,
@@ -162,48 +163,41 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
         </div>
 
         {/* Courses grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {loading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`rounded-xl p-6 animate-pulse ${
-                    isDarkMode ? "bg-gray-800" : "bg-gray-200"
-                  }`}
-                >
-                  <div
-                    className={`h-6 w-3/4 mb-3 rounded ${
-                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
-                    }`}
-                  ></div>
-                  <div
-                    className={`h-4 w-full mb-2 rounded ${
-                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
-                    }`}
-                  ></div>
-                  <div
-                    className={`h-4 w-2/3 rounded ${
-                      isDarkMode ? "bg-gray-700" : "bg-gray-300"
-                    }`}
-                  ></div>
-                </div>
-              ))
-            : courses.map((program, index) => (
-                <div
-                  key={index}
-                  className={`p-6 rounded-xl shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-lg ${
-                    isDarkMode
-                      ? "bg-gray-800 border border-gray-700 text-gray-100"
-                      : "bg-white border border-gray-200 text-gray-800"
-                  }`}
-                >
-                  <h3 className="text-xl font-semibold mb-2">{program.title}</h3>
-                  <p className="text-gray-400 dark:text-gray-300 text-[15px] leading-snug">
-                    {program.description}
-                  </p>
-                </div>
-              ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
+        {/* <h1 className="col-span-full text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Courses</h1> */}
+        {courses.map((course) => (
+          <div
+            key={course.id}
+            className="bg-white dark:bg-gray-900 shadow-md rounded-lg overflow-hidden"
+          >
+            {/* {course.image_path && (
+              <img
+                src={`http://localhost:5000${course.image_path}`}
+                alt={course.title}
+                className="w-full h-48 object-cover"
+              />
+            )} */}
+            <div className="p-4">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
+                {course.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4"> {course.description}</p>
+              <button
+                onClick={() => removeCourse(course.id)}
+               className="text-xl flex items-center border border-gray-100 px-2 py-1 bg-red-600 text-white rounded-full">
+                <FaTrash className="size-4 pr-1"/>Delete
+              </button>
+            </div>
+          </div>
+        ))}
+        {
+          courses.length === 0 && (
+            <p className="text-gray-600 dark:text-gray-300 col-span-full text-center">
+              No courses available. Please add a course.
+            </p>
+          )
+        }
+      </div>
       </section>
     </main>
   );

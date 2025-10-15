@@ -101,13 +101,13 @@ export default function Programs() {
       }
     }
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-center px-6">
       <div className="bg-white dark:bg-gray-900 shadow-xl rounded-2xl flex flex-col justify-center items-center p-8 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
           Add New Course
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 w-full">
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-300 font-medium">
               Course Title
@@ -137,7 +137,8 @@ export default function Programs() {
               className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
             />
           </div>
-                    {/* File Upload */}
+
+          {/* File Upload */}
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-300 font-medium">
               Upload Image
@@ -156,6 +157,7 @@ export default function Programs() {
               />
             )}
           </div>
+
           <button
             type="submit"
             disabled={isSubmitting}
@@ -167,14 +169,15 @@ export default function Programs() {
 
         {message && (
           <p
-            className={`mt-4 text-center ${message.includes("✅") ? "text-green-600" : "text-red-500"
-              }`}
+            className={`mt-4 text-center ${
+              message.includes("✅") ? "text-green-600" : "text-red-500"
+            }`}
           >
             {message}
           </p>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
         <h1 className="col-span-full text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Courses</h1>
         {courses.map((course) => (
           <div
@@ -208,7 +211,8 @@ export default function Programs() {
             </p>
           )
         }
-      </div>
-    </div>
+      </div>*/}
+</div>
+      
   );
 }

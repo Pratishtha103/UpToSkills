@@ -70,15 +70,25 @@ const LoginForm = () => {
 
       alert(response.data.message || "Login successful");
 
-      if (response.data.token)
-        localStorage.setItem("token", response.data.token);
-
+      // Save token and role
+      if (response.data.token) localStorage.setItem("token", response.data.token);
+      const roleToSave = response.data.user?.role || formData.role;
+      localStorage.setItem("role", roleToSave);
+    
+      // Save user details
       if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("id", response.data.user.id);
+        
+        // Save student-specific data
+        if (roleToSave === "student") {
+          localStorage.setItem("studentId", response.data.user.id);
+        }
+        
+        // Save mentor detail for mentor
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
       }
-
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
 
       if (roleToSave === "mentor" && response.data.user) {
         localStorage.setItem("mentor", JSON.stringify(response.data.user));

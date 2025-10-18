@@ -31,7 +31,6 @@ import Datascience from './components/Programs/Datascience';
 import Cloudcompute from './components/Programs/Cloudcompute';
 import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
-
 const queryClient = new QueryClient();
 
 function App() {
@@ -57,7 +56,9 @@ function App() {
             </div>
           } />
 
-          <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/programs" element={
+              <ProgramsPage />
+            } />
 
           <Route path="/dashboard" element={<Student_Dashboard />} />
           <Route path="/dashboard/profile" element={<UserProfilePage />} />

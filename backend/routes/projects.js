@@ -27,6 +27,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+
 // Get all projects
 router.get("/", async (req, res) => {
   try {
@@ -53,6 +54,57 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// router.get("/student/:studentId", async (req, res) => {
+//   const { studentId } = req.params;
 
+//   try {
+//     const result = await pool.query(
+//       "SELECT * FROM projects WHERE student_id = $1",
+//       [studentId]
+//     );
+
+//     if (result.rowCount === 0) {
+//       return res.status(404).json({ success: false, message: "No projects found" });
+//     }
+
+//     res.status(200).json({ success: true, data: result.rows });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, error: "Failed to fetch projects" });
+//   }
+// });
+
+// Get assigned projects for a student
+router.get("/assigned/:studentId", async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT 
+        p.id,
+        p.title,
+        p.description,
+        p.tech_stack,
+        p.contributions,
+        p.is_open_source,
+        p.github_pr_link,
+        p.created_at,
+        p.updated_at,
+        pa.assigned_at
+      FROM project_assignments pa
+      INNER JOIN projects p ON pa.project_id = p.id
+      WHERE pa.student_id = $1
+      ORDER BY pa.assigned_at DESC
+      `,
+      [studentId]
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error("Error fetching assigned projects:", err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 module.exports = router;

@@ -169,7 +169,7 @@ export default function Landing() {
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: [20, 0, 20], opacity: 1 }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              transition={{ repeat: 0, duration: 1, ease: "easeInOut" }}
             />
           </div>
         </div>

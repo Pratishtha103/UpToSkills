@@ -25,7 +25,7 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
-  const handleNotificationsClick = () => navigate("/dashboard/notifications");
+  // const handleNotificationsClick = () => navigate("/dashboard/notifications");
   const handleProfileClick = () => navigate("/mentor-dashboard/profile");
 
   // Menu toggle helper
@@ -93,7 +93,7 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
         {/* Right actions */}
         <div className="flex items-center gap-2">
           {/* Notifications */}
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
@@ -105,7 +105,7 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
                 <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
               </span>
             </Button>
-          </motion.div>
+          </motion.div> */}
 
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>

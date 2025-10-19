@@ -6,7 +6,7 @@ const pool = require('../config/database'); // PostgreSQL connection pool
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-
+const verifyToken= require('../middleware/auth');
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 
@@ -176,5 +176,25 @@ router.get('/setup-admin-table', async (req, res) => {
     res.status(500).json({ success: false, message: "Error creating admins table" });
   }
 });
+
+router.get("/getStudent", verifyToken,
+  async (req, res) => {
+  try {
+    const userId = req.user.id; // decoded from token
+
+    const query = 'SELECT * FROM students WHERE id = $1';
+    const result = await pool.query(query, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+})
+
 
 module.exports = router;

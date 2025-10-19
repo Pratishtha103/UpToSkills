@@ -139,7 +139,7 @@ export default function StudentCard({
         <div className="relative z-10">
           {/* Header: avatar, name, domain, rating */}
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
+            <div className="w-12 h-12 bg-gradient-primary bg-slate-300 rounded-full flex items-center justify-center text-black font-semibold">
               {initials}
             </div>
 

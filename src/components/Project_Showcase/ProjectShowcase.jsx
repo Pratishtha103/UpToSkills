@@ -32,21 +32,49 @@ const ProjectShowcase = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const studentId = localStorage.getItem("studentId");
+  const id = localStorage.getItem("id");
+
+  console.log("ProjectShowcase - id:", id, "studentId:", studentId);
+
+  if (!id || !studentId) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h3 className="text-lg font-medium text-gray-900">Authentication Required</h3>
+          <p className="text-gray-500">Please log in to view your assigned projects.</p>
+        </div>
+      </div>
+    );
+  }
   // Fetch projects from backend
-  useEffect(() => {
-    fetch("http://localhost:5000/api/projects")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setProjects(data.data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching projects:", err);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+  console.log("Student ID from localStorage:", localStorage.getItem("studentId"));
+  const studentId = localStorage.getItem("studentId");
+
+  if (!studentId) return;
+
+  setLoading(true);
+
+  fetch(`http://localhost:5000/api/projects/assigned/${studentId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Fetched projects:", data);
+      if (data.success) {
+        setProjects(data.data);
+      } else {
+        setProjects([]);
+      }
+
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching projects:", err);
+      setLoading(false);
+    });
+}, []);
+
+
 
   useEffect(() => {
     const onStorage = (e) => {
@@ -143,7 +171,7 @@ const ProjectShowcase = () => {
       </div> */}
 
       {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10">
         {loading
           ? // Skeleton loaders
             Array.from({ length: 6 }).map((_, idx) => (
@@ -159,6 +187,15 @@ const ProjectShowcase = () => {
                 <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
               </motion.div>
             ))
+          : projects.length === 0
+          ? // Empty state
+            <div className="col-span-full flex items-center justify-center min-h-[300px]">
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Assigned Projects</h3>
+                <p className="text-gray-500">You don't have any projects assigned to you yet.</p>
+                <p className="text-gray-400 text-sm mt-2">Check back later or contact your instructor.</p>
+              </div>
+            </div>
           : projects.map((proj, idx) => (
               <ProjectCard
                   key={idx}

@@ -53,7 +53,7 @@ export default function AdminNavbar({
         {/* Right actions */}
         <div className="flex items-center gap-2">
           {/* Notifications */}
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
@@ -65,7 +65,7 @@ export default function AdminNavbar({
                 <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
               </span>
             </Button>
-          </motion.div>
+          </motion.div> */}
 
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>

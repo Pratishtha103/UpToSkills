@@ -19,6 +19,7 @@ import AdminPanel from './pages/AdminPanel';
 import ProgramsPage from './pages/ProgramsPage';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
+import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 
 // About Page components
 import Header from './components/AboutPage/Header';
@@ -30,7 +31,6 @@ import Datascience from './components/Programs/Datascience';
 import Cloudcompute from './components/Programs/Cloudcompute';
 import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
-
 const queryClient = new QueryClient();
 
 function App() {
@@ -74,7 +74,9 @@ function App() {
             </div>
           } />
 
-          <Route path="/programs" element={<ProgramsPage />} />
+          <Route path="/programs" element={
+              <ProgramsPage />
+            } />
 
           <Route path="/dashboard" element={<Student_Dashboard />} />
           <Route path="/dashboard/profile" element={<UserProfilePage />} />
@@ -82,6 +84,7 @@ function App() {
           <Route path="/dashboard/my-projects" element={<MyProjects />} />
           <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+           <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
 
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
@@ -100,7 +103,7 @@ function App() {
           
           <Route path ="/adminPanel" element={<AdminPanel />} />
 
-          <Route path='/web-dev' element={<Webdev/>}/>
+          <Route path='/programForm/:id' element={<Webdev/>}/>
           <Route path='/data-science' element={<Datascience/>}/>
           <Route path='/cloud-computing' element={<Cloudcompute/>}/>
           <Route path='/cybersecurity' element={<Cybersecurity/>}/>

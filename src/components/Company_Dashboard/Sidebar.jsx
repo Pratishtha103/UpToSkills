@@ -1,42 +1,29 @@
-// Sidebar.jsx
+// src/components/Company_Dashboard/Sidebar.jsx
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Search,
   Calendar,
-  Bell,
   LogOut,
   Building2,
   Users,
-  Award,
-  Menu,
   X,
+  Linkedin,
+  Instagram,
+  Globe,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-
-function scrollToSection(sectionId, headerSelector, offset = 0) {
-  const section = document.getElementById(sectionId);
-  const header = document.querySelector(headerSelector);
-  if (section) {
-    const headerHeight = header ? header.offsetHeight : 0;
-    const yOffset = headerHeight + offset;
-    const y = section.getBoundingClientRect().top + window.pageYOffset - yOffset;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  } else {
-    console.warn(`Section with id '${sectionId}' not found.`);
-  }
-}
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "search", label: "Search Students", icon: Search },
   { id: "interviews", label: "Interviews", icon: Calendar },
-  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "edit-profile", label: "Edit Profile", icon: Building2 },
+  { id: "about-us", label: "About Us", icon: Users },
 ];
 
-export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
+export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemClick }) {
   const [activeItem, setActiveItem] = useState("dashboard");
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
@@ -58,13 +45,41 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
 
   const handleLogout = () => {
     const lastRole = localStorage.getItem("role") || "company";
+    // keep lastRole so login screen can preselect role
     localStorage.clear();
     navigate("/login", { state: { role: lastRole } });
   };
 
+  // IMPORTANT: this writes the desired view and navigates to /company
+  const handleClick = (item) => {
+    setActiveItem(item.id);
+
+    // Save the requested view for Index.jsx to read on mount
+    try {
+      localStorage.setItem("company_view", item.id);
+    } catch (e) {
+      // ignore storage problems but log for debug
+      // eslint-disable-next-line no-console
+      console.warn("Could not set company_view in localStorage", e);
+    }
+
+    // Navigate to company dashboard (Index.jsx)
+    navigate("/company");
+
+    // keep compatibility with onItemClick (when already on /company)
+    if (onItemClick) onItemClick(item.id);
+
+    // close on mobile
+    if (!isDesktop) setIsOpen(false);
+
+    // small UX: if user clicked dashboard, scroll top
+    if (item.id === "dashboard") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <>
-      {/* Background overlay for mobile */}
       <AnimatePresence>
         {!isDesktop && isOpen && (
           <motion.div
@@ -74,155 +89,114 @@ export default function Sidebar({ isOpen, setIsOpen, onItemClick }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar Panel */}
       <motion.aside
         className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 shadow-2xl z-40 overflow-hidden border-r border-gray-200 dark:border-gray-700"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.25 }}
       >
-        {/* Close Button (Mobile only) */}
-        <AnimatePresence>
-          {isOpen && !isDesktop && (
-            <motion.button
-              key="close-btn"
-              className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              onClick={toggleSidebar}
-              aria-label="Close Sidebar"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <X size={24} />
-            </motion.button>
-          )}
-        </AnimatePresence>
+        {/* close button for mobile */}
+        {isOpen && !isDesktop && (
+          <button
+            className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300"
+            onClick={toggleSidebar}
+            aria-label="Close Sidebar"
+          >
+            <X size={22} />
+          </button>
+        )}
 
         <div className="flex flex-col h-full pt-16">
-          {/* Navigation Items */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-1">
-              {sidebarItems.map((item, index) => (
+              {sidebarItems.map((item, idx) => (
                 <motion.button
                   key={item.id}
-                  className={`
-                    sidebar-item w-full flex items-center gap-4 p-4 rounded-2xl 
-                    transition-all duration-200 ease-out relative overflow-hidden
-                    group cursor-pointer select-none
+                  onClick={() => handleClick(item)}
+                  className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 group cursor-pointer select-none
                     ${
                       activeItem === item.id
-                        ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl shadow-primary/30 dark:from-gray-800 dark:to-gray-700 dark:text-white dark:shadow-none"
-                        : "hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 text-gray-700 hover:text-gray-900 dark:hover:from-gray-800 dark:hover:to-gray-700 dark:text-gray-300 dark:hover:text-white"
-                    }
-                  `}
-                  onClick={() => {
-                    setActiveItem(item.id);
-                    if (onItemClick) onItemClick(item.id);
-
-                    if (item.id === "notifications" || item.id === "edit-profile") {
-                      if (!isDesktop) setIsOpen(false);
-                      return;
-                    }
-
-                    if (item.id === "dashboard") {
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }
-
-                    if (item.id === "interviews") {
-                      scrollToSection("upcoming-interviews", ".site-header", 80);
-                    }
-
-                    if (!isDesktop) setIsOpen(false);
-                  }}
-                  initial={{ opacity: 0, x: -20 }}
+                        ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-xl"
+                        : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:text-gray-300 dark:hover:from-gray-800"
+                    }`}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: index * 0.03,
-                    duration: 0.3,
-                    ease: "easeOut",
-                  }}
-                  whileHover={{
-                    x: 8,
-                    scale: 1.03,
-                    transition: { duration: 0.15, ease: "easeOut" },
-                  }}
-                  whileTap={{
-                    scale: 0.97,
-                    transition: { duration: 0.1, ease: "easeInOut" },
-                  }}
+                  transition={{ delay: idx * 0.03, duration: 0.25 }}
+                  whileHover={{ x: 6, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {/* Icon */}
-                  <motion.div
-                    className="relative z-10 flex items-center justify-center"
-                    whileHover={{
-                      rotate: activeItem === item.id ? 0 : 5,
-                      scale: 1.15,
-                      transition: { duration: 0.15 },
-                    }}
-                    whileTap={{
-                      scale: 0.9,
-                      transition: { duration: 0.1 },
-                    }}
-                  >
+                  <div className="relative z-10 flex items-center justify-center">
                     <item.icon
-                      className={`w-6 h-6 transition-all duration-200 ${
-                        activeItem === item.id
-                          ? "text-white drop-shadow-md"
-                          : "text-gray-600 group-hover:text-primary dark:text-gray-300 dark:group-hover:text-white"
+                      className={`w-6 h-6 ${
+                        activeItem === item.id ? "text-white" : "text-gray-600 dark:text-gray-300"
                       }`}
                     />
-                  </motion.div>
+                  </div>
 
-                  {/* Active indicator */}
                   {activeItem === item.id && (
                     <motion.div
-                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white dark:bg-primary rounded-r-full"
+                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
                       layoutId="activeIndicator"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                        duration: 0.2,
-                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                   )}
 
-                  {/* Text */}
-                  <motion.span
-                    className={`
-                      font-bold relative z-10 transition-all duration-200
-                      ${
-                        activeItem === item.id
-                          ? "text-white drop-shadow-md tracking-wide"
-                          : "text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-white"
-                      }
-                    `}
-                    whileHover={{ x: 3, transition: { duration: 0.15 } }}
+                  <span
+                    className={`font-bold relative z-10 ${
+                      activeItem === item.id ? "text-white" : ""
+                    }`}
                   >
                     {item.label}
-                  </motion.span>
+                  </span>
                 </motion.button>
               ))}
             </div>
           </nav>
 
-          {/* Logout */}
+          {/* socials + logout */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <motion.button
+            <div className="mb-3 flex items-center justify-center gap-3">
+              <a
+                href="https://www.linkedin.com/company/uptoskills"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
+                href="https://www.instagram.com/uptoskills"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+              <a
+                href="https://uptoskills.com"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                aria-label="Website"
+              >
+                <Globe size={18} />
+              </a>
+            </div>
+
+            <button
               onClick={handleLogout}
-              className="sidebar-item w-full text-red-400 hover:bg-red-500/10 flex items-center gap-3 p-2 rounded-lg"
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
+              className="w-full text-red-500 hover:bg-red-100 flex items-center gap-3 p-2 rounded-lg"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Log Out</span>
-            </motion.button>
+            </button>
           </div>
         </div>
       </motion.aside>

@@ -11,31 +11,26 @@ const MultiStudent = ({ isDarkMode, setIsDarkMode }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/profiles")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.success && Array.isArray(data.data)) {
-          setStudents(data.data);
-        } else {
-          console.log(
-            "Error fetching students:",
-            data.message || "Invalid data structure."
-          );
-          setStudents([]);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setLoading(false);
-      });
-  }, []);
+ useEffect(() => {
+  fetch("http://localhost:5000/api/students")
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      return res.json();
+    })
+    .then((data) => {
+      if (data.success && Array.isArray(data.data)) {
+        setStudents(data.data);
+      } else {
+        console.log("Error fetching students:", data.message || "Invalid structure");
+        setStudents([]);
+      }
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      setLoading(false);
+    });
+}, []);
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? students.length - 1 : prev - 1));

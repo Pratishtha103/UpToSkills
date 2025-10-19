@@ -16,7 +16,7 @@ const mentorReviewRoutes = require('./routes/mentorReviews');
 const companyProfilesRoutes = require('./routes/companyProfiles.route');
 
 const statsRoutes = require("./routes/stats");
-
+const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
 const companiesRoutes = require('./routes/companies.route');
@@ -25,13 +25,15 @@ const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
 
+const coursesRoutes = require('./routes/courses.route');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const path = require('path');
 
 // Serve uploads folder correctly
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Middleware
 app.use(cors({
@@ -40,9 +42,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve uploads folder statically
-app.use('/uploads', express.static('backend/uploads'));
 
 // API Routes
 app.use('/api', userProfileRoutes);
@@ -54,7 +53,7 @@ app.use('/api/mentorreviews', mentorReviewRoutes);
 app.use('/api/students', studentsRoutes);
 app.use('/api/mentors', mentorsRoutes);
 app.use('/api/company-profiles', companyProfilesRoutes);
-
+app.use("/api/testimonials", testimonialsRouter);
 
 app.use("/api/stats", statsRoutes);
 
@@ -62,6 +61,8 @@ app.use('/api/students', searchStudent);
 
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
+
+app.use('/api/courses', coursesRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

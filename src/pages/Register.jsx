@@ -3,13 +3,21 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 
+// Helper function to capitalize the first letter and lowercase the rest
+const capitalizeFirstLetter = (string) => {
+  if (!string) return "";
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const RegistrationForm = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const initialRole = params.get("role") || "student";
+  // Ensure initial role is normalized to the capitalization used in the <select>
+  const initialRole = capitalizeFirstLetter(params.get("role") || "student");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    role: initialRole,
+    // Initial role is now "Student" instead of "student"
+    role: initialRole, 
     name: "",
     email: "",
     phone: "",
@@ -20,6 +28,7 @@ const RegistrationForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Note: The value from the <select> is already capitalized (e.g., "Student")
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (name === "password") {
       if (value.length < 8 || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) {
@@ -35,6 +44,8 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // NOTE: For the backend, you might want to send the role as lowercase (e.g., "student").
+      // If so, change formData to {...formData, role: formData.role.toLowerCase()}
       const response = await axios.post("http://localhost:5000/api/auth/register", formData);
       alert(response.data.message);
       navigate("/login");
@@ -63,7 +74,10 @@ const RegistrationForm = () => {
           <div className="flex flex-col items-center">
             <div className="text-center">
               <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6]">{formData.role}</span>{" "}
+                <span className="text-[#00BDA6]">
+                  {/* USE THE HELPER FUNCTION HERE */}
+                  {capitalizeFirstLetter(formData.role)}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Sign Up</span>
               </h1>
               <p className="text-[16px] text-gray-500">
@@ -83,9 +97,10 @@ const RegistrationForm = () => {
                   onChange={handleChange}
                   className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                 >
-                  <option value="student">Register as Student</option>
-                  <option value="company">Register as Company</option>
-                  <option value="mentor">Register as Mentor</option>
+                  {/* Keep these values capitalized as they are now used for the formData state */}
+                  <option value="Student">Register as Student</option>
+                  <option value="Company">Register as Company</option>
+                  <option value="Mentor">Register as Mentor</option>
                 </select>
 
                 <input
@@ -98,6 +113,7 @@ const RegistrationForm = () => {
                   required
                 />
 
+                {/* ... other form fields follow ... */}
                 <input
                   name="email"
                   value={formData.email}

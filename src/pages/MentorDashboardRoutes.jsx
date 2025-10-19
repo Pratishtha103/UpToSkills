@@ -5,7 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import MentorDashboardPage from "../components/MentorDashboard/pages/MentorDashboardPage";
 import ProjectsProgress from "../components/MentorDashboard/pages/ProjectsProgress";
 import OpenSourceContributions from "../components/MentorDashboard/pages/OpenSourceContributions";
-import Feedback from "../components/MentorDashboard/pages/Feedback";
+// import Feedback from "../components/MentorDashboard/pages/Feedback";
 import MultiStudent from "../components/MentorDashboard/pages/MultiStudent";
 import MentorProfilePage from "../components/MentorDashboard/components/MentorProfilePage";
 import MentorEditProfilePage from "../components/MentorDashboard/components/MentorEditProfilePage";
@@ -43,12 +43,12 @@ function MentorDashboardRoutes() {
           />
         }
       />
-      <Route
+      {/* <Route
         path="feedback"
         element={
           <Feedback isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
         }
-      />
+      /> */}
       <Route
         path="multi-student"
         element={

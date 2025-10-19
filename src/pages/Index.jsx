@@ -1,5 +1,5 @@
 // src/pages/Index.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Sidebar from "../components/Company_Dashboard/Sidebar";
 import Navbar from "../components/Company_Dashboard/Navbar";
 import StatCard from "../components/Company_Dashboard/StatCard";
@@ -9,6 +9,7 @@ import InterviewsSection from "../components/Company_Dashboard/InterviewsSection
 import CompanyNotificationsPage from "../components/Company_Dashboard/CompanyNotificationsPage";
 import SearchStudents from "../components/Company_Dashboard/SearchStudents";
 import EditProfile from "../components/Company_Dashboard/EditProfile";
+import AboutCompanyPage from "../components/Company_Dashboard/AboutCompanyPage";
 import { Button } from "../components/Company_Dashboard/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -21,6 +22,15 @@ import {
 } from "lucide-react";
 import boy from "../assets/boy2.png";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
+
+const VALID_VIEWS = new Set([
+  "dashboard",
+  "search",
+  "interviews",
+  "edit-profile",
+  "about-us",
+  "notifications",
+]);
 
 export default function Index() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -40,7 +50,6 @@ export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // --- read current user name from localStorage (fallbacks) ---
-  // expects something like localStorage.setItem('user', JSON.stringify({ full_name: 'Acme HR' }))
   const rawUser =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   let currentUserName = "Account";
@@ -129,9 +138,62 @@ export default function Index() {
     fetchStudents();
   }, []);
 
+  // ---------- NEW: read requested view from localStorage on mount ----------
+  // If Sidebar wrote localStorage.setItem('company_view', someView) then we'll
+  // switch to that view after landing on /company.
+  // --- IMPORTANT: if requestedView === 'interviews' we show dashboard and scroll.
+  const interviewRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const requestedView = localStorage.getItem("company_view");
+      if (requestedView && VALID_VIEWS.has(requestedView)) {
+        // If the request is 'interviews' we want to show the dashboard and scroll to interviews.
+        if (requestedView === "interviews") {
+          setCurrentView("dashboard");
+          // small delay so DOM/layout is ready before scrolling
+          setTimeout(() => {
+            interviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 80);
+        } else {
+          setCurrentView(requestedView);
+        }
+      }
+      // remove the flag so it doesn't persist
+      localStorage.removeItem("company_view");
+    } catch (e) {
+      // ignore localStorage issues
+      // eslint-disable-next-line no-console
+      console.warn("Could not read/clear company_view from localStorage", e);
+    }
+    // run only once on mount
+  }, []);
+
   // ---------- Handlers ----------
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-  const handleSidebarClick = (viewId) => setCurrentView(viewId);
+
+  // handleSidebarClick used when Sidebar calls onItemClick while staying on same page
+  // or for compatibility; clicking in Sidebar from other pages sets localStorage + navigates
+  const handleSidebarClick = (viewId) => {
+    if (!viewId) return;
+
+    // Special case: if interviews clicked, show dashboard and scroll down to interviews
+    if (viewId === "interviews") {
+      setCurrentView("dashboard");
+      // small delay to ensure DOM updated, then scroll
+      setTimeout(() => {
+        interviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+      return;
+    }
+
+    if (VALID_VIEWS.has(viewId)) {
+      setCurrentView(viewId);
+      // scroll to top for dashboard-like views
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const handleFilterChange = (key, value) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
   const clearFilters = () =>
@@ -221,6 +283,29 @@ export default function Index() {
     );
   }
 
+  // <-- PLACE ABOUT-US VIEW RIGHT HERE (after edit-profile, before dashboard) -->
+  if (currentView === "about-us") {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+          onItemClick={handleSidebarClick}
+        />
+        <div
+          className={`flex-1 flex flex-col transition-all duration-300 ${
+            isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
+        >
+          <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
+          <main className="flex-1 pt-16">
+            <AboutCompanyPage />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   // ================= DASHBOARD =================
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
@@ -279,39 +364,9 @@ export default function Index() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  {/* <Button
-      variant="logo"
-      size="lg"
-      className="glass-button text-gray-800 dark:text-white 
-                 border-gray-300 dark:border-white/30 hover:border-gray-500 dark:hover:border-white/50"
-    >
-      <Target className="w-5 h-5 mr-2" />
-      Start Hiring
-    </Button> */}
-
-                  {/* <Button
-      variant="glass"
-      size="lg"
-      className="border-gray-300 dark:border-white/30 
-                 hover:border-gray-500 dark:hover:border-white/50
-                 text-gray-800 dark:text-white"
-    >
-      <TrendingUp className="w-5 h-5 mr-2" />
-      Learn More
-    </Button> */}
+                  {/* optional CTA buttons */}
                 </motion.div>
               </div>
-
-              {/* <div className="hidden lg:block">
-                <div
-                  style={{ width: 320, height: 200 }}
-                  className="bg-white/3 rounded-2xl flex items-center justify-center"
-                >
-                  <div className="text-sm text-muted-foreground">
-                    3D Animation
-                  </div>
-                </div>
-              </div> */}
 
               <div className="mt-6 lg:mt-0">
                 <motion.img
@@ -413,8 +468,8 @@ export default function Index() {
             </div>
           </section>
 
-          {/* Interviews Section */}
-          <section className="mb-8">
+          {/* Interviews Section (this is the scroll target) */}
+          <section ref={interviewRef} className="mb-8">
             <InterviewsSection />
           </section>
         </div>

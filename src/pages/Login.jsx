@@ -1,27 +1,24 @@
-// src/pages/LoginForm.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: location.state?.role || "student", // set role from logout → default student
+    role: "student",
   });
-  const navigate = useNavigate();
 
-  // Restore role if saved before
   useEffect(() => {
-    const savedRole = localStorage.getItem("role");
-    if (savedRole) {
-      setFormData((prev) => ({ ...prev, role: savedRole }));
+    if (location.state?.role) {
+      setFormData((prev) => ({ ...prev, role: location.state.role }));
     }
-  }, []);
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -30,14 +27,47 @@ const LoginForm = () => {
     }));
   };
 
+  // ✅ Entire function below updated to include hardcoded admin login
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
 
-      // optional: use a better toast instead of alert
+    // ✅ Added for hardcoded admin login
+    const hardcodedAdmin = {
+      email: "admin@example.com",
+      password: "Admin123",
+      role: "admin",
+    };
+
+    // ✅ Check if entered credentials match admin
+    if (
+      formData.email === hardcodedAdmin.email &&
+      formData.password === hardcodedAdmin.password &&
+      formData.role === "admin"
+    ) {
+      alert("Admin login successful");
+
+      const adminUser = {
+        name: "SmartCart Admin",
+        email: hardcodedAdmin.email,
+        role: hardcodedAdmin.role,
+      };
+
+      // ✅ Save dummy admin session
+      localStorage.setItem("token", "dummy_admin_token");
+      localStorage.setItem("user", JSON.stringify(adminUser));
+
+      navigate("/adminPanel");
+      return; // ✅ Stop execution here for admin
+    }
+
+    // 🧠 Otherwise, continue with normal login flow
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
       alert(response.data.message || "Login successful");
 
       // Save token and role
@@ -45,27 +75,42 @@ const LoginForm = () => {
       const roleToSave = response.data.user?.role || formData.role;
       localStorage.setItem("role", roleToSave);
     
-      // Save user detail for mentor
-      if (roleToSave === "mentor" && response.data.user) {
-      localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      // Save user details
+      if (response.data.user) {
+        localStorage.setItem("id", response.data.user.id);
+        
+        // Save student-specific data
+        if (roleToSave === "student") {
+          localStorage.setItem("studentId", response.data.user.id);
+        }
+        
+        // Save mentor detail for mentor
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
       }
-      
-      // redirect based on role
-      const role = response.data.user?.role || formData.role;
-      if (role === "admin") navigate("/adminPanel");
-      else if (role === "student") navigate("/dashboard");
-      else if (role === "mentor") navigate("/mentor-dashboard");
-      else if (role === "company") navigate("/company");
+
+      if (roleToSave === "mentor" && response.data.user) {
+        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      }
+
+      if (roleToSave === "admin") navigate("/adminPanel");
+      else if (roleToSave === "student" || roleToSave === "learner")
+        navigate("/dashboard");
+      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
+      else if (roleToSave === "company") navigate("/company");
       else navigate("/login");
     } catch (err) {
-      console.error("Login error:", err);
-      const message = err.response?.data?.message || err.message || "Login failed. Please try again.";
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please try again.";
       alert(message);
     }
   };
 
   return (
-    <div className="h-[100vh] items-center flex justify-center px-5 lg:px-0 bg-gray-50">
+    <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
       <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
         {/* Left Image */}
         <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
@@ -83,14 +128,21 @@ const LoginForm = () => {
           <div className="flex flex-col items-center">
             <div className="text-center">
               <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
+                <span className="text-[#00BDA6] capitalize">
+                  {formData.role}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className="text-[16px] text-gray-500">Enter your details to login</p>
+              <p className="text-[16px] text-gray-500">
+                Enter your details to login
+              </p>
             </div>
 
             <div className="w-full flex-1 mt-8">
-              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
+              <form
+                className="mx-auto max-w-xs flex flex-col gap-4"
+                onSubmit={handleSubmit}
+              >
                 {/* Role Selector */}
                 <select
                   name="role"
@@ -130,16 +182,27 @@ const LoginForm = () => {
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword((s) => !s)}
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-500" />
+                    )}
                   </div>
                 </div>
 
-                {/* Submit */}
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="mt-5 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all duration-100 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                 >
-                  <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    className="w-6 h-6 -ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                     <circle cx="8.5" cy="7" r="4" />
                     <path d="M20 8v6M23 11h-6" />
@@ -149,9 +212,11 @@ const LoginForm = () => {
 
                 {/* Sign Up */}
                 <p className="text-l text-gray-600 text-center">
-                  Don't have an account?{" "}
+                  Don’t have an account?{" "}
                   <Link to="/register">
-                    <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">Sign up</span>
+                    <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
+                      Sign up
+                    </span>
                   </Link>
                 </p>
               </form>

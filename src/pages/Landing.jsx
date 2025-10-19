@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+// src/pages/Landing.jsx
+
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
@@ -10,24 +12,53 @@ export default function Landing() {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  // Redirect logged-in users automatically based on role
-  useEffect(() => {
-    if (user) {
-      if (user.role === "learner") navigate("/dashboard");
-      else if (user.role === "company") navigate("/company");
-      else if (user.role === "mentor") navigate("/mentor-dashboard");
-    }
-  }, [user, navigate]);
+  // State to track selected role in dropdown (default student)
+  const [selectedRole, setSelectedRole] = useState("student");
 
-  // Handle feature-based navigation
+  // Allow visiting home page even if logged in, so remove auto redirect from useEffect
+  // We only redirect when clicking the "What We Offer" boxes
+
+  // Handle feature-based navigation with role selection
   const handleNavigation = (role) => {
-    if (!user) return navigate("/login"); // Not logged in
-    if (role === "learner" && user.role === "learner") navigate("/dashboard");
-    else if (role === "company" && user.role === "company")
-      navigate("/company");
-    else if (role === "mentor" && user.role === "mentor")
-      navigate("/mentor-dashboard");
-    else navigate("/login"); // Role mismatch
+    // If logged in
+    if (user) {
+      // If user is student/learner and clicked learner, go to student dashboard
+      if (role === "learner" && (user.role === "student" || user.role === "learner")) {
+        navigate("/dashboard");
+        return;
+      }
+      // If user is company and clicked company, go to company dashboard
+      else if (role === "company" && user.role === "company") {
+        navigate("/company");
+        return;
+      }
+      // If user is mentor and clicked mentor, go to mentor dashboard
+      else if (role === "mentor" && user.role === "mentor") {
+        navigate("/mentor-dashboard");
+        return;
+      }
+      // Role mismatch or other roles - fallback to login
+      else {
+        navigate("/login");
+        return;
+      }
+    }
+
+    // If not logged in, go to login page with appropriate role preset
+    let loginRole = "student";
+    if (role === "company") loginRole = "company";
+    else if (role === "mentor") loginRole = "mentor";
+    else if (role === "learner") loginRole = "student";
+
+    setSelectedRole(loginRole);
+    navigate("/login", { state: { role: loginRole } });
+  };
+
+  // Handle dropdown role change and navigate to login with role preset
+  const handleRoleChange = (e) => {
+    const role = e.target.value;
+    setSelectedRole(role);
+    navigate("/login", { state: { role } });
   };
 
   // Features section data
@@ -46,7 +77,7 @@ export default function Landing() {
     },
     {
       title: "For Mentors",
-      icon: "https://static.thenounproject.com/png/2217264-200.png",
+      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },
@@ -54,6 +85,7 @@ export default function Landing() {
 
   return (
     <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
+
       {/* Header */}
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
@@ -65,8 +97,7 @@ export default function Landing() {
           />
           <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
             {["Home", "About", "Programs", "Contact"].map((link, i) => {
-              const path =
-                link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+              const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
               return (
                 <span
                   key={i}
@@ -94,8 +125,7 @@ export default function Landing() {
               Learn. Connect. <br /> Grow with Peers.
             </h1>
             <p className="text-gray-600 text-lg mb-6">
-              Collaborate with passionate learners and build real-world tech
-              skills through projects.
+              Collaborate with passionate learners and build real-world tech skills through projects.
             </p>
 
             {/* Buttons */}
@@ -139,7 +169,7 @@ export default function Landing() {
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: [20, 0, 20], opacity: 1 }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              transition={{ repeat: 0, duration: 1, ease: "easeInOut" }}
             />
           </div>
         </div>
@@ -147,17 +177,15 @@ export default function Landing() {
 
       {/* Features Section */}
       <section className="py-20 px-6 md:px-16 bg-white text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-10">
-          What We Offer
-        </h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.06 }}
               onClick={() => handleNavigation(box.role)}
-              className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition 
-                bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B] 
+              className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition
+                bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B]
                 hover:from-[#f97316] hover:to-[#fb923c]"
             >
               <img

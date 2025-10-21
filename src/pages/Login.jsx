@@ -1,5 +1,3 @@
-// src/pages/Login.jsx
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
@@ -10,7 +8,6 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Default role is 'student'
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,8 +27,40 @@ const LoginForm = () => {
     }));
   };
 
+  // ✅ Entire function below updated to include hardcoded admin login
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Added for hardcoded admin login
+    const hardcodedAdmin = {
+      email: "admin@example.com",
+      password: "Admin123",
+      role: "admin",
+    };
+
+    // ✅ Check if entered credentials match admin
+    if (
+      formData.email === hardcodedAdmin.email &&
+      formData.password === hardcodedAdmin.password &&
+      formData.role === "admin"
+    ) {
+      alert("Admin login successful");
+
+      const adminUser = {
+        name: "SmartCart Admin",
+        email: hardcodedAdmin.email,
+        role: hardcodedAdmin.role,
+      };
+
+      // ✅ Save dummy admin session
+      localStorage.setItem("token", "dummy_admin_token");
+      localStorage.setItem("user", JSON.stringify(adminUser));
+
+      navigate("/adminPanel");
+      return; // ✅ Stop execution here for admin
+    }
+
+    // 🧠 Otherwise, continue with normal login flow
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -41,15 +70,25 @@ const LoginForm = () => {
 
       alert(response.data.message || "Login successful");
 
-      if (response.data.token)
-        localStorage.setItem("token", response.data.token);
-
+      // Save token and role
+      if (response.data.token) localStorage.setItem("token", response.data.token);
+      const roleToSave = response.data.user?.role || formData.role;
+      localStorage.setItem("role", roleToSave);
+    
+      // Save user details
       if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("id", response.data.user.id);
+        
+        // Save student-specific data
+        if (roleToSave === "student") {
+          localStorage.setItem("studentId", response.data.user.id);
+        }
+        
+        // Save mentor detail for mentor
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
       }
-
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
 
       if (roleToSave === "mentor" && response.data.user) {
         localStorage.setItem("mentor", JSON.stringify(response.data.user));
@@ -89,10 +128,14 @@ const LoginForm = () => {
           <div className="flex flex-col items-center">
             <div className="text-center">
               <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
+                <span className="text-[#00BDA6] capitalize">
+                  {formData.role}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className="text-[16px] text-gray-500">Enter your details to login</p>
+              <p className="text-[16px] text-gray-500">
+                Enter your details to login
+              </p>
             </div>
 
             <div className="w-full flex-1 mt-8">
@@ -194,6 +237,6 @@ const LoginForm = () => {
       </div>
     </div>
   );
-}
+};
 
 export default LoginForm;

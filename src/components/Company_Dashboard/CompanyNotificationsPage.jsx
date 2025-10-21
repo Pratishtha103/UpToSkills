@@ -1,5 +1,5 @@
 // src/pages/CompanyNotificationsPage.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // ✅ Company-specific notifications data
 const companyNotificationsData = [
@@ -69,7 +69,40 @@ const companyNotificationsData = [
   },
 ];
 
-const CompanyNotificationsPage = () => {
+const CompanyNotificationsPage = ({ isDarkMode: propIsDarkMode } = {}) => {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof propIsDarkMode !== "undefined") return propIsDarkMode;
+    try {
+      if (typeof window !== "undefined") {
+        if (document.documentElement.classList.contains("dark")) return true;
+        return localStorage.getItem("isDarkMode") === "true";
+      }
+    } catch (e) {}
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof propIsDarkMode !== "undefined") {
+      setIsDarkMode(propIsDarkMode);
+      return;
+    }
+
+    const onStorage = (e) => {
+      if (e.key === "isDarkMode") setIsDarkMode(e.newValue === "true");
+    };
+    window.addEventListener("storage", onStorage);
+
+    // also observe class changes to <html> (fallback)
+    const obs = new MutationObserver(() => {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      obs.disconnect();
+    };
+  }, [propIsDarkMode]);
   const getNotificationIcon = (type) => {
     const icons = {
       application: "👤",
@@ -84,8 +117,8 @@ const CompanyNotificationsPage = () => {
   };
 
   return (
-    <div className="p-6 w-full">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+    <div className={`p-6 w-full`}> 
+      <h2 className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'} mb-6 flex items-center gap-2`}>
         🔔 Company Notifications
       </h2>
 
@@ -93,20 +126,19 @@ const CompanyNotificationsPage = () => {
         {companyNotificationsData.map((notification) => (
           <div
             key={notification.id}
-            className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow"
-          >
+            className={`rounded-lg p-4 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className="flex items-start gap-3">
               <div className="text-2xl">
                 {getNotificationIcon(notification.type)}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                <h3 className={`text-lg font-semibold mb-1 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                   {notification.title}
                 </h3>
-                <p className="text-sm text-gray-600">{notification.message}</p>
+                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-sm`}>{notification.message}</p>
               </div>
             </div>
-            <span className="text-xs text-gray-500 ml-4 whitespace-nowrap">
+            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-xs ml-4 whitespace-nowrap`}>
               {notification.time}
             </span>
           </div>

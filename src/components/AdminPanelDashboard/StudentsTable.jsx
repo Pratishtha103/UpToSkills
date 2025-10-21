@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 function downloadCSV(filename, rows) {
+  if (!rows || rows.length === 0) return;
   const header = Object.keys(rows[0] || {}).join(',') + '\n';
   const csv = rows.map(r => Object.values(r).map(v => `"${String(v ?? '')}"`).join(',')).join('\n');
   const blob = new Blob([header + csv], { type: 'text/csv' });

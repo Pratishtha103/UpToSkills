@@ -1,48 +1,29 @@
-// Sidebar.jsx
 import React, { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { X, Home, Users, Folder, LogOut, Edit3, Award } from "lucide-react";
+import { Home, Users, Folder, LogOut, Edit3, Award, Info } from "lucide-react";
+import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
-  {
-    name: "Students",
-    icon: <Users size={18} />,
-    path: "/mentor-dashboard/multi-student",
-  },
-  {
-    name: "Projects",
-    icon: <Folder size={18} />,
-    path: "/mentor-dashboard/open-source-contributions",
-  },
-  {
-    name: "Edit Profile",
-    icon: <Edit3 size={18} />,
-    path: "/mentor-dashboard/edit-profile",
-  },
-  {
-    name: "Skill Badges",
-    icon: <Award size={18}/>,
-    path: "/mentor-dashboard/skill-badges"
-  },
+  { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
+  { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
+  { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
+  { name: "Skill Badges", icon: <Award size={18} />, path: "/mentor-dashboard/skill-badges" },
+  { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard#contact-section" },
 ];
 
-const Sidebar = ({
-  children,
-  isOpen: controlledIsOpen,
-  setIsOpen: controlledSetIsOpen,
-  isDarkMode,
-}) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [internalOpen, setInternalOpen] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
+
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalOpen;
 
-  const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const check = () => {
       const desktop = window.innerWidth >= 1024;
@@ -62,22 +43,20 @@ const Sidebar = ({
     }
   };
 
-  // Sync active item to route
   useEffect(() => {
     const currentItem =
-      sidebarItems.find((item) => item.path === location.pathname) ||
+      sidebarItems.find((item) => location.pathname === item.path) ||
       sidebarItems.find((item) => location.pathname.startsWith(item.path));
     if (currentItem) setActiveItem(currentItem.name);
   }, [location.pathname]);
 
-  // global toggle handler
   const toggleHandlerRef = useRef();
   useEffect(() => {
     toggleHandlerRef.current = () => setOpen(!isOpen);
   }, [isOpen]);
+
   useEffect(() => {
-    const handler = () =>
-      toggleHandlerRef.current && toggleHandlerRef.current();
+    const handler = () => toggleHandlerRef.current && toggleHandlerRef.current();
     window.addEventListener("toggleSidebar", handler);
     return () => window.removeEventListener("toggleSidebar", handler);
   }, []);
@@ -88,111 +67,93 @@ const Sidebar = ({
     navigate("/login", { state: { role: lastRole } });
   };
 
-  // Dark mode colors
-  const bgColor = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
+  const handleAboutUs = () => {
+    navigate("/mentor-dashboard#contact-section");
+    setTimeout(() => {
+      const el = document.getElementById("contact-section");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }, 500);
+  };
+
+  const bgColor = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200";
   const hoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
   const activeBg = isDarkMode
     ? "bg-gray-700 text-white"
     : "bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-xl shadow-blue-400/30";
-
-  // New logout button hover color logic for Dark Mode
   const logoutHoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-red-50";
 
   return (
     <>
-      {/* Mobile Overlay (Only needed if you want a backdrop, currently not implemented) */}
-      <AnimatePresence>{!isControlled && !isOpen && null}</AnimatePresence>
-
       <motion.aside
         className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden ${bgColor}`}
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.28 }}
       >
-        {/* Mobile close button */}
-        <AnimatePresence>
-          {isOpen && !isDesktop && (
-            <motion.button
-              key="close-btn"
-              className={`absolute top-4 right-4 z-50 p-2 ${isDarkMode
-                  ? "text-white hover:text-gray-300"
-                  : "text-black hover:text-gray-700"
-                }`}
-              onClick={() => setOpen(false)}
-              aria-label="Close Sidebar"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.18 }}
-            >
-              <X size={22} />
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        <div className="flex flex-col h-full pt-16">
-          {/* Navigation Items */}
-          <nav className="flex-1 pt-6 px-4">
-            <div className="space-y-2">
-              {sidebarItems.map((item, index) => (
-                <motion.button
-                  key={item.name}
-                  className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none
-                    ${activeItem === item.name ? activeBg : hoverBg}`}
-                  onClick={() => {
-                    setActiveItem(item.name);
-                    navigate(item.path);
-                    if (!isDesktop) setOpen(false);
-                  }}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: index * 0.02,
-                    duration: 0.22,
-                    ease: "easeOut",
-                  }}
-                  whileHover={{
-                    x: 6,
-                    scale: 1.02,
-                    transition: { duration: 0.12 },
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {/* Icon */}
-                  <div className="relative z-10 flex items-center justify-center">
-                    {React.cloneElement(item.icon, {
-                      className: `w-5 h-5 transition-all duration-200 ${activeItem === item.name
-                          ? "text-white"
-                          : isDarkMode
-                            ? "text-gray-300 group-hover:text-white"
-                            : "text-gray-600 group-hover:text-gray-800"
-                        }`,
-                    })}
-                  </div>
-
-                  <span
-                    className={`font-semibold relative z-10 ${activeItem === item.name
-                        ? "text-white"
-                        : isDarkMode
-                          ? "text-gray-300"
-                          : "text-gray-800"
-                      }`}
+        {/* Sidebar Items */}
+        <div className="flex flex-col h-full pt-16 justify-between">
+          <div>
+            <nav className="flex-1 pt-6 px-4">
+              <div className="space-y-2">
+                {sidebarItems.map((item, index) => (
+                  <motion.button
+                    key={item.name}
+                    className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-200 ease-out relative ${
+                      activeItem === item.name ? activeBg : hoverBg
+                    }`}
+                    onClick={() => {
+                      setActiveItem(item.name);
+                      if (item.name === "About Us") handleAboutUs();
+                      else navigate(item.path);
+                      if (!isDesktop) setOpen(false);
+                    }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      delay: index * 0.02,
+                      duration: 0.22,
+                      ease: "easeOut",
+                    }}
+                    whileHover={{ x: 6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {item.name}
-                  </span>
-                </motion.button>
-              ))}
-            </div>
-          </nav>
+                    <div className="flex items-center">{item.icon}</div>
+                    <span className="font-semibold">{item.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </nav>
+          </div>
 
-          <div className={`p-4 border-t ${borderColor}`}>
+          {/* Social Media and Logout */}
+          <div className={`p-4 border-t ${borderColor} text-center`}>
+            <p className="font-semibold text-sm mb-2 text-gray-500">Connect With Us</p>
+            <div className="flex justify-center gap-4 mb-3">
+              <FaLinkedin
+                size={22}
+                className="cursor-pointer hover:text-[#0A66C2] transition"
+                onClick={() =>
+                  window.open("https://www.linkedin.com/company/uptoskills/posts/?feedView=all", "_blank")
+                }
+              />
+              <FaInstagram
+                size={22}
+                className="cursor-pointer hover:text-[#E1306C] transition"
+                onClick={() => window.open("https://www.instagram.com/uptoskills", "_blank")}
+              />
+              <FaYoutube
+                size={22}
+                className="cursor-pointer hover:text-[#FF0000] transition"
+                onClick={() =>
+                  window.open("https://youtube.com/@uptoskills9101?si=YvRk51dq0exU-zLv", "_blank")
+                }
+              />
+            </div>
+
             <motion.button
               onClick={handleLogout}
-              // --- MODIFIED LINE BELOW ---
-              className={`w-full text-red-500 ${logoutHoverBg} flex items-center gap-3 p-2 rounded-lg transition-all duration-200`}
+              className={`w-full text-red-500 ${logoutHoverBg} flex items-center justify-center gap-2 p-2 rounded-lg transition-all`}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -203,11 +164,8 @@ const Sidebar = ({
         </div>
       </motion.aside>
 
-      {/* Shift content when desktop and open */}
-      <div
-        className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"
-          }`}
-      >
+      {/* Offset content */}
+      <div className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"}`}>
         {children}
       </div>
     </>

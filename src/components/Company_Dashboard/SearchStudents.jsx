@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft } from "lucide-react";
 
+/**
+ * SearchStudents (ESLint-safe)
+ *
+ * - No eslint-disable or references to react-hooks/exhaustive-deps
+ * - fetchStudents is defined inside the mount effect so the effect has no external deps
+ * - Filtering effect declares its dependencies explicitly
+ */
+
 export default function SearchStudents() {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -10,46 +18,108 @@ export default function SearchStudents() {
   const [studentDetails, setStudentDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
+  // Mount: fetch students. fetchStudents is defined inside the effect to avoid being a dependency.
   useEffect(() => {
-    fetchStudents();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredStudents(students);
-    } else {
-      const filtered = students.filter((student) =>
-        student.student_name?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredStudents(filtered);
-    }
-  }, [searchQuery, students]);
-
-  const fetchStudents = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("http://localhost:5000/api/students/all-students");
-      const data = await res.json();
-      if (data.success) {
-        setStudents(data.data);
-        setFilteredStudents(data.data);
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:5000/api/students/all-students");
+        const data = await res.json();
+        // Accept either { success: true, data: [...] } or directly an array
+        const rows = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+        setStudents(rows);
+        setFilteredStudents(rows);
+      } catch (err) {
+        console.error("Error fetching students:", err);
+        setStudents([]);
+        setFilteredStudents([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching students:", err);
-    } finally {
-      setLoading(false);
+    };
+
+    fetchStudents();
+  }, []); // no external dependencies
+
+  // Client-side filtering: depends explicitly on searchQuery and students
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      setFilteredStudents(students);
+      return;
     }
-  };
+
+    const filtered = students.filter((s) => {
+      const name =
+        (s.student_name || s.full_name || s.name || s.displayName || "")
+          .toString()
+          .toLowerCase();
+
+      // Normalize domains: array, JSON string, comma-separated string, or plain string
+      let domains = "";
+      try {
+        if (Array.isArray(s.domains_of_interest)) {
+          domains = s.domains_of_interest.join(" ");
+        } else if (typeof s.domains_of_interest === "string") {
+          const trimmed = s.domains_of_interest.trim();
+          if (trimmed.startsWith("[")) {
+            try {
+              const parsed = JSON.parse(trimmed);
+              domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
+            } catch {
+              domains = trimmed;
+            }
+          } else {
+            domains = trimmed;
+          }
+        } else if (Array.isArray(s.domainsOfInterest)) {
+          domains = s.domainsOfInterest.join(" ");
+        } else if (s.domainsOfInterest && typeof s.domainsOfInterest === "string") {
+          domains = s.domainsOfInterest;
+        } else {
+          domains = "";
+        }
+      } catch {
+        domains = "";
+      }
+
+      const ai = (s.ai_skill_summary || s.ai_skills || s.ai || "").toString().toLowerCase();
+      const others = (s.othersDomain || s.others_domain || "").toString().toLowerCase();
+
+      return (
+        name.includes(q) ||
+        domains.toString().toLowerCase().includes(q) ||
+        ai.includes(q) ||
+        others.includes(q)
+      );
+    });
+
+    setFilteredStudents(filtered);
+  }, [searchQuery, students]); // explicit deps
 
   const fetchStudentDetails = async (studentId) => {
+    if (!studentId) return;
     try {
       setDetailsLoading(true);
       const res = await fetch(`http://localhost:5000/api/students/student/${studentId}`);
       const data = await res.json();
-
       if (data.success) {
-        setStudentDetails(data.data);
+        const d = data.data;
+        const normalized = {
+          ...d,
+          full_name: d.profile_full_name || d.full_name || d.student_name || "",
+          student_id: d.student_id || d.id,
+          contact_number: d.contact_number || d.phone,
+          linkedin_url: d.linkedin_url,
+          github_url: d.github_url,
+          ai_skill_summary: d.ai_skill_summary || d.ai_skills || "",
+          domainsOfInterest: d.domains_of_interest || d.domainsOfInterest || [],
+          othersDomain: d.others_domain || d.othersDomain || "",
+        };
+        setStudentDetails(normalized);
         setSelectedStudent(studentId);
+      } else {
+        console.warn("No student detail returned:", data);
       }
     } catch (err) {
       console.error("Error fetching student details:", err);
@@ -63,7 +133,7 @@ export default function SearchStudents() {
     setStudentDetails(null);
   };
 
-  // ------------------- STUDENT DETAILS VIEW -------------------
+  // ---------- STUDENT DETAILS VIEW ----------
   if (selectedStudent && studentDetails) {
     return (
       <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -83,7 +153,6 @@ export default function SearchStudents() {
               </div>
             ) : (
               <>
-                {/* Header */}
                 <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-8">
                   <div className="flex items-center gap-4">
                     <div className="bg-white/20 p-3 rounded-full">
@@ -100,9 +169,7 @@ export default function SearchStudents() {
                   </div>
                 </div>
 
-                {/* Details */}
                 <div className="p-6 space-y-6 text-gray-900 dark:text-gray-100">
-                  {/* Contact Information */}
                   <div>
                     <h2 className="text-lg font-semibold mb-4">
                       Contact Information
@@ -143,19 +210,23 @@ export default function SearchStudents() {
                     </div>
                   </div>
 
-                  {/* Domains of Interest */}
-                  {(studentDetails.domainsOfInterest ||
-                    studentDetails.othersDomain) && (
+                  {(studentDetails.domainsOfInterest || studentDetails.othersDomain) && (
                     <div>
                       <h2 className="text-lg font-semibold mb-4">
                         Domains of Interest
                       </h2>
                       <div className="flex flex-wrap gap-2">
-                        {studentDetails.domainsOfInterest && (
-                          <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
-                            {studentDetails.domainsOfInterest}
-                          </span>
-                        )}
+                        {Array.isArray(studentDetails.domainsOfInterest)
+                          ? studentDetails.domainsOfInterest.map((d, i) => (
+                              <span key={i} className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
+                                {d}
+                              </span>
+                            ))
+                          : (studentDetails.domainsOfInterest || "").toString().split(",").map((d, i) => d.trim() ? (
+                              <span key={i} className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
+                                {d}
+                              </span>
+                            ) : null)}
                         {studentDetails.othersDomain && (
                           <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm">
                             {studentDetails.othersDomain}
@@ -165,25 +236,17 @@ export default function SearchStudents() {
                     </div>
                   )}
 
-                  {/* AI Skill Summary */}
                   {studentDetails.ai_skill_summary && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-4">
-                        AI Skill Summary
-                      </h2>
-                      <p className="leading-relaxed">
-                        {studentDetails.ai_skill_summary}
-                      </p>
+                      <h2 className="text-lg font-semibold mb-4">AI Skill Summary</h2>
+                      <p className="leading-relaxed">{studentDetails.ai_skill_summary}</p>
                     </div>
                   )}
 
-                  {/* Why Hire Me */}
                   {studentDetails.why_hire_me && (
                     <div>
                       <h2 className="text-lg font-semibold mb-4">Why Hire Me</h2>
-                      <p className="leading-relaxed">
-                        {studentDetails.why_hire_me}
-                      </p>
+                      <p className="leading-relaxed">{studentDetails.why_hire_me}</p>
                     </div>
                   )}
                 </div>
@@ -195,11 +258,10 @@ export default function SearchStudents() {
     );
   }
 
-  // ------------------- STUDENT LIST VIEW -------------------
+  // ---------- STUDENT LIST VIEW ----------
   return (
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
-        {/* Search Bar */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
@@ -207,17 +269,16 @@ export default function SearchStudents() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search students by name..."
+              placeholder="Search by name or skill/domain (try: react, ai, frontend)..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
 
-        {/* Student List */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Students ({filteredStudents.length})
+              Candidates ({filteredStudents.length})
             </h2>
           </div>
 
@@ -227,27 +288,44 @@ export default function SearchStudents() {
             </div>
           ) : filteredStudents.length > 0 ? (
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredStudents.map((student) => (
-                <div
-                  key={student.user_detail_id || student.id}
-                  className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 cursor-pointer"
-                  onClick={() =>
-                    fetchStudentDetails(student.user_detail_id || student.id)
-                  }
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {student.student_name}
-                    </span>
+              {filteredStudents.map((student) => {
+                const id = student.user_detail_id || student.id || student.student_id;
+                const displayName =
+                  student.student_name ||
+                  student.full_name ||
+                  student.profile_full_name ||
+                  student.name ||
+                  "Unknown Student";
+                const domainDisplay =
+                  student.domains_of_interest ||
+                  student.domainsOfInterest ||
+                  student.ai_skill_summary ||
+                  "";
+                return (
+                  <div
+                    key={id || Math.random()}
+                    className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 cursor-pointer"
+                    onClick={() => fetchStudentDetails(id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{displayName}</span>
+                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                          {typeof domainDisplay === "string"
+                            ? domainDisplay.slice(0, 80)
+                            : Array.isArray(domainDisplay)
+                            ? domainDisplay.join(", ").slice(0, 80)
+                            : ""}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-gray-600 dark:text-gray-300">
-              {searchQuery
-                ? "No students found matching your search"
-                : "No students available"}
+              {searchQuery ? "No students found matching your search" : "No students available"}
             </div>
           )}
         </div>

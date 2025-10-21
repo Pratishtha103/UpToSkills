@@ -9,8 +9,23 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 
+<<<<<<< HEAD
+// Helper to format numbers with commas
+const formatNumber = (n) =>
+  n === null || n === undefined
+    ? "-"
+    : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
+  const [stats, setStats] = useState({
+    students: null,
+    mentors: null,
+    companies: null,
+  });
+=======
 const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
   const [stats, setStats] = useState({ students: null, mentors: null, companies: null });
+>>>>>>> ba97d89bdf1c2191ef72cfb322ac649f56591cdb
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
@@ -80,6 +95,26 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<<<<<<< HEAD
+  {/* Students */}
+        <motion.div
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => onNavigateSection && onNavigateSection('students_table')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500">
+            <FaUserGraduate className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div
+              className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}
+            >
+              {loadingStats ? "..." : formatNumber(stats.students)}
+=======
         {[
           {
             title: "Total Students",
@@ -117,6 +152,7 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
           >
             <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>
               {card.icon}
+>>>>>>> ba97d89bdf1c2191ef72cfb322ac649f56591cdb
             </div>
             <div>
               <div
@@ -134,8 +170,61 @@ const DashboardMain = ({ isDarkMode, onNavigateSection }) => {
                 {card.title}
               </div>
             </div>
+<<<<<<< HEAD
+          </div>
+        </motion.div>
+
+        {/* Mentors */}
+        <motion.div
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          onClick={() => onNavigateSection && onNavigateSection('mentors_table')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500">
+            <FaChalkboardTeacher className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              {loadingStats ? "..." : formatNumber(stats.mentors)}
+            </div>
+            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+              Total Mentors
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Companies */}
+        <motion.div
+          className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-lg transition ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={() => onNavigateSection && onNavigateSection('companies_table')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500">
+            <FaBuilding className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              {loadingStats ? "..." : formatNumber(stats.companies)}
+            </div>
+            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+              Total Companies
+            </div>
+          </div>
+        </motion.div>
+=======
           </motion.div>
         ))}
+>>>>>>> ba97d89bdf1c2191ef72cfb322ac649f56591cdb
       </section>
 
       {statsError && (

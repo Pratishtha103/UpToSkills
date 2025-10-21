@@ -5,8 +5,58 @@ import Header from "../dashboard/Header";
 import StudentProfileForm from "./StudentProfileForm";
 import DomainsOfInterest from "./DomainsOfInterest";
 
-const EditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
+  // effective dark mode state: prefer prop, otherwise derive from document/localStorage
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
+      if (typeof window !== 'undefined') {
+        if (document.documentElement.classList.contains('dark')) return true;
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') return true;
+        if (localStorage.getItem('isDarkMode') === 'true') return true;
+      }
+    } catch (e) {}
+    return false;
+  });
+
+  // fallback toggle if parent doesn't provide one
+  const toggleDarkMode = propToggleDarkMode
+    ? propToggleDarkMode
+    : () => {
+        setIsDarkMode((prev) => {
+          const next = !prev;
+          try {
+            document.documentElement.classList.toggle('dark', next);
+            localStorage.setItem('theme', next ? 'dark' : 'light');
+            localStorage.setItem('isDarkMode', String(next));
+          } catch (e) {}
+          return next;
+        });
+      };
+
+  // Listen to storage events and <html> class changes so component updates when theme toggles elsewhere
+  useEffect(() => {
+    if (typeof propIsDarkMode !== 'undefined') return; // controlled by parent
+
+    const handleStorage = (e) => {
+      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
+      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
+    };
+
+    const mo = new MutationObserver(() => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    });
+
+    window.addEventListener('storage', handleStorage);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      mo.disconnect();
+    };
+  }, [propIsDarkMode]);
   const [domainsOfInterest, setDomainsOfInterest] = useState([]);
   const [othersDomain, setOthersDomain] = useState("");
   const [formData, setFormData] = useState(null);
@@ -129,6 +179,7 @@ const EditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                     formData={formData || {}}
                     setFormData={setFormData}
                     onSubmit={handleFormSubmit}
+                    isDarkMode={isDarkMode}
                   />
                 </div>
 
@@ -137,6 +188,7 @@ const EditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                     selectedDomains={domainsOfInterest}
                     onChange={handleDomainChange}
                     othersValue={othersDomain}
+                    isDarkMode={isDarkMode}
                   />
                 </div>
               </div>

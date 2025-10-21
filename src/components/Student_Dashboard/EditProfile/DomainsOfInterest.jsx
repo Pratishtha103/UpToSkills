@@ -12,7 +12,33 @@ const DOMAIN_OPTIONS = [
   'App Development',
 ];
 
-const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' }) => {
+const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '', isDarkMode: propIsDarkMode }) => {
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    try {
+      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
+      if (typeof window !== 'undefined') {
+        if (document.documentElement.classList.contains('dark')) return true;
+        if (localStorage.getItem('theme') === 'dark') return true;
+        if (localStorage.getItem('isDarkMode') === 'true') return true;
+      }
+    } catch (e) {}
+    return false;
+  });
+
+  React.useEffect(() => {
+    if (typeof propIsDarkMode !== 'undefined') {
+      setIsDarkMode(propIsDarkMode);
+      return;
+    }
+    const onStorage = (e) => {
+      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
+      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
+    };
+    window.addEventListener('storage', onStorage);
+    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
+  }, [propIsDarkMode]);
   // Handle checkbox selection
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
@@ -25,8 +51,8 @@ const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' })
   };
 
   return (
-    <div className="domains-container p-4 bg-white rounded shadow">
-      <h3 className="text-lg font-semibold mb-4">Domains of Interest</h3>
+    <div className={`domains-container p-4 rounded shadow ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-gray-100' : ''}`}>Domains of Interest</h3>
 
       {/* Domain Checkboxes */}
       <div className="domains-list grid grid-cols-2 gap-4 mb-4">
@@ -40,7 +66,7 @@ const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' })
               onChange={handleCheckboxChange}
               className="form-checkbox h-4 w-4 text-blue-600"
             />
-            <label htmlFor={`domain_${domain}`} className="text-gray-700">
+            <label htmlFor={`domain_${domain}`} className={`${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}>
               {domain}
             </label>
           </div>
@@ -49,7 +75,7 @@ const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' })
 
       {/* Others Field */}
       <div className="form-group">
-        <label htmlFor="others" className="block mb-2 font-medium text-gray-700">
+        <label htmlFor="others" className={`block mb-2 font-medium ${isDarkMode ? 'text-gray-100' : ''}`}>
           Others
         </label>
         <input
@@ -59,7 +85,7 @@ const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' })
           value={othersValue}
           onChange={handleOthersChange}
           placeholder="Please specify other domains"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`w-full px-3 py-2 border rounded-lg text-sm ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'border-gray-300 bg-white'}`} 
         />
       </div>
     </div>

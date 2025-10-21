@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Landing from './pages/Landing';
@@ -34,11 +34,29 @@ import Thankyou from './components/Programs/Thankyou';
 const queryClient = new QueryClient();
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem('isDarkMode') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+
   const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
+    setIsDarkMode(prev => {
+      const next = !prev;
+      try { localStorage.setItem('isDarkMode', String(next)); } catch (e) {}
+      return next;
+    });
   };
+
+  // keep <html> dark class in sync globally
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) root.classList.add('dark');
+    else root.classList.remove('dark');
+    try { localStorage.setItem('isDarkMode', String(isDarkMode)); } catch (e) {}
+  }, [isDarkMode]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -71,8 +89,8 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
 
-          <Route path="/company" element={<CompanyDashboardHome />} />
-          <Route path="/company-profile" element={<CompanyProfilePage />} />
+          <Route path="/company" element={<CompanyDashboardHome isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/company-profile" element={<CompanyProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
 
           <Route path="/company/*" element={<CompanyNotFound />} />
           <Route path="*" element={<h1>404 - Page Not Found</h1>} />

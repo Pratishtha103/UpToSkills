@@ -2,10 +2,15 @@
 const express = require('express');
 const router = express.Router();
 
-const { getStudents, getStudentById, searchStudents } = require('../controllers/students.controller');
-const pool = require('../config/database');
+const pool = require('../config/database'); // used below in count/delete
+const {
+  getStudents,
+  getStudentById,
+  searchStudents,
+  searchStudentsByQuery
+} = require('../controllers/students.controller');
 
-// Route to get total student count
+// Route: get student count (keeps your existing count route)
 router.get('/count', async (req, res) => {
   try {
     const result = await pool.query('SELECT COUNT(*)::int AS total_students FROM students');
@@ -16,7 +21,7 @@ router.get('/count', async (req, res) => {
   }
 });
 
-// Delete student by ID
+// Delete student by ID (keep as-is)
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -34,13 +39,23 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Search route must come before '/:id'
+// --- SEARCH ROUTES ---
+// Improved query-style search: /api/students/search?q=react
+router.get('/search', searchStudentsByQuery);
+
+// Legacy param search: /api/students/search/:name
 router.get('/search/:name', searchStudents);
 
-// Get all students
+// Provide "all-students" alias for clients that expect it
+router.get('/all-students', getStudents);
+
+// Keep root route (getStudents) at /api/students/
 router.get('/', getStudents);
 
-// Get student by ID
+// Provide "student/:id" alias (used by your frontend code) -> maps to getStudentById
+router.get('/student/:id', getStudentById);
+
+// Also keep '/:id' for other clients
 router.get('/:id', getStudentById);
 
 module.exports = router;

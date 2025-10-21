@@ -17,7 +17,7 @@ import {
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "search", label: "Search Students", icon: Search },
+  { id: "search", label: "Search Candidate", icon: Search },
   { id: "interviews", label: "Interviews", icon: Calendar },
   { id: "edit-profile", label: "Edit Profile", icon: Building2 },
   { id: "about-us", label: "About Us", icon: Users },

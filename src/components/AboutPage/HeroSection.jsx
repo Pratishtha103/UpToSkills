@@ -6,6 +6,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const goToRegister = () => navigate("/register");
   const goToCompanyRegister = () => navigate("/register?role=company");
+  const goToMentorRegister = () => navigate("/register?role=mentor");
   return (
     <section
       id="home"
@@ -27,14 +28,14 @@ const HeroSection = () => {
             Explore Talent
           </button>
           <button
-          onClick={goToCompanyRegister}
+          onClick={goToMentorRegister}
           className="bg-[#FF6A28] text-white px-6 py-3 rounded-full font-semibold shadow-[0_10px_15px_rgba(0,0,0,0.1)] border-none cursor-pointer transition-all duration-300 ease hover:bg-[#00C7B1]">
-            Hire as Student
+            Guide & Earn
           </button>
           <button
           onClick={goToRegister}
           className="bg-[#FF6A28] text-white px-6 py-3 rounded-full font-semibold shadow-[0_10px_15px_rgba(0,0,0,0.1)] border-none cursor-pointer transition-all duration-300 ease hover:bg-[#00C7B1]">
-            Try Free
+          Join as Learner
           </button>
         </div>
       </div>

@@ -9,15 +9,16 @@ import {
   LogOut,
   X,
   Award,
+  ViewIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
-  { id: "projects", label: "Add Projects", icon: FolderOpen, path: "/dashboard/my-projects" },
-  { id: "viewproject", label: "My Project", icon: FolderOpen, path: "/projectshowcase" },
-  { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" }
+  { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
+  { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
+  // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" }
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {

@@ -1,9 +1,12 @@
 // src/components/AdminPanelDashboard/DashboardMain.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaUserGraduate, FaChalkboardTeacher, FaBuilding } from "react-icons/fa";
 import axios from "axios";
+<<<<<<< HEAD
 import { FaUserGraduate, FaChalkboardTeacher, FaBuilding } from "react-icons/fa";
+=======
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 
 const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   const [stats, setStats] = useState({ students: null, mentors: null, companies: null });
@@ -55,17 +58,55 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
     fetchCourses();
   }, []);
 
+<<<<<<< HEAD
   const formatNumber = (num) => (num === null || num === undefined ? "-" : num?.toLocaleString("en-IN") ?? "0");
 
   const removeCourse = async (id) => {
+=======
+  // Delete course
+  const removeCourse = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
     try {
       await axios.delete(`http://localhost:5000/api/courses/${id}`);
       setCourses((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
+<<<<<<< HEAD
       console.error("Failed to delete course:", err);
       // optional: show a toast / error state
     }
   };
+=======
+      console.error("Error deleting course:", err);
+    }
+  };
+
+  const formatNumber = (num) => num?.toLocaleString("en-IN") ?? "0";
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
+
+  const cards = [
+    {
+      title: "Total Students",
+      value: stats.students,
+      icon: <FaUserGraduate className="w-6 h-6 text-white" />,
+      gradient: "from-blue-500 to-indigo-500",
+      onClick: () => onNavigateSection?.("students_table"),
+    },
+    {
+      title: "Total Mentors",
+      value: stats.mentors,
+      icon: <FaChalkboardTeacher className="w-6 h-6 text-white" />,
+      gradient: "from-green-500 to-emerald-500",
+      onClick: () => onNavigateSection?.("mentors_table"),
+    },
+    {
+      title: "Total Companies",
+      value: stats.companies,
+      icon: <FaBuilding className="w-6 h-6 text-white" />,
+      gradient: "from-orange-500 to-red-500",
+      onClick: () => onNavigateSection?.("companies_table"),
+    },
+  ];
 
   return (
     <main
@@ -75,9 +116,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
     >
       {/* Header */}
       <motion.h2
-        className={`text-2xl font-bold mb-4 ${
-          isDarkMode ? "text-white" : "text-gray-800"
-        }`}
+        className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
       >
@@ -86,6 +125,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<<<<<<< HEAD
         {[
           {
             title: "Total Students",
@@ -109,6 +149,9 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
             onClick: () => onNavigateSection?.("companies_table"),
           },
         ].map((card, index) => (
+=======
+        {cards.map((card, index) => (
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
           <motion.div
             key={index}
             onClick={card.onClick}
@@ -121,13 +164,18 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
+<<<<<<< HEAD
             <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>
               {card.icon}
             </div>
+=======
+            <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>{card.icon}</div>
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
             <div>
               <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                 {loadingStats ? "..." : formatNumber(card.value)}
               </div>
+<<<<<<< HEAD
               <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                 {card.title}
               </div>
@@ -135,6 +183,13 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
           </motion.div>
         ))}
   </section>
+=======
+              <div className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>{card.title}</div>
+            </div>
+          </motion.div>
+        ))}
+      </section>
+>>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 
       {statsError && (
         <div className="mt-3 text-sm text-red-500">
@@ -151,51 +206,41 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
         }`}
       >
         <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
-          <h3
-            className={`text-lg font-semibold ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}
-          >
+          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
             Top Programs
           </h3>
         </div>
 
-        {/* Courses grid */}
+        {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
-        {/* <h1 className="col-span-full text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Courses</h1> */}
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="bg-white dark:bg-gray-900 shadow-md rounded-lg overflow-hidden"
-          >
-            {/* {course.image_path && (
-              <img
-                src={`http://localhost:5000${course.image_path}`}
-                alt={course.title}
-                className="w-full h-48 object-cover"
-              />
-            )} */}
-            <div className="p-4">
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
-                {course.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4"> {course.description}</p>
-              <button
-                onClick={() => removeCourse(course.id)}
-               className="text-xl flex items-center border border-gray-100 px-2 py-1 bg-red-600 text-white rounded-full">
-                <FaTrash className="size-4 pr-1"/>Delete
-              </button>
+          {courses.map((course) => (
+            <div
+              key={course.id}
+              className={`shadow-md rounded-lg overflow-hidden ${
+                isDarkMode ? "bg-gray-900" : "bg-white"
+              }`}
+            >
+              <div className="p-4">
+                <h3 className="text-lg font-bold mb-2">
+                  {course.title}
+                </h3>
+                <p className="text-sm mb-4">{course.description}</p>
+                <button
+                  onClick={() => removeCourse(course.id)}
+                  className="flex items-center gap-1 border border-gray-100 px-3 py-1 bg-red-600 text-white rounded-full text-sm"
+                >
+                  <FaTrash className="w-4 h-4" /> Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-        {
-          courses.length === 0 && (
+          ))}
+
+          {courses.length === 0 && !loading && (
             <p className="text-gray-600 dark:text-gray-300 col-span-full text-center">
               No courses available. Please add a course.
             </p>
-          )
-        }
-      </div>
+          )}
+        </div>
       </section>
     </main>
   );

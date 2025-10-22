@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Company_Dashboard/ui/select';
 import { Button } from '../Company_Dashboard/ui/button';
-import { Filter, RotateCcw,Search } from 'lucide-react';
+import { Filter, RotateCcw } from 'lucide-react';
 
 const domains = [
   'All Domains',
@@ -12,17 +12,11 @@ const domains = [
   'DevOps',
   'UI/UX Design',
   'Cybersecurity',
-  'Cloud Computing'
+  'Cloud Computing',
+  'Blockchain',
+  'Game Development',
+  'Other'
 ];
-const onFilterChange = () => {
-  // Placeholder function
-  console.log('Filter changed');
-};
-
-const onClearFilters = () => {
-  // Placeholder function
-  console.log('Filters cleared');
-};
 
 export default function SearchFilters({ filters, onFilterChange, onClearFilters }) {
   return (
@@ -42,10 +36,10 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
             Name:
           </label>
-          <input 
-            type="text" 
-            value={filters.name} 
-            onChange={(e) => onFilterChange('name', e.target.value)} 
+          <input
+            type="text"
+            value={filters.name}
+            onChange={(e) => onFilterChange('name', e.target.value)}
             className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Enter name"
           />
@@ -69,8 +63,8 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
         </div>
 
         <div className="flex items-end">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={onClearFilters}
             className="w-full"
           >

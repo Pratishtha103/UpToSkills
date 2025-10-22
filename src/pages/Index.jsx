@@ -37,12 +37,14 @@ export default function Index() {
   const [currentView, setCurrentView] = useState("dashboard");
 
   const [filters, setFilters] = useState({
+    name: "",
     domain: "All Domains",
     projectExperience: "All Levels",
     skillLevel: "All Skills",
   });
 
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
 
   // modal state
@@ -143,10 +145,12 @@ export default function Index() {
         });
 
         setStudents(formatted);
+        setFilteredStudents(formatted);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Error fetching students:", err);
         setStudents([]);
+        setFilteredStudents([]);
       } finally {
         setLoadingStudents(false);
       }
@@ -154,6 +158,63 @@ export default function Index() {
 
     fetchStudents();
   }, []);
+
+  // ---------- Client-side filtering ----------
+  useEffect(() => {
+    let filtered = students;
+
+    // Apply name filter
+    if (filters.name.trim()) {
+      const nameQuery = filters.name.trim().toLowerCase();
+      filtered = filtered.filter((s) => {
+        const name =
+          (s.full_name || s.name || s.student_name || "")
+            .toString()
+            .toLowerCase();
+        return name.includes(nameQuery);
+      });
+    }
+
+    // Apply domain filter
+    if (filters.domain !== "All Domains") {
+      filtered = filtered.filter((s) => {
+        // Normalize domains: array, JSON string, comma-separated string, or plain string
+        let domains = "";
+        try {
+          if (Array.isArray(s.__raw?.domains_of_interest)) {
+            domains = s.__raw.domains_of_interest.join(" ");
+          } else if (typeof s.__raw?.domains_of_interest === "string") {
+            const trimmed = s.__raw.domains_of_interest.trim();
+            if (trimmed.startsWith("[")) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
+              } catch {
+                domains = trimmed;
+              }
+            } else {
+              domains = trimmed;
+            }
+          } else if (Array.isArray(s.__raw?.domainsOfInterest)) {
+            domains = s.__raw.domainsOfInterest.join(" ");
+          } else if (s.__raw?.domainsOfInterest && typeof s.__raw.domainsOfInterest === "string") {
+            domains = s.__raw.domainsOfInterest;
+          } else {
+            domains = "";
+          }
+        } catch {
+          domains = "";
+        }
+
+        const others = (s.__raw?.others_domain || s.__raw?.othersDomain || "").toString().toLowerCase();
+        const combinedDomains = (domains.toLowerCase() + " " + others).trim();
+        // Check if the filter domain is contained in the combined domains string
+        return combinedDomains.includes(filters.domain.toLowerCase());
+      });
+    }
+
+    setFilteredStudents(filtered);
+  }, [filters, students]);
 
   // ---------- NEW: read requested view from localStorage on mount ----------
   // If Sidebar wrote localStorage.setItem('company_view', someView) then we'll
@@ -215,6 +276,7 @@ export default function Index() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   const clearFilters = () =>
     setFilters({
+      name: "",
       domain: "All Domains",
       projectExperience: "All Levels",
       skillLevel: "All Skills",
@@ -472,12 +534,12 @@ export default function Index() {
                 <div className="col-span-full text-center py-12">
                   Loading students…
                 </div>
-              ) : students.length === 0 ? (
+              ) : filteredStudents.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   No students found.
                 </div>
               ) : (
-                students.map((student, index) => (
+                filteredStudents.map((student, index) => (
                   <StudentCard
                     key={student.id}
                     student={student}

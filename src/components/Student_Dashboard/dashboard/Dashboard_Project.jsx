@@ -76,8 +76,7 @@ const Dashboard_Project = () => {
                     onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
                     toggleDarkMode={toggleDarkMode}
                 />
-                <div className="pt-24 px-4 sm:px-6 py-6 space-y-6 flex-grow"></div>
-                <div className='flex flex-col justify-center'>
+                <div className='flex flex-col justify-center pt-24 px-4 sm:px-6 py-2 space-y-6 flex-grow'>
                     <header className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center py-6 sm:py-8 tracking-wide border-b-4 border-[#00b2a9] flex items-center justify-center">
                         <span className="text-[#f26c3d]">All</span>
                             &nbsp;

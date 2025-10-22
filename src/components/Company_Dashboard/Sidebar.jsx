@@ -165,7 +165,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                 href="https://www.linkedin.com/company/uptoskills"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={18} />
@@ -174,7 +174,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                 href="https://www.instagram.com/uptoskills"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="Instagram"
               >
                 <Instagram size={18} />
@@ -183,7 +183,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                 href="https://uptoskills.com"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="Website"
               >
                 <Globe size={18} />

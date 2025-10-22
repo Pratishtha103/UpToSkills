@@ -97,8 +97,8 @@ export default function EditProfile() {
   if (loading) return <p className="text-center mt-6">Loading...</p>;
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-xl mt-10">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+    <div className="max-w-2xl mx-auto p-8 shadow-lg border border-gray-200 rounded-xl mt-10 dark:bg-gray-900 dark:text-white">
+      <h2 className="text-3xl font-bold mb-8 text-center">
         {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
       </h2>
 
@@ -109,7 +109,7 @@ export default function EditProfile() {
       >
         {/* Company Name */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block font-semibold mb-2">
             Company Name
           </label>
           <input
@@ -124,7 +124,7 @@ export default function EditProfile() {
 
         {/* Logo */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block font-semibold mb-2">
             Company Logo
           </label>
           <input
@@ -144,7 +144,7 @@ export default function EditProfile() {
 
         {/* Website */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block font-semibold mb-2">
             Website URL
           </label>
           <input
@@ -158,7 +158,7 @@ export default function EditProfile() {
 
         {/* Industry */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block font-semibold mb-2">
             Industry Type
           </label>
           <select
@@ -179,7 +179,7 @@ export default function EditProfile() {
 
         {/* Contact */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block font-semibold mb-2">
             Company Contact
           </label>
           <input

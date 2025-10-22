@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Company_Dashboard/ui/select';
 import { Button } from '../Company_Dashboard/ui/button';
-import { Filter, RotateCcw } from 'lucide-react';
+import { Filter, RotateCcw,Search } from 'lucide-react';
 
 const domains = [
   'All Domains',
@@ -14,6 +14,15 @@ const domains = [
   'Cybersecurity',
   'Cloud Computing'
 ];
+const onFilterChange = () => {
+  // Placeholder function
+  console.log('Filter changed');
+};
+
+const onClearFilters = () => {
+  // Placeholder function
+  console.log('Filters cleared');
+};
 
 export default function SearchFilters({ filters, onFilterChange, onClearFilters }) {
   return (
@@ -29,9 +38,21 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
+        <div className='flex items-center gap-2'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
-            Domain
+            Name:
+          </label>
+          <input 
+            type="text" 
+            value={filters.name} 
+            onChange={(e) => onFilterChange('name', e.target.value)} 
+            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Enter name"
+          />
+        </div>
+        <div className='flex items-center gap-2'>
+          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+            Domain:
           </label>
           <Select value={filters.domain} onValueChange={(value) => onFilterChange('domain', value)}>
             <SelectTrigger>

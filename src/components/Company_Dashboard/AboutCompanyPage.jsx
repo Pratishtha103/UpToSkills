@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export default function AboutCompanyPage() {
   return (
-    <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1000px] mx-auto">
+    <div className="pt-20 px-2 sm:px-4 py-6 mx-auto dark:text-white dark:bg-gray-900">
       <motion.div
         className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
         initial={{ opacity: 0, y: 10 }}

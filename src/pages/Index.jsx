@@ -62,6 +62,23 @@ export default function Index() {
     currentUserName = "Account";
   }
 
+  // --- dark mode state & effect ---
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+      // load from localStorage initially
+      return localStorage.getItem("theme") === "dark";
+    });
+   useEffect(() => {
+      if (isDarkMode) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+    }, [isDarkMode]);
+  
+    const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+
   // ---------- Fetch students (CRA-safe) ----------
   useEffect(() => {
     const fetchStudents = async () => {
@@ -263,7 +280,7 @@ export default function Index() {
 
   if (currentView === "edit-profile") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+      <div className="flex min-h-screen dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -275,7 +292,7 @@ export default function Index() {
           }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
-          <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto">
+          <div className="pt-20 px-2 sm:px-4 pb-6 max-w-[1400px] mx-auto">
             <EditProfile />
           </div>
         </div>
@@ -286,29 +303,30 @@ export default function Index() {
   // <-- PLACE ABOUT-US VIEW RIGHT HERE (after edit-profile, before dashboard) -->
   if (currentView === "about-us") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+      <div className="flex min-h-screen darg:bg-gray-900">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
+          className={`flex flex-col transition-all duration-300 ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"} ${
             isSidebarOpen ? "lg:ml-64" : "ml-0"
           }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
-          <main className="flex-1 pt-16">
-            <AboutCompanyPage />
+          <main className="flex flex-grow">
+            <AboutCompanyPage/>
           </main>
         </div>
       </div>
     );
   }
+  
 
   // ================= DASHBOARD =================
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+    <div className={`flex min-h-screen transition-all duration-300 dark:bg-gray-900`}>
       <Sidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
@@ -326,12 +344,16 @@ export default function Index() {
         <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto w-full">
           {/* Hero Section */}
           <motion.section
-            className="hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white"
+            className={`hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white ${
+        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+      }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 items-center">
+            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-1 items-center ${
+        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+      }`}>
               <div>
                 <motion.h1
                   className="text-3xl sm:text-4xl font-bold mb-8 select-none 

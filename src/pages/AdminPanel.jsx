@@ -9,15 +9,12 @@ import Company from "../components/AdminPanelDashboard/Company";
 import StudentsTable from "../components/AdminPanelDashboard/StudentsTable";
 import CompaniesTable from "../components/AdminPanelDashboard/CompaniesTable";
 import MentorsTable from "../components/AdminPanelDashboard/MentorsTable";
+import Mentors from "../components/AdminPanelDashboard/Mentors";
 import Project from "../components/AdminPanelDashboard/Project";
 import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
 import AdminNotifications from "../components/AdminPanelDashboard/AdminNotifications";
-<<<<<<< HEAD
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
-=======
-import Programs from "../components/AdminPanelDashboard/Programs";
->>>>>>> ba97d89bdf1c2191ef72cfb322ac649f56591cdb
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -40,6 +37,8 @@ function AdminPanel() {
         return <Students isDarkMode={isDarkMode} />;
       case "students_table":
         return <StudentsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
+      case "mentors":
+        return <Mentors isDarkMode={isDarkMode} />;
       case "companies":
         return <Company isDarkMode={isDarkMode} />;
       case "companies_table":
@@ -56,8 +55,7 @@ function AdminPanel() {
         return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
-      case "programs": 
-        return <Programs isDarkMode={isDarkMode}/>
+      /* duplicate "programs" case removed - ProgramsAdmin is used above */
       default:
         return <DashboardMain isDarkMode={isDarkMode} />;
     }

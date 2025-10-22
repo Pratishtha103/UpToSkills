@@ -28,4 +28,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+// DELETE mentor by id
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM mentors WHERE id = $1', [id]);
+    return res.json({ message: 'Mentor deleted' });
+  } catch (err) {
+    console.error('❌ Error deleting mentor:', err.message);
+    return res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 module.exports = router;

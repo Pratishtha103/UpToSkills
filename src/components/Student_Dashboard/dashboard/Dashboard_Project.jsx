@@ -77,8 +77,13 @@ const Dashboard_Project = () => {
                     toggleDarkMode={toggleDarkMode}
                 />
                 <div className="pt-24 px-4 sm:px-6 py-6 space-y-6 flex-grow"></div>
-                <div className='flex flex-col items-center justify-center'>
-                    <h1 className='text-3xl font-bold'>All Projects</h1>
+                <div className='flex flex-col justify-center'>
+                    <header className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center py-6 sm:py-8 tracking-wide border-b-4 border-[#00b2a9] flex items-center justify-center">
+                        <span className="text-[#f26c3d]">All</span>
+                            &nbsp;
+                        <span className="text-[#00b2a9]">Projects</span>
+                    </header>
+                    
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10'>
                         {loading
                             ?

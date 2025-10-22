@@ -19,7 +19,7 @@ const sidebarItems = [
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
-  { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
+  // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" },
   { id: "projectshowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
 ];
 

@@ -3,10 +3,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaTrash, FaUserGraduate, FaChalkboardTeacher, FaBuilding } from "react-icons/fa";
 import axios from "axios";
-<<<<<<< HEAD
-import { FaUserGraduate, FaChalkboardTeacher, FaBuilding } from "react-icons/fa";
-=======
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 
 const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   const [stats, setStats] = useState({ students: null, mentors: null, companies: null });
@@ -58,31 +54,18 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
     fetchCourses();
   }, []);
 
-<<<<<<< HEAD
-  const formatNumber = (num) => (num === null || num === undefined ? "-" : num?.toLocaleString("en-IN") ?? "0");
-
-  const removeCourse = async (id) => {
-=======
   // Delete course
   const removeCourse = async (id) => {
     if (!window.confirm("Are you sure you want to delete this course?")) return;
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
     try {
       await axios.delete(`http://localhost:5000/api/courses/${id}`);
       setCourses((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
-<<<<<<< HEAD
-      console.error("Failed to delete course:", err);
-      // optional: show a toast / error state
-    }
-  };
-=======
       console.error("Error deleting course:", err);
     }
   };
 
   const formatNumber = (num) => num?.toLocaleString("en-IN") ?? "0";
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 
   const cards = [
     {
@@ -125,33 +108,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-<<<<<<< HEAD
-        {[
-          {
-            title: "Total Students",
-            value: stats.students,
-            icon: <FaUserGraduate className="w-6 h-6 text-white" />,
-            gradient: "from-blue-500 to-indigo-500",
-            onClick: () => onNavigateSection?.("students_table"),
-          },
-          {
-            title: "Total Mentors",
-            value: stats.mentors,
-            icon: <FaChalkboardTeacher className="w-6 h-6 text-white" />,
-            gradient: "from-green-500 to-emerald-500",
-            onClick: () => onNavigateSection?.("mentors_table"),
-          },
-          {
-            title: "Total Companies",
-            value: stats.companies,
-            icon: <FaBuilding className="w-6 h-6 text-white" />,
-            gradient: "from-orange-500 to-red-500",
-            onClick: () => onNavigateSection?.("companies_table"),
-          },
-        ].map((card, index) => (
-=======
         {cards.map((card, index) => (
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
           <motion.div
             key={index}
             onClick={card.onClick}
@@ -164,32 +121,16 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-<<<<<<< HEAD
-            <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>
-              {card.icon}
-            </div>
-=======
             <div className={`p-3 rounded-2xl bg-gradient-to-r ${card.gradient}`}>{card.icon}</div>
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
             <div>
               <div className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                 {loadingStats ? "..." : formatNumber(card.value)}
               </div>
-<<<<<<< HEAD
-              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                {card.title}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-  </section>
-=======
               <div className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>{card.title}</div>
             </div>
           </motion.div>
         ))}
       </section>
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 
       {statsError && (
         <div className="mt-3 text-sm text-red-500">

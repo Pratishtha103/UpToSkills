@@ -15,11 +15,7 @@ import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
 import AdminNotifications from "../components/AdminPanelDashboard/AdminNotifications";
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
-<<<<<<< HEAD
-
-=======
 import Programs from "../components/AdminPanelDashboard/Programs";
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -59,12 +55,8 @@ function AdminPanel() {
         return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
-<<<<<<< HEAD
-      /* duplicate "programs" case removed - ProgramsAdmin is used above */
-=======
       case "courses": 
         return <Programs isDarkMode={isDarkMode}/>
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
       default:
         return <DashboardMain isDarkMode={isDarkMode} />;
     }

@@ -1,5 +1,5 @@
-import pool from "../config/database.js";
-import path from "path";
+const pool = require('../config/database');
+const path = require('path');
 
 // --- Ensure table exists ---
 const ensureCoursesTable = async () => {
@@ -20,8 +20,6 @@ const ensureCoursesTable = async () => {
   `;
   await pool.query(alterQuery);
 };
-
-
 
 // --- Add new course ---
 const addCourse = async (req, res) => {
@@ -64,26 +62,21 @@ const getAllCourses = async (req, res) => {
   }
 };
 
-export {
-    ensureCoursesTable,
-    addCourse,
-    getAllCourses
-};
- export const getCourseById= async (req, res)=>{
- const { id } = req.params;
+const getCourseById = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    // ✅ PostgreSQL query
     const result = await pool.query("SELECT * FROM courses WHERE id = $1", [id]);
-
-    res.status(200).json(result.rows); // returns an array of matching rows
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Database error" });
-  }}
- export const enrollStudent= async (req, res)=>{
-  const { id } = req.params;       // course id
-  const { studentId } = req.body;  // student id to enroll
+  }
+};
+
+const enrollStudent = async (req, res) => {
+  const { id } = req.params; // course id
+  const { studentId } = req.body; // student id to enroll
 
   try {
     // 1️⃣ Get the course and enrolled students
@@ -117,4 +110,12 @@ export {
     console.error(err);
     res.status(500).json({ error: "Database error" });
   }
-}
+};
+
+module.exports = {
+  ensureCoursesTable,
+  addCourse,
+  getAllCourses,
+  getCourseById,
+  enrollStudent,
+};

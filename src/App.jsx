@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Landing from './pages/Landing';
@@ -20,7 +20,7 @@ import ProgramsPage from './pages/ProgramsPage';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
-
+import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 // About Page components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
@@ -31,32 +31,15 @@ import Datascience from './components/Programs/Datascience';
 import Cloudcompute from './components/Programs/Cloudcompute';
 import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
+
 const queryClient = new QueryClient();
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) {
-      return false;
-    }
-  });
-
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
   const toggleDarkMode = () => {
-    setIsDarkMode(prev => {
-      const next = !prev;
-      try { localStorage.setItem('isDarkMode', String(next)); } catch (e) {}
-      return next;
-    });
+    setIsDarkMode(prev => !prev);
   };
-
-  // keep <html> dark class in sync globally
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) root.classList.add('dark');
-    else root.classList.remove('dark');
-    try { localStorage.setItem('isDarkMode', String(isDarkMode)); } catch (e) {}
-  }, [isDarkMode]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -74,9 +57,7 @@ function App() {
             </div>
           } />
 
-          <Route path="/programs" element={
-              <ProgramsPage />
-            } />
+          <Route path="/programs" element={<ProgramsPage />} />
 
           <Route path="/dashboard" element={<Student_Dashboard />} />
           <Route path="/dashboard/profile" element={<UserProfilePage />} />
@@ -85,12 +66,12 @@ function App() {
           <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
            <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
-
+          <Route path="/dashboard/projects" element={<Dashboard_Project />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
 
-          <Route path="/company" element={<CompanyDashboardHome isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
-          <Route path="/company-profile" element={<CompanyProfilePage isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/company" element={<CompanyDashboardHome />} />
+          <Route path="/company-profile" element={<CompanyProfilePage />} />
 
           <Route path="/company/*" element={<CompanyNotFound />} />
           <Route path="*" element={<h1>404 - Page Not Found</h1>} />

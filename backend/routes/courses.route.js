@@ -3,6 +3,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const { addCourse, getCourseById, getAllCourses, ensureCoursesTable, enrollStudent } = require("../controllers/coursesController");
+const pool = require('../config/database');
 
 const router = express.Router();
 

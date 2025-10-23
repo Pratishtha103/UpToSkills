@@ -12,7 +12,10 @@ const domains = [
   'DevOps',
   'UI/UX Design',
   'Cybersecurity',
-  'Cloud Computing'
+  'Cloud Computing',
+  'Blockchain',
+  'Game Development',
+  'Other'
 ];
 
 export default function SearchFilters({ filters, onFilterChange, onClearFilters }) {
@@ -29,9 +32,21 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
+        <div className='flex items-center gap-2'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
-            Domain
+            Name:
+          </label>
+          <input
+            type="text"
+            value={filters.name}
+            onChange={(e) => onFilterChange('name', e.target.value)}
+            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Enter name"
+          />
+        </div>
+        <div className='flex items-center gap-2'>
+          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+            Domain:
           </label>
           <Select value={filters.domain} onValueChange={(value) => onFilterChange('domain', value)}>
             <SelectTrigger>
@@ -48,8 +63,8 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
         </div>
 
         <div className="flex items-end">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={onClearFilters}
             className="w-full"
           >

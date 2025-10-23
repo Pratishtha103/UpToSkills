@@ -37,12 +37,14 @@ export default function Index() {
   const [currentView, setCurrentView] = useState("dashboard");
 
   const [filters, setFilters] = useState({
+    name: "",
     domain: "All Domains",
     projectExperience: "All Levels",
     skillLevel: "All Skills",
   });
 
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
 
   // modal state
@@ -61,6 +63,23 @@ export default function Index() {
   } catch (e) {
     currentUserName = "Account";
   }
+
+  // --- dark mode state & effect ---
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+      // load from localStorage initially
+      return localStorage.getItem("theme") === "dark";
+    });
+   useEffect(() => {
+      if (isDarkMode) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+    }, [isDarkMode]);
+  
+    const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
   // ---------- Fetch students (CRA-safe) ----------
   useEffect(() => {
@@ -126,10 +145,12 @@ export default function Index() {
         });
 
         setStudents(formatted);
+        setFilteredStudents(formatted);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Error fetching students:", err);
         setStudents([]);
+        setFilteredStudents([]);
       } finally {
         setLoadingStudents(false);
       }
@@ -137,6 +158,63 @@ export default function Index() {
 
     fetchStudents();
   }, []);
+
+  // ---------- Client-side filtering ----------
+  useEffect(() => {
+    let filtered = students;
+
+    // Apply name filter
+    if (filters.name.trim()) {
+      const nameQuery = filters.name.trim().toLowerCase();
+      filtered = filtered.filter((s) => {
+        const name =
+          (s.full_name || s.name || s.student_name || "")
+            .toString()
+            .toLowerCase();
+        return name.includes(nameQuery);
+      });
+    }
+
+    // Apply domain filter
+    if (filters.domain !== "All Domains") {
+      filtered = filtered.filter((s) => {
+        // Normalize domains: array, JSON string, comma-separated string, or plain string
+        let domains = "";
+        try {
+          if (Array.isArray(s.__raw?.domains_of_interest)) {
+            domains = s.__raw.domains_of_interest.join(" ");
+          } else if (typeof s.__raw?.domains_of_interest === "string") {
+            const trimmed = s.__raw.domains_of_interest.trim();
+            if (trimmed.startsWith("[")) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
+              } catch {
+                domains = trimmed;
+              }
+            } else {
+              domains = trimmed;
+            }
+          } else if (Array.isArray(s.__raw?.domainsOfInterest)) {
+            domains = s.__raw.domainsOfInterest.join(" ");
+          } else if (s.__raw?.domainsOfInterest && typeof s.__raw.domainsOfInterest === "string") {
+            domains = s.__raw.domainsOfInterest;
+          } else {
+            domains = "";
+          }
+        } catch {
+          domains = "";
+        }
+
+        const others = (s.__raw?.others_domain || s.__raw?.othersDomain || "").toString().toLowerCase();
+        const combinedDomains = (domains.toLowerCase() + " " + others).trim();
+        // Check if the filter domain is contained in the combined domains string
+        return combinedDomains.includes(filters.domain.toLowerCase());
+      });
+    }
+
+    setFilteredStudents(filtered);
+  }, [filters, students]);
 
   // ---------- NEW: read requested view from localStorage on mount ----------
   // If Sidebar wrote localStorage.setItem('company_view', someView) then we'll
@@ -198,6 +276,7 @@ export default function Index() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   const clearFilters = () =>
     setFilters({
+      name: "",
       domain: "All Domains",
       projectExperience: "All Levels",
       skillLevel: "All Skills",
@@ -263,7 +342,7 @@ export default function Index() {
 
   if (currentView === "edit-profile") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+      <div className="flex min-h-screen dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -275,7 +354,7 @@ export default function Index() {
           }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
-          <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto">
+          <div className="pt-20 px-2 sm:px-4 pb-6 max-w-[1400px] mx-auto">
             <EditProfile />
           </div>
         </div>
@@ -286,29 +365,30 @@ export default function Index() {
   // <-- PLACE ABOUT-US VIEW RIGHT HERE (after edit-profile, before dashboard) -->
   if (currentView === "about-us") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+      <div className="flex min-h-screen darg:bg-gray-900">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
+          className={`flex flex-col transition-all duration-300 ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"} ${
             isSidebarOpen ? "lg:ml-64" : "ml-0"
           }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
-          <main className="flex-1 pt-16">
-            <AboutCompanyPage />
+          <main className="flex flex-grow">
+            <AboutCompanyPage/>
           </main>
         </div>
       </div>
     );
   }
+  
 
   // ================= DASHBOARD =================
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+    <div className={`flex min-h-screen transition-all duration-300 dark:bg-gray-900`}>
       <Sidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
@@ -326,12 +406,16 @@ export default function Index() {
         <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto w-full">
           {/* Hero Section */}
           <motion.section
-            className="hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white"
+            className={`hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white ${
+        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+      }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 items-center">
+            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-1 items-center ${
+        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+      }`}>
               <div>
                 <motion.h1
                   className="text-3xl sm:text-4xl font-bold mb-8 select-none 
@@ -450,12 +534,12 @@ export default function Index() {
                 <div className="col-span-full text-center py-12">
                   Loading students…
                 </div>
-              ) : students.length === 0 ? (
+              ) : filteredStudents.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   No students found.
                 </div>
               ) : (
-                students.map((student, index) => (
+                filteredStudents.map((student, index) => (
                   <StudentCard
                     key={student.id}
                     student={student}

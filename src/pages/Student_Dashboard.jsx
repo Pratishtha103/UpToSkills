@@ -8,7 +8,7 @@ import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
 // import AssignmentsSection from "../components/Student_Dashboard/dashboard/AssignmentsSection";
 // import BottomProfileMessages from "../components/Student_Dashboard/dashboard/BottomProfileMessages";
 import Footer from "../components/Student_Dashboard/dashboard/Footer";
-
+import Dashboard_Project from "../components/Student_Dashboard/dashboard/Dashboard_Project";
 const StudentDashboard = () => {
   const [isSidebarVisible, setSidebarVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -57,7 +57,7 @@ const StudentDashboard = () => {
           onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
           toggleDarkMode={toggleDarkMode}
         />
-        <div className="pt-24 px-4 sm:px-6 py-6 space-y-6">
+        <div className="pt-24 px-4 sm:px-6 py-6 space-y-6 flex-grow">
           <WelcomeSection />
           <StatsGrid />
           {/* <NoticeBoard />

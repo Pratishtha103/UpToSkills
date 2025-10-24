@@ -196,7 +196,6 @@ export default function StudentCard({
               className="flex-1"
               onClick={() => onViewProfile(student)}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
               View Profile
             </Button>
             <Button

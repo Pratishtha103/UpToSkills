@@ -15,10 +15,10 @@ import { useNavigate } from "react-router-dom";
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "students", label: "Students", icon: Users },
+  { id: "mentors", label: "Mentors", icon: Users },
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "courses", label: "Courses", icon: BookOpen },
   { id: "projects", label: "Projects", icon: FolderOpen },
-  // { id: "notifications", label: "Notifications", icon: Bell },
   { id: "programs", label: "Programs", icon: BookOpen },
 ];
 

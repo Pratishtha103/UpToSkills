@@ -2,7 +2,7 @@
 const pool = require('../config/database');
 
 /**
- * Fetch latest students (safe for use from frontend)
+ * ✅ Fetch latest students (safe for use from frontend)
  * Returns rows as-is from DB. Clients may normalize fields.
  */
 const getStudents = async (req, res) => {
@@ -27,17 +27,20 @@ const getStudents = async (req, res) => {
     return res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error('getStudents error:', err);
-    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 };
 
 /**
- * Fetch a single student (detailed)
- * Note: supports selecting user_details joined data.
+ * ✅ Fetch a single student (detailed)
+ * Supports fetching from both `students` and `user_details` tables.
  */
 const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
+
     const query = `
       SELECT
         s.id,
@@ -62,24 +65,32 @@ const getStudentById = async (req, res) => {
       WHERE s.id = $1
       LIMIT 1;
     `;
+
     const result = await pool.query(query, [id]);
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Student not found' });
     }
+
     return res.status(200).json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('getStudentById error:', err);
-    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 };
 
 /**
- * Search by name (legacy route /search/:name)
- * Keeps existing behavior but is case-insensitive.
+ * ✅ Search by name (legacy route /search/:name)
+ * Case-insensitive search for compatibility with old API.
  */
 const searchStudents = async (req, res) => {
   try {
     const { name } = req.params;
+
     const query = `
       SELECT
         s.id,
@@ -99,27 +110,34 @@ const searchStudents = async (req, res) => {
     `;
 
     const result = await pool.query(query, [`%${name}%`]);
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'No students found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'No students found' });
     }
 
     return res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error('searchStudents error:', err);
-    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 };
 
 /**
- * Improved search endpoint (recommended): /api/students/search?q=react
- * Searches names, ai_skill_summary, domains_of_interest and others_domain.
- * Uses LOWER(...) LIKE LOWER($1) and casts domains_of_interest to text for arrays/json.
+ * ✅ Enhanced search endpoint (recommended)
+ * Route: /api/students/search?q=keyword
+ * Searches by name, AI skill summary, domains, or others_domain.
  */
 const searchStudentsByQuery = async (req, res) => {
   try {
     const q = (req.query.q || '').trim();
     if (!q) {
-      return res.status(400).json({ success: false, message: "Query parameter 'q' is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Query parameter 'q' is required" });
     }
 
     const like = `%${q}%`;
@@ -149,7 +167,9 @@ const searchStudentsByQuery = async (req, res) => {
     return res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error('searchStudentsByQuery error:', err);
-    return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 };
 

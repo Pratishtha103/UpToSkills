@@ -13,14 +13,16 @@ import {
   Linkedin,
   Instagram,
   Globe,
+  Info,
 } from "lucide-react";
+import { info } from "autoprefixer";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "search", label: "Search Candidate", icon: Search },
   { id: "interviews", label: "Interviews", icon: Calendar },
   { id: "edit-profile", label: "Edit Profile", icon: Building2 },
-  { id: "about-us", label: "About Us", icon: Users },
+  { id: "about-us", label: "About Us", icon: Info },
 ];
 
 export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemClick }) {
@@ -160,12 +162,13 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
 
           {/* socials + logout */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="font-semibold text-sm mb-2 text-gray-500 flex items-center justify-center">Connect With Us</p>
             <div className="mb-3 flex items-center justify-center gap-3">
               <a
                 href="https://www.linkedin.com/company/uptoskills"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={18} />
@@ -174,7 +177,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                 href="https://www.instagram.com/uptoskills"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="Instagram"
               >
                 <Instagram size={18} />
@@ -183,20 +186,22 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
                 href="https://uptoskills.com"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
                 aria-label="Website"
               >
                 <Globe size={18} />
               </a>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="w-full text-red-500 hover:bg-red-100 flex items-center gap-3 p-2 rounded-lg"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Log Out</span>
-            </button>
+           <motion.button
+           onClick={handleLogout}
+           className={`w-full text-red-500 flex items-center justify-center gap-2 p-2 rounded-lg transition-all`}
+            whileHover={{ x: 4 }}
+             whileTap={{ scale: 0.98 }}
+           >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Log Out</span>
+           </motion.button>
           </div>
         </div>
       </motion.aside>

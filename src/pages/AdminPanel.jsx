@@ -9,6 +9,7 @@ import Company from "../components/AdminPanelDashboard/Company";
 import StudentsTable from "../components/AdminPanelDashboard/StudentsTable";
 import CompaniesTable from "../components/AdminPanelDashboard/CompaniesTable";
 import MentorsTable from "../components/AdminPanelDashboard/MentorsTable";
+import Mentors from "../components/AdminPanelDashboard/Mentors";
 import Project from "../components/AdminPanelDashboard/Project";
 import Analytics from "../components/AdminPanelDashboard/Analytics";
 import MentorReview from "../components/AdminPanelDashboard/MentorReview";
@@ -36,6 +37,8 @@ function AdminPanel() {
         return <Students isDarkMode={isDarkMode} />;
       case "students_table":
         return <StudentsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
+      case "mentors":
+        return <Mentors isDarkMode={isDarkMode} />;
       case "companies":
         return <Company isDarkMode={isDarkMode} />;
       case "companies_table":

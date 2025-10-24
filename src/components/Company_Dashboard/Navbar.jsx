@@ -42,7 +42,7 @@ export default function Navbar({ onMenuClick }) {
             whileTap={{ scale: 0.95 }}
             onClick={onMenuClick}
           >
-            <Menu className="w-6 h-6 text-gray-700" />
+            <Menu className="w-6 h-6 text-gray-900 dark:text-white" />
           </motion.button>
 
           {/* Logo */}
@@ -75,9 +75,9 @@ export default function Navbar({ onMenuClick }) {
 
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            <Button variant="ghost"  size="icon" onClick={toggleTheme}>
               {isDarkMode ? (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5 text-white" />
               ) : (
                 <Moon className="w-5 h-5" />
               )}
@@ -91,7 +91,7 @@ export default function Navbar({ onMenuClick }) {
               size="icon"
               onClick={() => navigate("/company-profile")}
             >
-              <User className="w-5 h-5" />
+              <User className="w-5 h-5 dark:text-white" />
             </Button>
           </motion.div>
         </div>

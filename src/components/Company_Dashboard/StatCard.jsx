@@ -4,9 +4,9 @@ import { useRef, useState } from "react";
 
 const colorClasses = {
   primary: "bg-primary text-primary-foreground",
-  secondary: "bg-secondary text-secondary-foreground",
-  success: "bg-success text-success-foreground",
-  warning: "bg-warning text-warning-foreground",
+  secondary: "bg-primary text-primary-foreground",
+  success: "bg-primary text-primary-foreground",
+  warning: "bg-primary text-primary-foreground",
 };
 
 export default function StatCard({

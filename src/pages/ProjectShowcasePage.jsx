@@ -19,9 +19,9 @@ function ProjectShowcasePage() {
       <div className={`${isOpen ? "ml-[240px]" : "ml-0"} flex flex-col min-h-screen transition-all duration-300 pt-[72px]`}>
         {/* Project Showcase Heading */}
         <header className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center py-6 sm:py-8 tracking-wide border-b-4 border-[#00b2a9] flex items-center justify-center">
-          <span className="text-[#f26c3d]">Project</span>
+          <span className="text-[#f26c3d]">My</span>
           &nbsp;
-          <span className="text-[#00b2a9]">ShowCase</span>
+          <span className="text-[#00b2a9]">Projects</span>
         </header>
 
         {/* Scrollable Section */}

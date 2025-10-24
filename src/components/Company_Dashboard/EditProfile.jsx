@@ -102,8 +102,8 @@ export default function EditProfile() {
     <div className="flex flex-col min-h-screen">
       {/* Main Content */}
       <main className="flex-grow flex justify-center items-start p-6">
-        <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-8 mt-10">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
+          <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
             {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
           </h2>
 
@@ -114,9 +114,7 @@ export default function EditProfile() {
           >
             {/* Company Name */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Company Name
-              </label>
+              <label className="block font-semibold mb-2">Company Name</label>
               <input
                 type="text"
                 name="companyName"
@@ -127,11 +125,9 @@ export default function EditProfile() {
               />
             </div>
 
-            {/* Logo */}
+            {/* Company Logo */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Company Logo
-              </label>
+              <label className="block font-semibold mb-2">Company Logo</label>
               <input
                 type="file"
                 accept="image/*"
@@ -149,9 +145,7 @@ export default function EditProfile() {
 
             {/* Website */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Website URL
-              </label>
+              <label className="block font-semibold mb-2">Website URL</label>
               <input
                 type="url"
                 name="website"
@@ -163,15 +157,13 @@ export default function EditProfile() {
 
             {/* Industry */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Industry Type
-              </label>
+              <label className="block font-semibold mb-2">Industry Type</label>
               <select
                 name="industry"
                 value={formData.industry}
                 onChange={handleChange}
                 required
-                className="w-full border rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select industry</option>
                 <option value="IT">IT / Technology</option>
@@ -184,9 +176,7 @@ export default function EditProfile() {
 
             {/* Contact */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Company Contact
-              </label>
+              <label className="block font-semibold mb-2">Company Contact</label>
               <input
                 type="text"
                 name="contact"
@@ -207,7 +197,7 @@ export default function EditProfile() {
         </div>
       </main>
 
-      {/* Footer - Full Width */}
+      {/* Footer */}
       <footer className="w-full">
         <Footer />
       </footer>

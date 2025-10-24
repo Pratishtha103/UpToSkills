@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import boy from "../assets/boy2.png";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
+import ContactModal from "../components/Company_Dashboard/ContactModal";
 
 const VALID_VIEWS = new Set([
   "dashboard",
@@ -51,6 +52,10 @@ export default function Index() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactStudentId, setContactStudentId] = useState(null);
+
+
   // --- read current user name from localStorage (fallbacks) ---
   const rawUser =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
@@ -66,20 +71,20 @@ export default function Index() {
 
   // --- dark mode state & effect ---
   const [isDarkMode, setIsDarkMode] = useState(() => {
-      // load from localStorage initially
-      return localStorage.getItem("theme") === "dark";
-    });
-   useEffect(() => {
-      if (isDarkMode) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
-    }, [isDarkMode]);
-  
-    const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+    // load from localStorage initially
+    return localStorage.getItem("theme") === "dark";
+  });
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
   // ---------- Fetch students (CRA-safe) ----------
   useEffect(() => {
@@ -291,9 +296,10 @@ export default function Index() {
     // eslint-disable-next-line no-console
     console.log("View profile for student:", s);
   };
-  const handleContact = (studentId) =>
-    // eslint-disable-next-line no-console
-    console.log("Contact student:", studentId);
+  const handleContact = (studentId) => {
+    setContactStudentId(studentId);
+    setIsContactModalOpen(true);
+  };
 
   // ================= VIEWS =================
   if (currentView === "notifications") {
@@ -305,9 +311,8 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
-            isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+            }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex-1 pt-16">
@@ -327,9 +332,8 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
-            isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+            }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex-1 pt-16">
@@ -349,9 +353,8 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
-            isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+            }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <div className="pt-20 px-2 sm:px-4 pb-6 max-w-[1400px] mx-auto">
@@ -372,19 +375,18 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex flex-col transition-all duration-300 ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"} ${
-            isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+          className={`flex flex-col transition-all duration-300 ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"} ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+            }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex flex-grow">
-            <AboutCompanyPage/>
+            <AboutCompanyPage />
           </main>
         </div>
       </div>
     );
   }
-  
+
 
   // ================= DASHBOARD =================
   return (
@@ -396,9 +398,8 @@ export default function Index() {
       />
 
       <div
-        className={`flex-1 flex flex-col  transition-all duration-300 ${
-          isSidebarOpen ? "lg:ml-64" : "ml-0"
-        }`}
+        className={`flex-1 flex flex-col  transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
       >
         <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
 
@@ -406,16 +407,14 @@ export default function Index() {
         <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto w-full">
           {/* Hero Section */}
           <motion.section
-            className={`hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white ${
-        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
-      }`}
+            className={`hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+              }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-1 items-center ${
-        isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
-      }`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-1 items-center ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
+              }`}>
               <div>
                 <motion.h1
                   className="text-3xl sm:text-4xl font-bold mb-8 select-none 
@@ -565,6 +564,13 @@ export default function Index() {
           student={selectedStudent}
           fetchFresh={true}
         />
+
+        <ContactModal
+          open={isContactModalOpen}
+          studentId={contactStudentId}
+          onClose={() => setIsContactModalOpen(false)}
+        />
+
       </div>
     </div>
   );

@@ -28,25 +28,6 @@ export default function AboutCompanyPage() {
                   Empowering hiring teams to discover, evaluate and hire great student talent.
                 </p>
               </div>
-    <div className="pt-20 px-2 sm:px-4 py-6 mx-auto dark:text-white dark:bg-gray-900">
-      <motion.div
-        className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-gradient-to-r from-[#01BDA5] to-[#43cea2] text-white shadow-md">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-                About UptoSkill
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Empowering hiring teams to discover, evaluate and hire great student talent.
-              </p>
             </div>
             <BriefcaseIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
@@ -106,6 +87,8 @@ export default function AboutCompanyPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

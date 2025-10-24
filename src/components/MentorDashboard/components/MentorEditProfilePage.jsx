@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Sidebar from "../../MentorDashboard/components/Sidebar";
 import Header from "../../MentorDashboard/components/Header";
+import Footer from "../../MentorDashboard/components/Footer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -72,7 +73,6 @@ const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
       if (res.data?.success) {
         toast.success("Profile updated successfully!");
-        // Clear input fields after save
         setFormData({
           full_name: "",
           contact_number: "",
@@ -114,16 +114,19 @@ const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
   };
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
+    <div className={`flex min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div className="flex-1 flex flex-col transition-all duration-300">
+
+      {/* ✅ Smart layout: flex column + justify-between keeps footer at bottom when content is short */}
+      <div className="flex flex-col flex-1 justify-between transition-all duration-300">
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
           toggleDarkMode={toggleDarkMode}
         />
 
-        <div className="flex-1 overflow-y-auto pt-16 p-6 bg-gray-50 dark:bg-gray-900">
+        {/* Main Content */}
+        <main className="flex-1 pt-16 p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -256,7 +259,8 @@ const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
               </form>
             )}
           </div>
-        </div>
+        </main>
+        <Footer />
       </div>
     </div>
   );

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../dashboard/Sidebar";
 import Header from "../dashboard/Header";
+import Footer from "../dashboard/Footer";
 import StudentProfileForm from "./StudentProfileForm";
 import DomainsOfInterest from "./DomainsOfInterest";
 
 const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
-  // effective dark mode state: prefer prop, otherwise derive from document/localStorage
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
       if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
@@ -21,7 +22,6 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
     return false;
   });
 
-  // fallback toggle if parent doesn't provide one
   const toggleDarkMode = propToggleDarkMode
     ? propToggleDarkMode
     : () => {
@@ -36,9 +36,8 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
         });
       };
 
-  // Listen to storage events and <html> class changes so component updates when theme toggles elsewhere
   useEffect(() => {
-    if (typeof propIsDarkMode !== 'undefined') return; // controlled by parent
+    if (typeof propIsDarkMode !== 'undefined') return;
 
     const handleStorage = (e) => {
       if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
@@ -57,12 +56,12 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
       mo.disconnect();
     };
   }, [propIsDarkMode]);
+
   const [domainsOfInterest, setDomainsOfInterest] = useState([]);
   const [othersDomain, setOthersDomain] = useState("");
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ⬇️ Fetch profile once on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -71,7 +70,7 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const d = res.data.data; // ✅ your API's data shape
+        const d = res.data.data;
         setFormData({
           full_name: d.profile_full_name || d.student_name,
           contact_number: d.contact_number || d.student_phone,
@@ -99,32 +98,22 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
       setOthersDomain(value);
     } else {
       setDomainsOfInterest((prev) => {
-        if (value && !prev.includes(domain)) {
-          return [...prev, domain];
-        } else if (!value) {
-          return prev.filter((d) => d !== domain);
-        }
+        if (value && !prev.includes(domain)) return [...prev, domain];
+        if (!value) return prev.filter((d) => d !== domain);
         return prev;
       });
     }
   };
 
   const handleFormSubmit = async (formValues) => {
-    const fullData = {
-      ...formValues,
-      domainsOfInterest,
-      othersDomain,
-    };
+    const fullData = { ...formValues, domainsOfInterest, othersDomain };
     console.log("Submitting full profile data:", fullData);
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/api/profile", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(fullData),
       });
 
@@ -141,61 +130,49 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
   };
 
   return (
-    <div className={`flex h-screen dashboard-container${isDarkMode ? " dark" : ""}`}>
-      {isOpen && (
-        <Sidebar
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          isDarkMode={isDarkMode}
-        />
-      )}
+    <div className={`flex flex-col min-h-screen dashboard-container${isDarkMode ? " dark" : ""}`}>
+      <div className="flex flex-1">
+        {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
 
-      <div
-        className={`flex-1 flex flex-col overflow-hidden main-content${
-          isOpen ? "" : " full-width"
-        }`}
-      >
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
-        />
+        <div className={`flex-1 flex flex-col overflow-hidden main-content${isOpen ? "" : " full-width"}`}>
+          <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
 
-        <div className="flex-1 overflow-y-auto pt-24 p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-              Edit Profile
-            </h1>
+          <div className="flex-1 overflow-y-auto pt-24 p-6">
+            <div className="max-w-6xl mx-auto">
+              <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Edit Profile</h1>
 
-            {/* ✅ Only the form section shows loading spinner */}
-            {loading ? (
-              <div className="flex justify-center items-center h-40">
-                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <StudentProfileForm
-                    formData={formData || {}}
-                    setFormData={setFormData}
-                    onSubmit={handleFormSubmit}
-                    isDarkMode={isDarkMode}
-                  />
+              {loading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                    <StudentProfileForm
+                      formData={formData || {}}
+                      setFormData={setFormData}
+                      onSubmit={handleFormSubmit}
+                      isDarkMode={isDarkMode}
+                    />
+                  </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <DomainsOfInterest
-                    selectedDomains={domainsOfInterest}
-                    onChange={handleDomainChange}
-                    othersValue={othersDomain}
-                    isDarkMode={isDarkMode}
-                  />
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                    <DomainsOfInterest
+                      selectedDomains={domainsOfInterest}
+                      onChange={handleDomainChange}
+                      othersValue={othersDomain}
+                      isDarkMode={isDarkMode}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Footer at the bottom of the screen */}
+      <Footer />
     </div>
   );
 };

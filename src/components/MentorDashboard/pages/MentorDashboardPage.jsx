@@ -4,6 +4,7 @@ import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import Footer from "../components/Footer"
 import WelcomeSection from "../components/Welcome";
 
 const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
@@ -71,8 +72,12 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
             ))}
           </div>
         </div>
+
+        <Footer/>
+
       </div>
-    </div>
+     
+    </div> 
   );
 };
 

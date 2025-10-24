@@ -25,7 +25,7 @@ const Footer = () => {
 </div>
 
       <p className="text-center text-sm text-gray-400">
-        2025 © UptoSkills, All Rights Reserved
+        © 2025 Uptoskills. Built by learners.
       </p>
     </footer>
   );

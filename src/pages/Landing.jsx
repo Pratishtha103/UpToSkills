@@ -223,9 +223,11 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white text-center py-6 text-sm">
-        <p>©2025 Uptoskills. Built by learners.</p>
-      </footer>
+      <footer
+      className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+    >
+      <p>© 2025 Uptoskills. Built by learners.</p>
+    </footer>
 
       {/* Chatbot */}
       <Chatbot />

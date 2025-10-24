@@ -4,6 +4,7 @@ import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import Footer from "../components/Footer"
 import WelcomeSection from "../components/Welcome";
 import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 
@@ -107,8 +108,10 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
             </div>
           </div>
         </section>
+        <Footer/>
       </div>
-    </div>
+     
+    </div> 
   );
 };
 

@@ -1,67 +1,97 @@
-import React, { useState } from 'react';
-
-import Header from '../Header';
-import Sidebar from '../Sidebar';
-// import RightSidebar from '../dashboard/RightSidebar';
+import React, { useState } from "react";
+import Header from "../Header";
+import Sidebar from "../Sidebar";
+import Footer from "../Footer";
 
 const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
-  student_name: '', // CHANGED TO student_name
-  badge_name: '',
-  badge_description: '',
-  verified: false,
-});
+    student_name: "",
+    badge_name: "",
+    badge_description: "",
+    verified: false,
+  });
 
-  const toggleSidebar = () => {
-    setIsOpen((prev) => !prev);
-  };
+  const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await fetch('http://localhost:5000/api/skill-badges', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
-    const data = await response.json();
-    if (data.success) {
-      alert('Badge added successfully!');
-      setFormData({ student_id: '', badge_name: '', badge_description: '', verified: false });
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/skill-badges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert("Badge added successfully!");
+        setFormData({
+          student_name: "",
+          badge_name: "",
+          badge_description: "",
+          verified: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+  };
 
   return (
-    <div className={`dashboard-container${isDarkMode ? ' dark' : ''}`}>
-      {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-      <div className={`main-content${isOpen ? '' : ' full-width'}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="min-h-screen flex items-center justify-center px-4 py-10">
-          <div className="pt-24 p-6 bg-white rounded-lg w-full max-w-xl shadow-md dark:bg-gray-700">
-            <h2 className="text-2xl font-semibold mb-6 dark:text-white">Add New Skill Badge</h2>
+    <div
+      className={`flex min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      {/* Sidebar */}
+      {isOpen && (
+        <div className="w-64">
+          <Sidebar
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            isDarkMode={isDarkMode}
+          />
+        </div>
+      )}
+
+      {/* Main content */}
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          isOpen ? "ml-0 md:ml-0" : "ml-0"
+        }`}
+      >
+        <Header
+          onMenuClick={toggleSidebar}
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
+
+        <main className="flex-grow flex items-center justify-center px-4 py-10">
+          <div className="pt-20 p-6 bg-white dark:bg-gray-800 rounded-lg w-full max-w-xl shadow-md transition-colors duration-300">
+            <h2 className="text-2xl font-semibold mb-6 dark:text-white">
+              Add New Skill Badge
+            </h2>
+
             <form className="space-y-4" onSubmit={handleSubmit}>
               <label className="block dark:text-white">
-                Student Name: 
+                Student Name:
                 <input
-                  type="text" // CHANGED
-                  placeholder="Student Name" // CHANGED
-                  name="student_name" // CHANGED
-                  value={formData.student_name} // CHANGED
+                  type="text"
+                  name="student_name"
+                  placeholder="Student Name"
+                  value={formData.student_name}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-极 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md 
+                             dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </label>
 
@@ -69,12 +99,13 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
                 Badge Name:
                 <input
                   type="text"
-                  placeholder="Badge Name"
                   name="badge_name"
+                  placeholder="Badge Name"
                   value={formData.badge_name}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md 
+                             dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </label>
 
@@ -86,7 +117,8 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
                   value={formData.badge_description}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md 
+                             dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 ></textarea>
               </label>
 
@@ -109,9 +141,10 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
               </button>
             </form>
           </div>
-        </div>
+        </main>
+
+        <Footer />
       </div>
-      {/* <RightSidebar isDarkMode={isDarkMode} className="padded-top" /> */}
     </div>
   );
 };

@@ -1,11 +1,17 @@
-// AboutCompanyPage.jsx
 import React from "react";
 import { BriefcaseIcon, Users, Target } from "lucide-react";
 import { motion } from "framer-motion";
 import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
-export default function AboutCompanyPage() {
+export default function AboutUs() {
   return (
+    <div className="mt-14 flex min-h-screen">
+                <Header/>
+                {/* Sidebar Navbar */}
+                <Sidebar />
     <div className="pt-20 px-2 sm:px-4 py-6 mx-auto dark:text-white dark:bg-gray-900">
       <motion.div
         className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
@@ -126,6 +132,7 @@ export default function AboutCompanyPage() {
                       </div>
                     </section>
               
+    </div>
     </div>
   );
 }

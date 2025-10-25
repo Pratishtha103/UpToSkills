@@ -16,6 +16,7 @@ import {
   Info,
 } from "lucide-react";
 import { info } from "autoprefixer";
+import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -159,38 +160,29 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
               ))}
             </div>
           </nav>
-
-          {/* socials + logout */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="font-semibold text-sm mb-2 text-gray-500 flex items-center justify-center">Connect With Us</p>
-            <div className="mb-3 flex items-center justify-center gap-3">
-              <a
-                href="https://www.linkedin.com/company/uptoskills"
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={18} />
-              </a>
-              <a
-                href="https://www.instagram.com/uptoskills"
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-              </a>
-              <a
-                href="https://uptoskills.com"
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 dark:text-white"
-                aria-label="Website"
-              >
-                <Globe size={18} />
-              </a>
+{/* Social Media and Logout */}
+          <div className={`p-4 border-t  text-center`}>
+            <p className="font-semibold text-sm mb-2 text-gray-500">Connect With Us</p>
+            <div className="flex justify-center gap-4 mb-3">
+              <FaLinkedin
+                size={22}
+                className="cursor-pointer hover:text-[#0A66C2] transition"
+                onClick={() =>
+                  window.open("https://www.linkedin.com/company/uptoskills/posts/?feedView=all", "_blank")
+                }
+              />
+              <FaInstagram
+                size={22}
+                className="cursor-pointer hover:text-[#E1306C] transition"
+                onClick={() => window.open("https://www.instagram.com/uptoskills", "_blank")}
+              />
+              <FaYoutube
+                size={22}
+                className="cursor-pointer hover:text-[#FF0000] transition"
+                onClick={() =>
+                  window.open("https://youtube.com/@uptoskills9101?si=YvRk51dq0exU-zLv", "_blank")
+                }
+              />
             </div>
 
            <motion.button

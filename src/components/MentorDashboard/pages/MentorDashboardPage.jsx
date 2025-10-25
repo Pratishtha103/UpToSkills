@@ -6,7 +6,6 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer"
 import WelcomeSection from "../components/Welcome";
-import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 
 const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
   const navigate = useNavigate();
@@ -74,41 +73,8 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </div>
 
-        <section
-          id="contact-section"
-          className="w-full mx-auto py-16 px-4 text-center bg-white shadow-sm"
-        >
-          <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
-          <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-            Got a project in mind? We’d love to hear about it. Take five minutes
-            to fill out our project form so that we can get to know you and
-            understand your project.
-          </p>
-
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-              <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Get to Know Us:</h3>
-              <p className="text-gray-600">
-                https://www.linkedin.com/company/uptoskills
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-              <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Phone Us 24/7:</h3>
-              <p className="text-gray-600">+91 (931) 977 2294</p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
-              <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-              <p className="text-gray-600">info@uptoskills.com</p>
-            </div>
-          </div>
-        </section>
         <Footer/>
+
       </div>
      
     </div> 

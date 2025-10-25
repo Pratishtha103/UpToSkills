@@ -9,6 +9,7 @@ import OpenSourceContributions from "../components/MentorDashboard/pages/OpenSou
 import MultiStudent from "../components/MentorDashboard/pages/MultiStudent";
 import MentorProfilePage from "../components/MentorDashboard/components/MentorProfilePage";
 import MentorEditProfilePage from "../components/MentorDashboard/components/MentorEditProfilePage";
+import AboutUs from "../components/MentorDashboard/pages/AboutUs";
 
 function MentorDashboardRoutes() {
   const [isDarkMode, setIsDarkMode] = useState(
@@ -73,7 +74,13 @@ function MentorDashboardRoutes() {
           />
         }
       />
-    </Routes>
+    
+
+     <Route
+        path="AboutUs"
+        element={<AboutUs />}
+      />
+      </Routes>
   );
 }
 

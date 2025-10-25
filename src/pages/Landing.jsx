@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
+import logo from "../assets/logo.jpg";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -90,8 +91,8 @@ export default function Landing() {
       <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <img
-            src="/uptoskill.jpeg"
-            alt="Uptoskills Logo"
+            src={logo}
+            alt="Upto To Skills logo"          
             className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />

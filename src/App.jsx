@@ -37,9 +37,7 @@ const queryClient = new QueryClient();
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
-  };
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,7 +61,7 @@ function App() {
           <Route path="/dashboard/profile" element={<UserProfilePage />} />
           <Route path="/dashboard/edit-profile" element={<EditProfilePage />} />
           <Route path="/dashboard/my-projects" element={<MyProjects />} />
-          <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
            <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
 

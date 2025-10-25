@@ -17,7 +17,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
-const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -115,7 +115,7 @@ const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
       <div className="flex-1 flex flex-col transition-all duration-300">
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}

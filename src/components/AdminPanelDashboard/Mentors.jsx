@@ -27,9 +27,11 @@ export default function Mentors({ isDarkMode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   const fetchMentors = async () => {
     try {
-      const res = await axios.get('/api/mentors');
+      const res = await axios.get(`${API_BASE}/api/mentors`);
       setMentors(res.data || []);
     } catch (err) {
       console.error('Failed to load mentors', err);
@@ -46,7 +48,7 @@ export default function Mentors({ isDarkMode }) {
   const deleteMentor = async (id) => {
     if (!confirm('Delete this mentor?')) return;
     try {
-      await axios.delete(`/api/mentors/${id}`);
+      await axios.delete(`${API_BASE}/api/mentors/${id}`);
       setMentors((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
       console.error('Failed to delete mentor', err);

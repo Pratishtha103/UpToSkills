@@ -4,7 +4,7 @@ import Header from '../Header';
 import Sidebar from '../Sidebar';
 // import RightSidebar from '../dashboard/RightSidebar';
 
-const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
+const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
   student_name: '', // CHANGED TO student_name
@@ -13,9 +13,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
   verified: false,
 });
 
-  const toggleSidebar = () => {
-    setIsOpen((prev) => !prev);
-  };
+  const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,13 +42,14 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
 };
 
   return (
-    <div className={`dashboard-container${isDarkMode ? ' dark' : ''}`}>
+    <div className="mt-14 flex min-h-screen">
+      <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onMenuClick={toggleSidebar} />
       {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-      <div className={`main-content${isOpen ? '' : ' full-width'}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="min-h-screen flex items-center justify-center px-4 py-10">
-          <div className="pt-24 p-6 bg-white rounded-lg w-full max-w-xl shadow-md dark:bg-gray-700">
-            <h2 className="text-2xl font-semibold mb-6 dark:text-white">Add New Skill Badge</h2>
+
+      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
+        <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">
+          <div className="p-6 bg-white rounded-lg w-full max-w-xl shadow-md dark:bg-gray-800">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Add New Skill Badge</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <label className="block dark:text-white">
                 Student Name: 
@@ -61,7 +60,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
                   value={formData.student_name} // CHANGED
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-极 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </label>
 
@@ -74,7 +73,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
                   value={formData.badge_name}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </label>
 
@@ -86,7 +85,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
                   value={formData.badge_description}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 ></textarea>
               </label>
 
@@ -109,7 +108,7 @@ const SkillBadgeForm = ({ isDarkMode, toggleDarkMode }) => {
               </button>
             </form>
           </div>
-        </div>
+        </main>
       </div>
       {/* <RightSidebar isDarkMode={isDarkMode} className="padded-top" /> */}
     </div>

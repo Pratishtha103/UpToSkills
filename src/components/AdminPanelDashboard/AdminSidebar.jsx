@@ -17,10 +17,7 @@ const sidebarItems = [
   { id: "students", label: "Students", icon: Users },
   { id: "mentors", label: "Mentors", icon: Users },
   { id: "companies", label: "Companies", icon: Building2 },
-<<<<<<< HEAD
-=======
   { id: "courses", label: "Courses", icon: BookOpen },
->>>>>>> 9e1969d9bfc851e6dcbb8aee079935f32541f531
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "programs", label: "Programs", icon: BookOpen },
 ];

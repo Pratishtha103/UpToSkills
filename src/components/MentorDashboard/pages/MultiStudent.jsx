@@ -210,8 +210,8 @@ const MultiStudent = ({ isDarkMode, setIsDarkMode }) => {
     // For simplicity in the component, we'll apply dark background/text classes here.
     <div className={`mt-14 flex min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-      {/* Assuming Sidebar handles its own dark mode internally */}
-      <Sidebar />
+  {/* Sidebar should receive isDarkMode to render correctly */}
+  <Sidebar isDarkMode={isDarkMode} />
 
       {/* Main content background now uses dark:bg-gray-900 */}
       <div className="flex flex-col flex-grow bg-white dark:bg-gray-900 transition-colors">

@@ -4,7 +4,7 @@ import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
 import WelcomeSection from "../components/Welcome";
 
 const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
@@ -42,7 +42,6 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
   ];
 
   return (
-    // ✅ Fixed: use backticks for className interpolation
     <div
       className={`mt-14 flex min-h-screen ${
         isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -52,7 +51,6 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
       <div className="flex-1 flex flex-col">
         <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-        {/* ✅ Fixed here too */}
         <div
           className={`flex-1 p-8 ${
             isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -76,8 +74,7 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
         <Footer/>
 
       </div>
-     
-    </div> 
+    </div>
   );
 };
 

@@ -133,50 +133,7 @@ export default function AboutCompanyPage() {
         </section>
       </div>
 
-      {/* Contact Info Section */}
-      <section className="w-full mx-auto py-16 px-4 text-center bg-white">
-        <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
-        <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
-        <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-          Got a project in mind? We’d love to hear about it. Take five minutes to fill out our project form
-          so that we can get to know you and understand your project.
-        </p>
-
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <a
-            href="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-              <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Get to Know Us:</h3>
-              <p>www.LinkedIn.com</p>
-            </div>
-          </a>
-
-          <a href="tel:+919319772294">
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-              <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Phone Us 24/7:</h3>
-              <p className="text-gray-600">+91 (931) 977 2294</p>
-            </div>
-          </a>
-
-          <a
-            href="mailto:info@uptoskills.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-              <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-              <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-              <p className="text-gray-600">info@uptoskills.com</p>
-            </div>
-          </a>
-        </div>
-      </section>
-
+      
       {/* Footer */}
       <Footer />
     </div>

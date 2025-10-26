@@ -5,6 +5,7 @@ import { Button } from "../Company_Dashboard/ui/button";
 import { Badge } from "../Company_Dashboard/ui/badge";
 import { Input } from "../Company_Dashboard/ui/input";
 import { Label } from "../Company_Dashboard/ui/label";
+import Footer from "../AboutPage/Footer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Company_Dashboard/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Company_Dashboard/ui/dialog";
 import { Calendar, Clock, Video, Phone, MoreHorizontal, Trash } from "lucide-react";

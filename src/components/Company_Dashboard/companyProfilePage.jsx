@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Navbar";
+import Footer from "../AboutPage/Footer";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BriefcaseIcon } from "lucide-react";
 
@@ -51,11 +52,31 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
   }, []);
 
   return (
-    <div className={`flex h-screen dashboard-container${isDarkMode ? " dark" : ""}`}>
-      {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-      <div className={`flex-1 flex flex-col overflow-hidden main-content${isOpen ? "" : " full-width"}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="flex-1 overflow-y-auto scrollbar-hide pt-20 p-6">
+    <div
+      className={`flex h-screen dashboard-container${
+        isDarkMode ? " dark" : ""
+      }`}
+    >
+      {isOpen && (
+        <Sidebar
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          isDarkMode={isDarkMode}
+        />
+      )}
+      <div
+        className={`flex-1 flex flex-col overflow-hidden main-content${
+          isOpen ? "" : " full-width"
+        }`}
+      >
+        <Header
+          onMenuClick={toggleSidebar}
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
+
+        {/* Main Scrollable Content */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide pt-20 p-6 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
           {/* Back Button */}
           <motion.button
             onClick={() => navigate("/company")}
@@ -66,14 +87,14 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
             <ArrowLeft className="w-5 h-5" />
             <span>Back To Company Dashboard</span>
           </motion.button>
+
+          {/* Profile Data Section */}
           <div className="max-w-6xl mx-auto">
             {loading ? (
               <p className="text-gray-600 dark:text-gray-400 m-6">Loading...</p>
             ) : error ? (
-
               <p className="text-red-500 m-6">{error}</p>
             ) : companyData ? (
-
               <div className="flex w-full justify-center">
                 <div className="grid grid-cols-1 gap-6">
                   <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full max-w-4xl border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl">
@@ -94,7 +115,11 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                             <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full bg-white dark:bg-gray-900 shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]">
                               <img
                                 src={`http://localhost:5000${companyData.logo_url}`}
-                                alt={`${companyData.company_name || companyData.name || "Company"} Logo`}
+                                alt={`${
+                                  companyData.company_name ||
+                                  companyData.name ||
+                                  "Company"
+                                } Logo`}
                                 className="h-28 w-28 object-cover rounded-full"
                                 loading="lazy"
                               />
@@ -102,6 +127,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                           </div>
                         </section>
                       )}
+
                       {/* Basic Info */}
                       <section aria-labelledby="basic-info-heading">
                         <h2
@@ -114,12 +140,24 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                           <Info
                             label="Company Name :- "
-                            value={companyData.company_name || companyData.name}
+                            value={
+                              companyData.company_name || companyData.name
+                            }
                             defaultText="N/A"
                             isLink={false}
                           />
-                          <Info label="Industry :- " value={companyData.industry} defaultText="N/A" isLink={false} />
-                          <Info label="Website :- " value={companyData.website} defaultText="Not provided" isLink={true} />
+                          <Info
+                            label="Industry :- "
+                            value={companyData.industry}
+                            defaultText="N/A"
+                            isLink={false}
+                          />
+                          <Info
+                            label="Website :- "
+                            value={companyData.website}
+                            defaultText="Not provided"
+                            isLink={true}
+                          />
                           <Info
                             label="Contact Email :- "
                             value={companyData.email}
@@ -134,7 +172,12 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                             isLink={true}
                             linkPrefix="tel:"
                           />
-                          <Info label="General Contact :- " value={companyData.contact} defaultText="Not provided" isLink={false} />
+                          <Info
+                            label="General Contact :- "
+                            value={companyData.contact}
+                            defaultText="Not provided"
+                            isLink={false}
+                          />
                         </div>
                       </section>
                     </div>
@@ -143,6 +186,11 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
               </div>
             ) : null}
           </div>
+
+          {/* ✅ Non-Sticky Footer */}
+          <div className="mt-8">
+            <Footer />
+          </div>
         </div>
       </div>
     </div>
@@ -150,12 +198,20 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 };
 
 // Helper component for label/value display
-const Info = ({ label, value, defaultText = "—", isLink = false, linkPrefix = "" }) => {
+const Info = ({
+  label,
+  value,
+  defaultText = "—",
+  isLink = false,
+  linkPrefix = "",
+}) => {
   if (!value) value = defaultText;
 
   return (
     <div className="flex gap-2 items-center">
-      <label className="block text-sm font-bold text-gray-600 dark:text-gray-400">{label}</label>
+      <label className="block text-sm font-bold text-gray-600 dark:text-gray-400">
+        {label}
+      </label>
       {isLink ? (
         <a
           href={`${linkPrefix}${value}`}
@@ -166,7 +222,9 @@ const Info = ({ label, value, defaultText = "—", isLink = false, linkPrefix = 
           {value}
         </a>
       ) : (
-        <p className="text-gray-800 dark:text-white whitespace-pre-wrap">{value}</p>
+        <p className="text-gray-800 dark:text-white whitespace-pre-wrap">
+          {value}
+        </p>
       )}
     </div>
   );

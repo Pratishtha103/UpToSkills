@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-
-import Header from '../Header';
-import Sidebar from '../Sidebar';
-// import RightSidebar from '../dashboard/RightSidebar';
+import React, { useState } from "react";
+import Header from "../Header";
+import Sidebar from "../Sidebar";
+import Footer from "../Footer";
 
 const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
-  student_name: '', // CHANGED TO student_name
-  badge_name: '',
-  badge_description: '',
-  verified: false,
-});
+    student_name: "",
+    badge_name: "",
+    badge_description: "",
+    verified: false,
+  });
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
@@ -19,27 +18,32 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await fetch('http://localhost:5000/api/skill-badges', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
-    const data = await response.json();
-    if (data.success) {
-      alert('Badge added successfully!');
-      setFormData({ student_id: '', badge_name: '', badge_description: '', verified: false });
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/skill-badges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert("Badge added successfully!");
+        setFormData({
+          student_name: "",
+          badge_name: "",
+          badge_description: "",
+          verified: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+  };
 
   return (
     <div className="mt-14 flex min-h-screen">
@@ -52,12 +56,12 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
             <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Add New Skill Badge</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <label className="block dark:text-white">
-                Student Name: 
+                Student Name:
                 <input
-                  type="text" // CHANGED
-                  placeholder="Student Name" // CHANGED
-                  name="student_name" // CHANGED
-                  value={formData.student_name} // CHANGED
+                  type="text"
+                  name="student_name"
+                  placeholder="Student Name"
+                  value={formData.student_name}
                   onChange={handleChange}
                   required
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -68,8 +72,8 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                 Badge Name:
                 <input
                   type="text"
-                  placeholder="Badge Name"
                   name="badge_name"
+                  placeholder="Badge Name"
                   value={formData.badge_name}
                   onChange={handleChange}
                   required
@@ -110,7 +114,6 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </main>
       </div>
-      {/* <RightSidebar isDarkMode={isDarkMode} className="padded-top" /> */}
     </div>
   );
 };

@@ -50,7 +50,7 @@ function AdminPanel() {
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
       case "programs":
-        return <ProgramsAdmin isDarkMode={isDarkMode} onNavigateSection={(s)=>setActiveSection(s)} />;
+        return <ProgramsAdmin isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "mentors_table":
         return <MentorsTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       case "notifications":
@@ -66,9 +66,8 @@ function AdminPanel() {
 
   return (
     <div
-      className={`flex min-h-screen transition-colors duration-500 ${
-        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`flex min-h-screen transition-colors duration-500 ${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
       {/* Sidebar */}
       <AdminSidebar
@@ -81,9 +80,8 @@ function AdminPanel() {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? "lg:ml-64" : "ml-0"
-        }`}
+        className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
       >
         {/* Navbar */}
         <AdminNavbar
@@ -96,11 +94,10 @@ function AdminPanel() {
         {/* Content */}
         <main className="pt-20 px-4 sm:px-6 py-6">
           <motion.section
-            className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${
-              isDarkMode
+            className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${isDarkMode
                 ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white"
                 : "bg-gradient-to-br from-white to-gray-100 text-gray-900"
-            }`}
+              }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
@@ -114,9 +111,8 @@ function AdminPanel() {
               UptoSkills Admin Dashboard
             </motion.h1>
             <motion.p
-              className={`text-xl ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-xl ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -126,19 +122,15 @@ function AdminPanel() {
             </motion.p>
           </motion.section>
 
-        {/* Active Module */}
+          {/* Active Module */}
           {renderActiveModule()}
         </main>
 
         {/* Footer */}
         <footer
-          className={`text-center py-8 border-t mt-12 transition-all duration-500 ${
-            isDarkMode
-              ? "border-gray-700 text-gray-400"
-              : "border-gray-300 text-gray-600"
-          }`}
+          className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
         >
-          <p>© 2025 UptoSkills Team. All rights reserved. ✨</p>
+          <p>© 2025 Uptoskills. Built by learners.</p>
         </footer>
       </div>
     </div>

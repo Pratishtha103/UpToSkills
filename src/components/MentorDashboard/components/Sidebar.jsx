@@ -10,7 +10,7 @@ const sidebarItems = [
   { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
   { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
   { name: "Skill Badges", icon: <Award size={18} />, path: "/mentor-dashboard/skill-badges" },
-  { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard#contact-section" },
+  { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 
 const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode }) => {
@@ -68,7 +68,7 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
   };
 
   const handleAboutUs = () => {
-    navigate("/mentor-dashboard#contact-section");
+    navigate("/mentor-dashboard/AboutUs");
     setTimeout(() => {
       const el = document.getElementById("contact-section");
       if (el) el.scrollIntoView({ behavior: "smooth" });

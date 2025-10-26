@@ -20,7 +20,7 @@ import ProgramsPage from './pages/ProgramsPage';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
-
+import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 // About Page components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
@@ -64,7 +64,7 @@ function App() {
           <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
            <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
-
+          <Route path="/dashboard/projects" element={<Dashboard_Project />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
 

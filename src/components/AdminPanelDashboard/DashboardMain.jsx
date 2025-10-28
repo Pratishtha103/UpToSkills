@@ -97,13 +97,19 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
       gradient: "from-orange-500 to-red-500",
       onClick: () => onNavigateSection?.("companies_table"),
     },
+    {
+      title: "Total Courses",
+      value: courses?.length ?? 0, // 🆕 shows total number of courses
+      icon: <FaBookOpen className="w-6 h-6 text-white" />, // 🆕 new icon
+      gradient: "from-purple-500 to-pink-500", // 🆕 matching gradient
+      onClick: () => onNavigateSection?.("courses_table"),
+    },
   ];
 
   return (
     <main
-      className={`flex-grow p-4 sm:p-6 flex flex-col gap-8 transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`flex-grow p-4 sm:p-6 flex flex-col gap-8 transition-colors duration-300 ${isDarkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
       <motion.h2
         className={`text-2xl font-bold mb-4 ${
@@ -121,11 +127,10 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
           <motion.div
             key={index}
             onClick={card.onClick}
-            className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-xl transition cursor-pointer ${
-              isDarkMode
+            className={`p-6 rounded-2xl shadow-md flex items-center gap-4 hover:shadow-xl transition cursor-pointer ${isDarkMode
                 ? "bg-gray-900 hover:bg-gray-800 border border-gray-700"
                 : "bg-white hover:bg-gray-100 border border-gray-200"
-            }`}
+              }`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}

@@ -90,6 +90,8 @@ function AdminPanel() {
         return <AdminNotifications isDarkMode={isDarkMode} />;
       case "courses":
         return <Programs isDarkMode={isDarkMode} />;
+      case "courses_table":
+        return <CoursesTable isDarkMode={isDarkMode} onNavigateSection={(s) => setActiveSection(s)} />;
       default:
         return <DashboardMain isDarkMode={isDarkMode} />;
     }

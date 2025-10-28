@@ -6,7 +6,7 @@ import {
   FaTrash,
   FaUserGraduate,
   FaChalkboardTeacher,
-  FaBuilding,
+  FaBuilding,FaBookOpen
 } from "react-icons/fa";
 import axios from "axios";
 

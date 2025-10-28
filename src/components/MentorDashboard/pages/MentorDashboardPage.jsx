@@ -43,16 +43,19 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
 
   return (
     <div
-      className={`mt-14 flex min-h-screen ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+      className={`mt-14 flex min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
       }`}
     >
-      <Sidebar isDarkMode={isDarkMode} />
+      {/* ✅ Pass both isDarkMode and setIsDarkMode to Sidebar */}
+      <Sidebar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+
       <div className="flex-1 flex flex-col">
+        {/* ✅ Header toggle controls global theme */}
         <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
         <div
-          className={`flex-1 p-8 ${
+          className={`flex-1 p-8 transition-colors duration-300 ${
             isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
@@ -71,8 +74,8 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </div>
 
-        <Footer/>
-
+        {/* ✅ Footer adapts automatically */}
+        <Footer isDarkMode={isDarkMode} />
       </div>
     </div>
   );

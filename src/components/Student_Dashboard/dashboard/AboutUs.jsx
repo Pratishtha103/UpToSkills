@@ -1,131 +1,167 @@
-import React from "react";
-import { BriefcaseIcon, Users, Target,GraduationCap } from "lucide-react";
-import { motion } from "framer-motion";
-import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
+// src/pages/AboutUs.jsx
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import Footer from "./Footer";
+import { FaLinkedin, FaPhone, FaEnvelope, FaUsers } from "react-icons/fa";
 
 export default function AboutUs() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+      else setIsSidebarOpen(true);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div className="mt-14 flex min-h-screen">
-                <Header/>
-                {/* Sidebar Navbar */}
-                <Sidebar />
-    <div className="pt-20 px-2 sm:px-4 py-6 mx-auto dark:text-white dark:bg-gray-900">
-      <motion.div
-        className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-       <div className="flex items-center justify-between mb-6">
-  <div className="flex items-center gap-4">
-    <div className="p-3 rounded-full bg-gradient-to-r from-[#01BDA5] to-[#43cea2] text-white shadow-md">
-      <Users className="w-6 h-6" />
-    </div>
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-        About UptoSkill
-      </h1>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-        Empowering students to showcase their talent, learn through real-world projects, and connect with mentors and companies.
-      </p>
-    </div>
-  </div>
+    <div className="flex min-h-screen bg-gray-900 text-gray-100">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-  <GraduationCap className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-</div>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col transition-all duration-300">
+        {/* Header */}
+        <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <section>
-    <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-blue-500 pl-3">
-      Our Mission
-    </h2>
-    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-      At UptoSkill, our mission is to bridge the gap between learning and employment by giving students a platform to enhance their skills, build portfolios, and gain exposure to industry-ready challenges.
-    </p>
+        {/* Page Content */}
+        <main
+          className={`flex-grow p-6 lg:p-10 transition-all duration-300 ${
+            isSidebarOpen && window.innerWidth >= 1024 ? "lg:ml-64" : ""
+          }`}
+        >
+          <div className="max-w-6xl mx-auto">
+            {/* About Section */}
+            <div className="bg-gray-800/60 rounded-2xl p-8 shadow-md border border-gray-700">
+              <div className="flex items-center gap-3 mb-6">
+                <FaUsers className="text-orange-500 text-3xl" />
+                <h1 className="text-3xl font-bold">About UptoSkill</h1>
+              </div>
 
-    <h3 className="mt-4 text-md font-semibold text-gray-700 dark:text-gray-200">What we offer</h3>
-    <ul className="list-disc pl-5 mt-2 text-gray-700 dark:text-gray-300 leading-relaxed">
-      <li>Access to hands-on projects and learning challenges.</li>
-      <li>Personalized skill badges and performance tracking.</li>
-      <li>Opportunities to connect with mentors and hiring teams.</li>
-    </ul>
-  </section>
+              <p className="text-gray-300 mb-6">
+                Empowering students to build skills, collaborate, and grow through
+                real-world projects and personalized mentorship.
+              </p>
 
-  <section>
-    <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-green-400 pl-3">
-      Values & Approach
-    </h2>
-    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-      We believe in learning by doing. UptoSkill encourages students to apply knowledge, collaborate with peers, and showcase their progress in a transparent and motivating environment.
-    </p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Mission Section */}
+                <div>
+                  <h2 className="text-orange-500 font-semibold text-xl mb-3">
+                    Our Mission
+                  </h2>
+                  <p className="text-gray-300 mb-4">
+                    UptoSkill connects ambitious students with professional mentors,
+                    enabling hands-on project experience, valuable insights, and
+                    growth-oriented learning opportunities.
+                  </p>
 
-    <div className="mt-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
-      <h4 className="flex items-center gap-2 font-semibold text-gray-800 dark:text-white">
-        <Target className="w-4 h-4" /> Why students love UptoSkill
-      </h4>
-      <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-        UptoSkill helps students build real-world skills, gain recognition, and get ready for job opportunities through guided mentorship and verified achievements.
-      </p>
-    </div>
-  </section>
-</div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    What students can do
+                  </h3>
+                  <ul className="list-disc list-inside space-y-2 text-gray-300">
+                    <li>Collaborate with experienced mentors on real projects.</li>
+                    <li>Gain feedback to improve technical and soft skills.</li>
+                    <li>
+                      Build an impressive portfolio with industry-level guidance.
+                    </li>
+                  </ul>
+                  <hr className="border-gray-600 my-4" />
+                  <p className="text-gray-400 text-sm">
+                    We believe in practical learning and teamwork. UptoSkill helps
+                    students develop confidence and employable skills through
+                    mentorship, structured learning, and collaboration.
+                  </p>
+                </div>
 
-<div className="mt-6 border-t pt-6 text-sm text-gray-600 dark:text-gray-400">
-  <p>
-    UptoSkill is more than a platform—it's a growth partner for students. From guided learning to showcasing your capabilities, every feature is designed to help you reach your career goals.
-  </p>
-</div>
+                {/* Values Section */}
+                <div>
+                  <h2 className="text-orange-500 font-semibold text-xl mb-3">
+                    Values & Approach
+                  </h2>
+                  <p className="text-gray-300 mb-4">
+                    We value experiential learning that drives growth. UptoSkill is
+                    designed to make student learning interactive, collaborative,
+                    and career-focused.
+                  </p>
 
+                  <div className="bg-gray-700/60 p-4 rounded-xl">
+                    <h3 className="font-semibold text-orange-400 mb-1">
+                      Why students choose UptoSkill
+                    </h3>
+                    <p className="text-gray-300 text-sm">
+                      UptoSkill empowers students to explore new domains, get
+                      guidance from experts, and build a strong foundation for their
+                      future careers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      </motion.div>
-          
-              {/* Contact Info Section */}
-                    <section className="w-full mx-auto py-16 px-4 text-center bg-white">
-                      <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
-                      <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
-                      <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-                        Got a project in mind? We’d love to hear about it. Take five minutes to fill out our project form
-                        so that we can get to know you and understand your project.
-                      </p>
-              
-                      <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                        <a href ="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        >
-                        <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                          <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
-                          <h3 className="text-xl font-semibold mb-2">Get to Know Us:</h3>
-                          <p>www.Linked In.com</p>
-                        </div>
-                        </a>
-                         <a
-                      href="tel:+919319772294">
-                        <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                          <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
-                          <h3 className="text-xl font-semibold mb-2">Phone Us 24/7:</h3>
-                          <p className="text-gray-600">+91 (931) 977 2294</p>
-                        </div>
-                        </a>
-              
-                        <a
-                      href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      
-                      >
-                        <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                          <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-                          <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-                          <p className="text-gray-600">info@uptoskills.com</p>
-                        </div>
-                        </a>
-                      </div>
-                    </section>
-              
-    </div>
+            {/* Contact Section */}
+            <section className="mt-12 text-center">
+              <h3 className="text-orange-500 font-semibold tracking-wide">
+                OUR CONTACTS
+              </h3>
+              <h2 className="text-3xl font-bold mt-2 mb-4">
+                We’re here to Help You
+              </h2>
+              <p className="text-gray-400 max-w-3xl mx-auto mb-10">
+                Got a project in mind? We’d love to hear about it. Take a few
+                minutes to fill out our project form so we can get to know you
+                and understand your project.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                >
+                  <FaLinkedin
+                    className="text-orange-500 mx-auto mb-4"
+                    size={40}
+                  />
+                  <h3 className="text-lg font-semibold mb-2">Get to Know Us:</h3>
+                  <p className="text-gray-400">www.LinkedIn.com</p>
+                </a>
+
+                {/* Phone */}
+                <a
+                  href="tel:+919319772294"
+                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                >
+                  <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
+                  <h3 className="text-lg font-semibold mb-2">Phone Us 24/7:</h3>
+                  <p className="text-gray-400">+91 (931) 977 2294</p>
+                </a>
+
+                {/* Email */}
+                <a
+                  href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
+                  className="bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition border border-gray-700 hover:border-orange-500"
+                >
+                  <FaEnvelope
+                    className="text-orange-500 mx-auto mb-4"
+                    size={40}
+                  />
+                  <h3 className="text-lg font-semibold mb-2">Mail Us 24/7:</h3>
+                  <p className="text-gray-400">info@uptoskills.com</p>
+                </a>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <Footer />
+      </div>
     </div>
   );
 }

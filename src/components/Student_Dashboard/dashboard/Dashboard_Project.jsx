@@ -1,7 +1,7 @@
 import React from 'react'
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Footer from "./Footer";
+import Footer from "../../Project_Showcase/Footer";
 import ProjectModal from "../../Project_Showcase/ProjectModal";
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";

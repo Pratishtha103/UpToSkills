@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import Footer from "./Footer";
 
 export default function AboutUs() {
   return (
@@ -124,7 +125,7 @@ export default function AboutUs() {
                         </a>
                       </div>
                     </section>
-              
+              <Footer/>
     </div>
     </div>
   );

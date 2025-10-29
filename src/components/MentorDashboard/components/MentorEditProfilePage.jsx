@@ -18,7 +18,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
-const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -114,11 +114,9 @@ const MentorEditProfilePage = ({ isDarkMode, toggleDarkMode }) => {
   };
 
   return (
-    <div className={`flex min-h-screen ${isDarkMode ? "dark" : ""}`}>
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-
-      {/* ✅ Smart layout: flex column + justify-between keeps footer at bottom when content is short */}
-      <div className="flex flex-col flex-1 justify-between transition-all duration-300">
+    <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
+      <div className="flex-1 flex flex-col transition-all duration-300">
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}

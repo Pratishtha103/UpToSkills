@@ -31,15 +31,14 @@ import Datascience from './components/Programs/Datascience';
 import Cloudcompute from './components/Programs/Cloudcompute';
 import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
+import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 
 const queryClient = new QueryClient();
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
-  };
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,13 +62,12 @@ function App() {
           <Route path="/dashboard/profile" element={<UserProfilePage />} />
           <Route path="/dashboard/edit-profile" element={<EditProfilePage />} />
           <Route path="/dashboard/my-projects" element={<MyProjects />} />
-          <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/mentor-dashboard/skill-badges" element={<SkillBadgeForm isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} toggleDarkMode={toggleDarkMode} />} />
           <Route path="/dashboard/notifications" element={<NotificationsPage />} />
            <Route path="/student/skill-badges" element={<StudentSkillBadgesPage />} />
           <Route path="/dashboard/projects" element={<Dashboard_Project />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
-
           <Route path="/company" element={<CompanyDashboardHome />} />
           <Route path="/company-profile" element={<CompanyProfilePage />} />
 
@@ -89,6 +87,7 @@ function App() {
           <Route path='/cloud-computing' element={<Cloudcompute/>}/>
           <Route path='/cybersecurity' element={<Cybersecurity/>}/>
           <Route path='/thankyou' element={<Thankyou/>}/>
+          <Route path="/dashboard/aboutus" element={<AboutUs />} />
 
         </Routes>
       </Router>

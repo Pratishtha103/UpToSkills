@@ -13,7 +13,13 @@ const sidebarItems = [
   { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 
-const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode }) => {
+const Sidebar = ({
+  children,
+  isOpen: controlledIsOpen,
+  setIsOpen: controlledSetIsOpen,
+  isDarkMode,
+  setIsDarkMode,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,6 +30,7 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalOpen;
 
+  // ✅ Track window size for responsive sidebar
   useEffect(() => {
     const check = () => {
       const desktop = window.innerWidth >= 1024;
@@ -43,6 +50,7 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
     }
   };
 
+  // ✅ Highlight active route
   useEffect(() => {
     const currentItem =
       sidebarItems.find((item) => location.pathname === item.path) ||
@@ -50,6 +58,7 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
     if (currentItem) setActiveItem(currentItem.name);
   }, [location.pathname]);
 
+  // ✅ Listen for global sidebar toggle event
   const toggleHandlerRef = useRef();
   useEffect(() => {
     toggleHandlerRef.current = () => setOpen(!isOpen);
@@ -75,6 +84,7 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
     }, 500);
   };
 
+  // ✅ Dark mode dynamic classes
   const bgColor = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200";
   const hoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
@@ -85,8 +95,9 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
 
   return (
     <>
+      {/* ✅ Sidebar Container */}
       <motion.aside
-        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden ${bgColor}`}
+        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden transition-colors duration-300 ${bgColor}`}
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.28 }}
@@ -126,8 +137,8 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
             </nav>
           </div>
 
-          {/* Social Media and Logout */}
-          <div className={`p-4 border-t ${borderColor} text-center`}>
+          {/* Social Media + Logout */}
+          <div className={`p-4 border-t ${borderColor} text-center transition-colors duration-300`}>
             <p className="font-semibold text-sm mb-2 text-gray-500">Connect With Us</p>
             <div className="flex justify-center gap-4 mb-3">
               <FaLinkedin
@@ -164,8 +175,12 @@ const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetI
         </div>
       </motion.aside>
 
-      {/* Offset content */}
-      <div className={`transition-all duration-300 ${isOpen && isDesktop ? "ml-64" : "ml-0"}`}>
+      {/* ✅ Offset for main content */}
+      <div
+        className={`transition-all duration-300 ${
+          isOpen && isDesktop ? "ml-64" : "ml-0"
+        } ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
+      >
         {children}
       </div>
     </>

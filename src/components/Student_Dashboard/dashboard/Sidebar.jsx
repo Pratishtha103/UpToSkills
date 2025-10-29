@@ -10,6 +10,7 @@ import {
   ViewIcon,
   Book,
   Info,
+  Award
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
@@ -21,14 +22,13 @@ const sidebarItems = [
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
   { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
-<<<<<<< HEAD
+
   { id: "skillbadges", label: "Skill Badges", icon: Award, path: "/student/skill-badges" },
   // { id: "notifications", label: "Notifications", icon: Bell, path: "/dashboard/notifications" }
-=======
   { id: "projectshowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
   // ✅ New About Us section
   { id: "aboutus", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
->>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
+// >>>>>>> 10643f4906e20650359dd0a5d3a0fd789a2597ab
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {

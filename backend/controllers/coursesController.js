@@ -11,7 +11,7 @@ const ensureCoursesTable = async () => {
       description TEXT NOT NULL,
       image_path VARCHAR(255),
       enrolled integer[],
-      skills TEXT[],     -- Added skills array column
+      skills TEXT[],
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;

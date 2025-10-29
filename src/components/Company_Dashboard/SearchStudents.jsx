@@ -196,7 +196,7 @@ export default function SearchStudents() {
   // ---------- STUDENT DETAILS VIEW ----------
   if (selectedStudent && studentDetails) {
     return (
-      <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+      <div className="p-6  dark:bg-gray-900 min-h-screen transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <button
             onClick={handleBackToList}
@@ -206,7 +206,7 @@ export default function SearchStudents() {
             <b>Back to Students List</b>
           </button>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
+          <div className="dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
             {detailsLoading ? (
               <div className="flex justify-center items-center py-12">
                 <Loader className="w-8 h-8 animate-spin text-primary" />
@@ -278,17 +278,17 @@ export default function SearchStudents() {
                       <div className="flex flex-wrap gap-2">
                         {Array.isArray(studentDetails.domainsOfInterest)
                           ? studentDetails.domainsOfInterest.map((d, i) => (
-                              <span key={i} className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
+                              <span key={i} className=" dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
                                 {d}
                               </span>
                             ))
                           : (studentDetails.domainsOfInterest || "").toString().split(",").map((d, i) => d.trim() ? (
-                              <span key={i} className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
+                              <span key={i} className=" dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
                                 {d}
                               </span>
                             ) : null)}
                         {studentDetails.othersDomain && (
-                          <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm">
+                          <span className=" dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm">
                             {studentDetails.othersDomain}
                           </span>
                         )}
@@ -320,7 +320,7 @@ export default function SearchStudents() {
 
   // ---------- STUDENT LIST VIEW ----------
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <div className="p-6 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
         <SearchFilters
           filters={filters}
@@ -328,7 +328,7 @@ export default function SearchStudents() {
           onClearFilters={onClearFilters}
         />
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
+        <div className=" dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
             <input
@@ -341,7 +341,7 @@ export default function SearchStudents() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
+        <div className="dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Candidates ({filteredStudents.length})

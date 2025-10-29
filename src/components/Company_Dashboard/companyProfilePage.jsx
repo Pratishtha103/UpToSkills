@@ -51,6 +51,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
     fetchCompanyProfile();
   }, []);
 
+  
   return (
     <div
       className={`flex h-screen dashboard-container${
@@ -97,7 +98,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
             ) : companyData ? (
               <div className="flex w-full justify-center">
                 <div className="grid grid-cols-1 gap-6">
-                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full max-w-4xl border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl">
+                  <div className=" dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full max-w-4xl border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl">
                     {/* Card Header */}
                     <div className="border-b border-gray-100 dark:border-gray-800 pb-4 mb-3 flex items-center justify-between">
                       <h1 className="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
@@ -112,7 +113,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                       {companyData.logo_url && (
                         <section aria-labelledby="logo-heading">
                           <div className="flex justify-center py-1 rounded-full">
-                            <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full bg-white dark:bg-gray-900 shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]">
+                            <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full dark:bg-gray-900 shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]">
                               <img
                                 src={`http://localhost:5000${companyData.logo_url}`}
                                 alt={`${

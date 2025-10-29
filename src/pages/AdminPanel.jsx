@@ -19,7 +19,6 @@ import AdminNotifications from "../components/AdminPanelDashboard/AdminNotificat
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
 import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
-
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

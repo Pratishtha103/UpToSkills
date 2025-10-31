@@ -22,20 +22,33 @@ router.get('/count', async (req, res) => {
 });
 
 // Delete student by ID (keep as-is)
+// Delete student by ID safely: remove dependent rows in user_details first (transaction)
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
+  const client = await pool.connect();
 
   try {
-    const result = await pool.query('DELETE FROM students WHERE id = $1 RETURNING *', [id]);
+    await client.query('BEGIN');
+
+    // Remove dependent rows that reference this student to avoid FK violations.
+    // If you prefer cascading deletes at the DB level, alter the FK to use ON DELETE CASCADE instead.
+    await client.query('DELETE FROM user_details WHERE student_id = $1', [id]);
+
+    const result = await client.query('DELETE FROM students WHERE id = $1 RETURNING *', [id]);
 
     if (result.rowCount === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
 
+    await client.query('COMMIT');
     res.json({ success: true, message: 'Student deleted', data: result.rows[0] });
   } catch (err) {
-    console.error(err);
+    await client.query('ROLLBACK');
+    console.error('Error deleting student:', err);
     res.status(500).json({ success: false, message: 'Server error' });
+  } finally {
+    client.release();
   }
 });
 

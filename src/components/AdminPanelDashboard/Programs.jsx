@@ -1,19 +1,43 @@
+// src/components/AdminPanelDashboard/Programs.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrash } from "react-icons/fa";
-export default function Programs() {
+
+export default function Programs({ onCoursesUpdate }) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    skills: [""], // Dynamic skills array for input
   });
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [courses, setCourses] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSkillChange = (index, value) => {
+    const newSkills = [...formData.skills];
+    newSkills[index] = value;
+    setFormData((prev) => ({ ...prev, skills: newSkills }));
+  };
+
+  const addSkill = () => {
+    setFormData((prev) => ({ ...prev, skills: [...prev.skills, ""] }));
+  };
+
+  const removeSkill = (index) => {
+    const newSkills = formData.skills.filter((_, i) => i !== index);
+    setFormData((prev) => ({
+      ...prev,
+      skills: newSkills.length > 0 ? newSkills : [""],
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -28,11 +52,14 @@ export default function Programs() {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage("");
-
     try {
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
+      data.append(
+        "skills",
+        JSON.stringify(formData.skills.filter((skill) => skill.trim() !== ""))
+      );
       if (image) data.append("image", image);
 
       const res = await axios.post("http://localhost:5000/api/courses", data, {
@@ -40,10 +67,14 @@ export default function Programs() {
       });
 
       setMessage("✅ Course added successfully!");
-      setFormData({ title: "", description: ""});
+      setFormData({ title: "", description: "", skills: [""] });
       setImage(null);
       setPreview(null);
-      console.log("Saved course:", res.data);
+
+      // Update courses list in this component
+      setCourses((prev) => [res.data, ...prev]);
+      // Notify parent about the updated courses list
+      onCoursesUpdate && onCoursesUpdate(res.data);
     } catch (error) {
       console.error("Error adding course:", error);
       setMessage("❌ Failed to add course. Please try again.");
@@ -51,8 +82,6 @@ export default function Programs() {
       setIsSubmitting(false);
     }
   };
-
-  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -69,6 +98,7 @@ export default function Programs() {
         const data = await res.json();
         if (Array.isArray(data)) {
           setCourses(data);
+          onCoursesUpdate && onCoursesUpdate(data);
         } else {
           console.error("Invalid data format:", data);
           setCourses([]);
@@ -80,26 +110,27 @@ export default function Programs() {
     };
 
     fetchCourses();
-  }, []);
+  }, [onCoursesUpdate]);
 
   const removeCourse = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this course?")) 
-      return;
-    try{
-      const res = await fetch(`http://localhost:5000/api/courses/${id}`,
-        {method: "DELETE"}
-      );
-      const data=await res.json();
-      if(data.success){
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/courses/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
         setCourses((prev) => prev.filter((c) => c.id !== id));
-      }else{
+        onCoursesUpdate && onCoursesUpdate(courses.filter((c) => c.id !== id));
+      } else {
         alert(data.message || "Failed to delete course");
       }
-    }catch(err){
+    } catch (err) {
       console.error(err);
       alert("Error deleting course");
-      }
     }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-center px-6">
       <div className="bg-white dark:bg-gray-900 shadow-xl rounded-2xl flex flex-col justify-center items-center p-8 w-full max-w-lg">
@@ -138,7 +169,39 @@ export default function Programs() {
             />
           </div>
 
-          {/* File Upload */}
+          <div>
+            <label className="block mb-1 text-gray-700 dark:text-gray-300 font-medium">
+              Skills
+            </label>
+            {formData.skills.map((skill, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <input
+                  type="text"
+                  value={skill}
+                  onChange={(e) => handleSkillChange(index, e.target.value)}
+                  placeholder={`Skill ${index + 1}`}
+                  required={index === 0}
+                  className="flex-grow border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSkill(index)}
+                  disabled={formData.skills.length === 1}
+                  className="text-red-600 hover:text-red-800 font-bold"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addSkill}
+              className="text-blue-600 hover:text-blue-800 font-semibold"
+            >
+              + Add Skill
+            </button>
+          </div>
+
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-300 font-medium">
               Upload Image
@@ -157,7 +220,6 @@ export default function Programs() {
               />
             )}
           </div>
-
           <button
             type="submit"
             disabled={isSubmitting}
@@ -177,42 +239,6 @@ export default function Programs() {
           </p>
         )}
       </div>
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto px-6">
-        <h1 className="col-span-full text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Courses</h1>
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="bg-white dark:bg-gray-900 shadow-md rounded-lg overflow-hidden"
-          >
-            {course.image_path && (
-              <img
-                src={`http://localhost:5000${course.image_path}`}
-                alt={course.title}
-                className="w-full h-48 object-cover"
-              />
-            )}
-            <div className="p-4">
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
-                {course.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4"> {course.description}</p>
-              <button
-                onClick={() => removeCourse(course.id)}
-               className="text-xl flex items-center border border-gray-100 px-2 py-1 bg-red-600 text-white rounded-full">
-                <FaTrash className="size-4 pr-1"/>Delete
-              </button>
-            </div>
-          </div>
-        ))}
-        {
-          courses.length === 0 && (
-            <p className="text-gray-600 dark:text-gray-300 col-span-full text-center">
-              No courses available. Please add a course.
-            </p>
-          )
-        }
-      </div>*/}
-</div>
-      
+    </div>
   );
 }

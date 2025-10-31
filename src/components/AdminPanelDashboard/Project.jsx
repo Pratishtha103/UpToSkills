@@ -8,14 +8,12 @@ export default function Project({ isDarkMode }) {
   const [newProjectMentor, setNewProjectMentor] = useState("");
   const [newProjectStudents, setNewProjectStudents] = useState("");
 
-  // Apply dark or light mode globally
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) root.classList.add("dark");
     else root.classList.remove("dark");
   }, [isDarkMode]);
 
-  // Fetch all projects
   useEffect(() => {
     fetch("http://localhost:5000/api/mentor_projects")
       .then((res) => res.json())
@@ -26,7 +24,6 @@ export default function Project({ isDarkMode }) {
       .catch(() => setLoading(false));
   }, []);
 
-  // Add Project
   const addProject = async () => {
     if (!newProjectTitle || !newProjectMentor || !newProjectStudents) {
       alert("Please fill out all fields before adding a project.");
@@ -56,10 +53,8 @@ export default function Project({ isDarkMode }) {
     }
   };
 
-  // Delete Project
   const removeProject = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
       const res = await fetch(
@@ -74,6 +69,17 @@ export default function Project({ isDarkMode }) {
       console.error(err);
       alert("Error deleting project");
     }
+  };
+
+  // 🟢 Add Student (Frontend Only)
+  const handleAddStudent = (id) => {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === id
+          ? { ...project, total_students: project.total_students + 1 }
+          : project
+      )
+    );
   };
 
   return (
@@ -117,7 +123,16 @@ export default function Project({ isDarkMode }) {
             type="number"
             placeholder="Number of Students"
             value={newProjectStudents}
-            onChange={(e) => setNewProjectStudents(e.target.value)}
+            min="1"
+            max="20"
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value >= 1 && value <= 20) {
+                setNewProjectStudents(value);
+              } else if (e.target.value === "") {
+                setNewProjectStudents("");
+              }
+            }}
             className={`rounded-md p-2 border w-full transition-colors duration-300 ${
               isDarkMode
                 ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
@@ -138,7 +153,7 @@ export default function Project({ isDarkMode }) {
         </button>
       </div>
 
-      {/*  Projects List */}
+      {/* Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading
           ? Array.from({ length: 6 }).map((_, idx) => (
@@ -201,7 +216,9 @@ export default function Project({ isDarkMode }) {
                     <Trash2 className="w-4 h-4" /> Delete
                   </button>
 
+                  {/* 🟢 Add Student Button */}
                   <button
+                    onClick={() => handleAddStudent(project.id)}
                     className={`flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 transition-colors duration-300 ${
                       isDarkMode
                         ? "bg-green-600 hover:bg-green-500 text-white"

@@ -1,6 +1,7 @@
 // src/components/AboutSection.jsx
 import React from 'react';
 import Testimonials from './Testimonials';
+import communityImpact from"../../assets/community2.png"
 
 const AboutSection = () => {
   return (
@@ -102,8 +103,12 @@ const AboutSection = () => {
             </div>
 
             <div>
-              <img src="https://img.freepik.com/free-vector/successful-team-concept-illustration_114360-3966.jpg?semt=ais_hybrid&w=740" alt="Community Success" className="max-w-[600px] w-full mx-auto rounded-xl shadow-lg" />
+              <img src={communityImpact} alt="Community Success" className="max-w-[600px] w-full mx-auto rounded-xl shadow-lg" />
             </div>
+
+            
+
+
           </div>
         </div>
       </div>

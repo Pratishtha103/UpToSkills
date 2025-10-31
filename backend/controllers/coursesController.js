@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+
 const path = require('path');
 
 // --- Ensure table exists ---
@@ -9,7 +10,8 @@ const ensureCoursesTable = async () => {
       title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       image_path VARCHAR(255),
-      enrolled integer,
+      enrolled integer[],
+      skills TEXT[],
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -28,16 +30,28 @@ const addCourse = async (req, res) => {
     let imagePath = null;
 
     if (req.file) {
-      // store as relative path (for easy use in frontend)
+      // store as relative path (for frontend use)
       imagePath = `/uploads/${req.file.filename}`;
     }
 
+    // parse skills JSON string, fallback to empty array if invalid or missing
+    let skillsArray = [];
+    if (req.body.skills) {
+      try {
+        skillsArray = JSON.parse(req.body.skills);
+        if (!Array.isArray(skillsArray)) skillsArray = [];
+      } catch {
+        skillsArray = [];
+      }
+    }
+
     const insertQuery = `
-      INSERT INTO courses (title, description, image_path, enrolled)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO courses (title, description, image_path, enrolled, skills)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
     `;
-    const values = [title, description, imagePath, enrolled || null];
+
+    const values = [title, description, imagePath, enrolled || null, skillsArray];
 
     const { rows } = await pool.query(insertQuery, values);
 
@@ -79,11 +93,7 @@ const enrollStudent = async (req, res) => {
   const { studentId } = req.body; // student id to enroll
 
   try {
-    // 1️⃣ Get the course and enrolled students
-    const courseResult = await pool.query(
-      "SELECT enrolled FROM courses WHERE id = $1",
-      [id]
-    );
+    const courseResult = await pool.query("SELECT enrolled FROM courses WHERE id = $1", [id]);
 
     if (courseResult.rows.length === 0) {
       return res.status(404).json({ error: "Course not found" });
@@ -91,19 +101,13 @@ const enrollStudent = async (req, res) => {
 
     const enrolled = courseResult.rows[0].enrolled || [];
 
-    // 2️⃣ Check if student is already enrolled
     if (enrolled.includes(parseInt(studentId))) {
       return res.status(400).json({ error: "Student already enrolled" });
     }
 
-    // 3️⃣ Add studentId to array
     const updatedEnrolled = [...enrolled, parseInt(studentId)];
 
-    // 4️⃣ Update the course in the database
-    await pool.query(
-      "UPDATE courses SET enrolled = $1 WHERE id = $2",
-      [updatedEnrolled, id]
-    );
+    await pool.query("UPDATE courses SET enrolled = $1 WHERE id = $2", [updatedEnrolled, id]);
 
     res.status(200).json({ message: "Student enrolled successfully" });
   } catch (err) {

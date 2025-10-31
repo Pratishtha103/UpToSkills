@@ -1,18 +1,20 @@
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API = "http://localhost:5000";
+const API = "http://localhost:4000";
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [form, setForm] = useState({ name: "", role: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // ✅ success alert
+  const [success, setSuccess] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  // --- Fetch testimonials ---
   const fetchTestimonials = async () => {
     try {
       const res = await axios.get(`${API}/api/testimonials`);
@@ -27,7 +29,6 @@ const Testimonials = () => {
     fetchTestimonials();
   }, []);
 
-  // --- Form handling ---
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -46,8 +47,6 @@ const Testimonials = () => {
       setForm({ name: "", role: "", message: "" });
       setShowForm(false);
       setSuccess("✅ Your review has been submitted successfully!");
-
-      // Auto hide alert after 3 seconds
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       console.error(err);
@@ -57,24 +56,31 @@ const Testimonials = () => {
     }
   };
 
+  // --- Static Testimonials ---
+  const featuredTestimonials = [];
+
   return (
     <div className="relative bg-white rounded-2xl shadow-md p-6 flex flex-col justify-between h-[450px]">
-      <h3 className="font-semibold text-lg mb-4">Testimonials</h3>
+      <h3 className="font-semibold text-lg mb-3 text-gray-800 text-center">
+        Testimonials
+      </h3>
 
-      {/* --- Testimonials list --- */}
-      <div className="overflow-y-auto pr-2 h-[360px] space-y-4">
-        {testimonials.length === 0 ? (
+      {/* --- Scrollable testimonials list (VERTICAL) --- */}
+      <div className="overflow-y-auto pr-2 h-[350px] space-y-4 custom-scroll">
+        {[...featuredTestimonials, ...testimonials].length === 0 ? (
           <p className="text-gray-500 text-center">
             No testimonials yet — be the first to add one!
           </p>
         ) : (
-          testimonials.map((t, i) => (
+          [...featuredTestimonials, ...testimonials].map((t, i) => (
             <div
               key={i}
-              className="border-l-4 border-emerald-500 pl-4 text-left"
+              className="border-l-4 border-orange-500 pl-4 text-left bg-gray-50 hover:bg-gray-100 rounded-md transition-all duration-200 shadow-sm"
             >
-              <p className="italic text-[#334155] mb-2">“{t.message.trim()}”</p>
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="italic text-[#334155] mb-2 leading-relaxed text-sm">
+                “{t.message.trim()}”
+              </p>
+              <p className="text-sm text-gray-800 font-semibold">
                 – {t.name}
                 {t.role ? `, ${t.role}` : ""}
               </p>
@@ -88,14 +94,15 @@ const Testimonials = () => {
         )}
       </div>
 
-      {/* --- Button to open popup --- */}
+      {/* --- Add review button --- */}
       <div className="text-center mt-4">
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-[#FF6A28] text-white px-5 py-2 rounded hover:bg-[#e45f24] transition-all"
-        >
-          Give Review
-        </button>
+   <button
+  onClick={() => setShowForm(true)}
+  className="bg-[#FF6A28] text-white font-bold px-5 py-2 rounded hover:bg-green-500 transition-all duration-300"
+>
+  Give Review
+</button>
+
       </div>
 
       {/* ✅ Success Alert */}
@@ -109,7 +116,7 @@ const Testimonials = () => {
         </motion.div>
       )}
 
-      {/* --- Popup Modal --- */}
+      {/* --- Popup form --- */}
       {showForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <motion.div
@@ -124,7 +131,9 @@ const Testimonials = () => {
             >
               ✖
             </button>
-            <h4 className="font-semibold mb-4 text-xl">Add a Testimonial</h4>
+            <h4 className="font-semibold mb-4 text-xl text-gray-800 text-center">
+              Add a Testimonial
+            </h4>
             {error && <div className="text-red-500 mb-3">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">

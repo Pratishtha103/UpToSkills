@@ -1,5 +1,5 @@
-// src/pages/Index.jsx
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import Sidebar from "../components/Company_Dashboard/Sidebar";
 import Navbar from "../components/Company_Dashboard/Navbar";
 import StatCard from "../components/Company_Dashboard/StatCard";
@@ -10,15 +10,12 @@ import CompanyNotificationsPage from "../components/Company_Dashboard/CompanyNot
 import SearchStudents from "../components/Company_Dashboard/SearchStudents";
 import EditProfile from "../components/Company_Dashboard/EditProfile";
 import AboutCompanyPage from "../components/Company_Dashboard/AboutCompanyPage";
-import { Button } from "../components/Company_Dashboard/ui/button";
 import { motion } from "framer-motion";
 import {
   Users,
   Calendar as CalIcon,
   Award,
-  TrendingUp,
   UserCheck,
-  Target,
 } from "lucide-react";
 import boy from "../assets/boy2.png";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
@@ -36,7 +33,13 @@ const VALID_VIEWS = new Set([
 export default function Index() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentView, setCurrentView] = useState("dashboard");
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [totalMentors, setTotalMentors] = useState(0);
+  const [totalBadges, setTotalBadges] = useState(0);
 
+  // Filters
   const [filters, setFilters] = useState({
     name: "",
     domain: "All Domains",
@@ -44,19 +47,13 @@ export default function Index() {
     skillLevel: "All Skills",
   });
 
-  const [students, setStudents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-
-  // modal state
+  // Modal states
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactStudentId, setContactStudentId] = useState(null);
 
-
-  // --- read current user name from localStorage (fallbacks) ---
+  // Current user
   const rawUser =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   let currentUserName = "Account";
@@ -65,15 +62,14 @@ export default function Index() {
       const u = JSON.parse(rawUser);
       currentUserName = u.full_name || u.name || u.username || currentUserName;
     }
-  } catch (e) {
+  } catch {
     currentUserName = "Account";
   }
 
-  // --- dark mode state & effect ---
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // load from localStorage initially
-    return localStorage.getItem("theme") === "dark";
-  });
+  // Dark mode
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
@@ -83,25 +79,26 @@ export default function Index() {
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
+  const toggleDarkMode = () => setIsDarkMode((p) => !p);
 
-  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+  const interviewRef = useRef(null);
 
-  // ---------- Fetch students (CRA-safe) ----------
+  // ---------- Fetch Students + Mentor count ----------
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       setLoadingStudents(true);
       try {
         const API_BASE =
           process.env.REACT_APP_API_URL || "http://localhost:5000";
-        // eslint-disable-next-line no-console
-        console.info("[Index.jsx] Using API_BASE =", API_BASE);
 
-        const res = await fetch(`${API_BASE}/api/students`);
-        if (!res.ok)
-          throw new Error(`Failed to fetch students (status ${res.status})`);
+        const [studentsRes, mentorRes] = await Promise.all([
+          axios.get(`${API_BASE}/api/students`),
+          axios.get(`${API_BASE}/api/mentors/count`),
+        ]);
 
-        const json = await res.json();
-        const rows = Array.isArray(json.data) ? json.data : [];
+        const rows = Array.isArray(studentsRes.data.data)
+          ? studentsRes.data.data
+          : [];
 
         const formatted = rows.map((r) => {
           let domains = [];
@@ -118,7 +115,7 @@ export default function Index() {
                 domains = [trimmed];
               }
             }
-          } catch (e) {
+          } catch {
             domains = r.domains_of_interest
               ? [String(r.domains_of_interest)]
               : [];
@@ -144,141 +141,97 @@ export default function Index() {
             ai_skill_summary: r.ai_skill_summary || r.ai_skills || "",
             created_at:
               r.created_at || r.profile_created_at || new Date().toISOString(),
-            // preserve original raw data for debug if needed
             __raw: r,
           };
         });
 
         setStudents(formatted);
         setFilteredStudents(formatted);
+        setTotalMentors(mentorRes.data.totalMentors || 0);
+
+        // ✅ Calculate total badges
+        const totalBadgesCount = formatted.reduce(
+          (sum, s) => sum + (s.badges?.length || 0),
+          0
+        );
+        setTotalBadges(totalBadgesCount);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("Error fetching students:", err);
+        console.error("Error fetching data:", err);
         setStudents([]);
         setFilteredStudents([]);
+        setTotalMentors(0);
+        setTotalBadges(0);
       } finally {
         setLoadingStudents(false);
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
 
-  // ---------- Client-side filtering ----------
+  // ---------- Filtering ----------
   useEffect(() => {
     let filtered = students;
 
-    // Apply name filter
     if (filters.name.trim()) {
-      const nameQuery = filters.name.trim().toLowerCase();
-      filtered = filtered.filter((s) => {
-        const name =
-          (s.full_name || s.name || s.student_name || "")
-            .toString()
-            .toLowerCase();
-        return name.includes(nameQuery);
-      });
+      const q = filters.name.toLowerCase();
+      filtered = filtered.filter((s) =>
+        (s.full_name || "").toLowerCase().includes(q)
+      );
     }
 
-    // Apply domain filter
     if (filters.domain !== "All Domains") {
-      filtered = filtered.filter((s) => {
-        // Normalize domains: array, JSON string, comma-separated string, or plain string
-        let domains = "";
-        try {
-          if (Array.isArray(s.__raw?.domains_of_interest)) {
-            domains = s.__raw.domains_of_interest.join(" ");
-          } else if (typeof s.__raw?.domains_of_interest === "string") {
-            const trimmed = s.__raw.domains_of_interest.trim();
-            if (trimmed.startsWith("[")) {
-              try {
-                const parsed = JSON.parse(trimmed);
-                domains = Array.isArray(parsed) ? parsed.join(" ") : trimmed;
-              } catch {
-                domains = trimmed;
-              }
-            } else {
-              domains = trimmed;
-            }
-          } else if (Array.isArray(s.__raw?.domainsOfInterest)) {
-            domains = s.__raw.domainsOfInterest.join(" ");
-          } else if (s.__raw?.domainsOfInterest && typeof s.__raw.domainsOfInterest === "string") {
-            domains = s.__raw.domainsOfInterest;
-          } else {
-            domains = "";
-          }
-        } catch {
-          domains = "";
-        }
-
-        const others = (s.__raw?.others_domain || s.__raw?.othersDomain || "").toString().toLowerCase();
-        const combinedDomains = (domains.toLowerCase() + " " + others).trim();
-        // Check if the filter domain is contained in the combined domains string
-        return combinedDomains.includes(filters.domain.toLowerCase());
-      });
+      filtered = filtered.filter((s) =>
+        (s.domain || "").toLowerCase().includes(filters.domain.toLowerCase())
+      );
     }
 
     setFilteredStudents(filtered);
   }, [filters, students]);
 
-  // ---------- NEW: read requested view from localStorage on mount ----------
-  // If Sidebar wrote localStorage.setItem('company_view', someView) then we'll
-  // switch to that view after landing on /company.
-  // --- IMPORTANT: if requestedView === 'interviews' we show dashboard and scroll.
-  const interviewRef = useRef(null);
-
+  // ---------- LocalStorage view handling ----------
   useEffect(() => {
     try {
-      const requestedView = localStorage.getItem("company_view");
-      if (requestedView && VALID_VIEWS.has(requestedView)) {
-        // If the request is 'interviews' we want to show the dashboard and scroll to interviews.
-        if (requestedView === "interviews") {
+      const view = localStorage.getItem("company_view");
+      if (view && VALID_VIEWS.has(view)) {
+        if (view === "interviews") {
           setCurrentView("dashboard");
-          // small delay so DOM/layout is ready before scrolling
           setTimeout(() => {
-            interviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            interviewRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
           }, 80);
         } else {
-          setCurrentView(requestedView);
+          setCurrentView(view);
         }
       }
-      // remove the flag so it doesn't persist
       localStorage.removeItem("company_view");
-    } catch (e) {
-      // ignore localStorage issues
-      // eslint-disable-next-line no-console
-      console.warn("Could not read/clear company_view from localStorage", e);
-    }
-    // run only once on mount
+    } catch { }
   }, []);
 
   // ---------- Handlers ----------
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-
-  // handleSidebarClick used when Sidebar calls onItemClick while staying on same page
-  // or for compatibility; clicking in Sidebar from other pages sets localStorage + navigates
-  const handleSidebarClick = (viewId) => {
-    if (!viewId) return;
-
-    // Special case: if interviews clicked, show dashboard and scroll down to interviews
-    if (viewId === "interviews") {
+  const toggleSidebar = () => setIsSidebarOpen((p) => !p);
+  const handleSidebarClick = (v) => {
+    if (!v) return;
+    if (v === "interviews") {
       setCurrentView("dashboard");
-      // small delay to ensure DOM updated, then scroll
       setTimeout(() => {
-        interviewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        interviewRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }, 60);
       return;
     }
-
-    if (VALID_VIEWS.has(viewId)) {
-      setCurrentView(viewId);
-      // scroll to top for dashboard-like views
+    if (VALID_VIEWS.has(v)) {
+      setCurrentView(v);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleFilterChange = (key, value) =>
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((p) => ({ ...p, [key]: value }));
   const clearFilters = () =>
     setFilters({
       name: "",
@@ -288,20 +241,15 @@ export default function Index() {
     });
 
   const handleViewProfile = (student) => {
-    // Accept either the whole student object or an id
-    const s =
-      student && (typeof student === "object" ? student : { id: student });
-    setSelectedStudent(s);
+    setSelectedStudent(student);
     setIsModalOpen(true);
-    // eslint-disable-next-line no-console
-    console.log("View profile for student:", s);
   };
-  const handleContact = (studentId) => {
-    setContactStudentId(studentId);
+  const handleContact = (id) => {
+    setContactStudentId(id);
     setIsContactModalOpen(true);
   };
 
-  // ================= VIEWS =================
+  // ---------- VIEWS ----------
   if (currentView === "notifications") {
     return (
       <div className="flex min-h-screen bg-gray-50">
@@ -311,7 +259,7 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
             }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
@@ -332,7 +280,7 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
             }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
@@ -353,7 +301,7 @@ export default function Index() {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
             }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
@@ -365,18 +313,17 @@ export default function Index() {
     );
   }
 
-  // <-- PLACE ABOUT-US VIEW RIGHT HERE (after edit-profile, before dashboard) -->
   if (currentView === "about-us") {
     return (
-      <div className="flex min-h-screen darg:bg-gray-900">
+      <div className="flex min-h-screen dark:bg-gray-900">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex flex-col transition-all duration-300 ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"} ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-            }`}
+          className={`flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+            } text-gray-900 dark:text-white`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex flex-grow">
@@ -387,52 +334,43 @@ export default function Index() {
     );
   }
 
-
-  // ================= DASHBOARD =================
+  // ---------- DASHBOARD ----------
   return (
-    <div className={`flex min-h-screen transition-all duration-300 dark:bg-gray-900`}>
+    <div className="flex min-h-screen dark:bg-gray-900">
       <Sidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
         onItemClick={handleSidebarClick}
       />
-
       <div
-        className={`flex-1 flex flex-col  transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
+        className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
           }`}
       >
         <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
-
-        {/* note: reduced horizontal padding (px-2 sm:px-4) and centered with max width */}
         <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto w-full">
-          {/* Hero Section */}
+          {/* Hero */}
           <motion.section
-            className={`hero-gradient rounded-2xl p-6 sm:p-6 mb-8 text-white ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
-              }`}
+            className="hero-gradient rounded-2xl p-6 sm:p-6 mb-8"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-1 items-center ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
-              }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 items-center">
               <div>
                 <motion.h1
-                  className="text-3xl sm:text-4xl font-bold mb-8 select-none 
-               text-gray-800 dark:text-white"
+                  className="text-3xl sm:text-4xl font-bold mb-8 text-gray-800 dark:text-white"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
                   Welcome to{" "}
-                  <span className="bg-gradient-to-r from-[#01BDA5] via-[#43cea2] to-[#FF824C] bg-clip-text text-transparent font-extrabold drop-shadow-lg">
+                  <span className="bg-gradient-to-r from-[#01BDA5] via-[#43cea2] to-[#FF824C] bg-clip-text text-transparent font-extrabold">
                     UptoSkill
                   </span>{" "}
                   Hiring Dashboard
                 </motion.h1>
-
                 <motion.p
-                  className="text-base sm:text-xl mb-4 select-none 
-               text-gray-600 dark:text-gray-300"
+                  className="text-base sm:text-xl mb-4 text-gray-600 dark:text-gray-300"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -440,22 +378,12 @@ export default function Index() {
                   Discover talented students, schedule interviews, and build
                   your dream team with our comprehensive hiring platform.
                 </motion.p>
-
-                <motion.div
-                  className="flex flex-wrap gap-4"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  {/* optional CTA buttons */}
-                </motion.div>
               </div>
-
               <div className="mt-6 lg:mt-0">
                 <motion.img
                   src={boy}
                   alt="Programmer"
-                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-[340px] h-auto mx-auto drop-shadow-2xl"
+                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-[340px] mx-auto"
                   style={{ borderRadius: "2rem" }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -465,7 +393,7 @@ export default function Index() {
             </div>
           </motion.section>
 
-          {/* Stats Section */}
+          {/* Stats */}
           <section className="mb-8">
             <motion.h2
               className="text-2xl font-bold text-foreground mb-6"
@@ -475,7 +403,7 @@ export default function Index() {
             >
               Hiring Overview
             </motion.h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 dark:text-foreground-white ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatCard
                 title="Total Students Available"
                 value={students.length}
@@ -490,19 +418,19 @@ export default function Index() {
                 subtitle="This week"
                 icon={CalIcon}
                 color="secondary"
-                delay={0.2}
-              />
-              <StatCard
-                title="Mentored Students"
-                value="156"
-                subtitle="Active mentorships"
-                icon={UserCheck}
-                color="success"
                 delay={0.3}
               />
               <StatCard
-                title="Verified Badges"
-                value="1,923"
+                title="Total Mentors"
+                value={totalMentors}
+                subtitle="Active mentors"
+                icon={UserCheck}
+                color="success"
+                delay={0.2}
+              />
+              <StatCard
+                title="Verified Skill Badges"
+                value={totalBadges}
                 subtitle="Across all students"
                 icon={Award}
                 color="warning"
@@ -511,7 +439,7 @@ export default function Index() {
             </div>
           </section>
 
-          {/* Student Section */}
+          {/* Students */}
           <section className="mb-8">
             <motion.h2
               className="text-2xl font-bold text-foreground mb-6"
@@ -521,13 +449,11 @@ export default function Index() {
             >
               Find the Perfect Candidate
             </motion.h2>
-
             <SearchFilters
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={clearFilters}
             />
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {loadingStudents ? (
                 <div className="col-span-full text-center py-12">
@@ -551,26 +477,23 @@ export default function Index() {
             </div>
           </section>
 
-          {/* Interviews Section (this is the scroll target) */}
+          {/* Interviews */}
           <section ref={interviewRef} className="mb-8">
             <InterviewsSection />
           </section>
         </div>
 
-        {/* Student Profile Modal */}
         <StudentProfileModal
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           student={selectedStudent}
-          fetchFresh={true}
+          fetchFresh
         />
-
         <ContactModal
           open={isContactModalOpen}
           studentId={contactStudentId}
           onClose={() => setIsContactModalOpen(false)}
         />
-
       </div>
     </div>
   );

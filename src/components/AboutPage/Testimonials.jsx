@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API = "http://localhost:5000";
+const API = "http://localhost:4000";
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -57,38 +57,7 @@ const Testimonials = () => {
   };
 
   // --- Static Testimonials ---
-  const featuredTestimonials = [
-    {
-      name: "Aarav Sharma",
-      role: "Frontend Developer Intern",
-      message:
-        "Working at UpToSkills helped me gain real-world experience in React.js and teamwork.",
-    },
-    {
-      name: "Priya Singh",
-      role: "UI/UX Designer",
-      message:
-        "Amazing mentors and supportive peers! I learned to turn creative ideas into clean UI designs.",
-    },
-    {
-      name: "Rohan Mehta",
-      role: "Full Stack Developer Trainee",
-      message:
-        "Got hands-on exposure to backend integration and API handling — truly a great experience!",
-    },
-    {
-      name: "Sneha Patel",
-      role: "React Intern",
-      message:
-        "Loved the collaborative environment! Everyone is so helpful and encouraging.",
-    },
-    {
-      name: "Karan Verma",
-      role: "MERN Stack Developer",
-      message:
-        "UpToSkills gave me the perfect balance of learning and practical exposure to real projects.",
-    },
-  ];
+  const featuredTestimonials = [];
 
   return (
     <div className="relative bg-white rounded-2xl shadow-md p-6 flex flex-col justify-between h-[450px]">

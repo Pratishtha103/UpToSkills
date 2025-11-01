@@ -25,7 +25,7 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 bg-black-60 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 bg-black-60 dark:bg-gray-800 pb-2 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -79,7 +79,7 @@ export default function Navbar({ onMenuClick }) {
               {isDarkMode ? (
                 <Sun className="w-5 h-5 text-white" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-black" />
               )}
             </Button>
           </motion.div>

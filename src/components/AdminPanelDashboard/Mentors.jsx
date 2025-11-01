@@ -37,7 +37,7 @@ export default function Mentors({ isDarkMode }) {
 
   const fetchMentors = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/mentors`);
+      const res = await axios.get('http://localhost:5000/api/mentors');
       setMentors(res.data || []);
     } catch (err) {
       console.error('Failed to load mentors', err);

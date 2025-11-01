@@ -108,6 +108,10 @@ export default function AdminSidebar({
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-1">
               {sidebarItems.map((item, index) => {
+                if(item.id === "courses") {
+                  return null; // Hide Courses section
+                  // const Active = activeSection === item.courses;
+                }
                 const Icon = item.icon;
                 const isActive = activeSection === item.id;
                 return (

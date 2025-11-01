@@ -143,9 +143,9 @@ function App() {
           } />
 
           <Route path="/contact" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <ContactPage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/projectShowcase" element={
@@ -172,19 +172,19 @@ function App() {
             // </ProtectedRoute>
           } />
           <Route path='/data-science' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Datascience />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cloud-computing' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cloudcompute />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cybersecurity' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cybersecurity />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/thankyou' element={
             // <ProtectedRoute>

@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card } from "../Company_Dashboard/ui/card";
 import { Button } from "../Company_Dashboard/ui/button";
 import { Badge } from "../Company_Dashboard/ui/badge";
 import { Input } from "../Company_Dashboard/ui/input";
 import { Label } from "../Company_Dashboard/ui/label";
-import Footer from "../AboutPage/Footer";
 import {
   Select,
   SelectContent,
@@ -20,56 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../Company_Dashboard/ui/dialog";
-import {
-  Calendar,
-  Clock,
-  Video,
-  Phone,
-  Trash,
-} from "lucide-react";
-
-/* -------------------------------------------------------------------------- */
-/* Mock data (replace with API later)                                         */
-/* -------------------------------------------------------------------------- */
-
-let initialInterviews = [
-  {
-    id: "1",
-    candidateName: "Sarah Johnson",
-    position: "React Developer",
-    date: "2024-07-20",
-    time: "10:00",
-    type: "video",
-    status: "scheduled",
-  },
-  {
-    id: "2",
-    candidateName: "Mike Chen",
-    position: "Data Scientist",
-    date: "2024-07-20",
-    time: "14:00",
-    type: "video",
-    status: "scheduled",
-  },
-  {
-    id: "3",
-    candidateName: "Emily Rodriguez",
-    position: "UI/UX Designer",
-    date: "2024-07-21",
-    time: "11:30",
-    type: "phone",
-    status: "scheduled",
-  },
-  {
-    id: "4",
-    candidateName: "David Lee",
-    position: "Full Stack Developer",
-    date: "2024-07-22",
-    time: "15:00",
-    type: "in-person",
-    status: "scheduled",
-  },
-];
+import { Calendar, Clock, Video, Phone, Trash } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
 /* Styling Helpers                                                            */
@@ -77,8 +28,8 @@ let initialInterviews = [
 
 const statusColors = {
   scheduled: "bg-primary text-primary-foreground",
-  completed: "bg-success text-success-foreground",
-  cancelled: "bg-destructive text-destructive-foreground",
+  completed: "bg-green-500 text-white",
+  cancelled: "bg-red-600 text-white",
 };
 
 const typeIcons = {
@@ -92,11 +43,7 @@ const typeIcons = {
 /* -------------------------------------------------------------------------- */
 
 export default function InterviewsSection() {
-  const [interviews, setInterviews] = useState(() => {
-    const stored = localStorage.getItem("company_interviews");
-    return stored ? JSON.parse(stored) : initialInterviews;
-  });
-
+  const [interviews, setInterviews] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newInterview, setNewInterview] = useState({
     candidateName: "",
@@ -105,63 +52,69 @@ export default function InterviewsSection() {
     time: "",
     type: "",
   });
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editInterview, setEditInterview] = useState(null);
 
-  // Save to localStorage whenever interviews change
+  // Fetch all interviews from backend
   useEffect(() => {
-    localStorage.setItem("company_interviews", JSON.stringify(interviews));
-  }, [interviews]);
+    axios
+      .get("http://localhost:5000/api/interviews")
+      .then((res) => setInterviews(res.data))
+      .catch((err) => console.error("Error fetching interviews:", err));
+  }, []);
 
+  // Add new interview
   const handleScheduleInterview = () => {
     if (
-      newInterview.candidateName &&
-      newInterview.position &&
-      newInterview.date &&
-      newInterview.time &&
-      newInterview.type
+      !newInterview.candidateName ||
+      !newInterview.position ||
+      !newInterview.date ||
+      !newInterview.time ||
+      !newInterview.type
     ) {
-      const interview = {
-        id: Date.now().toString(),
-        ...newInterview,
-        status: "scheduled",
-      };
-      const updated = [...interviews, interview];
-      setInterviews(updated);
-      setNewInterview({
-        candidateName: "",
-        position: "",
-        date: "",
-        time: "",
-        type: "",
-      });
-      setIsModalOpen(false);
+      alert("Please fill all fields.");
+      return;
     }
+
+    axios
+      .post("http://localhost:5000/api/interviews", newInterview)
+      .then((res) => {
+        setInterviews([...interviews, res.data]);
+        setIsModalOpen(false);
+        setNewInterview({
+          candidateName: "",
+          position: "",
+          date: "",
+          time: "",
+          type: "",
+        });
+      })
+      .catch((err) => console.error("Error scheduling interview:", err));
   };
 
+  // Delete interview
   const handleDeleteInterview = (id) => {
-    const updatedInterviews = interviews.filter(
-      (interview) => interview.id !== id
-    );
-    setInterviews(updatedInterviews);
+    axios
+      .delete(`http://localhost:5000/api/interviews/${id}`)
+      .then(() => {
+        setInterviews(interviews.filter((int) => int.id !== id));
+      })
+      .catch((err) => console.error("Error deleting interview:", err));
   };
 
+  // Edit / Reschedule interview
   const handleEditSave = () => {
-    if (
-      editInterview.candidateName &&
-      editInterview.position &&
-      editInterview.date &&
-      editInterview.time &&
-      editInterview.type
-    ) {
-      const updatedInterviews = interviews.map((int) =>
-        int.id === editInterview.id ? editInterview : int
-      );
-      setInterviews(updatedInterviews);
-      setIsEditModalOpen(false);
-      setEditInterview(null);
-    }
+    axios
+      .put(`http://localhost:5000/api/interviews/${editInterview.id}`, editInterview)
+      .then((res) => {
+        const updated = interviews.map((int) =>
+          int.id === editInterview.id ? res.data : int
+        );
+        setInterviews(updated);
+        setIsEditModalOpen(false);
+        setEditInterview(null);
+      })
+      .catch((err) => console.error("Error updating interview:", err));
   };
 
   return (
@@ -195,10 +148,7 @@ export default function InterviewsSection() {
             <div className="grid gap-4 py-4">
               {["candidateName", "position", "date", "time", "type"].map(
                 (field) => (
-                  <div
-                    key={field}
-                    className="grid grid-cols-4 items-center gap-4"
-                  >
+                  <div key={field} className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor={field} className="text-right dark:text-gray-200 capitalize">
                       {field === "candidateName" ? "Candidate Name" : field}
                     </Label>
@@ -255,7 +205,7 @@ export default function InterviewsSection() {
       {/* Interview Cards */}
       <div className="grid gap-4">
         {interviews.map((interview, index) => {
-          const TypeIcon = typeIcons[interview.type];
+          const TypeIcon = typeIcons[interview.type] || Calendar;
 
           return (
             <motion.div
@@ -264,43 +214,37 @@ export default function InterviewsSection() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card
-                className="p-4 h-full flex flex-col border-2 border-transparent transition-all duration-300 bg-gray-50 dark:bg-gray-800 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_4px_rgba(59,130,246,0.4)] rounded-2xl"
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#3B82F6";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "transparent";
-                }}
-              >
+              <Card className="p-4 h-full flex flex-col border-2 border-transparent transition-all duration-300 bg-gray-50 dark:bg-gray-800 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_4px_rgba(59,130,246,0.4)] rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                   {/* Candidate Info */}
                   <div className="flex items-center gap-2">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      {interview.candidateName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                      {interview.candidate_name
+                        ? interview.candidate_name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                        : interview.candidateName
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground dark:text-white text-base sm:text-lg">
-                        {interview.candidateName}
+                        {interview.candidate_name || interview.candidateName}
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        {interview.position}
+                        {interview.role || interview.position}
                       </p>
                     </div>
                   </div>
 
                   {/* Date, Time, Status, Buttons */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full lg:w-auto">
-                    {/* Date & Time */}
                     <div className="flex flex-col text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        <span>
-                          {new Date(interview.date).toLocaleDateString()}
-                        </span>
+                        <span>{new Date(interview.date).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
@@ -308,17 +252,13 @@ export default function InterviewsSection() {
                       </div>
                     </div>
 
-                    {/* Status */}
                     <div className="flex items-center gap-2">
                       <TypeIcon className="w-5 h-5 text-primary" />
-                      <Badge
-                        className={`${statusColors[interview.status]} capitalize`}
-                      >
+                      <Badge className={`${statusColors[interview.status]} capitalize`}>
                         {interview.status}
                       </Badge>
                     </div>
 
-                    {/* Buttons */}
                     <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
@@ -353,65 +293,55 @@ export default function InterviewsSection() {
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <DialogContent className="sm:max-w-[425px] dark:bg-gray-900">
             <DialogHeader>
-              <DialogTitle className="dark:text-white">
-                Reschedule Interview
-              </DialogTitle>
+              <DialogTitle className="dark:text-white">Reschedule Interview</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              {["candidateName", "position", "date", "time", "type"].map(
-                (field) => (
-                  <div
-                    key={field}
-                    className="grid grid-cols-4 items-center gap-4"
-                  >
-                    <Label htmlFor={field} className="text-right dark:text-gray-200 capitalize">
-                      {field === "candidateName" ? "Candidate Name" : field}
-                    </Label>
-                    {field === "type" ? (
-                      <Select
-                        value={editInterview.type}
-                        onValueChange={(value) =>
-                          setEditInterview({ ...editInterview, type: value })
-                        }
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select interview type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="video">Video</SelectItem>
-                          <SelectItem value="phone">Phone</SelectItem>
-                          <SelectItem value="in-person">In-person</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        id={field}
-                        type={
-                          field === "date"
-                            ? "date"
-                            : field === "time"
-                            ? "time"
-                            : "text"
-                        }
-                        value={editInterview[field]}
-                        onChange={(e) =>
-                          setEditInterview({
-                            ...editInterview,
-                            [field]: e.target.value,
-                          })
-                        }
-                        className="col-span-3"
-                      />
-                    )}
-                  </div>
-                )
-              )}
+              {["candidateName", "position", "date", "time", "type"].map((field) => (
+                <div key={field} className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor={field} className="text-right dark:text-gray-200 capitalize">
+                    {field === "candidateName" ? "Candidate Name" : field}
+                  </Label>
+                  {field === "type" ? (
+                    <Select
+                      value={editInterview.type}
+                      onValueChange={(value) =>
+                        setEditInterview({ ...editInterview, type: value })
+                      }
+                    >
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select interview type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="video">Video</SelectItem>
+                        <SelectItem value="phone">Phone</SelectItem>
+                        <SelectItem value="in-person">In-person</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      id={field}
+                      type={
+                        field === "date"
+                          ? "date"
+                          : field === "time"
+                          ? "time"
+                          : "text"
+                      }
+                      value={editInterview[field]}
+                      onChange={(e) =>
+                        setEditInterview({
+                          ...editInterview,
+                          [field]: e.target.value,
+                        })
+                      }
+                      className="col-span-3"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
             <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsEditModalOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
                 Cancel
               </Button>
               <Button onClick={handleEditSave}>Save Changes</Button>

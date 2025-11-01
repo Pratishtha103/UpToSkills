@@ -52,13 +52,13 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Landing />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/about" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <div>
                 <Header />
                 <HeroSection />
@@ -66,13 +66,13 @@ function App() {
                 <Footer />
                 <Chatbot />
               </div>
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/programs" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <ProgramsPage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/dashboard" element={
@@ -143,9 +143,9 @@ function App() {
           } />
 
           <Route path="/contact" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <ContactPage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/projectShowcase" element={
@@ -167,29 +167,29 @@ function App() {
           } />
 
           <Route path='/programForm/:id' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Webdev />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/data-science' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Datascience />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cloud-computing' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cloudcompute />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cybersecurity' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cybersecurity />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/thankyou' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Thankyou />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path="/dashboard/aboutus" element={
             <ProtectedRoute>

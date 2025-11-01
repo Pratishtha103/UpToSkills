@@ -38,8 +38,11 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const location = useLocation();
-  if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
-  return children;
+  return children; // disable login protection
+
+  //if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
+  //return children;
+
 }
 
 function App() {

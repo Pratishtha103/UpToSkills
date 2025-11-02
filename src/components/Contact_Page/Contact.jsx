@@ -21,7 +21,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await submitForm('https://your-backend-url.com/api/contact', formData);
+    await submitForm('http://localhost:5000/api/form/contact', formData);
   };
 
   return (

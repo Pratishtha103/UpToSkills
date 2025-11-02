@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 
+
 const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   const [stats, setStats] = useState({
     students: null,

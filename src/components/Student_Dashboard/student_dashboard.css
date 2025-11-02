@@ -795,3 +795,7 @@ body {
 }
 
 
+/* FIX: Dark mode override for the base page background */
+.dark body { 
+    background-color: #1f2937 !important; /* Use a dark color matching your main-content */
+}

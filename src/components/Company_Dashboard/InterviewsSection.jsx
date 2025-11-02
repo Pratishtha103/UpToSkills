@@ -5,7 +5,8 @@ import { Button } from "../Company_Dashboard/ui/button";
 import { Badge } from "../Company_Dashboard/ui/badge";
 import { Input } from "../Company_Dashboard/ui/input";
 import { Label } from "../Company_Dashboard/ui/label";
-import Footer from "../AboutPage/Footer";
+//import Footer from "../AboutPage/Footer";
+//import Footer from "about_page/Footer";
 import {
   Select,
   SelectContent,

@@ -27,9 +27,9 @@ import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
 import Webdev from './components/Programs/Webdev';
-import Datascience from './components/Programs/Datascience';
-import Cloudcompute from './components/Programs/Cloudcompute';
-import Cybersecurity from './components/Programs/Cybersecurity';
+// import Datascience from './components/Programs/Datascience';
+// import Cloudcompute from './components/Programs/Cloudcompute';
+// import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 
@@ -171,7 +171,7 @@ function App() {
               <Webdev />
             // </ProtectedRoute>
           } />
-          <Route path='/data-science' element={
+          {/* <Route path='/data-science' element={
             // <ProtectedRoute>
               <Datascience />
             // </ProtectedRoute>
@@ -185,7 +185,7 @@ function App() {
             // <ProtectedRoute>
               <Cybersecurity />
             // </ProtectedRoute>
-          } />
+          } /> */}
           <Route path='/thankyou' element={
             // <ProtectedRoute>
               <Thankyou />

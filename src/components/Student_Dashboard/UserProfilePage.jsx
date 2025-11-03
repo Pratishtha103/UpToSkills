@@ -472,7 +472,7 @@ const UserProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  //  Dark mode toggle
+  // ✅zz Dark mode toggle
   useEffect(() => {
     if (isDarkMode) document.documentElement.classList.add("dark");
     else document.documentElement.classList.remove("dark");
@@ -481,7 +481,7 @@ const UserProfilePage = () => {
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
-  // Fetch user profile from backend
+  // ✅ Fetch user profile from backend
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -522,10 +522,10 @@ const UserProfilePage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-all duration-500">
-      {/* Sidebar */}
+      {/* ✅ Sidebar */}
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
 
-      {/*  Main Content Area */}
+      {/* ✅ Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
         <Header
@@ -534,7 +534,7 @@ const UserProfilePage = () => {
           toggleDarkMode={toggleDarkMode}
         />
 
-        {/*  Centered Card like ProjectSubmissionForm */}
+        {/* ✅ Centered Card like ProjectSubmissionForm */}
         <motion.div
   className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8"
   animate={{
@@ -619,7 +619,7 @@ const UserProfilePage = () => {
 </motion.div>
 
 
-        {/*  Footer */}
+        {/* ✅ Footer */}
         <Footer />
       </div>
     </div>

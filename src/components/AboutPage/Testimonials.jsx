@@ -1,11 +1,8 @@
-
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API = "http://localhost:4000";
+const API = "http://localhost:5000";
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -72,10 +69,10 @@ const Testimonials = () => {
             No testimonials yet — be the first to add one!
           </p>
         ) : (
-          [...featuredTestimonials, ...testimonials].map((t, i) => (
+          [...testimonials].map((t, i) => (
             <div
               key={i}
-              className="border-l-4 border-orange-500 pl-4 text-left bg-gray-50 hover:bg-gray-100 rounded-md transition-all duration-200 shadow-sm"
+              className="border-l-4 border-green-500 pl-4 text-left bg-gray-50 hover:bg-gray-100 rounded-md transition-all duration-200 shadow-sm"
             >
               <p className="italic text-[#334155] mb-2 leading-relaxed text-sm">
                 “{t.message.trim()}”

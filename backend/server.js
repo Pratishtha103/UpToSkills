@@ -3,8 +3,9 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
-// Import database connection
+// Database connection
 const pool = require('./config/database');
 
 // Import routes
@@ -14,38 +15,32 @@ const projectsRoutes = require('./routes/projects');
 const mentorProjectRoutes = require('./routes/mentor_projects');
 const mentorReviewRoutes = require('./routes/mentorReviews');
 const companyProfilesRoutes = require('./routes/companyProfiles.route');
-
 const statsRoutes = require("./routes/stats");
 const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
 const companiesRoutes = require('./routes/companies.route');
 const searchStudent = require('./routes/searchStudents');
-
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
-
 const coursesRoutes = require('./routes/courses.route');
+
+// ✅ Import the interviews route
+const interviewRoutes = require('./routes/interviews');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const path = require('path');
-
-app.post('/api/test', (req, res) => {
-    res.status(200).send("Test route working!");
-})
-
-// Serve uploads folder correctly
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000', // React frontend port
+    origin: 'http://localhost:3000', // React frontend
     credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploads folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // API Routes
 app.use('/api', userProfileRoutes);
@@ -58,17 +53,16 @@ app.use('/api/students', studentsRoutes);
 app.use('/api/mentors', mentorsRoutes);
 app.use('/api/company-profiles', companyProfilesRoutes);
 app.use("/api/testimonials", testimonialsRouter);
-
 app.use("/api/stats", statsRoutes);
-
 app.use('/api/students', searchStudent);
-
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
-
 app.use('/api/courses', coursesRoutes);
 
-// Health check endpoint
+// ✅ Connect the interviews route
+app.use('/api/interviews', interviewRoutes);
+
+// Health check
 app.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -97,6 +91,6 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Health check available at: http://localhost:${PORT}/health`);
+    console.log(`✅ Server is running on port ${PORT}`);
+    console.log(`🌐 Health check: http://localhost:${PORT}/health`);
 });

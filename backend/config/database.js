@@ -19,7 +19,6 @@ const pool = new Pool({
 // The pool will connect lazily when a query is executed.
 
 // Optional: A safe, async connection test function if you want to run it on server startup:
-
 async function testDbConnection() {
   try {
     const client = await pool.connect();
@@ -29,6 +28,7 @@ async function testDbConnection() {
     console.error('Error connecting to the database:', err.stack);
   }
 }
-testDbConnection();
+testDbConnection(); // You could call this once in server.js instead.
+
 
 module.exports = pool;

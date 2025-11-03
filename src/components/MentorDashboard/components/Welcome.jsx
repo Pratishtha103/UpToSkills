@@ -4,7 +4,7 @@ function WelcomeSection() {
   const mentorName = mentorData && mentorData.name? mentorData.name : "Mentor";
 
   return (
-    <div className="welcome-section">
+    <div className="welcome-section flex bg-gray-100 p-2 rounded-2xl">
       <div className="welcome-content">
         <section className="p-6 rounded-2xl mb-8 transition-all duration-300 bg-gray-100 dark:bg-[#1e293b]">
   <h2 className="text-3xl font-bold mb-2 transition-colors text-gray-800 dark:text-white">
@@ -19,6 +19,7 @@ function WelcomeSection() {
   <p className="font-medium transition-colors text-blue-600 dark:text-blue-400">
 Let’s turn your mentorship into meaningful impact!
   </p>
+  
 </section>
 
       </div>
@@ -26,6 +27,7 @@ Let’s turn your mentorship into meaningful impact!
         <img
           src={mentorimg}
           alt="Mentor"
+          width='200px'
           className="rounded-2xl"
         />
       </div>

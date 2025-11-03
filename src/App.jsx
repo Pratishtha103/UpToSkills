@@ -27,9 +27,9 @@ import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
 import Webdev from './components/Programs/Webdev';
-/*import Datascience from './components/Programs/Datascience';
-import Cloudcompute from './components/Programs/Cloudcompute';
-import Cybersecurity from './components/Programs/Cybersecurity';*/
+// import Datascience from './components/Programs/Datascience';
+// import Cloudcompute from './components/Programs/Cloudcompute';
+// import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 
@@ -173,24 +173,21 @@ function App() {
               <Webdev />
             // </ProtectedRoute>
           } />
-          {/* 
-<Route path='/data-science' element={
-  // <ProtectedRoute>
-  <Datascience />
-  // </ProtectedRoute>
-} />
-<Route path='/cloud-computing' element={
-  // <ProtectedRoute>
-  <Cloudcompute />
-  // </ProtectedRoute>
-} />
-<Route path='/cybersecurity' element={
-  // <ProtectedRoute>
-  <Cybersecurity />
-  // </ProtectedRoute>
-} />
-*/}
-
+          {/* <Route path='/data-science' element={
+            // <ProtectedRoute>
+              <Datascience />
+            // </ProtectedRoute>
+          } />
+          <Route path='/cloud-computing' element={
+            // <ProtectedRoute>
+              <Cloudcompute />
+            // </ProtectedRoute>
+          } />
+          <Route path='/cybersecurity' element={
+            // <ProtectedRoute>
+              <Cybersecurity />
+            // </ProtectedRoute>
+          } /> */}
           <Route path='/thankyou' element={
             // <ProtectedRoute>
               <Thankyou />

@@ -130,13 +130,14 @@ const Contact = () => {
                 textarea
               />
 
-              <button
-                type="submit"
-                className="bg-orange-500 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-md transition-color duration-300"
-                disabled={loading}
-              >
-                {loading ? 'Sending...' : 'Send a Message'}
-              </button>
+             <button
+  type="submit"
+  className="bg-orange-500 hover:bg-[#09C3A1] text-white font-semibold px-6 py-3 rounded-md transition-all duration-300"
+  disabled={loading}
+>
+  {loading ? 'Sending...' : 'Send a Message'}
+</button>
+
 
               {error && <p className="text-red-500">{error}</p>}
               {response && <p className="text-green-500">Message sent successfully!</p>}

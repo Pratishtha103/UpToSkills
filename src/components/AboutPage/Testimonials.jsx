@@ -95,7 +95,11 @@ const Testimonials = () => {
       <div className="text-center mt-4">
    <button
   onClick={() => setShowForm(true)}
-  className="bg-[#FF6A28] text-white font-bold px-5 py-2 rounded hover:bg-green-500 transition-all duration-300"
+  className="bg-[#FF6A28] hover:bg-[#09C3A1] text-white font-bold px-5 py-2 rounded transition-all duration-300"
+
+  //className="bg-[#09C3A1] hover:bg-[#07a98a] text-white font-bold px-5 py-2 rounded transition-all duration-300"
+
+  //className="bg-[#FF6A28] text-white font-bold px-5 py-2 rounded hover:bg-green-500 transition-all duration-300"
 >
   Give Review
 </button>

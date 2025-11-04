@@ -41,7 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000', // React frontend port
+    origin: ['http://localhost:3000', 'http://localhost:3001'], // React frontend ports
     credentials: true
 }));
 app.use(express.json());
@@ -67,6 +67,9 @@ app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 
 app.use('/api/courses', coursesRoutes);
+app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+app.use('/api/test', require('./routes/testEnrollment'));
+app.use('/api/debug', require('./routes/debugRoutes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

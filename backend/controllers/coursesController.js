@@ -92,27 +92,38 @@ const enrollStudent = async (req, res) => {
   const { id } = req.params; // course id
   const { studentId } = req.body; // student id to enroll
 
+  console.log('Enrollment request received:', { courseId: id, studentId });
+
   try {
-    const courseResult = await pool.query("SELECT enrolled FROM courses WHERE id = $1", [id]);
-
-    if (courseResult.rows.length === 0) {
-      return res.status(404).json({ error: "Course not found" });
+    // Import enrollment functions
+    const { createEnrollment } = require('./enrollment.controller');
+    
+    // Create enrollment using the new enrollment system
+    const enrollment = await createEnrollment(studentId, id, 'active');
+    
+    console.log('Enrollment created successfully:', enrollment);
+    
+    res.status(200).json({ 
+      success: true,
+      message: "Student enrolled successfully",
+      data: enrollment
+    });
+  } catch (error) {
+    console.error('Enrollment error:', error);
+    
+    if (error.message === 'Student not found') {
+      return res.status(400).json({ success: false, message: 'Student not found' });
     }
-
-    const enrolled = courseResult.rows[0].enrolled || [];
-
-    if (enrolled.includes(parseInt(studentId))) {
-      return res.status(400).json({ error: "Student already enrolled" });
+    
+    if (error.message === 'Course not found') {
+      return res.status(400).json({ success: false, message: 'Course not found' });
     }
-
-    const updatedEnrolled = [...enrolled, parseInt(studentId)];
-
-    await pool.query("UPDATE courses SET enrolled = $1 WHERE id = $2", [updatedEnrolled, id]);
-
-    res.status(200).json({ message: "Student enrolled successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database error" });
+    
+    if (error.message === 'Student already enrolled in this course') {
+      return res.status(409).json({ success: false, message: 'Student already enrolled in this course' });
+    }
+    
+    res.status(500).json({ success: false, message: 'Database error' });
   }
 };
 

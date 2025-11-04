@@ -158,6 +158,46 @@ const pool = require('../config/database');
       );
     `);
 
+    // Create courses table first (from coursesController logic)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS courses (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        image_path VARCHAR(255),
+        enrolled integer[],
+        skills TEXT[],
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS enroll_url TEXT;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS enrollments (
+        id SERIAL PRIMARY KEY,
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+        status VARCHAR(20) DEFAULT 'active',
+        UNIQUE(student_id, course_id)
+      );
+    `);
+
+    // Create indexes for better query performance
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_student_id ON enrollments(student_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
+    `);
 
     console.log('✅ All tables checked/created successfully');
   } catch (err) {

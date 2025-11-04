@@ -60,19 +60,19 @@ export default function Landing() {
   const features = [
     {
       title: "For Learners",
-      icon: "https://static.thenounproject.com/png/7914064-512.png",
+      icon: "https://img.icons8.com/?size=100&id=23319&format=png&color=000000",
       desc: "Sharpen your tech skills with projects and peer sessions.",
       role: "learner",
     },
     {
       title: "For Companies",
-      icon: "https://cdn-icons-png.flaticon.com/512/2858/2858749.png",
+      icon: "https://img.icons8.com/?size=100&id=113856&format=png&color=000000",
       desc: "Hire pre-vetted, job-ready talent from our community.",
       role: "company",
     },
     {
       title: "For Mentors",
-      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
+      icon: "https://img.icons8.com/?size=100&id=mBzT9ySeO_go&format=png&color=000000",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },

@@ -3,6 +3,7 @@ import { Bell, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.jpg";
 import darkLogo from "../../assets/darkLogo.jpg";
+import { Link } from "react-router-dom";
 
 export default function AdminNavbar({
   onMenuClick,
@@ -40,13 +41,13 @@ export default function AdminNavbar({
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
                 className="object-contain w-36 h-25"
               />
-            </div>
+            </Link>
           </motion.div>
         </div>
 

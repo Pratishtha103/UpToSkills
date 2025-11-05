@@ -7,6 +7,8 @@ import { Button } from "../../Company_Dashboard/ui/button";
 import { Input } from "../../Company_Dashboard/ui/input";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
+import { Line } from "react-chartjs-2";
+import { Link } from "react-router-dom";
 
 export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
   const navigate = useNavigate();
@@ -69,13 +71,13 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <div className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
                 className="object-contain w-25 h-10"
               />
-            </div>
+            </Link>
           </motion.div>
         </div>
 

@@ -19,6 +19,10 @@ const pool = require('../config/database');
     `);
 
     await pool.query(`
+      Alter TABLE companies
+      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
+    `);
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS company_profiles (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -40,6 +44,10 @@ const pool = require('../config/database');
         password TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+    `);
+    await pool.query(`
+      Alter TABLE mentors
+      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
     `);
 
     await pool.query(`
@@ -83,7 +91,10 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-
+    await pool.query(`
+      Alter TABLE students
+      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
+    `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_details (
         id SERIAL PRIMARY KEY,

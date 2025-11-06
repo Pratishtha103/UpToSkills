@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -10,27 +9,21 @@ import {
     ViewIcon,
     Book,
     Info,
-    // ADDED Bell icon (used for notifications)
     Bell, 
 } from "lucide-react";
 import { useEffect, useState } from "react";
-// IMPORTED FaTrophy for the Skill Badges icon
-import { FaLinkedin, FaInstagram, FaYoutube, FaTrophy } from "react-icons/fa"; 
+import { FaLinkedin, FaInstagram, FaYoutube, FaTrophy, FaGraduationCap } from "react-icons/fa"; 
 
-
-// Sidebar Items - CLEANED UP DUPLICATES
+// ✅ Sidebar Items
 const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
     { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
     { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
-
-    // FIXED: Using FaTrophy instead of undefined 'Award'
     { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
-    
-    
-    // Removed duplicate entries for Project Showcase and About Us
     { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
+    { id: "mycourses", label: "My Courses", icon: Book, path: "/dashboard" },
+
     { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
 ];
 
@@ -135,9 +128,8 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                                         whileHover={{ x: 8, scale: 1.03 }}
                                         whileTap={{ scale: 0.97 }}
                                     >
-                                        {/* Dynamic Icon Rendering */}
-                                        {item.icon === FaTrophy ? (
-                                            <FaTrophy className={`w-6 h-6 transition-all duration-200 ${
+                                        {item.icon === FaTrophy || item.icon === FaGraduationCap ? (
+                                            <item.icon className={`w-6 h-6 transition-all duration-200 ${
                                                 activeItem === item.id
                                                     ? "text-white drop-shadow-md"
                                                     : "text-gray-700 dark:text-gray-300 group-hover:text-primary"
@@ -151,7 +143,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
                                                 }`}
                                             />
                                         )}
-                                        
+
                                         <motion.span
                                             className={`font-bold relative z-10 transition-all duration-200 ${
                                                 activeItem === item.id
@@ -169,7 +161,6 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
 
                     {/* Footer */}
                     <div className="p-4 border-t">
-                        {/* ... (Social media and Log Out buttons remain unchanged) ... */}
                         <p className="font-semibold text-sm mb-2 text-center text-gray-500">
                             Connect With Us
                         </p>

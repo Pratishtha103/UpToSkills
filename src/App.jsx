@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+//import MyCourses from "./components/MentorDashboard/components/MyCourses";
 import Landing from './pages/Landing';
 import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
@@ -32,7 +33,6 @@ import Webdev from './components/Programs/Webdev';
 // import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
-
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }) {
@@ -118,6 +118,7 @@ function App() {
               <Dashboard_Project />
             </ProtectedRoute>
           } />
+  
            {/* keep login/register public so users can authenticate */}
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
@@ -155,7 +156,6 @@ function App() {
               <ProjectShowcasePage />
             </ProtectedRoute>
           } />
-
           <Route path="/mentor-dashboard/*" element={
             <ProtectedRoute>
               <MentorDashboardRoutes />

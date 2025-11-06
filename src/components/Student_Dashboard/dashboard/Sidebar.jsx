@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaLinkedin, FaInstagram, FaYoutube, FaTrophy, FaGraduationCap } from "react-icons/fa"; 
-
-// ✅ Sidebar Items
 const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
@@ -22,7 +20,8 @@ const sidebarItems = [
     { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
     { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
     { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
-    { id: "mycourses", label: "My Courses", icon: Book, path: "/dashboard" },
+    { id: "mycourses", label: "My Courses", icon: FaGraduationCap, path: "/dashboard/my-courses" },
+
 
     { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
 ];

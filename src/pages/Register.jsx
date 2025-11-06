@@ -19,6 +19,7 @@ const RegistrationForm = () => {
     // Initial role is now "Student" instead of "student"
     role: initialRole, 
     name: "",
+    username: "",
     email: "",
     phone: "",
     password: "",
@@ -47,6 +48,7 @@ const RegistrationForm = () => {
       // NOTE: For the backend, you might want to send the role as lowercase (e.g., "student").
       // If so, change formData to {...formData, role: formData.role.toLowerCase()}
       const response = await axios.post("http://localhost:5000/api/auth/register", formData);
+      console.log('Form Data:', formData);
       alert(response.data.message);
       navigate("/login");
     } catch (err) {
@@ -112,7 +114,15 @@ const RegistrationForm = () => {
                   placeholder="Enter your name"
                   required
                 />
-
+                <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200"
+                  type="text"
+                  placeholder="Enter UserName"
+                  required
+                />
                 {/* ... other form fields follow ... */}
                 <input
                   name="email"

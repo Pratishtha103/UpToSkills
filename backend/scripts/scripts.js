@@ -10,8 +10,8 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
-        company_name VARCHAR(255) NOT NULL,
         username VARCHAR(50),
+        company_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,

@@ -93,4 +93,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+    // console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+    // console.log('Type:', typeof process.env.DB_PASSWORD);
+
 });

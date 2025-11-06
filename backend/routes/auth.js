@@ -25,7 +25,7 @@ function validateRole(role) {
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, phone, password, role } = req.body;
+    const { name, email, phone, password, role ,username} = req.body;
 
     if (!name || !email || !phone || !password || !role) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
@@ -61,25 +61,25 @@ router.post('/register', async (req, res) => {
     let insertQuery, values;
     if (role.toLowerCase() === 'company') {
       insertQuery = `
-        INSERT INTO companies (company_name, email, phone, password)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO companies (company_name, email, phone, password,username)
+        VALUES ($1, $2, $3, $4,$5)
         RETURNING id, company_name AS name, email
       `;
-      values = [name, email, phone, hashedPassword];
+      values = [name, email, phone, hashedPassword,username];
     } else if (role.toLowerCase() === 'mentor') {
       insertQuery = `
-        INSERT INTO mentors (full_name, email, phone, password)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO mentors (full_name, email, phone, password,username)
+        VALUES ($1, $2, $3, $4,$5)
         RETURNING id, full_name AS name, email
       `;
-      values = [name, email, phone, hashedPassword];
+      values = [name, email, phone, hashedPassword,username];
     } else {
       insertQuery = `
-        INSERT INTO students (full_name, email, phone, password)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO students (full_name, email, phone, password,username)
+        VALUES ($1, $2, $3, $4,$5)
         RETURNING id, full_name AS name, email
       `;
-      values = [name, email, phone, hashedPassword];
+      values = [name, email, phone, hashedPassword,username];
     }
 
     const result = await pool.query(insertQuery, values);

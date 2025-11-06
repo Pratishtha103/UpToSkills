@@ -10,6 +10,7 @@ const getStudents = async (req, res) => {
     const query = `
       SELECT
         s.id,
+        s.username,
         COALESCE(u.full_name, s.full_name) AS full_name,
         s.email,
         s.phone,
@@ -44,6 +45,7 @@ const getStudentById = async (req, res) => {
     const query = `
       SELECT
         s.id,
+        s.username,
         s.full_name,
         s.email,
         s.phone,
@@ -94,6 +96,7 @@ const searchStudents = async (req, res) => {
     const query = `
       SELECT
         s.id,
+        s.username,
         COALESCE(u.full_name, s.full_name) AS full_name,
         s.email,
         s.phone,
@@ -145,6 +148,7 @@ const searchStudentsByQuery = async (req, res) => {
     const query = `
       SELECT
         s.id,
+        s.username,
         COALESCE(u.full_name, s.full_name) AS full_name,
         s.email,
         s.phone,

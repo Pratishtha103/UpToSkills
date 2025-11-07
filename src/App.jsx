@@ -27,9 +27,9 @@ import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
 import Webdev from './components/Programs/Webdev';
-import Datascience from './components/Programs/Datascience';
-import Cloudcompute from './components/Programs/Cloudcompute';
-import Cybersecurity from './components/Programs/Cybersecurity';
+// import Datascience from './components/Programs/Datascience';
+// import Cloudcompute from './components/Programs/Cloudcompute';
+// import Cybersecurity from './components/Programs/Cybersecurity';
 import Thankyou from './components/Programs/Thankyou';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 
@@ -52,13 +52,13 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Landing />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/about" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <div>
                 <Header />
                 <HeroSection />
@@ -66,13 +66,13 @@ function App() {
                 <Footer />
                 <Chatbot />
               </div>
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/programs" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <ProgramsPage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/dashboard" element={
@@ -143,9 +143,9 @@ function App() {
           } />
 
           <Route path="/contact" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <ContactPage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
 
           <Route path="/projectShowcase" element={
@@ -167,29 +167,29 @@ function App() {
           } />
 
           <Route path='/programForm/:id' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Webdev />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
-          <Route path='/data-science' element={
-            <ProtectedRoute>
+          {/* <Route path='/data-science' element={
+            // <ProtectedRoute>
               <Datascience />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cloud-computing' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cloudcompute />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path='/cybersecurity' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cybersecurity />
-            </ProtectedRoute>
-          } />
+            // </ProtectedRoute>
+          } /> */}
           <Route path='/thankyou' element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Thankyou />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
           <Route path="/dashboard/aboutus" element={
             <ProtectedRoute>

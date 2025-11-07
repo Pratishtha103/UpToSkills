@@ -52,6 +52,8 @@ export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactStudentId, setContactStudentId] = useState(null);
+// Interview count
+const [interviewCount, setInterviewCount] = useState(0);
 
   // Current user
   const rawUser =
@@ -208,7 +210,36 @@ export default function Index() {
       }
       localStorage.removeItem("company_view");
     } catch { }
-  }, []);
+  }, 
+  
+  []);
+ // ---------- Fetch Interviews (For Both Count + Upcoming Section) ----------
+const [interviews, setInterviews] = useState([]);
+
+useEffect(() => {
+  const fetchInterviews = async () => {
+    try {
+      const API_BASE =
+        process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await axios.get(`${API_BASE}/api/interviews`);
+
+      if (Array.isArray(res.data)) {
+        setInterviews(res.data);
+        setInterviewCount(res.data.length);
+      } else {
+        setInterviews([]);
+        setInterviewCount(0);
+      }
+    } catch (err) {
+      console.error("Error fetching interviews:", err);
+      setInterviews([]);
+      setInterviewCount(0);
+    }
+  };
+
+  fetchInterviews();
+}, []);
+
 
   // ---------- Handlers ----------
   const toggleSidebar = () => setIsSidebarOpen((p) => !p);
@@ -414,7 +445,7 @@ export default function Index() {
               />
               <StatCard
                 title="Interviews Scheduled"
-                value="24"
+                value={interviewCount}
                 subtitle="This week"
                 icon={CalIcon}
                 color="secondary"

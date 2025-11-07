@@ -44,35 +44,40 @@ const createProgram = async (req, res) => {
 
     // Now create enrollment record
     try {
+      console.log('=== STARTING ENROLLMENT PROCESS ===');
+      console.log('Course title from form:', course);
+      
       // Find course by title
-      const courseResult = await pool.query('SELECT id FROM courses WHERE title ILIKE $1', [course]);
+      const courseResult = await pool.query('SELECT id, title FROM courses WHERE title ILIKE $1', [course]);
+      console.log('Course search result:', courseResult.rows);
       
       if (courseResult.rows.length > 0) {
         const courseId = courseResult.rows[0].id;
-        console.log('Found course ID:', courseId);
+        console.log('✅ Found course ID:', courseId, 'for title:', courseResult.rows[0].title);
 
         // Find or create student by email
-        let studentResult = await pool.query('SELECT id FROM students WHERE email = $1', [email]);
+        let studentResult = await pool.query('SELECT id, full_name, email FROM students WHERE email = $1', [email]);
         let studentId;
 
         if (studentResult.rows.length === 0) {
           // Create new student record
-          console.log('Creating new student for email:', email);
+          console.log('📝 Creating new student for email:', email);
           const newStudentResult = await pool.query(
             'INSERT INTO students (full_name, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING id',
-            [name, email, phone, 'temp_password'] // You may want to generate a proper password
+            [name, email, phone, 'temp_password_' + Date.now()]
           );
           studentId = newStudentResult.rows[0].id;
-          console.log('Created new student with ID:', studentId);
+          console.log('✅ Created new student with ID:', studentId);
         } else {
           studentId = studentResult.rows[0].id;
-          console.log('Found existing student with ID:', studentId);
+          console.log('✅ Found existing student with ID:', studentId, 'email:', studentResult.rows[0].email);
         }
 
         // Create enrollment
+        console.log('📚 Creating enrollment for student:', studentId, 'course:', courseId);
         const { createEnrollment } = require('./enrollment.controller');
         const enrollment = await createEnrollment(studentId, courseId, 'active');
-        console.log('Enrollment created:', enrollment);
+        console.log('✅ ENROLLMENT CREATED SUCCESSFULLY:', enrollment);
 
         res.json({ 
           success: true, 
@@ -81,20 +86,30 @@ const createProgram = async (req, res) => {
           message: 'Program application and enrollment created successfully'
         });
       } else {
-        console.log('Course not found for title:', course);
+        console.log('❌ Course not found for title:', course);
+        console.log('Checking all available courses...');
+        const allCourses = await pool.query('SELECT id, title FROM courses LIMIT 10');
+        console.log('Available courses:', allCourses.rows);
+        
         res.json({ 
           success: true, 
           data: result.rows[0],
-          message: 'Program application created, but course not found for enrollment'
+          message: 'Program application created, but course not found for enrollment',
+          debug: {
+            searchedFor: course,
+            availableCourses: allCourses.rows
+          }
         });
       }
     } catch (enrollmentError) {
-      console.error('Enrollment creation failed:', enrollmentError);
+      console.error('❌ ENROLLMENT CREATION FAILED:', enrollmentError);
+      console.error('Error stack:', enrollmentError.stack);
       // Still return success for program creation even if enrollment fails
       res.json({ 
         success: true, 
         data: result.rows[0],
-        message: 'Program application created, but enrollment failed'
+        message: 'Program application created, but enrollment failed: ' + enrollmentError.message,
+        error: enrollmentError.message
       });
     }
 

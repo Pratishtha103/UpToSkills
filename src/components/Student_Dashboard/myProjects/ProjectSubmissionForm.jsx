@@ -5,7 +5,8 @@ import Footer from "../../Student_Dashboard/dashboard/Footer";
 
 function ProjectSubmissionForm() {
   const [formData, setFormData] = useState({
-    student_mail_id: "",
+    // ✅ CHANGED: student_mail_id → student_email (to match backend)
+    student_email: "",
     title: "",
     description: "",
     tech_stack: "",
@@ -26,10 +27,49 @@ function ProjectSubmissionForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ VALIDATION BLOCK - Updated field name
+    if (!formData.student_email || formData.student_email.trim() === '') {
+      alert("Student Email is required.");
+      return;
+    }
+
+    if (!formData.title || formData.title.trim() === '') {
+      alert("Project Title is required.");
+      return;
+    }
+
+    if (!formData.tech_stack || formData.tech_stack.trim() === '') {
+      alert("Technology Stack is required.");
+      return;
+    }
+
+    if (!formData.description || formData.description.trim() === '') {
+      alert("Project Description is required.");
+      return;
+    }
+
+    if (!formData.contributions || formData.contributions.trim() === '') {
+      alert("Your Contributions is required.");
+      return;
+    }
+
+    // 🌟 FIX: Retrieve the Auth Token 🌟
+    const authToken = localStorage.getItem("token");
+    
+    if (!authToken) {
+      alert("You are not logged in. Please log in and try again.");
+      console.error("Authentication token not found.");
+      return; 
+    }
+
     try {
       const response = await fetch("http://localhost:5000/api/projects", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`, 
+        },
         body: JSON.stringify(formData),
       });
 
@@ -37,7 +77,7 @@ function ProjectSubmissionForm() {
         setShowModal(true);
         // Clear the form data upon successful submission
         setFormData({
-          student_mail_id: "",
+          student_email: "",
           title: "",
           description: "",
           tech_stack: "",
@@ -45,13 +85,16 @@ function ProjectSubmissionForm() {
           is_open_source: false,
           github_pr_link: "",
         });
+      } else if (response.status === 401) {
+         alert(`Failed to submit project: Session expired or invalid token. Please log in again.`);
       } else {
         const errorData = await response.json();
-        alert(`Failed to submit project: ${errorData.message || 'Server error'}`);
+        const message = errorData.message || errorData.error || 'Server error';
+        alert(`Failed to submit project: ${message}`);
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An unexpected error occurred. Please try again.");
+      alert("An unexpected error occurred. Please check your network connection.");
     }
   };
 
@@ -80,7 +123,7 @@ function ProjectSubmissionForm() {
             {[
               {
                 label: "Student Mail ID",
-                name: "student_mail_id",
+                name: "student_email", // ✅ CHANGED: student_mail_id → student_email
                 type: "email",
                 placeholder: "Your Student Mail ID (e.g., student@mail.com)",
               },

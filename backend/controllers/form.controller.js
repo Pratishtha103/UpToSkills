@@ -2,15 +2,20 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST, 
-    port: parseInt(process.env.EMAIL_PORT, 10), // Port 465 for Gmail
-    secure: true, // Must be TRUE for Gmail port 465
+    port: parseInt(process.env.EMAIL_PORT, 10),
+    port: 587,
+    secure: false, 
     auth: {
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS, // Your App Password
+        pass: process.env.EMAIL_PASS,
     },
+    tls: {
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
+    }
 });
+
 const sendContactEmail = async (req, res) => {
-    // ... (rest of the code is the same)
     const { name, email, inquiryType, message } = req.body;
 
     if (!name || !email || !inquiryType || !message) {
@@ -19,10 +24,10 @@ const sendContactEmail = async (req, res) => {
         });
     }
     
-    // The Email Content (using the fixed recipient)
+    // The Email Content (Recipient is fixed to boobeshkaruna@gmail.com)
     const mailOptions = {
         from: `"${name}" <${email}>`, 
-        to: "boobeshkaruna@gmail.com", // <<< Target Recipient
+        to: "boobeshkaruna@gmail.com", 
         subject: `New ${inquiryType} Inquiry for Uptoskills`,
         html: `
             <div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">

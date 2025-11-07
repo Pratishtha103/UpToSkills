@@ -22,7 +22,7 @@ const useSubmitContactForm = () => {
 
       const json = await res.json();
 
-    console.log(data);
+
 
       if (!res.ok) {
         throw new Error(json.message || "Submission failed");

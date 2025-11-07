@@ -15,7 +15,7 @@ export default function AboutCompanyPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Header */}
+          {/* Header ... (rest of the code is unchanged) */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-gradient-to-r from-[#01BDA5] to-[#43cea2] text-white shadow-md">
@@ -33,9 +33,8 @@ export default function AboutCompanyPage() {
             <BriefcaseIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
 
-          {/* Mission + Values */}
+          {/* Mission + Values ... (rest of the code is unchanged) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Mission Section */}
             <section>
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-blue-500 pl-3">
                 Our Mission
@@ -64,7 +63,6 @@ export default function AboutCompanyPage() {
               </ul>
             </section>
 
-            {/* Values Section */}
             <section>
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-green-400 pl-3">
                 Values & Approach
@@ -88,51 +86,62 @@ export default function AboutCompanyPage() {
           </div>
         </motion.div>
 
-        {/* Contact Info Section */}
-        <section className="w-full mx-auto py-16 px-4 text-center bg-white">
+        {/* Contact Info Section - 🌟 FIX APPLIED HERE 🌟 */}
+        <section className="w-full mx-auto py-16 px-4 text-center bg-white dark:bg-gray-900 transition-colors duration-300">
           <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
-          <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+          {/* Main Heading Text Fix */}
+          <h2 className="text-4xl font-bold mt-2 text-gray-800 dark:text-white">
+            We're here to Help You
+          </h2>
+          {/* Subtext Fix */}
+          <p className="mt-4 max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
             Got a project in mind? We’d love to hear about it. Take five minutes to fill out our project form
             so that we can get to know you and understand your project.
           </p>
 
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Contact Card 1: LinkedIn */}
             <a
               href="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+              {/* Card Background and Text Fix */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition text-gray-800 dark:text-white">
                 <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
                 <h3 className="text-xl font-semibold mb-2">Get to Know Us:</h3>
                 <p>www.linkedin.com</p>
               </div>
             </a>
 
+            {/* Contact Card 2: Phone */}
             <a href="tel:+919319772294">
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+              {/* Card Background and Text Fix */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition text-gray-800 dark:text-white">
                 <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
                 <h3 className="text-xl font-semibold mb-2">Phone Us 24/7:</h3>
-                <p className="text-gray-600">+91 (931) 977 2294</p>
+                {/* Specific Text Color Fix */}
+                <p className="text-gray-600 dark:text-gray-300">+91 (931) 977 2294</p>
               </div>
             </a>
 
+            {/* Contact Card 3: Email */}
             <a
               href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+              {/* Card Background and Text Fix */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition text-gray-800 dark:text-white">
                 <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
                 <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-                <p className="text-gray-600">info@uptoskills.com</p>
+                {/* Specific Text Color Fix */}
+                <p className="text-gray-600 dark:text-gray-300">info@uptoskills.com</p>
               </div>
             </a>
           </div>
         </section>
       </div>
-
       
       {/* Footer */}
       <Footer />

@@ -1,53 +1,93 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Users, Trash2, Eye, X, Mail, Phone, Globe, Briefcase, Calendar, Loader2 } from "lucide-react";
+import { Building2, Users, Trash2, Eye, X, Mail, Phone, Globe, Briefcase, Calendar, Loader2, Search } from "lucide-react";
+
+const API_BASE_URL = "http://localhost:5000/api/companies";
 
 export default function Company({ isDarkMode }) {
   const [companies, setCompanies] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // Apply dark or light mode to document root
+  // Apply/remove dark mode class on root
   useEffect(() => {
     const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    if (isDarkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
   }, [isDarkMode]);
 
-  // Fetch companies
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/companies");
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        const mappedData = data.map((company) => ({
-          id: company.id,
-          name: company.company_name,
-          hires: 0,
-        }));
-        setCompanies(mappedData);
-      } catch (error) {
-        console.error("Failed to fetch companies:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCompanies();
+  // Fetch all companies initially and on search reset
+  const fetchAllCompanies = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_BASE_URL);
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
+      setCompanies(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to fetch companies:", error);
+      setCompanies([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchAllCompanies();
+  }, [fetchAllCompanies]);
+
+  // Debounced search effect (500ms delay)
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (!searchTerm.trim()) {
+        fetchAllCompanies();
+        return;
+      }
+      try {
+        setSearching(true);
+        const response = await fetch(
+          `${API_BASE_URL}/search/${encodeURIComponent(searchTerm)}`
+        );
+        if (!response.ok)
+          throw new Error(`Search failed: ${response.status}`);
+        const data = await response.json();
+        setCompanies(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error searching companies:", error);
+        setCompanies([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm, fetchAllCompanies]);
+
+  // Handler for removing a company
+  const handleRemoveCompany = async (id) => {
+    const companyName = companies.find(c => c.id === id)?.company_name || `ID ${id}`;
+    if (!window.confirm(`Are you sure you want to remove ${companyName}?`)) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete company");
+      setCompanies(current => current.filter(c => c.id !== id));
+    } catch (error) {
+      console.error("Error deleting company:", error);
+      alert("Failed to delete company");
+    }
+  };
 
   // Fetch company details
   const fetchCompanyDetails = async (companyId) => {
     try {
       setLoadingDetails(true);
       setSelectedCompany(companyId);
-      const res = await fetch(`http://localhost:5000/api/companies/${companyId}/details`);
+      const res = await fetch(`${API_BASE_URL}/${companyId}/details`);
       const data = await res.json();
       if (data.success) {
         setCompanyDetails(data.data);
@@ -69,101 +109,100 @@ export default function Company({ isDarkMode }) {
     setCompanyDetails(null);
   };
 
-  // Remove company
-  const handleRemoveCompany = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to remove this company?"
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/companies/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to delete company");
-
-      setCompanies(companies.filter((company) => company.id !== id));
-    } catch (error) {
-      console.error("Error deleting company:", error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <main className="p-4 sm:p-6 flex flex-col gap-6 text-foreground">
-        <p>Loading companies...</p>
-      </main>
-    );
-  }
-
   return (
     <main
-      className={`${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-      } flex-grow p-4 sm:p-6 flex flex-col gap-8 transition-colors duration-300`}
+      className={`min-h-screen p-4 sm:p-8 font-inter transition-colors duration-500 ${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
-        <motion.h2
-          className="text-2xl font-bold text-foreground"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
+      <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        {/* Header */}
+        <div className="text-4xl font-extrabold flex items-center gap-3">
+          <Users className="w-8 h-8 text-indigo-500" />
           Manage Companies
-        </motion.h2>
-      </div>
+        </div>
 
-      {/* Company Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {companies.map((company, index) => (
-          <motion.div
-            key={company.id}
-            className="p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-pointer shadow-md hover:shadow-lg transition-all"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ scale: 1.02, y: -4 }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500">
-                <Building2 className="w-6 h-6 text-white" />
+        {/* Search Bar */}
+        <div
+          className={`p-4 shadow-md rounded-lg border transition-colors duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
+            }`}
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search companies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${isDarkMode
+                  ? "bg-gray-700 text-gray-100 border-gray-600 placeholder-gray-400"
+                  : "bg-white text-gray-900 border-gray-300 placeholder-gray-400"
+                }`}
+              autoFocus
+            />
+            {searching && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
               </div>
-              <div>
-                <h3 className="text-lg font-bold">{company.name}</h3>
-              </div>
-            </div>
+            )}
+          </div>
+        </div>
 
-            <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span>{company.hires} Hires</span>
-            </div>
+        {/* Companies Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`rounded-lg shadow-md p-6 animate-pulse ${isDarkMode ? "bg-gray-800" : "bg-white"
+                  }`}
+              ></div>
+            ))
+          ) : companies.length > 0 ? (
+            companies.map((company) => (
+              <motion.div
+                key={company.id}
+                layout
+                className={`p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-pointer shadow-md hover:shadow-lg transition-all ${isDarkMode ? "text-gray-100" : "text-gray-900"
+                  }`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500">
+                    <Building2 className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-bold truncate">{company.company_name || company.name}</h3>
+                      <button
+                        onClick={() => fetchCompanyDetails(company.id)}
+                        className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
+                        title="View Details"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex gap-2">
-              <motion.button
-                onClick={() => fetchCompanyDetails(company.id)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Eye className="w-4 h-4" />
-                View
-              </motion.button>
-              <motion.button
-                onClick={() => handleRemoveCompany(company.id)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Trash2 className="w-4 h-4" />
-                Remove
-              </motion.button>
-            </div>
-          </motion.div>
-        ))}
+                <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
+                  <Users className="w-4 h-4" />
+                  <span>{company.hires || 0} Hires</span>
+                </div>
+
+                <motion.button
+                  onClick={() => handleRemoveCompany(company.id)}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Remove
+                </motion.button>
+              </motion.div>
+            ))
+          ) : (
+            <p>No companies found.</p>
+          )}
+        </div>
       </div>
 
       {/* Company Details Modal */}
@@ -181,14 +220,12 @@ export default function Company({ isDarkMode }) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl ${
-                isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
-              }`}
+              className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl ${isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
+                }`}
             >
               {/* Modal Header */}
-              <div className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${
-                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-              }`}>
+              <div className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+                }`}>
                 <h2 className="text-2xl font-bold">Company Details</h2>
                 <button
                   onClick={closeModal}
@@ -307,15 +344,14 @@ export default function Company({ isDarkMode }) {
                                     <p className="text-sm mt-2">{interview.feedback}</p>
                                   )}
                                 </div>
-                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  interview.status === 'completed' 
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${interview.status === 'completed'
                                     ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                                     : interview.status === 'pending'
-                                    ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                                    : interview.status === 'hired'
-                                    ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
-                                    : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200'
-                                }`}>
+                                      ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+                                      : interview.status === 'hired'
+                                        ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                                        : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200'
+                                  }`}>
                                   {interview.status}
                                 </span>
                               </div>

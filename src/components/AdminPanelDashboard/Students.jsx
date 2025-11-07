@@ -173,10 +173,19 @@ const Students = ({ isDarkMode }) => {
                   <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
                     <User className="w-6 h-6 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold truncate">
-                      {student.full_name}
-                    </h3>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-bold truncate">
+                        {student.full_name}
+                      </h3>
+                      <button
+                        onClick={() => fetchStudentDetails(student.id)}
+                        className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
+                        title="View Details"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </div>
                     <p className="text-sm line-clamp-2">
                       {Array.isArray(student.domains_of_interest)
                         ? student.domains_of_interest.join(", ")
@@ -185,14 +194,7 @@ const Students = ({ isDarkMode }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => fetchStudentDetails(student.id)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View Details
-                  </button>
+                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => handleDelete(student.id)}
                     disabled={isDeleting === student.id}

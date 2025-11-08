@@ -11,6 +11,7 @@ const pool = require('../config/database');
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
         company_name VARCHAR(255) NOT NULL,
+        username VARCHAR(50),
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,
@@ -18,10 +19,10 @@ const pool = require('../config/database');
       );
     `);
 
-    await pool.query(`
-      Alter TABLE companies
-      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    `);
+    // await pool.query(`
+    //   Alter TABLE companies
+    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
+    // `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS company_profiles (
         id SERIAL PRIMARY KEY,
@@ -38,6 +39,7 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
+        username VARCHAR(50),
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -45,10 +47,10 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    await pool.query(`
-      Alter TABLE mentors
-      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    `);
+    // await pool.query(`
+    //   Alter TABLE mentors
+    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
+    // `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS skill_badges (
@@ -83,6 +85,7 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
+        username VARCHAR(50),
         program_id INTEGER REFERENCES programs(id),
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -91,10 +94,10 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    await pool.query(`
-      Alter TABLE students
-      ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    `);
+    // await pool.query(`
+    //   Alter TABLE students
+    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
+    // `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_details (
         id SERIAL PRIMARY KEY,
@@ -169,6 +172,46 @@ const pool = require('../config/database');
       );
     `);
 
+    // Create courses table first (from coursesController logic)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS courses (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        image_path VARCHAR(255),
+        enrolled integer[],
+        skills TEXT[],
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS enroll_url TEXT;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS enrollments (
+        id SERIAL PRIMARY KEY,
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+        status VARCHAR(20) DEFAULT 'active',
+        UNIQUE(student_id, course_id)
+      );
+    `);
+
+    // Create indexes for better query performance
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_student_id ON enrollments(student_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
+    `);
 
     console.log('✅ All tables checked/created successfully');
   } catch (err) {

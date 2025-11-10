@@ -166,7 +166,7 @@ export default function Mentors({ isDarkMode }) {
           <Users className="w-8 h-8 text-indigo-500" />
           Manage Mentors
         </div>
-
+     <br />
       {/* SEARCH BAR  */}
       <div
         className={`p-4 shadow-md rounded-lg border transition-colors duration-300 mb-8 ${

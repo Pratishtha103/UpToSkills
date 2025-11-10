@@ -22,6 +22,7 @@ const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
 const companiesRouter = require("./routes/searchcompanies");       // Use the one companies router consistently
+const searchProjectRoutes = require('./routes/searchproject'); // Add your search project route
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');

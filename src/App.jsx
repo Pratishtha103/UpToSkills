@@ -100,6 +100,7 @@ function App() {
           <Route path="/projectShowcase" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
           <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} />
           <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+          <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
           {/* ===== Program Forms ===== */}
           <Route path="/programForm/:id" element={<Webdev />} />

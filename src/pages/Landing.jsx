@@ -142,7 +142,7 @@ export default function Landing() {
           {/* Animated Illustrations */}
           <div className="relative flex justify-center items-center">
             <motion.img
-              src="https://img.freepik.com/free-vector/online-world-concept-illustration_114360-1206.jpg"
+              src="https://th.bing.com/th/id/OIG2.eX62G2JT2MqvSOXZg5DE?pid=ImgGn"
               alt="Main Hero"
               className="w-72 md:w-80 rounded-xl shadow-2xl z-10"
               initial={{ y: 20, opacity: 0 }}

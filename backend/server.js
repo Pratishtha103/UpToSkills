@@ -22,6 +22,7 @@ const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
 const companiesRouter = require("./routes/searchcompanies");       // Use the one companies router consistently
+const searchProjectRoutes = require('./routes/searchproject'); // Add your search project route
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
@@ -55,6 +56,7 @@ app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/companies', companiesRouter);                 // Companies routes here
+app.use('/api/mentor_projects', searchProjectRoutes); // Mount search under /mentor_projects/search
 app.use('/api/interviews', interviewRoutes);
 
 // Health check endpoint

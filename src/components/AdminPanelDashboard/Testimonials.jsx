@@ -1,113 +1,171 @@
-import React, { useState } from "react";
-import { Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { MessageSquare, Trash2, Loader2, User } from "lucide-react";
 
-export default function Testimonials({ isDarkMode = false }) {
-  const [testimonials, setTestimonials] = useState([
-    { id: 1, text: "Test Review", author: "Pratishtha", role: "student", date: "03/11/2025, 14:21:36" },
-    { id: 2, text: "TEST", author: "TEST", role: "TEST", date: "03/11/2025, 04:07:22" },
-    { id: 3, text: "Test", author: "Pratishtha", role: "TEST", date: "31/10/2025, 13:38:29" },
-    { id: 4, text: "Test", author: "Test", role: "", date: "27/10/2025, 12:50:50" },
-    { id: 5, text: "Glad to work with Uptoskills", author: "Boobesh K", role: "", date: "15/10/2025, 14:21:54" },
-    { id: 6, text: "test", author: "Pratishtha", role: "student", date: "15/10/2025, 14:21:15" },
-    { id: 7, text: "Glad to work", author: "Mohan", role: "", date: "15/10/2025, 13:59:06" },
-    { id: 8, text: "Good", author: "Test", role: "student", date: "15/10/2025, 13:52:10" },
-    { id: 9, text: "Glad to work with upToSkills", author: "Kanchan", role: "student", date: "15/10/2025, 13:37:47" },
-    { id: 10, text: "Supporting teachers", author: "Kartik", role: "web dev intern", date: "15/10/2025, 13:24:00" },
-    { id: 11, text: "Great place to learn", author: "Rachit", role: "", date: "15/10/2025, 13:22:26" },
-    { id: 12, text: "Hello", author: "Rachit Taneja", role: "web dev intern", date: "15/10/2025, 12:59:20" },
-  ]);
+const API_BASE_URL = "http://localhost:5000/api/testimonials";
 
-  const handleDelete = (id) => {
-    setTestimonials(testimonials.filter((t) => t.id !== id));
+export default function Testimonials({ isDarkMode }) {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(null);
+
+  // Fetch all testimonials
+  const fetchTestimonials = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_BASE_URL);
+      const data = await response.json();
+      setTestimonials(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+      setTestimonials([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  // Delete testimonial
+  const handleDelete = async (id) => {
+    const testimonial = testimonials.find((t) => t.id === id);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the testimonial from ${testimonial?.name || "this user"}?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setDeleting(id);
+      const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setTestimonials((current) => current.filter((t) => t.id !== id));
+      } else {
+        alert(result.message || "Failed to delete testimonial");
+      }
+    } catch (error) {
+      console.error("Error deleting testimonial:", error);
+      alert("Failed to delete testimonial");
+    } finally {
+      setDeleting(null);
+    }
   };
 
   return (
     <div
-      className={`min-h-screen flex flex-col items-center p-6 transition-colors duration-300 ${
+      className={`min-h-screen p-4 sm:p-8 font-inter transition-colors duration-500 ${
         isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
-      <div
-        className={`w-full max-w-5xl rounded-2xl shadow-2xl p-8 backdrop-blur-sm ${
-          isDarkMode ? "bg-gray-800/95" : "bg-white/95"
-        }`}
-      >
-        <h2 className="text-4xl font-bold mb-2 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-          Testimonials
-        </h2>
-        <p className={`text-center mb-8 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-          What our community says about us
-        </p>
+      <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="text-4xl font-extrabold flex items-center gap-3">
+            <MessageSquare className="w-8 h-8 text-indigo-500" />
+            Testimonials
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            Total: {testimonials.length}
+          </div>
+        </div>
 
-        <div className="space-y-4">
-          {testimonials.map((t) => (
-            <div
-              key={t.id}
-              className={`group relative p-6 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
-                isDarkMode 
-                  ? "bg-gray-900/50 border-gray-700 hover:border-blue-500/50 hover:shadow-blue-500/10" 
-                  : "bg-gray-50/50 border-gray-200 hover:border-purple-300 hover:shadow-purple-200/50"
-              }`}
-            >
-              {/* Delete Button - Appears on Hover */}
-              <button
-                onClick={() => handleDelete(t.id)}
-                className={`absolute top-4 right-4 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+        {/* Testimonials List - Horizontal Cards */}
+        <div className="flex flex-col gap-4">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`rounded-lg shadow-md p-6 animate-pulse ${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                }`}
+              >
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
+                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-5/6"></div>
+              </div>
+            ))
+          ) : testimonials.length > 0 ? (
+            testimonials.map((testimonial) => (
+              <motion.div
+                key={testimonial.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
                   isDarkMode
-                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-400"
-                    : "bg-red-50 hover:bg-red-100 text-red-600"
+                    ? "bg-gray-800 text-gray-100"
+                    : "bg-white text-gray-900"
                 }`}
-                aria-label="Delete testimonial"
               >
-                <Trash2 size={18} />
-              </button>
+                <div className="flex items-start justify-between gap-6">
+                  {/* Left Side - User Info and Message */}
+                  <div className="flex-1">
+                    {/* User Info */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">{testimonial.name}</h3>
+                        {testimonial.role && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {testimonial.role}
+                          </p>
+                        )}
+                      </div>
+                      {/* Date */}
+                      {testimonial.created_at && (
+                        <p className="text-xs text-gray-400 ml-auto">
+                          {new Date(testimonial.created_at).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Quote Icon */}
-              <div className={`text-5xl mb-2 leading-none ${isDarkMode ? "text-gray-700" : "text-gray-200"}`}>
-                "
-              </div>
-              
-              <p
-                className={`text-lg mb-4 leading-relaxed ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                {t.text}
-              </p>
-              
-              <div className="flex items-center gap-3">
-                {/* Avatar */}
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${
-                  isDarkMode 
-                    ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
-                    : "bg-gradient-to-br from-blue-400 to-purple-500 text-white"
-                }`}>
-                  {t.author.charAt(0).toUpperCase()}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-lg truncate">{t.author}</h4>
-                  {t.role && (
-                    <p
-                      className={`text-sm truncate ${
-                        isDarkMode ? "text-blue-400" : "text-purple-600"
-                      }`}
-                    >
-                      {t.role}
+                    {/* Message */}
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      "{testimonial.message}"
                     </p>
-                  )}
+                  </div>
+
+                  {/* Right Side - Delete Button */}
+                  <button
+                    onClick={() => handleDelete(testimonial.id)}
+                    disabled={deleting === testimonial.id}
+                    className={`flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                      deleting === testimonial.id
+                        ? "bg-red-300 text-red-800 cursor-not-allowed"
+                        : "bg-red-500 text-white hover:bg-red-600"
+                    }`}
+                  >
+                    {deleting === testimonial.id ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </>
+                    )}
+                  </button>
                 </div>
-                
-                <p
-                  className={`text-xs whitespace-nowrap ${
-                    isDarkMode ? "text-gray-500" : "text-gray-400"
-                  }`}
-                >
-                  {t.date}
-                </p>
-              </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <MessageSquare className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">
+                No testimonials yet. Users can submit reviews from the /about page.
+              </p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

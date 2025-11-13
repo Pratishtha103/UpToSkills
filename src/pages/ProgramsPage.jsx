@@ -2,6 +2,7 @@ import React from 'react';
 import ProgramsSection from '../components/AboutPage/ProgramsSection';
 import Header from '../components/AboutPage/Header';
 import Footer from '../components/AboutPage/Footer';
+import Chatbot from "../components/Contact_Page/Chatbot";
 
 const ProgramsPage = () => {
   return (
@@ -11,6 +12,7 @@ const ProgramsPage = () => {
         <ProgramsSection />
       </main>
       <Footer />
+      <Chatbot />
     </div>
   );
 };

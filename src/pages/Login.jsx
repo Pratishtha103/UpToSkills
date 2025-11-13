@@ -148,8 +148,8 @@ const LoginForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="email"
-                  placeholder="Enter registered email-id"
+                  type="text"
+                  placeholder="Enter registered email-id or username"
                   required
                 />
 

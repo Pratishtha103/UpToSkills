@@ -93,20 +93,20 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error during registration' });
   }
 });
-
-// ---------------- LOGIN ----------------
+// ---------------- LOGIN (Email or Username) ----------------
 router.post('/login', async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
+    // Field validation
     if (!email || !password || !role) {
-      return res.status(400).json({ success: false, message: 'Email, password and role are required' });
+      return res.status(400).json({ success: false, message: 'Email/Username, password and role are required' });
     }
     if (!validateRole(role)) {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 
-    // Choose table
+    // Choose the table based on role
     let tableName;
     if (role.toLowerCase() === 'admin') {
       tableName = 'admins';
@@ -118,38 +118,49 @@ router.post('/login', async (req, res) => {
       tableName = 'companies';
     }
 
-    const userResult = await pool.query(`SELECT * FROM ${tableName} WHERE email = $1`, [email]);
+    // ✅ Allow login with either email OR username
+    const identifier = email; // Frontend still sends in `email` field
+    const userResult = await pool.query(
+      `SELECT * FROM ${tableName} WHERE email = $1 OR username = $1`,
+      [identifier]
+    );
+
+    // Check if user exists
     if (userResult.rows.length === 0) {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
     const user = userResult.rows[0];
+
+    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Build JWT payload (IMPORTANT: nested under `user`)
+    // Generate JWT payload
     const payload = {
       user: {
         id: user.id,
         role: role.toLowerCase(),
         email: user.email,
-        name: user.full_name || user.company_name
-      }
+        name: user.full_name || user.company_name || user.username,
+      },
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
+    // Send response
     res.json({
       success: true,
+      message: "Login successful",
       token,
       user: {
         id: user.id,
-        name: user.full_name || user.company_name,
+        name: user.full_name || user.company_name || user.username,
         email: user.email,
-        role: role.toLowerCase()
-      }
+        role: role.toLowerCase(),
+      },
     });
   } catch (error) {
     console.error('Login error:', error);

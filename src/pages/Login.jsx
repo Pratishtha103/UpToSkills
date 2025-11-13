@@ -176,12 +176,13 @@ const LoginForm = () => {
 
                
                 <div className="text-right -mt-2 mb-3">
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
-                  >
-                    Forgot password?
-                  </Link>
+                 <Link
+  to="/login/forgot-password"
+  className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+>
+  Forgot password?
+</Link>
+
                 </div>
 
                 {/* Submit Button */}

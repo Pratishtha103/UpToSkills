@@ -20,7 +20,7 @@ const programs = [
     skills: ['Ethical Hacking', 'Forensics', 'Cryptography'],
     icon: FaShieldAlt,
     path: '/cyber-security',
-  },
+  }, 
   {
     id: 'web-development',
     title: 'Web Development',

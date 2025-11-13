@@ -25,6 +25,8 @@ import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/S
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
+import ForgotPassword from "./pages/ForgotPassword";
+
 
 // About Page Components
 import Header from './components/AboutPage/Header';
@@ -74,6 +76,8 @@ function App() {
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
+           <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
+
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
 
@@ -100,6 +104,7 @@ function App() {
           <Route path="/projectShowcase" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
           <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} />
           <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+          <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
           {/* ===== Program Forms ===== */}
           <Route path="/programForm/:id" element={<Webdev />} />

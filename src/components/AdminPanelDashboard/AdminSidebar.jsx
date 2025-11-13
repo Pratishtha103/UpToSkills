@@ -20,6 +20,7 @@ const sidebarItems = [
   { id: "courses", label: "Courses", icon: BookOpen },
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "programs", label: "Courses", icon: BookOpen },
+   { id: "testimonials", label: "Testimonials", icon: Bell },
 ];
 
 export default function AdminSidebar({

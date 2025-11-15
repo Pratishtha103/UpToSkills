@@ -32,8 +32,8 @@ const Contact = () => {
         <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
         <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
         <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-          Got a project in mind? We’d love to hear about it. Take five minutes to fill out our project form
-          so that we can get to know you and understand your project.
+          Got a query in mind? We’d love to provide you solution for it. Take a minute to fill out the form below  
+          so that we can get to know you and understand your query.
         </p>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">

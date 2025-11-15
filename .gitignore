@@ -17,3 +17,9 @@ backend/node
 bun.lockb
 mydata.session.sql
 uptoskill_connect.session.sql
+
+# python virtual environments
+.venv/
+
+# editor history
+.history/

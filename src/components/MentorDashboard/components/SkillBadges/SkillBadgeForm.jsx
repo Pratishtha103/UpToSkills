@@ -25,11 +25,44 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
         verified: false,
     });
     // State to track submission status for UI feedback (from HEAD)
-    const [submissionStatus, setSubmissionStatus] = useState(null); 
+    const [submissionStatus, setSubmissionStatus] = useState(null);
+    // State for student autocomplete
+    const [students, setStudents] = useState([]);
+    const [filteredStudents, setFilteredStudents] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(false);
 
     const toggleSidebar = () => {
         setIsOpen((prev) => !prev);
     };
+
+    // Fetch all students on component mount
+    React.useEffect(() => {
+        const fetchStudents = async () => {
+            setLoadingStudents(true);
+            try {
+                const response = await fetch('http://localhost:5000/api/skill-badges/students');
+                const data = await response.json();
+                if (data.success) {
+                    setStudents(data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching students:', error);
+            } finally {
+                setLoadingStudents(false);
+            }
+        };
+        fetchStudents();
+    }, []);
+
+    // Close suggestions when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = () => setShowSuggestions(false);
+        if (showSuggestions) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [showSuggestions]);
 
     // Function to set the badge name when a card is clicked (from HEAD)
     const selectBadge = (badgeName) => {
@@ -45,6 +78,29 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
             ...prevData,
             [name]: type === 'checkbox' ? checked : value,
         }));
+    };
+
+    // Handler specifically for student name input with autocomplete
+    const handleStudentNameChange = (e) => {
+        const value = e.target.value;
+        setFormData(prev => ({ ...prev, student_name: value }));
+        
+        if (value.trim().length > 0) {
+            const filtered = students.filter(student => 
+                student.full_name.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredStudents(filtered);
+            setShowSuggestions(true);
+        } else {
+            setFilteredStudents([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    // Select a student from suggestions
+    const selectStudent = (studentName) => {
+        setFormData(prev => ({ ...prev, student_name: studentName }));
+        setShowSuggestions(false);
     };
     
     // Merged handleSubmit logic (using full error handling and token from HEAD)
@@ -76,13 +132,14 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
             
             if (response.ok && data.success) {
                 setSubmissionStatus('success');
-                alert('Badge added successfully!');
+                alert('✅ Badge added successfully!');
                 // Clear form data on successful submission
                 setFormData({ student_name: '', badge_name: '', badge_description: '', verified: false });
             } else {
                 setSubmissionStatus('error');
                 console.error("Backend Error:", data.message || "Unknown error during badge creation.");
-                alert(`Failed to add badge. Server response: ${data.message || 'Check browser console for details.'}`); 
+                // Show the detailed error message from backend
+                alert(`❌ Failed to add badge\n\n${data.message || 'Unknown error. Check browser console for details.'}`);
             }
         } catch (error) {
             console.error('Network Error:', error);
@@ -145,18 +202,54 @@ const SkillBadgeForm = ({ isDarkMode, setIsDarkMode }) => {
                                 
                                 <h3 className="text-lg font-medium pt-4 mb-3 border-t dark:border-gray-600 dark:text-white">2. Award Details:</h3>
                                 
-                                {/* Student Name Input */}
+                                {/* Student Name Input with Autocomplete */}
                                 <label className="block dark:text-white">
                                     Student Name: 
-                                    <input
-                                        type="text"
-                                        placeholder="Student Name (e.g., John Doe)"
-                                        name="student_name"
-                                        value={formData.student_name}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    />
+                                    <div className="relative" onClick={(e) => e.stopPropagation()}>
+                                        <input
+                                            type="text"
+                                            placeholder="Start typing student name..."
+                                            name="student_name"
+                                            value={formData.student_name}
+                                            onChange={handleStudentNameChange}
+                                            onFocus={() => formData.student_name && setShowSuggestions(true)}
+                                            onClick={() => formData.student_name && setShowSuggestions(true)}
+                                            required
+                                            autoComplete="off"
+                                            className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        />
+                                        
+                                        {/* Autocomplete Dropdown */}
+                                        {showSuggestions && filteredStudents.length > 0 && (
+                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                                {filteredStudents.map((student) => (
+                                                    <div
+                                                        key={student.id}
+                                                        onClick={() => selectStudent(student.full_name)}
+                                                        className="p-2 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer border-b dark:border-gray-600 last:border-b-0"
+                                                    >
+                                                        <div className="font-medium text-gray-900 dark:text-white">{student.full_name}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{student.email}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Show when no students match */}
+                                        {showSuggestions && formData.student_name && filteredStudents.length === 0 && (
+                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
+                                                <p className="text-sm text-red-600 dark:text-red-400">⚠️ No students found with that name</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Make sure the student is registered in the system</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Student count indicator */}
+                                    {!loadingStudents && students.length > 0 && (
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            💡 {students.length} student(s) registered. Start typing to search.
+                                        </p>
+                                    )}
                                 </label>
 
                                 {/* Badge Description Textarea */}

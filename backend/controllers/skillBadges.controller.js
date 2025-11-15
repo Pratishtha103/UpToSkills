@@ -3,7 +3,6 @@
 const pool = require('../config/database');
 
 const addSkillBadge = async (req, res) => {
-    // ... (Your existing addSkillBadge code remains unchanged)
     const { student_name, badge_name, badge_description, verified } = req.body; 
 
     if (!student_name || !badge_name || !badge_description) {
@@ -11,16 +10,37 @@ const addSkillBadge = async (req, res) => {
     }
 
     try {
+        // Trim whitespace and search with flexible matching
+        const trimmedName = student_name.trim();
+        
         const studentResult = await pool.query(
-            'SELECT id FROM students WHERE full_name ILIKE $1',
-            [student_name]
+            'SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1',
+            [trimmedName]
         );
 
         if (studentResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Student not found with that name' });
+            // Try partial match as fallback
+            const partialResult = await pool.query(
+                'SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1 LIMIT 5',
+                [`%${trimmedName}%`]
+            );
+            
+            if (partialResult.rows.length > 0) {
+                const suggestions = partialResult.rows.map(r => r.full_name).join(', ');
+                return res.status(404).json({ 
+                    success: false, 
+                    message: `Student "${student_name}" not found. Did you mean: ${suggestions}?`
+                });
+            }
+            
+            return res.status(404).json({ 
+                success: false, 
+                message: `Student "${student_name}" not found. Please check the spelling or ensure the student is registered.`
+            });
         }
         
         const student_id = studentResult.rows[0].id;
+        const actualStudentName = studentResult.rows[0].full_name;
 
         const badgeResult = await pool.query(
             'INSERT INTO skill_badges (name, description, is_verified) VALUES ($1, $2, $3) RETURNING id',
@@ -73,4 +93,21 @@ const getStudentBadges = async (req, res) => {
     }
 };
 
-module.exports = { addSkillBadge, getStudentBadges };
+// Get all students for autocomplete/dropdown
+const getAllStudents = async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, full_name, email FROM students ORDER BY full_name ASC`
+        );
+        
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        console.error('Error fetching students:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Database error while fetching students' 
+        });
+    }
+};
+
+module.exports = { addSkillBadge, getStudentBadges, getAllStudents };

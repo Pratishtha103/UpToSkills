@@ -11,7 +11,7 @@ const pool = require('../config/database');
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
         company_name VARCHAR(255) NOT NULL,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,  -- ✅ Added UNIQUE
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,
@@ -36,17 +36,18 @@ const pool = require('../config/database');
       );
     `);
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS mentors (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
-        full_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        password TEXT NOT NULL,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `);
+   await pool.query(`
+    CREATE TABLE IF NOT EXISTS mentors (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(50) UNIQUE,  -- ✅ Added UNIQUE
+      full_name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      phone VARCHAR(15) NOT NULL,
+      password TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
     // await pool.query(`
     //   Alter TABLE mentors
     //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
@@ -85,7 +86,7 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,  -- ✅ Added UNIQUE constraint
         program_id INTEGER REFERENCES programs(id),
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,

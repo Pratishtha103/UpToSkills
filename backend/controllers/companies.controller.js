@@ -1,15 +1,23 @@
+//backend/controllers/companies.controller.js
 const pool = require('../config/database');
 
 const getCompanies = async (req, res) => {
   try {
-    const companies = await pool.query(`SELECT * FROM companies`);
+    const companies = await pool.query(`SELECT * FROM companies ORDER BY created_at DESC`);
+    
+    // ✅ FIXED: Return empty array instead of 404 when no companies
     if (!companies.rows.length) {
-      return res.status(404).send('No companies found');
+      return res.status(200).json([]);  // Return empty array, not 404
     }
+    
     return res.status(200).json(companies.rows);
   } catch (error) {
     console.error("Error fetching companies:", error);
-    return res.status(500).send("Server error");
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server error",
+      error: error.message 
+    });
   }
 };
 
@@ -25,7 +33,7 @@ const deleteCompany = async (req, res) => {
     res.json({ success: true, message: "Company removed successfully" });
   } catch (error) {
     console.error("Error deleting company:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 

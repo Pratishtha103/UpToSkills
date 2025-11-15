@@ -19,6 +19,7 @@ import AdminNotifications from "../components/AdminPanelDashboard/AdminNotificat
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
 import Testimonials from "../components/AdminPanelDashboard/Testimonials";
+import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -80,6 +81,8 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+      case "courses_table":
+        return (<CoursesTable isDarkMode={isDarkMode} onNavigateSection={() => setActiveSection} />);
       case "mentors_table":
         return (
           <MentorsTable
@@ -167,14 +170,10 @@ function AdminPanel() {
 
         {/* Footer */}
         <footer
-          className={`w-full text-center py-4 text-sm border-t transition-colors duration-300 ${isDarkMode
-              ? "bg-gray-900 text-gray-300 border-gray-700"
-              : "bg-gray-100 text-gray-700 border-gray-300"
-            }`}
+          className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300"
         >
           <p>© 2025 Uptoskills. Built by learners.</p>
         </footer>
-
       </div>
     </div>
   );

@@ -80,10 +80,10 @@ const ProgramsSection = () => {
 
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-[32px] font-bold mb-4 mt-12 dark:text-white">
-          Courses We Offer
+         Programs We Offer
         </h2>
         <p className="text-[#64748b] dark:text-slate-300 text-[17px] mb-12">
-          Discover our expertly designed courses to master in-demand tech skills
+          Discover our expertly designed programs to master in-demand tech skills
           through hands-on projects and mentorship from industry professionals.
         </p>
 

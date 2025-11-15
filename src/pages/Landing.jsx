@@ -85,7 +85,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <img
             src={logo}
-            alt="Upto To Skills logo"
+            alt="Upto To Skills logo"          
             className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
@@ -222,11 +222,9 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer
-      className="w-full text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-    >
-      <p>© 2025 Uptoskills. Built by learners.</p>
-    </footer>
+      <footer className="bg-gray-900 text-white text-center py-6 text-sm">
+        <p>©2025 Uptoskills. Built by learners.</p>
+      </footer>
 
       {/* Chatbot */}
       <Chatbot />

@@ -19,7 +19,7 @@ const sidebarItems = [
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "courses", label: "Courses", icon: BookOpen },
   { id: "projects", label: "Projects", icon: FolderOpen },
-  { id: "programs", label: "Programs", icon: BookOpen },
+  { id: "programs", label: "Courses", icon: BookOpen },
    { id: "testimonials", label: "Testimonials", icon: Bell },
 ];
 

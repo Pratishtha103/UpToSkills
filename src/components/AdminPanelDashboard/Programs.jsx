@@ -135,13 +135,13 @@ export default function Programs({ onCoursesUpdate }) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-center px-6">
       <div className="bg-white dark:bg-gray-900 shadow-xl rounded-2xl flex flex-col justify-center items-center p-8 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
-          Add New Program
+          Add New Course
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5 w-full">
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-300 font-medium">
-              Program Title
+              Course Title
             </label>
             <input
               type="text"
@@ -225,7 +225,7 @@ export default function Programs({ onCoursesUpdate }) {
             disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-all disabled:opacity-60"
           >
-            {isSubmitting ? "Saving..." : "Add Program"}
+            {isSubmitting ? "Saving..." : "Add Course"}
           </button>
         </form>
 

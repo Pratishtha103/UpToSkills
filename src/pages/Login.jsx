@@ -77,8 +77,9 @@ const LoginForm = () => {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
+      const roleToSave = (
+        response.data.user?.role || formData.role
+      ).toLowerCase();
 
       if (roleToSave === "mentor" && response.data.user) {
         localStorage.setItem("mentor", JSON.stringify(response.data.user));
@@ -118,10 +119,14 @@ const LoginForm = () => {
           <div className="flex flex-col items-center">
             <div className="text-center">
               <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
+                <span className="text-[#00BDA6] capitalize">
+                  {formData.role}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className="text-[16px] text-gray-500">Enter your details to login</p>
+              <p className="text-[16px] text-gray-500">
+                Enter your details to login
+              </p>
             </div>
 
             <div className="w-full flex-1 mt-8">
@@ -143,7 +148,7 @@ const LoginForm = () => {
                 </select>
 
                 {/* Email Input */}
-                <input
+                {/* <input
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
@@ -151,8 +156,17 @@ const LoginForm = () => {
                   type="email"
                   placeholder="Enter registered email-id"
                   required
-                />
+                /> */}
 
+                <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  type="email"
+                  placeholder="Enter registered username or email id"
+                  required
+                />
                 {/* Password Input */}
                 <div className="relative w-full">
                   <input
@@ -223,6 +237,6 @@ const LoginForm = () => {
       </div>
     </div>
   );
-}
+};
 
 export default LoginForm;

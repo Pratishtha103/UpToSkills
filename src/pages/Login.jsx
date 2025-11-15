@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 
 const LoginForm = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -174,11 +174,11 @@ const LoginForm = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     placeholder="Enter your password"
                     required
                   />
-                  <div
+                  {/* <div
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword((s) => !s)}
                   >
@@ -187,7 +187,7 @@ const LoginForm = () => {
                     ) : (
                       <Eye className="h-5 w-5 text-gray-500" />
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Submit Button */}

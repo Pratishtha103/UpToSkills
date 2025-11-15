@@ -14,7 +14,7 @@ const RegistrationForm = () => {
   const params = new URLSearchParams(location.search);
   // Ensure initial role is normalized to the capitalization used in the <select>
   const initialRole = capitalizeFirstLetter(params.get("role") || "student");
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     // Initial role is now "Student" instead of "student"
     role: initialRole,
@@ -169,11 +169,11 @@ const RegistrationForm = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 pr-10"
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     placeholder="Create a Password"
                     required
                   />
-                  <div
+                  {/* <div
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -182,7 +182,7 @@ const RegistrationForm = () => {
                     ) : (
                       <Eye className="h-5 w-5 text-gray-500" />
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {passwordWarning && (

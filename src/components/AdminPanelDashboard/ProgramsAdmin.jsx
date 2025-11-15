@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { FaCloud, FaShieldAlt, FaLaptopCode, FaChartLine, FaSearch, FaTags, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
+
 // Metadata for programs (kept local for now)
 const programs = [
   {
@@ -49,7 +50,6 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
     setSelectedTag(null);
   };
 
-
   const [showAllTags, setShowAllTags] = useState(false);
   const allTags = useMemo(() => {
     const s = new Set();
@@ -59,10 +59,10 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
     return Array.from(s);
   }, []);
 
-  {/* fetch courses */ }
-
+  // Fetch courses
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -116,8 +116,6 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
       return matchesQuery && matchesTag;
     });
   }, [courses, query, selectedTag]);
-
-
 
   return (
     <main className={`${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} min-h-screen p-6`}>
@@ -257,12 +255,23 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
                 } rounded-2xl p-8 lg:p-10 shadow hover:shadow-lg transition`}
             >
               <div className="flex items-start gap-6">
-                <div
-                  className={`${isDarkMode ? 'bg-gray-900' : 'bg-indigo-50'
-                    } p-4 rounded-xl text-indigo-600`}
-                >
-                  <FaLaptopCode className="w-8 h-8" />
-                </div>
+                {/* Display course image or fallback to icon */}
+                {course.image_path ? (
+                  <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                    <img
+                      src={`http://localhost:5000${course.image_path}`}
+                      alt={course.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className={`${isDarkMode ? 'bg-gray-900' : 'bg-indigo-50'
+                      } p-4 rounded-xl text-indigo-600`}
+                  >
+                    <FaLaptopCode className="w-8 h-8" />
+                  </div>
+                )}
                 <div className="flex-1">
                   <h3 className="text-xl lg:text-2xl font-semibold mb-2">
                     {course.title}
@@ -301,6 +310,7 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
               </div>
             </div>
           ))}
+          
           {/* Show message when no courses */}
           {filteredPrograms.length === 0 &&
             filteredCourses.length === 0 &&

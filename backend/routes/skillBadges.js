@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { addSkillBadge, getStudentBadges } = require('../controllers/skillBadges.controller');
+const { addSkillBadge, getStudentBadges, getAllStudents } = require('../controllers/skillBadges.controller');
 // IMPORT the authentication middleware (adjust path as necessary)
 const authMiddleware = require('../middleware/auth'); // <<< IMPORTANT: ENSURE THIS PATH IS CORRECT
 
@@ -11,6 +11,9 @@ router.post('/', addSkillBadge);
 router.post('/*', addSkillBadge); 
 
 // MODIFIED GET route: Add the authMiddleware to ensure only the logged-in student's ID is used
-router.get('/', authMiddleware, getStudentBadges); 
+router.get('/', authMiddleware, getStudentBadges);
+
+// GET route to fetch all students for mentor dropdown
+router.get('/students', getAllStudents);
 
 module.exports = router;

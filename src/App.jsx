@@ -30,6 +30,7 @@ import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
+import Footer from './components/AboutPage/Footer';
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -75,6 +76,7 @@ function App() {
 
               </footer>
               
+              <Footer />
               <Chatbot />
             </>
           } />

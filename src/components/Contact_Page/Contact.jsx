@@ -5,24 +5,25 @@ import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 import useSubmitContactForm from '../../hooks/useSubmitContactForm'; 
 
 const Contact = () => {
-  const { submitForm, loading, response, error } = useSubmitContactForm();
+  const { submitForm, loading, response, error } = useSubmitContactForm();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    inquiryType: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    inquiryType: '',
+    message: '',
+  });
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
-  };
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await submitForm('http://localhost:5000/api/form/contact', formData);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // THIS URL IS CORRECT AND MATCHES THE BACKEND ROUTE: /api/form/contact
+    await submitForm('http://localhost:5000/api/form/contact', formData);
+  };
 
   return (
     <>
@@ -130,13 +131,14 @@ const Contact = () => {
                 textarea
               />
 
-              <button
-                type="submit"
-                className="bg-orange-500 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-md transition-color duration-300"
-                disabled={loading}
-              >
-                {loading ? 'Sending...' : 'Send a Message'}
-              </button>
+             <button
+  type="submit"
+  className="bg-orange-500 hover:bg-[#09C3A1] text-white font-semibold px-6 py-3 rounded-md transition-all duration-300"
+  disabled={loading}
+>
+  {loading ? 'Sending...' : 'Send a Message'}
+</button>
+
 
               {error && <p className="text-red-500">{error}</p>}
               {response && <p className="text-green-500">Message sent successfully!</p>}

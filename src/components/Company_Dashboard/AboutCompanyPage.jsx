@@ -8,7 +8,7 @@ export default function AboutCompanyPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       {/* Content */}
-      <div className="flex-grow pt-20 px-2 sm:px-4 py-6 max-w-[1000px] mx-auto">
+      <div className="flex-grow pt-20 px-2 sm:px-4 py-6 max-w-[1650px] mx-auto">
         <motion.div
           className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
           initial={{ opacity: 0, y: 10 }}
@@ -18,7 +18,7 @@ export default function AboutCompanyPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-gradient-to-r from-[#01BDA5] to-[#43cea2] text-white shadow-md">
+              <div className="p-3 rounded-full bg-[#FB923C] text-white shadow-md">
                 <Users className="w-6 h-6" />
               </div>
               <div>
@@ -30,22 +30,24 @@ export default function AboutCompanyPage() {
                 </p>
               </div>
             </div>
-            <BriefcaseIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <BriefcaseIcon className="w-8 h-8 text-orange-500" />
           </div>
 
           {/* Mission + Values */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Mission Section */}
             <section>
-              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-blue-500 pl-3">
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-orange-500 pl-3">
                 Our Mission
               </h2>
+
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 UptoSkill exists to shorten the gap between emerging technical talent and companies
                 looking to hire them. We build tools and experiences that help companies discover
                 capable students, run structured interviews, and make bias-reduced hiring decisions —
                 all from a single, straightforward dashboard.
               </p>
+
               <div className="mt-6 border-t pt-6 text-sm text-gray-600 dark:text-gray-400">
                 <p>
                   Founded with the goal of making early-career hiring efficient and fair, UptoSkill blends
@@ -66,7 +68,7 @@ export default function AboutCompanyPage() {
 
             {/* Values Section */}
             <section>
-              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-green-400 pl-3">
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-orange-400 pl-3">
                 Values & Approach
               </h2>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -88,52 +90,55 @@ export default function AboutCompanyPage() {
           </div>
         </motion.div>
 
-        {/* Contact Info Section */}
-        <section className="w-full mx-auto py-16 px-4 text-center bg-white">
-          <p className="text-orange-500 font-semibold uppercase">Our Contacts</p>
-          <h2 className="text-4xl font-bold mt-2">We're here to Help You</h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-            Got a project in mind? We’d love to hear about it. Take five minutes to fill out our project form
-            so that we can get to know you and understand your project.
+        {/* Distinct Contact Info Section */}
+        <section className="mt-12 text-center">
+          <p className="text-orange-500 text-3xl font-bold uppercase tracking-wide mb-3">
+            Our Contacts
           </p>
 
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <a
-              href="https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                <FaLinkedin className="text-orange-500 mx-auto mb-4" size={40} />
-                <h3 className="text-xl font-semibold mb-2">Get to Know Us:</h3>
-                <p>www.linkedin.com</p>
-              </div>
-            </a>
+          <h2 className="  font-normal text-gray-900 text-lg dark:text-white mb-6">
+            We're here to Help You
+          </h2>
 
+
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Reach out to us anytime — our team is happy to assist you with inquiries, collaborations, or support.
+          </p>
+
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-5xl mx-auto">
+            {/* Phone Section */}
             <a href="tel:+919319772294">
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
-                <h3 className="text-xl font-semibold mb-2">Phone Us 24/7:</h3>
-                <p className="text-gray-600">+91 (931) 977 2294</p>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-transform">
+                <FaPhone className="text-[#F97316] mx-auto mb-5" size={50} />
+                <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">
+                  Phone Us 24/7
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  +91 (931) 977 2294
+                </p>
               </div>
             </a>
 
+            {/* Mail Section */}
             <a
               href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-                <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-                <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-                <p className="text-gray-600">info@uptoskills.com</p>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-transform">
+                <FaEnvelope className="text-[#F97316] mx-auto mb-5" size={50} />
+                <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">
+                  Mail Us 24/7
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  info@uptoskills.com
+                </p>
               </div>
             </a>
           </div>
         </section>
       </div>
 
-      
       {/* Footer */}
       <Footer />
     </div>

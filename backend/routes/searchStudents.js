@@ -12,6 +12,7 @@ router.get("/search-students", async (req, res) => {
     let query = `
       SELECT
         u.id AS user_detail_id,
+        u.username,
         u.student_id,
         u.full_name AS student_name,
         u.domains_of_interest,
@@ -65,6 +66,7 @@ router.get("/all-students", async (req, res) => {
     const query = `
       SELECT
         u.id AS user_detail_id,
+        u.username,
         u.student_id,
         u.full_name AS student_name,
         u.domains_of_interest,
@@ -100,6 +102,7 @@ router.get("/student/:id", async (req, res) => {
     const query = `
       SELECT 
         u.id AS user_detail_id,
+        u.username,
         u.student_id,
         u.full_name,
         u.contact_number,

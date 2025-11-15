@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft } from "lucide-react";
 import SearchFilters from "./SearchFilters";
+import Footer from "../AboutPage/Footer"
 
 /**
  * SearchStudents (ESLint-safe)
@@ -396,6 +397,7 @@ export default function SearchStudents() {
           )}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

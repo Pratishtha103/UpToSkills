@@ -10,16 +10,11 @@ const sidebarItems = [
   { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
   { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
   { name: "Skill Badges", icon: <Award size={18} />, path: "/mentor-dashboard/skill-badges" },
+  { name: "Project Showcase", icon: <Folder size={18} />, path: "/mentor-dashboard/project-showcase" },
   { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 
-const Sidebar = ({
-  children,
-  isOpen: controlledIsOpen,
-  setIsOpen: controlledSetIsOpen,
-  isDarkMode,
-  setIsDarkMode,
-}) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode, setIsDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -30,7 +25,7 @@ const Sidebar = ({
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalOpen;
 
-  // ✅ Track window size for responsive sidebar
+  // ✅ Handle screen size changes
   useEffect(() => {
     const check = () => {
       const desktop = window.innerWidth >= 1024;
@@ -58,12 +53,9 @@ const Sidebar = ({
     if (currentItem) setActiveItem(currentItem.name);
   }, [location.pathname]);
 
-  // ✅ Listen for global sidebar toggle event
+  // ✅ Sidebar toggle handler
   const toggleHandlerRef = useRef();
-  useEffect(() => {
-    toggleHandlerRef.current = () => setOpen(!isOpen);
-  }, [isOpen]);
-
+  useEffect(() => { toggleHandlerRef.current = () => setOpen(!isOpen); }, [isOpen]);
   useEffect(() => {
     const handler = () => toggleHandlerRef.current && toggleHandlerRef.current();
     window.addEventListener("toggleSidebar", handler);
@@ -84,7 +76,7 @@ const Sidebar = ({
     }, 500);
   };
 
-  // ✅ Dark mode dynamic classes
+  // ✅ Dynamic theme styles
   const bgColor = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200";
   const hoverBg = isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
@@ -95,14 +87,12 @@ const Sidebar = ({
 
   return (
     <>
-      {/* ✅ Sidebar Container */}
       <motion.aside
         className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden transition-colors duration-300 ${bgColor}`}
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.28 }}
       >
-        {/* Sidebar Items */}
         <div className="flex flex-col h-full pt-16 justify-between">
           <div>
             <nav className="flex-1 pt-6 px-4">
@@ -121,11 +111,7 @@ const Sidebar = ({
                     }}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: index * 0.02,
-                      duration: 0.22,
-                      ease: "easeOut",
-                    }}
+                    transition={{ delay: index * 0.02, duration: 0.22, ease: "easeOut" }}
                     whileHover={{ x: 6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -137,16 +123,14 @@ const Sidebar = ({
             </nav>
           </div>
 
-          {/* Social Media + Logout */}
+          {/* ✅ Footer Section */}
           <div className={`p-4 border-t ${borderColor} text-center transition-colors duration-300`}>
             <p className="font-semibold text-sm mb-2 text-gray-500">Connect With Us</p>
             <div className="flex justify-center gap-4 mb-3">
               <FaLinkedin
                 size={22}
                 className="cursor-pointer hover:text-[#0A66C2] transition"
-                onClick={() =>
-                  window.open("https://www.linkedin.com/company/uptoskills/posts/?feedView=all", "_blank")
-                }
+                onClick={() => window.open("https://www.linkedin.com/company/uptoskills/posts/?feedView=all", "_blank")}
               />
               <FaInstagram
                 size={22}
@@ -156,9 +140,7 @@ const Sidebar = ({
               <FaYoutube
                 size={22}
                 className="cursor-pointer hover:text-[#FF0000] transition"
-                onClick={() =>
-                  window.open("https://youtube.com/@uptoskills9101?si=YvRk51dq0exU-zLv", "_blank")
-                }
+                onClick={() => window.open("https://youtube.com/@uptoskills9101?si=YvRk51dq0exU-zLv", "_blank")}
               />
             </div>
 
@@ -175,7 +157,6 @@ const Sidebar = ({
         </div>
       </motion.aside>
 
-      {/* ✅ Offset for main content */}
       <div
         className={`transition-all duration-300 ${
           isOpen && isDesktop ? "ml-64" : "ml-0"

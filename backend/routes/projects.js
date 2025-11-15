@@ -1,122 +1,141 @@
 const express = require('express');
-const pool = require('../config/database');
+const pool = require('../config/database'); // Assuming '../config/database' is your PostgreSQL connection pool
 const router = express.Router();
 
+// --- 🚀 POST: Submit a New Project (Working Code) ---
 router.post("/", async (req, res) => {
-  // CHANGED: Accept student_email instead of student_id
-  const { student_email, title, description, tech_stack, contributions, is_open_source, github_pr_link } = req.body;
-  let student_id = null; // Initialize the variable for the database ID
+    const { student_email, title, description, tech_stack, contributions, is_open_source, github_pr_link } = req.body;
+    let student_id = null; 
 
-  // 1. Basic validation (Email check added)
-  if (!student_email || student_email.trim() === '') {
-    return res.status(400).json({
-      success: false,
-      message: 'Student Email is required.'
-    });
-  }
+    // Ensure is_open_source is a boolean
+    const final_is_open_source = is_open_source === true || is_open_source === 'true'; 
 
-  if (github_pr_link && github_pr_link.trim() && !/^https?:\/\/(www\.)?github\.com\/.*$/.test(github_pr_link)) {
-     return res.status(400).json({
-      success: false,
-      message: 'Please provide a valid GitHub URL'
-     });
-  }
+    // 1. INPUT VALIDATION 
+    if (!student_email || student_email.trim() === '') {
+        return res.status(400).json({ success: false, message: 'Student Email is required.' });
+    }
+    
+    if (!title || title.trim() === '') {
+        return res.status(400).json({ success: false, message: 'Project Title is required.' });
+    }
+    if (!description || description.trim() === '') {
+        return res.status(400).json({ success: false, message: 'Project Description is required.' });
+    }
+    if (!tech_stack || tech_stack.trim() === '') {
+        return res.status(400).json({ success: false, message: 'Technology Stack is required.' });
+    }
+    if (!contributions || contributions.trim() === '') {
+        return res.status(400).json({ success: false, message: 'Your Contributions is required.' });
+    }
 
-  try {
-    // 2. LOOKUP: Find the student's ID using the email
-    const studentResult = await pool.query(
-      `SELECT id FROM students WHERE email = $1`,
-      [student_email]
-    );
+    // GitHub URL validation
+    if (github_pr_link && github_pr_link.trim() && !/^https?:\/\/(www\.)?github\.com\/.*$/.test(github_pr_link)) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid GitHub URL' });
+    }
 
-    if (studentResult.rowCount === 0) {
-      // If no student found with that email, reject the submission
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Student email not found in the database. Please check the address.' 
-      });
-    }
+    try {
+        // 2. LOOKUP: Find the student's ID using the email
+        const studentResult = await pool.query(
+            `SELECT id FROM students WHERE email = $1`,
+            [student_email]
+        );
 
-    // Get the actual student ID from the lookup result
-    student_id = studentResult.rows[0].id;
-    
-    // 3. INSERT: Use the retrieved student_id for the project insertion
-    const result = await pool.query(
-      `INSERT INTO projects (student_id, title, description, tech_stack, contributions, is_open_source, github_pr_link)
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-      [student_id, title, description, tech_stack, contributions, is_open_source, github_pr_link]
-    );
-    
-    console.log('Form submitted successfully!',result.rows[0])
-  
+        if (studentResult.rowCount === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Student email not found in the database. Please check the address.' 
+            });
+        }
 
-    res.status(201).json({ message: "Project submitted successfully!", project: result.rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to submit project" });
-  }
+        student_id = studentResult.rows[0].id;
+
+        // Clean up input strings by trimming whitespace before insertion
+        const cleanTitle = title.trim();
+        const cleanDescription = description.trim();
+        const cleanTechStack = tech_stack.trim();
+        const cleanContributions = contributions.trim();
+        const cleanGithubLink = github_pr_link ? github_pr_link.trim() : null;
+        
+        // 3. INSERT: Use the retrieved student_id for the project insertion
+        const result = await pool.query(
+            `INSERT INTO projects (student_id, title, description, tech_stack, contributions, is_open_source, github_pr_link)
+             VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+            [student_id, cleanTitle, cleanDescription, cleanTechStack, cleanContributions, final_is_open_source, cleanGithubLink]
+        );
+        
+        console.log('Project submitted successfully!', result.rows[0]);
+    
+        res.status(201).json({ message: "Project submitted successfully!", project: result.rows[0] });
+    } catch (err) {
+        // Log the specific database error for debugging
+        console.error("Project Submission Error (Database/Server):", err.message); 
+        res.status(500).json({ error: "Failed to submit project. A server error occurred. Check server console for details." });
+    }
 });
 
-
-// Get all projects
-router.get("/", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM projects");
-    res.status(200).json({ success: true, data: result.rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: "Failed to fetch projects" });
-  }
-});
-
-// Delete a project by id
-router.delete("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query("DELETE FROM projects WHERE id = $1 RETURNING *", [id]);
-    if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: "Project not found" });
-    }
-    res.status(200).json({ success: true, message: "Project deleted successfully", deleted: result.rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: "Failed to delete project" });
-  }
-});
-
-// The commented out route below can remain commented out as it expects studentId in params.
-
-// Get assigned projects for a student
+// --- 📥 GET: Get assigned projects for a student (The Fix) ---
 router.get("/assigned/:studentId", async (req, res) => {
-  const { studentId } = req.params;
+    const studentId = req.params.studentId; 
+    
+    console.log('Fetching projects for student ID:', studentId);
 
-  try {
-    const result = await pool.query(
-      `
-      SELECT 
-        p.id,
-        p.title,
-        p.description,
-        p.tech_stack,
-        p.contributions,
-        p.is_open_source,
-        p.github_pr_link,
-        p.created_at,
-        p.updated_at,
-        pa.assigned_at
-      FROM project_assignments pa
-      INNER JOIN projects p ON pa.project_id = p.id
-      WHERE pa.student_id = $1
-      ORDER BY pa.assigned_at DESC
-      `,
-      [studentId]
-    );
+    try {
+        const query = `
+            SELECT
+                p.*,
+                s.full_name,  -- 🏆 FIX: Corrected from s.name to s.full_name
+                s.email
+            FROM projects p
+            JOIN students s ON p.student_id = s.id
+            WHERE p.student_id = $1
+            ORDER BY p.created_at DESC;
+        `;
 
-    res.json({ success: true, data: result.rows });
-  } catch (err) {
-    console.error("Error fetching assigned projects:", err.message);
-    res.status(500).json({ success: false, message: err.message });
-  }
+        const result = await pool.query(query, [studentId]);
+        
+        return res.status(200).json({ success: true, data: result.rows });
+    } catch (err) {
+        console.error('Error fetching assigned projects:', err.message);
+        return res
+            .status(500)
+            .json({ success: false, message: 'Server error fetching projects', error: err.message });
+    }
 });
+
+
+// --- 📥 GET: Get all projects (Placeholder) ---
+router.get("/", async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                p.*,
+                s.full_name
+            FROM projects p
+            JOIN students s ON p.student_id = s.id
+            ORDER BY p.created_at DESC;
+        `;
+        const result = await pool.query(query);
+        res.status(200).json({ success: true, data: result.rows });
+    } catch (err) {
+        console.error('Error fetching all projects:', err.message);
+        res.status(500).json({ success: false, message: 'Server error fetching all projects' });
+    }
+});
+
+// --- 🗑️ DELETE: Delete a project by id (Placeholder) ---
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM projects WHERE id = $1 RETURNING *', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: 'Project not found' });
+        }
+        res.json({ success: true, message: 'Project deleted successfully', data: result.rows[0] });
+    } catch (err) {
+        console.error('Error deleting project:', err.message);
+        res.status(500).json({ success: false, message: 'Server error deleting project' });
+    }
+});
+
 
 module.exports = router;

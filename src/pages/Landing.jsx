@@ -292,19 +292,19 @@ export default function Landing() {
   const features = [
     {
       title: "For Learners",
-      icon: "https://static.thenounproject.com/png/7914064-512.png",
+      icon: "https://img.icons8.com/?size=100&id=23319&format=png&color=000000",
       desc: "Sharpen your tech skills with projects and peer sessions.",
       role: "learner",
     },
     {
       title: "For Companies",
-      icon: "https://cdn-icons-png.flaticon.com/512/2858/2858749.png",
+      icon: "https://img.icons8.com/?size=100&id=113856&format=png&color=000000",
       desc: "Hire pre-vetted, job-ready talent from our community.",
       role: "company",
     },
     {
       title: "For Mentors",
-      icon: "https://cdn-icons-png.flaticon.com/512/3159/3159980.png",
+      icon: "https://img.icons8.com/?size=100&id=mBzT9ySeO_go&format=png&color=000000",
       desc: "Provide guidance and mentorship opportunities.",
       role: "mentor",
     },
@@ -373,29 +373,34 @@ export default function Landing() {
 
           {/* Animated Illustrations */}
           <div className="relative flex justify-center items-center">
+            {/* 1. Main Hero (Kept as is - The reference animation) */}
             <motion.img
-              src="https://img.freepik.com/free-vector/online-world-concept-illustration_114360-1206.jpg"
+              src="https://th.bing.com/th/id/OIG2.eX62G2JT2MqvSOXZg5DE?pid=ImgGn"
               alt="Main Hero"
               className="w-72 md:w-80 rounded-xl shadow-2xl z-10"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.9 }}
             />
+
+            {/* 2. Secondary Hero (Animation changed to match Main Hero) */}
             <motion.img
               src="https://img.freepik.com/free-vector/programming-concept-illustration_114360-1351.jpg"
               alt="Secondary Hero"
               className="absolute top-[-40px] right-[-30px] w-40 md:w-48 shadow-xl rounded-lg z-0 opacity-80"
-              initial={{ scale: 0.9, rotate: -5, opacity: 0 }}
-              animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 1 }}
+              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
+              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid
+              transition={{ delay: 0.6, duration: 0.9 }} // Kept delay, matched duration
             />
+
+            {/* 3. Floating Hero (Animation changed to match Main Hero) */}
             <motion.img
               src="https://img.freepik.com/free-vector/college-project-concept-illustration_114360-7793.jpg"
               alt="Floating Hero"
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: [20, 0, 20], opacity: 1 }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
+              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid (REMOVES REPEAT)
+              transition={{ delay: 0.9, duration: 0.9 }} // Added delay, matched duration (REMOVES REPEAT: INFINITY)
             />
           </div>
         </div>

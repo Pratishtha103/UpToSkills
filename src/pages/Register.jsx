@@ -129,15 +129,7 @@ const RegistrationForm = () => {
                   required
                 />
 
-                <input
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200"
-                  type="text"
-                  placeholder="Enter username"
-                  required
-                />
+                
 
                 <input
                   name="name"

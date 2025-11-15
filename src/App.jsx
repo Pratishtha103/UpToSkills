@@ -30,7 +30,7 @@ import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
-import Footer from './components/AboutPage/Footer';
+
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -69,14 +69,11 @@ function App() {
               <HeroSection />
               <AboutSection />
               <footer
-
                 className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
               >
                 <p>© 2025 Uptoskills. Built by learners.</p>
 
               </footer>
-              
-              <Footer />
               <Chatbot />
             </>
           } />

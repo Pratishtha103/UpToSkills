@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Settings, User, Sun, Moon, Menu } from "lucide-react";
+import { User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
+import NotificationCenter from "../Notifications/NotificationCenter";
 
 export default function Navbar({ onMenuClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -65,16 +66,7 @@ export default function Navbar({ onMenuClick }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          
-        {/* Notifications */}
-          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5 relative z-10" />
-              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
-                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
-              </span>
-            </Button>
-          </motion.div> */}
+          <NotificationCenter role="company" />
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -101,13 +93,3 @@ export default function Navbar({ onMenuClick }) {
     </motion.nav>
   );
 }
-
-{/* Notifications */}
-          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5 relative z-10" />
-              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
-                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
-              </span>
-            </Button>
-          </motion.div> */}

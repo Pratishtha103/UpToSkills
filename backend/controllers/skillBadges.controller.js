@@ -1,6 +1,7 @@
 // backend/controllers/skillBadges.controller.js
 
 const pool = require('../config/database');
+const { pushNotification } = require('../utils/notificationService');
 
 const addSkillBadge = async (req, res) => {
     const { student_name, badge_name, badge_description, verified } = req.body; 
@@ -51,6 +52,21 @@ const addSkillBadge = async (req, res) => {
             'INSERT INTO student_badges (student_id, badge_id) VALUES ($1, $2)',
             [student_id, badgeResult.rows[0].id]
         );
+
+        await pushNotification({
+            role: 'student',
+            recipientRole: 'student',
+            recipientId: student_id,
+            type: 'badge_award',
+            title: `${badge_name} badge awarded`,
+            message: `You just earned the ${badge_name} badge. ${badge_description}`,
+            metadata: {
+                badgeId: badgeResult.rows[0].id,
+                studentId: student_id,
+                awardedBy: req.user?.id || null,
+            },
+            io: req.app?.get('io'),
+        });
 
         res.json({ success: true, message: 'Skill badge added successfully' });
     } catch (err) {

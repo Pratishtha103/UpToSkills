@@ -128,7 +128,6 @@ function AdminPanel() {
         {/* Navbar */}
         <AdminNavbar
           onMenuClick={toggleSidebar}
-          onNotificationsClick={() => setActiveSection("notifications")}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
         />

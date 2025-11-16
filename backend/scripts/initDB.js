@@ -1,6 +1,7 @@
 // scripts/initDB.js
 require('dotenv').config();
 const pool = require('../config/database');
+const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable');
 
 (async () => {
   try {
@@ -213,6 +214,8 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
     `);
+
+    await ensureNotificationsTable();
 
     console.log('✅ All tables checked/created successfully');
   } catch (err) {

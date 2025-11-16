@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const verifyToken= require('../middleware/auth');
+const { ensureWelcomeNotification, pushNotification } = require('../utils/notificationService');
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 
@@ -137,13 +138,15 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 
+    const normalizedRole = role.toLowerCase();
+
     // Choose table
     let tableName;
-    if (role.toLowerCase() === 'admin') {
+    if (normalizedRole === 'admin') {
       tableName = 'admins';
-    } else if (role.toLowerCase() === 'student') {
+    } else if (normalizedRole === 'student') {
       tableName = 'students';
-    } else if (role.toLowerCase() === 'mentor') {
+    } else if (normalizedRole === 'mentor') {
       tableName = 'mentors';
     } else {
       tableName = 'companies';
@@ -164,13 +167,47 @@ router.post('/login', async (req, res) => {
     const payload = {
       user: {
         id: user.id,
-        role: role.toLowerCase(),
+        role: normalizedRole,
         email: user.email,
         name: user.full_name || user.company_name
       }
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+
+    const ioInstance = req.app.get('io');
+
+    await ensureWelcomeNotification({
+      role: normalizedRole,
+      recipientId: user.id,
+      name: user.full_name || user.company_name,
+      io: ioInstance,
+    });
+
+    try {
+      const timestamp = new Date();
+      const friendlyTime = timestamp.toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      });
+
+      await pushNotification({
+        role: normalizedRole,
+        recipientRole: normalizedRole,
+        recipientId: user.id,
+        type: 'login',
+        title: 'New login detected',
+        message: `You signed in on ${friendlyTime}. If this wasn't you, please reset your password.`,
+        metadata: {
+          timestamp: timestamp.toISOString(),
+          ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip,
+          userAgent: req.get('user-agent') || 'unknown',
+        },
+        io: ioInstance,
+      });
+    } catch (notificationError) {
+      console.error('Login notification error:', notificationError);
+    }
 
     res.json({
       success: true,

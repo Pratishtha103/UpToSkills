@@ -1,7 +1,7 @@
 // backend/controllers/skillBadges.controller.js
 
 const pool = require('../config/database');
-const { pushNotification } = require('../utils/notificationService');
+const { pushNotification, notifyAdmins } = require('../utils/notificationService');
 
 const addSkillBadge = async (req, res) => {
     const { student_name, badge_name, badge_description, verified } = req.body; 
@@ -53,6 +53,8 @@ const addSkillBadge = async (req, res) => {
             [student_id, badgeResult.rows[0].id]
         );
 
+        const ioInstance = req.app?.get('io');
+
         await pushNotification({
             role: 'student',
             recipientRole: 'student',
@@ -65,8 +67,24 @@ const addSkillBadge = async (req, res) => {
                 studentId: student_id,
                 awardedBy: req.user?.id || null,
             },
-            io: req.app?.get('io'),
+            io: ioInstance,
         });
+
+        try {
+            await notifyAdmins({
+                title: 'Skill badge awarded',
+                message: `${req.user?.name || 'A mentor'} awarded ${badge_name} to ${actualStudentName}.`,
+                type: 'badge_award',
+                metadata: {
+                    badgeId: badgeResult.rows[0].id,
+                    studentId: student_id,
+                    mentorId: req.user?.id || null,
+                },
+                io: ioInstance,
+            });
+        } catch (adminBadgeError) {
+            console.error('Admin notification error (badge)', adminBadgeError);
+        }
 
         res.json({ success: true, message: 'Skill badge added successfully' });
     } catch (err) {

@@ -1,6 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
+const { pushNotification, notifyAdmins } = require("../utils/notificationService");
+
+const formatInterviewSlot = (date, time) => {
+  try {
+    const slot = new Date(`${date}T${time}`);
+    if (!Number.isNaN(slot.getTime())) {
+      return slot.toLocaleString("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    }
+  } catch (err) {
+    // ignore formatting errors
+  }
+  return `${date} ${time}`;
+};
 
 // ✅ GET all interviews (sorted by date & time)
 router.get("/", async (req, res) => {
@@ -29,7 +45,58 @@ router.post("/", async (req, res) => {
       [candidateName, position, date, time]
     );
 
-    res.status(201).json(result.rows[0]);
+    const createdInterview = result.rows[0];
+    const slotLabel = formatInterviewSlot(createdInterview.date, createdInterview.time);
+    const ioInstance = req.app.get("io");
+
+    try {
+      const trimmedCandidate = candidateName?.trim();
+      if (trimmedCandidate) {
+        const studentMatch = await pool.query(
+          "SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1 LIMIT 1",
+          [trimmedCandidate]
+        );
+
+        if (studentMatch.rows.length) {
+          await pushNotification({
+            role: "student",
+            recipientRole: "student",
+            recipientId: studentMatch.rows[0].id,
+            type: "interview",
+            title: "Interview scheduled",
+            message: `Your interview for ${position} is set for ${slotLabel}.`,
+            metadata: {
+              interviewId: createdInterview.id,
+              candidateName: trimmedCandidate,
+              position,
+              date: createdInterview.date,
+              time: createdInterview.time,
+            },
+            io: ioInstance,
+          });
+        }
+      }
+    } catch (studentNotifyError) {
+      console.error("Student interview notification error", studentNotifyError);
+    }
+
+    try {
+      await notifyAdmins({
+        title: "Interview scheduled",
+        message: `${candidateName} has an interview for ${position} on ${slotLabel}.`,
+        type: "interview",
+        metadata: {
+          interviewId: createdInterview.id,
+          candidateName,
+          position,
+        },
+        io: ioInstance,
+      });
+    } catch (adminInterviewError) {
+      console.error("Admin notification error (interview)", adminInterviewError);
+    }
+
+    res.status(201).json(createdInterview);
   } catch (error) {
     console.error("Error adding interview:", error);
     res.status(500).json({ error: "Server error while adding interview" });

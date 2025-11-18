@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 const path = require('path');
 const { ensureNotificationsTable } = require('./utils/ensureNotificationsTable');
+const { ensureAdminBootstrap } = require('./utils/ensureAdminBootstrap');
 
 // Database connection
 const pool = require('./config/database');
@@ -33,6 +34,13 @@ ensureNotificationsTable()
     .then(() => console.log('✅ Notifications table ready'))
     .catch((err) => {
         console.error('❌ Failed to ensure notifications schema', err);
+        process.exit(1);
+    });
+
+ensureAdminBootstrap()
+    .then(() => console.log('✅ Admin table ready'))
+    .catch((err) => {
+        console.error('❌ Failed to ensure admin bootstrap', err);
         process.exit(1);
     });
 

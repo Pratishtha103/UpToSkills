@@ -33,19 +33,19 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Hardcoded admin login
+    // ✅ Hardcoded admin login (fallback only — main flow still hits the API so notifications fire)
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
       role: "admin",
     };
-
-    if (
+    const isHardcodedAdmin =
       formData.email === hardcodedAdmin.email &&
       formData.password === hardcodedAdmin.password &&
-      formData.role === "admin"
-    ) {
-      alert("Admin login successful");
+      formData.role === "admin";
+
+    const fallbackAdminLogin = () => {
+      alert("Admin login successful (fallback mode)");
 
       const adminUser = {
         name: "Admin",
@@ -55,10 +55,10 @@ const LoginForm = () => {
 
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
+      localStorage.setItem("admin", JSON.stringify(adminUser));
 
       navigate("/adminPanel", { state: { updated: true } });
-      return;
-    }
+    };
 
     // ✅ Regular login flow
     try {
@@ -81,8 +81,13 @@ const LoginForm = () => {
         response.data.user?.role || formData.role
       ).toLowerCase();
 
-      if (roleToSave === "mentor" && response.data.user) {
-        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      if (response.data.user) {
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
+        if (roleToSave === "admin") {
+          localStorage.setItem("admin", JSON.stringify(response.data.user));
+        }
       }
 
       if (roleToSave === "admin") navigate("/adminPanel");
@@ -92,6 +97,12 @@ const LoginForm = () => {
       else if (roleToSave === "company") navigate("/company");
       else navigate("/login");
     } catch (err) {
+      if (isHardcodedAdmin) {
+        console.warn("Admin API login failed, using fallback mode:", err.message);
+        fallbackAdminLogin();
+        return;
+      }
+
       const message =
         err.response?.data?.message ||
         err.message ||

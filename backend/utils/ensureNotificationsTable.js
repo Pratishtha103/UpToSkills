@@ -63,6 +63,7 @@ async function ensureNotificationsTable() {
   await pool.query(`ALTER TABLE notifications ALTER COLUMN metadata SET DEFAULT '{}'::jsonb;`);
   await pool.query(`ALTER TABLE notifications ALTER COLUMN is_read SET DEFAULT FALSE;`);
   await pool.query(`ALTER TABLE notifications ALTER COLUMN created_at SET DEFAULT NOW();`);
+  await pool.query(`ALTER TABLE notifications ALTER COLUMN recipient_id DROP NOT NULL;`);
   await pool.query(`ALTER TABLE notifications ALTER COLUMN recipient_role SET NOT NULL;`);
   await pool.query(`ALTER TABLE notifications ALTER COLUMN notification_type SET DEFAULT 'general';`);
   await pool.query(`ALTER TABLE notifications ALTER COLUMN notification_type SET NOT NULL;`);

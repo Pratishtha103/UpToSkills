@@ -1,5 +1,7 @@
 const pool = require("../config/database");
 
+const ADMIN_ROLE = "admin";
+
 const INSERT_NOTIFICATION = `
   INSERT INTO notifications (role, recipient_role, recipient_id, notification_type, title, message, link, metadata)
   VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -89,4 +91,15 @@ async function ensureWelcomeNotification({ role, recipientId, name, io }) {
 module.exports = {
   pushNotification,
   ensureWelcomeNotification,
+  notifyAdmins: ({ title, message, type = "admin_alert", metadata = {}, io }) =>
+    pushNotification({
+      role: ADMIN_ROLE,
+      recipientRole: ADMIN_ROLE,
+      recipientId: null,
+      type,
+      title,
+      message,
+      metadata,
+      io,
+    }),
 };

@@ -8,7 +8,7 @@ import { cn } from "../../lib/utils";
 
 const deriveRecipientFromStorage = () => {
   if (typeof window === "undefined") return null;
-  const potentialKeys = ["user", "mentor", "company", "student"];
+  const potentialKeys = ["user", "admin", "mentor", "company", "student"];
   for (const key of potentialKeys) {
     try {
       const raw = localStorage.getItem(key);

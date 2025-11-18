@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const verifyToken= require('../middleware/auth');
-const { ensureWelcomeNotification, pushNotification } = require('../utils/notificationService');
+const { ensureWelcomeNotification, pushNotification, notifyAdmins } = require('../utils/notificationService');
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 
@@ -22,6 +22,8 @@ function validateRole(role) {
   const roles = ['admin', 'student', 'company', 'mentor'];
   return roles.includes(role.toLowerCase());
 }
+
+const formatRoleLabel = (role = '') => role.charAt(0).toUpperCase() + role.slice(1);
 
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
@@ -44,15 +46,17 @@ router.post('/register', async (req, res) => {
     if (!validateRole(role)) {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
-    if (role.toLowerCase() === 'admin') {
+    const normalizedRole = role.toLowerCase();
+
+    if (normalizedRole === 'admin') {
       return res.status(400).json({ success: false, message: 'Admin registration is not allowed' });
     }
 
     // Choose table
     let tableName;
-    if (role.toLowerCase() === 'company') {
+    if (normalizedRole === 'company') {
       tableName = 'companies';
-    } else if (role.toLowerCase() === 'mentor') {
+    } else if (normalizedRole === 'mentor') {
       tableName = 'mentors';
     } else {
       tableName = 'students';
@@ -76,14 +80,14 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let insertQuery, values;
-    if (role.toLowerCase() === 'company') {
+    if (normalizedRole === 'company') {
       insertQuery = `
         INSERT INTO companies (company_name, email, phone, password, username)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id, company_name AS name, email, username
       `;
       values = [name, email, phone, hashedPassword, username];
-    } else if (role.toLowerCase() === 'mentor') {
+    } else if (normalizedRole === 'mentor') {
       insertQuery = `
         INSERT INTO mentors (full_name, email, phone, password, username)
         VALUES ($1, $2, $3, $4, $5)
@@ -99,11 +103,49 @@ router.post('/register', async (req, res) => {
       values = [name, email, phone, hashedPassword, username];
     }
 
+    const ioInstance = req.app.get('io');
     const result = await pool.query(insertQuery, values);
+    const newUser = { ...result.rows[0], role: normalizedRole };
+
+    try {
+      await pushNotification({
+        role: normalizedRole,
+        recipientRole: normalizedRole,
+        recipientId: newUser.id,
+        type: 'welcome',
+        title: `Welcome to UpToSkills, ${newUser.name || name}!`,
+        message: 'You are all set. Explore the dashboard to get started.',
+        metadata: {
+          username: newUser.username,
+          email: newUser.email,
+          role: normalizedRole,
+        },
+        io: ioInstance,
+      });
+    } catch (welcomeError) {
+      console.error('Welcome notification error:', welcomeError);
+    }
+
+    try {
+      await notifyAdmins({
+        title: `New ${formatRoleLabel(normalizedRole)} registered`,
+        message: `${newUser.name || name || 'A user'} just joined as a ${normalizedRole}.`,
+        type: 'user_register',
+        metadata: {
+          role: normalizedRole,
+          userId: newUser.id,
+          email: newUser.email,
+        },
+        io: ioInstance,
+      });
+    } catch (adminNotifyError) {
+      console.error('Admin notification error (registration):', adminNotifyError);
+    }
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      user: { ...result.rows[0], role: role.toLowerCase() }
+      user: newUser,
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -163,13 +205,20 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
+    const displayName =
+      user.full_name ||
+      user.company_name ||
+      user.name ||
+      (normalizedRole === 'admin' ? 'Admin' : null) ||
+      user.email;
+
     // Build JWT payload (IMPORTANT: nested under `user`)
     const payload = {
       user: {
         id: user.id,
         role: normalizedRole,
         email: user.email,
-        name: user.full_name || user.company_name
+        name: displayName
       }
     };
 
@@ -209,12 +258,28 @@ router.post('/login', async (req, res) => {
       console.error('Login notification error:', notificationError);
     }
 
+    try {
+      await notifyAdmins({
+        title: `${formatRoleLabel(normalizedRole)} signed in`,
+        message: `${displayName || 'A user'} logged in at ${new Date().toLocaleTimeString('en-US')}.`,
+        type: 'user_login',
+        metadata: {
+          role: normalizedRole,
+          userId: user.id,
+          email: user.email,
+        },
+        io: ioInstance,
+      });
+    } catch (adminNotifyLoginError) {
+      console.error('Admin notification error (login):', adminNotifyLoginError);
+    }
+
     res.json({
       success: true,
       token,
       user: {
         id: user.id,
-        name: user.full_name || user.company_name,
+        name: displayName,
         email: user.email,
         role: role.toLowerCase()
       }

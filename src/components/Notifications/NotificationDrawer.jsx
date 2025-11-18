@@ -39,35 +39,35 @@ const roleThemes = {
     accent: "text-emerald-600",
     badge: "bg-emerald-500",
     iconBg: "bg-emerald-50 dark:bg-emerald-500/10",
-    gradient: "from-emerald-500/15 via-white to-white",
+    gradient: "from-emerald-200/70 via-white to-white dark:from-emerald-500/10 dark:via-slate-900 dark:to-slate-950",
   },
   mentor: {
     tag: "Mentor updates",
     accent: "text-sky-600",
     badge: "bg-sky-500",
     iconBg: "bg-sky-50 dark:bg-sky-500/10",
-    gradient: "from-sky-500/15 via-white to-white",
+    gradient: "from-sky-200/70 via-white to-white dark:from-sky-500/10 dark:via-slate-900 dark:to-slate-950",
   },
   admin: {
     tag: "Admin updates",
     accent: "text-violet-600",
     badge: "bg-violet-500",
     iconBg: "bg-violet-50 dark:bg-violet-500/10",
-    gradient: "from-violet-500/15 via-white to-white",
+    gradient: "from-violet-200/60 via-white to-white dark:from-violet-500/15 dark:via-slate-900 dark:to-slate-950",
   },
   company: {
     tag: "Company updates",
     accent: "text-amber-600",
     badge: "bg-amber-500",
     iconBg: "bg-amber-50 dark:bg-amber-500/10",
-    gradient: "from-amber-500/15 via-white to-white",
+    gradient: "from-amber-100 via-orange-50 to-white dark:from-amber-500/15 dark:via-slate-900 dark:to-slate-950",
   },
   default: {
     tag: "Latest updates",
     accent: "text-indigo-600",
     badge: "bg-indigo-500",
     iconBg: "bg-indigo-50 dark:bg-indigo-500/10",
-    gradient: "from-indigo-500/15 via-white to-white",
+    gradient: "from-indigo-200/70 via-white to-white dark:from-indigo-500/10 dark:via-slate-900 dark:to-slate-950",
   },
 };
 
@@ -118,9 +118,10 @@ const NotificationDrawer = ({
             transition={{ type: "spring", stiffness: 260, damping: 30 }}
           >
             <div className="flex h-full flex-col">
-              <header className={`relative overflow-hidden border-b border-slate-200 px-6 py-5 dark:border-slate-800`}
+              <header
+                className={`relative mx-4 mt-4 mb-4 overflow-hidden rounded-[32px] border border-slate-200/80 bg-gradient-to-br px-6 py-6 text-gray-900 shadow-[0_12px_40px_rgba(15,23,42,0.08)] dark:border-slate-800/80 dark:text-white ${theme.gradient}`}
+                style={{ minHeight: "140px" }}
               >
-                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${theme.gradient}`} />
                 <div className="relative flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
@@ -150,11 +151,11 @@ const NotificationDrawer = ({
                   </div>
                 </div>
                 {unreadCount > 0 && (
-                  <div className="relative mt-4 flex items-center gap-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <div className="relative mt-6 flex items-center gap-3">
+                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 dark:text-slate-300">
                       Unread
                     </span>
-                    <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                    <div className="h-px flex-1 bg-slate-200/70 dark:bg-slate-800/70" />
                     <Button size="sm" variant="ghost" onClick={onMarkAllRead} className="text-xs">
                       Mark all read
                     </Button>
@@ -168,7 +169,7 @@ const NotificationDrawer = ({
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto bg-slate-50 px-6 py-6 dark:bg-slate-950">
+              <div className="flex-1 overflow-y-auto bg-slate-50 px-6 pb-6 pt-2 dark:bg-slate-950">
                 {isLoading ? (
                   <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     Loading notifications...

@@ -19,7 +19,7 @@ const Header = () => {
 
         {/* Navigation */}
         <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
-          {["Home", "About", "Courses", "Contact"].map((link, i) => {
+          {["Home", "About", "Programs", "Contact"].map((link, i) => {
             const path =
               link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
             return (

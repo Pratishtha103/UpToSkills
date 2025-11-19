@@ -216,7 +216,7 @@
 //         </div>
 //       </section>
 
-   
+
 
 
 //       {/* Footer */}
@@ -375,9 +375,9 @@ export default function Landing() {
           <div className="relative flex justify-center items-center">
             {/* 1. Main Hero (Kept as is - The reference animation) */}
             <motion.img
-              src="https://th.bing.com/th/id/OIG2.eX62G2JT2MqvSOXZg5DE?pid=ImgGn"
+              src="https://i.postimg.cc/X7ypPmVZ/hero.jpg"
               alt="Main Hero"
-              className="w-72 md:w-80 rounded-xl shadow-2xl z-10"
+              className="w-72 md:w-80 rounded-xl shadow-2xl z-10 mr-8 ml-5"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.9 }}
@@ -395,7 +395,7 @@ export default function Landing() {
 
             {/* 3. Floating Hero (Animation changed to match Main Hero) */}
             <motion.img
-              src="https://img.freepik.com/free-vector/college-project-concept-illustration_114360-7793.jpg"
+              src="https://i.postimg.cc/50qrTPRm/s1.jpg"
               alt="Floating Hero"
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
               initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
@@ -454,8 +454,10 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white text-center py-6 text-sm">
-        <p>©2025 Uptoskills. Built by learners.</p>
+      <footer
+        className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+      >
+        <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
 
       {/* Chatbot */}

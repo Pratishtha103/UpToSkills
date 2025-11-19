@@ -174,7 +174,7 @@ const Students = ({ isDarkMode }) => {
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 justify-between">
                       <h3 className="text-xl font-bold truncate">
                         {student.full_name}
                       </h3>

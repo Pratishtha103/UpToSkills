@@ -21,8 +21,7 @@ const statsRoutes = require("./routes/stats");
 const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
-const companiesRouter = require("./routes/searchcompanies");       // Use the one companies router consistently
-const searchProjectRoutes = require('./routes/searchproject'); // Add your search project route
+const companiesRoutes = require('./routes/companies.route');
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
@@ -31,7 +30,7 @@ const interviewRoutes = require('./routes/interviews');
 
 // Middleware setup
 app.use(cors({
-    origin: 'http://localhost:3000', // React frontend
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'], // React frontend ports
     credentials: true
 }));
 app.use(express.json());
@@ -55,8 +54,10 @@ app.use('/api/mentors', mentorsRoutes);
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
-
-// ✅ Connect the interviews route
+app.use('/api/companies', companiesRoutes);
+app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+app.use('/api/test', require('./routes/testEnrollment'));
+app.use('/api/debug', require('./routes/debugRoutes'));
 app.use('/api/interviews', interviewRoutes);
 
 // Health check endpoint

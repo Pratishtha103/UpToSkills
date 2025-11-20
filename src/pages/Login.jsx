@@ -71,6 +71,7 @@ const LoginForm = () => {
 
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("studentId", response.data.user.id);
       }
 
       const roleToSave =

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import loginImage from "../assets/loginnew.jpg"; // ✅ Local image import
+import loginImage from "../assets/loginnew.jpg";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +31,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ---------------- HARD-CODED ADMIN ----------------
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
@@ -47,7 +48,7 @@ const LoginForm = () => {
       const adminUser = {
         name: "Admin",
         email: hardcodedAdmin.email,
-        role: hardcodedAdmin.role,
+        role: "admin",
       };
 
       localStorage.setItem("token", "dummy_admin_token");
@@ -98,18 +99,16 @@ const LoginForm = () => {
   return (
     <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
       <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
-        {/* Left Image */}
-       <div className="w-full md:w-1/2 p-3 flex items-center">
-  <div
-    className="w-full h-[420px] md:h-[400px] lg:h-[600px] bg-cover bg-center rounded-2xl shadow-sm"
-    style={{
-      backgroundImage: `url(${loginImage})`,
-    }}
-  />
-</div>
 
+        {/* Image */}
+        <div className="w-full md:w-1/2 p-3 flex items-center">
+          <div
+            className="w-full h-[420px] md:h-[400px] lg:h-[600px] bg-cover bg-center rounded-2xl shadow-sm"
+            style={{ backgroundImage: `url(${loginImage})` }}
+          />
+        </div>
 
-        {/* Right Form */}
+        {/* Form */}
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div className="flex flex-col items-center">
             <div className="text-center">
@@ -117,7 +116,7 @@ const LoginForm = () => {
                 <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className="text-[16px] text-gray-500">Enter your details to login</p>
+              <p className="text-[16px] text-gray-500">Enter your details</p>
             </div>
 
             <div className="w-full flex-1 mt-8">
@@ -129,7 +128,7 @@ const LoginForm = () => {
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm"
                 >
                   <option value="admin">Login as Admin</option>
                   <option value="student">Login as Student</option>
@@ -137,24 +136,22 @@ const LoginForm = () => {
                   <option value="mentor">Login as Mentor</option>
                 </select>
 
-                {/* Email Input */}
                 <input
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="email"
-                  placeholder="Enter registered email-id"
+                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+                  type="text"
+                  placeholder="Enter email or username"
                   required
                 />
 
-                {/* Password Input */}
-                <div className="relative w-full">
+                <div className="relative">
                   <input
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
@@ -173,24 +170,12 @@ const LoginForm = () => {
 
                 <button
                   type="submit"
-                  className="mt-5 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all duration-100 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  className="mt-5 bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
                 >
-                  <svg
-                    className="w-6 h-6 -ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                    <path d="M20 8v6M23 11h-6" />
-                  </svg>
-                  <span className="ml-3">Login</span>
+                  Login
                 </button>
 
-                <p className="text-l text-gray-600 text-center">
+                <p className="text-center text-gray-600">
                   Don’t have an account?{" "}
                   <Link to="/register">
                     <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
@@ -200,11 +185,12 @@ const LoginForm = () => {
                 </p>
               </form>
             </div>
+
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default LoginForm;

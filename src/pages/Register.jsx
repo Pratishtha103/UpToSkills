@@ -14,10 +14,10 @@ const RegistrationForm = () => {
   const params = new URLSearchParams(location.search);
   // Ensure initial role is normalized to the capitalization used in the <select>
   const initialRole = capitalizeFirstLetter(params.get("role") || "student");
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     // Initial role is now "Student" instead of "student"
-    role: initialRole, 
+    role: initialRole,
     name: "",
     username: "",
     email: "",
@@ -47,13 +47,17 @@ const RegistrationForm = () => {
     try {
       // NOTE: For the backend, you might want to send the role as lowercase (e.g., "student").
       // If so, change formData to {...formData, role: formData.role.toLowerCase()}
-      const response = await axios.post("http://localhost:5000/api/auth/register", formData);
-      console.log('Form Data:', formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData
+      );
       alert(response.data.message);
       navigate("/login");
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Registration failed. Please try again.");
+      alert(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 
@@ -105,6 +109,28 @@ const RegistrationForm = () => {
                   <option value="Mentor">Register as Mentor</option>
                 </select>
 
+                {/* <input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200"
+                  type="text"
+                  placeholder="Enter your name"
+                  required
+                />
+                 */}
+                 <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200"
+                  type="text"
+                  placeholder="Enter your username"
+                  required
+                />
+
+                
+
                 <input
                   name="name"
                   value={formData.name}
@@ -114,15 +140,7 @@ const RegistrationForm = () => {
                   placeholder="Enter your name"
                   required
                 />
-                <input
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200"
-                  type="text"
-                  placeholder="Enter UserName"
-                  required
-                />
+                
                 {/* ... other form fields follow ... */}
                 <input
                   name="email"
@@ -151,11 +169,11 @@ const RegistrationForm = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 pr-10"
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     placeholder="Create a Password"
                     required
                   />
-                  <div
+                  {/* <div
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -164,13 +182,11 @@ const RegistrationForm = () => {
                     ) : (
                       <Eye className="h-5 w-5 text-gray-500" />
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {passwordWarning && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {passwordWarning}
-                  </p>
+                  <p className="text-xs text-red-500 mt-1">{passwordWarning}</p>
                 )}
 
                 <button

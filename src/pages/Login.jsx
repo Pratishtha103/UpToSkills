@@ -1,9 +1,8 @@
-// src/pages/Login.jsx
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import loginImage from "../assets/loginnew.jpg"; // ✅ Local image import
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -205,7 +204,6 @@ const LoginForm = () => {
                   <span className="ml-3">Login</span>
                 </button>
 
-                {/* Sign Up */}
                 <p className="text-l text-gray-600 text-center">
                   Don’t have an account?{" "}
                   <Link to="/register">
@@ -217,17 +215,6 @@ const LoginForm = () => {
               </form>
             </div>
           </div>
-        </div>
-
-        {/* Right Image */}
-        <div className="flex-1 text-center hidden md:flex">
-          <div
-            className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-            style={{
-              backgroundImage:
-                "url(https://www.mahindrauniversity.edu.in/wp-content/uploads/2023/04/why20is20training2020placement20cell20important1.png)",
-            }}
-          />
         </div>
       </div>
     </div>

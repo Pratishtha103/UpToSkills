@@ -25,11 +25,18 @@ function validateRole(role) {
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, phone, password, role ,username} = req.body;
+    const { name, email, phone, password, role, username } = req.body;
 
+    // ✅ Basic validation
     if (!name || !email || !phone || !password || !role) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
+    
+    // ✅ Validate username is provided
+    if (!username || username.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Username is required' });
+    }
+    
     if (!validateEmail(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
     }
@@ -50,10 +57,19 @@ router.post('/register', async (req, res) => {
       tableName = 'students';
     }
 
-    // Check if user exists
-    const existing = await pool.query(`SELECT * FROM ${tableName} WHERE email = $1`, [email]);
-    if (existing.rows.length > 0) {
+    // ✅ Check if email exists
+    const existingEmail = await pool.query(`SELECT * FROM ${tableName} WHERE email = $1`, [email]);
+    if (existingEmail.rows.length > 0) {
       return res.status(400).json({ success: false, message: 'User already exists with this email' });
+    }
+
+    // ✅ Check if username exists (NEW VALIDATION)
+    const existingUsername = await pool.query(`SELECT * FROM ${tableName} WHERE username = $1`, [username]);
+    if (existingUsername.rows.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Username already taken. Please choose a different username.' 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -61,25 +77,25 @@ router.post('/register', async (req, res) => {
     let insertQuery, values;
     if (role.toLowerCase() === 'company') {
       insertQuery = `
-        INSERT INTO companies (company_name, email, phone, password,username)
-        VALUES ($1, $2, $3, $4,$5)
-        RETURNING id, company_name AS name, email
+        INSERT INTO companies (company_name, email, phone, password, username)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, company_name AS name, email, username
       `;
-      values = [name, email, phone, hashedPassword,username];
+      values = [name, email, phone, hashedPassword, username];
     } else if (role.toLowerCase() === 'mentor') {
       insertQuery = `
-        INSERT INTO mentors (full_name, email, phone, password,username)
-        VALUES ($1, $2, $3, $4,$5)
-        RETURNING id, full_name AS name, email
+        INSERT INTO mentors (full_name, email, phone, password, username)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, full_name AS name, email, username
       `;
-      values = [name, email, phone, hashedPassword,username];
+      values = [name, email, phone, hashedPassword, username];
     } else {
       insertQuery = `
-        INSERT INTO students (full_name, email, phone, password,username)
-        VALUES ($1, $2, $3, $4,$5)
-        RETURNING id, full_name AS name, email
+        INSERT INTO students (full_name, email, phone, password, username)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, full_name AS name, email, username
       `;
-      values = [name, email, phone, hashedPassword,username];
+      values = [name, email, phone, hashedPassword, username];
     }
 
     const result = await pool.query(insertQuery, values);
@@ -90,6 +106,21 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // ✅ Handle database unique constraint error (fallback)
+    if (error.code === '23505') { // PostgreSQL unique violation error code
+      if (error.constraint && error.constraint.includes('username')) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Username already taken. Please choose a different username.' 
+        });
+      }
+      return res.status(400).json({ 
+        success: false, 
+        message: 'This email or username is already registered.' 
+      });
+    }
+    
     res.status(500).json({ success: false, message: 'Server error during registration' });
   }
 });

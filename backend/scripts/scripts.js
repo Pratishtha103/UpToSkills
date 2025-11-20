@@ -19,13 +19,10 @@ const pool = require('../config/database');
       );
     `);
 
-    // await pool.query(`
-    //   Alter TABLE companies
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS company_profiles (
         id SERIAL PRIMARY KEY,
+        company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
         name TEXT NOT NULL,
         website TEXT,
         industry TEXT,
@@ -47,10 +44,6 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    // await pool.query(`
-    //   Alter TABLE mentors
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS skill_badges (
@@ -86,7 +79,7 @@ const pool = require('../config/database');
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
         username VARCHAR(50),
-        program_id INTEGER REFERENCES programs(id),
+        program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -94,14 +87,11 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    // await pool.query(`
-    //   Alter TABLE students
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_details (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         full_name VARCHAR(255),
         contact_number VARCHAR(15),
         linkedin_url TEXT,
@@ -119,7 +109,7 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS attendance (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         date DATE NOT NULL,
         status VARCHAR(10) NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -131,7 +121,7 @@ const pool = require('../config/database');
       CREATE TABLE IF NOT EXISTS mentor_projects (
         id SERIAL PRIMARY KEY,
         project_title TEXT NOT NULL,
-        mentor_id INTEGER REFERENCES mentors(id),
+        mentor_id INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         mentor_name TEXT NOT NULL,
         total_students INTEGER DEFAULT 0,
         created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -142,7 +132,7 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
         description TEXT,
         tech_stack TEXT,
@@ -157,8 +147,8 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS project_assignments (
         id SERIAL PRIMARY KEY,
-        project_id INTEGER REFERENCES projects(id),
-        student_id INTEGER REFERENCES students(id),
+        project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         assigned_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
@@ -166,12 +156,11 @@ const pool = require('../config/database');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS student_badges (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
-        badge_id INTEGER REFERENCES skill_badges(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        badge_id INTEGER NOT NULL REFERENCES skill_badges(id) ON DELETE CASCADE,
         awarded_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-
 
     console.log('✅ All tables checked/created successfully');
   } catch (err) {

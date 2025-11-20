@@ -57,7 +57,6 @@ const LoginForm = () => {
       navigate("/adminPanel", { state: { updated: true } });
       return;
     }
-
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -72,6 +71,7 @@ const LoginForm = () => {
 
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("studentId", response.data.user.id);
       }
 
       const roleToSave =
@@ -124,6 +124,7 @@ const LoginForm = () => {
                 className="mx-auto max-w-xs flex flex-col gap-4"
                 onSubmit={handleSubmit}
               >
+               
                 <select
                   name="role"
                   value={formData.role}
@@ -168,6 +169,18 @@ const LoginForm = () => {
                   </div>
                 </div>
 
+               
+                <div className="text-right -mt-2 mb-3">
+                 <Link
+  to="/login/forgot-password"
+  className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+>
+  Forgot password?
+</Link>
+
+                </div>
+
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="mt-5 bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"

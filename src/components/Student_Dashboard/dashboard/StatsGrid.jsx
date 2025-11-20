@@ -1,15 +1,35 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Calendar, Star, TrendingUp } from "lucide-react";
+import axios from "axios";
 
-function StatsGrid() {
+function StatsGrid({ studentId }) {
+  const [enrolledCount, setEnrolledCount] = useState(0);
+
+  useEffect(() => {
+    if (!studentId) return;
+    const fetchEnrollment = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/enrollments/count/${studentId}`
+        );
+        setEnrolledCount(res.data.count);
+      } catch (error) {
+        console.error("Error fetching enrollment:", error);
+      }
+    };
+
+    fetchEnrollment();
+  }, [studentId]);
+
   const stats = [
-    { title: "Attendance", value: "80%", icon: CheckCircle, color: "primary", delay: 0.1 },
+    { title: "Program Enrolled", value: enrolledCount, icon: CheckCircle, color: "primary", delay: 0.1 },
     { title: "Tasks Completed", value: "258+", icon: Calendar, color: "secondary", delay: 0.2 },
     { title: "Tasks in Progress", value: "64%", icon: Star, color: "accent", delay: 0.3 },
     { title: "Reward Points", value: "245", icon: TrendingUp, color: "success", delay: 0.4 },
   ];
 
-  // helper function to map gradient color names
+
   const gradientClasses = {
     primary: "bg-gradient-to-r from-blue-500 to-blue-600",
     secondary: "bg-gradient-to-r from-orange-500 to-yellow-500",
@@ -31,17 +51,16 @@ function StatsGrid() {
         {stats.map((stat) => (
           <motion.div
             key={stat.title}
-            className="stat-card p-6 flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md transition-all duration-300"
+            className="stat-card p-6 flex items-center gap-4 bg-white dark:bg-gray-800 
+                       border border-gray-200 dark:border-gray-700 rounded-xl shadow-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: stat.delay, duration: 0.5 }}
           >
-            {/* icon */}
             <div className={`p-3 rounded-2xl ${gradientClasses[stat.color]}`}>
               <stat.icon className="w-6 h-6 text-white" />
             </div>
 
-            {/* text */}
             <div>
               <div className="text-2xl font-bold text-foreground">{stat.value}</div>
               <div className="text-sm text-muted-foreground">{stat.title}</div>

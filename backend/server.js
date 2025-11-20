@@ -59,6 +59,8 @@ app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/interviews', interviewRoutes);
 
+app.use("/api/enrollments", require("./routes/enrollments"));
+
 // ✅ FIXED: Mount the companies route
 app.use('/api/companies', companiesRouter);
 

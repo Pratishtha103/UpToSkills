@@ -56,7 +56,6 @@ const LoginForm = () => {
       navigate("/adminPanel", { state: { updated: true } });
       return;
     }
-
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -99,18 +98,18 @@ const LoginForm = () => {
   return (
     <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
       <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
-        {/* Left Image */}
-       <div className="w-full md:w-1/2 p-3 flex items-center">
-  <div
-    className="w-full h-[420px] md:h-[400px] lg:h-[600px] bg-cover bg-center rounded-2xl shadow-sm"
-    style={{
-      backgroundImage: `url(${loginImage})`,
-    }}
-  />
-</div>
+       
+        <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
+          <div
+            className="h-full w-full bg-cover rounded-l-2xl"
+            style={{
+              backgroundImage:
+                "url(https://static.vecteezy.com/system/resources/previews/008/415/006/non_2x/employment-agency-for-recruitment-or-placement-job-service-with-skilled-and-experienced-career-laborers-in-flat-cartoon-illustration-vector.jpg)",
+            }}
+          />
+        </div>
 
-
-        {/* Right Form */}
+       
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div className="flex flex-col items-center">
             <div className="text-center">
@@ -118,7 +117,9 @@ const LoginForm = () => {
                 <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className="text-[16px] text-gray-500">Enter your details to login</p>
+              <p className="text-[16px] text-gray-500">
+                Enter your details to login
+              </p>
             </div>
 
             <div className="w-full flex-1 mt-8">
@@ -126,6 +127,7 @@ const LoginForm = () => {
                 className="mx-auto max-w-xs flex flex-col gap-4"
                 onSubmit={handleSubmit}
               >
+               
                 <select
                   name="role"
                   value={formData.role}
@@ -138,6 +140,7 @@ const LoginForm = () => {
                   <option value="mentor">Login as Mentor</option>
                 </select>
 
+             
                 <input
                   name="email"
                   value={formData.email}
@@ -148,6 +151,7 @@ const LoginForm = () => {
                   required
                 />
 
+               
                 <div className="relative w-full">
                   <input
                     name="password"
@@ -170,9 +174,21 @@ const LoginForm = () => {
                   </div>
                 </div>
 
+               
+                <div className="text-right -mt-2 mb-3">
+                 <Link
+  to="/login/forgot-password"
+  className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+>
+  Forgot password?
+</Link>
+
+                </div>
+
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className="mt-5 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all duration-100 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  className="mt-2 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all duration-100 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                 >
                   <svg
                     className="w-6 h-6 -ml-2"

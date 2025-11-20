@@ -25,6 +25,8 @@ import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/S
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
+import ForgotPassword from "./pages/ForgotPassword";
+
 
 // About Page Components
 import Header from './components/AboutPage/Header';
@@ -79,6 +81,8 @@ function App() {
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
+           <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
+
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft } from "lucide-react";
 import SearchFilters from "./SearchFilters";
 import Footer from "../AboutPage/Footer"
@@ -16,10 +16,84 @@ export default function SearchStudents() {
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [filterSuggestions, setFilterSuggestions] = useState([]);
+  const [showFilterSuggestions, setShowFilterSuggestions] = useState(false);
   const [filters, setFilters] = useState({ name: "", domain: "All Domains" });
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+
+  const normalizeName = (student) =>
+    (student.student_name ||
+      student.full_name ||
+      student.profile_full_name ||
+      student.name ||
+      "")
+      .toString()
+      .trim();
+
+  const normalizeDomains = (student) => {
+    try {
+      if (Array.isArray(student.domains_of_interest)) {
+        return student.domains_of_interest.map((d) => d?.toString().trim()).filter(Boolean);
+      }
+      if (typeof student.domains_of_interest === "string") {
+        const trimmed = student.domains_of_interest.trim();
+        if (!trimmed) return [];
+        if (trimmed.startsWith("[")) {
+          const parsed = JSON.parse(trimmed);
+          return Array.isArray(parsed)
+            ? parsed.map((d) => d?.toString().trim()).filter(Boolean)
+            : [trimmed];
+        }
+        return trimmed.split(/[,|]/).map((d) => d.trim()).filter(Boolean);
+      }
+      if (Array.isArray(student.domainsOfInterest)) {
+        return student.domainsOfInterest.map((d) => d?.toString().trim()).filter(Boolean);
+      }
+      if (typeof student.domainsOfInterest === "string") {
+        return student.domainsOfInterest.split(/[,|]/).map((d) => d.trim()).filter(Boolean);
+      }
+    } catch (err) {
+      console.warn("Domain normalization failed", err);
+    }
+    const fallback = student.othersDomain || student.others_domain || "";
+    return fallback ? [fallback.toString().trim()] : [];
+  };
+
+  const dedupe = (items) => {
+    const seen = new Set();
+    const result = [];
+    items.forEach((item) => {
+      const value = item?.toString().trim();
+      if (!value) return;
+      const key = value.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(value);
+      }
+    });
+    return result;
+  };
+
+  const suggestionPool = useMemo(() => {
+    const nameSamples = students.map(normalizeName).filter(Boolean);
+    const domainSamples = students.flatMap((student) => normalizeDomains(student)).filter(Boolean);
+    const aiSnippets = students
+      .map((s) => (s.ai_skill_summary || s.ai_skills || "").toString().trim())
+      .filter(Boolean)
+      .map((summary) => summary.split(/[.,]/)[0].trim())
+      .filter(Boolean);
+    return dedupe([...nameSamples, ...domainSamples, ...aiSnippets]);
+  }, [students]);
+
+  const computeSuggestions = (query) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return suggestionPool.slice(0, 8);
+    return suggestionPool.filter((item) => item.toLowerCase().includes(q)).slice(0, 8);
+  };
 
   // Mount: fetch students. fetchStudents is defined inside the effect to avoid being a dependency.
   useEffect(() => {
@@ -150,6 +224,14 @@ export default function SearchStudents() {
     setFilteredStudents(filtered);
   }, [searchQuery, filters, students]); // explicit deps
 
+  useEffect(() => {
+    setSearchSuggestions(computeSuggestions(searchQuery));
+  }, [searchQuery, suggestionPool]);
+
+  useEffect(() => {
+    setFilterSuggestions(computeSuggestions(filters.name));
+  }, [filters.name, suggestionPool]);
+
   const fetchStudentDetails = async (studentId) => {
     if (!studentId) return;
     try {
@@ -192,6 +274,16 @@ export default function SearchStudents() {
 
   const onClearFilters = () => {
     setFilters({ name: "", domain: "All Domains" });
+  };
+
+  const handleSearchSuggestionSelect = (value) => {
+    setSearchQuery(value);
+    setShowSearchSuggestions(false);
+  };
+
+  const handleFilterSuggestionSelect = (value) => {
+    setFilters((prev) => ({ ...prev, name: value }));
+    setShowFilterSuggestions(false);
   };
 
   // ---------- STUDENT DETAILS VIEW ----------
@@ -327,6 +419,11 @@ export default function SearchStudents() {
           filters={filters}
           onFilterChange={onFilterChange}
           onClearFilters={onClearFilters}
+          nameSuggestions={filterSuggestions}
+          showNameSuggestions={showFilterSuggestions}
+          onNameFocus={() => setShowFilterSuggestions(true)}
+          onNameBlur={() => setTimeout(() => setShowFilterSuggestions(false), 120)}
+          onNameSuggestionSelect={handleFilterSuggestionSelect}
         />
 
         <div className=" dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
@@ -336,9 +433,28 @@ export default function SearchStudents() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setShowSearchSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 120)}
               placeholder="Search by name or skill/domain (try: react, ai, frontend)..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
+            {showSearchSuggestions && searchSuggestions.length > 0 && (
+              <div className="absolute z-10 mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-60 overflow-auto text-left">
+                {searchSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-primary/10 dark:hover:bg-primary/20 text-left"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSearchSuggestionSelect(suggestion);
+                    }}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

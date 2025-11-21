@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Company_Dashboard/Sidebar";
 import Navbar from "../components/Company_Dashboard/Navbar";
@@ -38,6 +38,9 @@ export default function Index() {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [totalMentors, setTotalMentors] = useState(0);
   const [totalBadges, setTotalBadges] = useState(0);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const [allStudentNames, setAllStudentNames] = useState([]);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -84,6 +87,28 @@ const [interviewCount, setInterviewCount] = useState(0);
   const toggleDarkMode = () => setIsDarkMode((p) => !p);
 
   const interviewRef = useRef(null);
+  const suggestionPool = useMemo(() => {
+    const dedupe = (items) => {
+      const seen = new Set();
+      const result = [];
+      items.forEach((value) => {
+        const name = value?.toString().trim();
+        if (!name) return;
+        const key = name.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(name);
+        }
+      });
+      return result;
+    };
+
+    if (allStudentNames.length) {
+      return dedupe(allStudentNames);
+    }
+
+    return dedupe(students.map((student) => student.full_name));
+  }, [students, allStudentNames]);
 
   // ---------- Fetch Students + Mentor count ----------
   useEffect(() => {
@@ -191,6 +216,42 @@ const [interviewCount, setInterviewCount] = useState(0);
     setFilteredStudents(filtered);
   }, [filters, students]);
 
+  useEffect(() => {
+    const fetchAllStudentNames = async () => {
+      try {
+        const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await axios.get(`${API_BASE}/api/students/all-students`);
+        const rows = Array.isArray(res.data?.data)
+          ? res.data.data
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+        const names = rows.map(
+          (r) =>
+            (r.full_name || r.name || r.student_name || r.profile_full_name || "")
+              .toString()
+              .trim()
+        );
+        setAllStudentNames(names.filter(Boolean));
+      } catch (err) {
+        console.warn("Unable to fetch student names for suggestions", err);
+      }
+    };
+
+    fetchAllStudentNames();
+  }, []);
+
+  useEffect(() => {
+    const query = filters.name.trim().toLowerCase();
+    if (!query) {
+      setNameSuggestions(suggestionPool.slice(0, 8));
+      return;
+    }
+    setNameSuggestions(
+      suggestionPool.filter((name) => name.toLowerCase().includes(query)).slice(0, 8)
+    );
+  }, [filters.name, suggestionPool]);
+
   // ---------- LocalStorage view handling ----------
   useEffect(() => {
     try {
@@ -270,6 +331,10 @@ useEffect(() => {
       projectExperience: "All Levels",
       skillLevel: "All Skills",
     });
+  const handleNameSuggestionSelect = (value) => {
+    setFilters((prev) => ({ ...prev, name: value }));
+    setShowNameSuggestions(false);
+  };
 
   const handleViewProfile = (student) => {
     setSelectedStudent(student);
@@ -484,6 +549,11 @@ useEffect(() => {
               filters={filters}
               onFilterChange={handleFilterChange}
               onClearFilters={clearFilters}
+              nameSuggestions={nameSuggestions}
+              showNameSuggestions={showNameSuggestions}
+              onNameFocus={() => setShowNameSuggestions(true)}
+              onNameBlur={() => setTimeout(() => setShowNameSuggestions(false), 120)}
+              onNameSuggestionSelect={handleNameSuggestionSelect}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {loadingStudents ? (

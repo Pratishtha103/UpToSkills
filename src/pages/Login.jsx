@@ -69,9 +69,17 @@ const LoginForm = () => {
         localStorage.setItem("token", response.data.token);
 
       if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        localStorage.setItem("studentId", response.data.user.id);
+        const user = response.data.user;
+
+        // Save full user
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // Always save studentId regardless of role
+        if (user.role === "student" || user.role === "learner") {
+          localStorage.setItem("studentId", user.id);
+        }
       }
+
 
       const roleToSave =
         (response.data.user?.role || formData.role).toLowerCase();
@@ -98,7 +106,7 @@ const LoginForm = () => {
   return (
     <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
       <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
-       
+
         <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
           <div
             className="h-full w-full bg-cover rounded-l-2xl"
@@ -109,7 +117,7 @@ const LoginForm = () => {
           />
         </div>
 
-       
+
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div className="flex flex-col items-center">
             <div className="text-center">
@@ -127,7 +135,7 @@ const LoginForm = () => {
                 className="mx-auto max-w-xs flex flex-col gap-4"
                 onSubmit={handleSubmit}
               >
-               
+
                 <select
                   name="role"
                   value={formData.role}
@@ -140,7 +148,7 @@ const LoginForm = () => {
                   <option value="mentor">Login as Mentor</option>
                 </select>
 
-             
+
                 <input
                   name="email"
                   value={formData.email}
@@ -151,7 +159,7 @@ const LoginForm = () => {
                   required
                 />
 
-               
+
                 <div className="relative w-full">
                   <input
                     name="password"
@@ -174,14 +182,14 @@ const LoginForm = () => {
                   </div>
                 </div>
 
-               
+
                 <div className="text-right -mt-2 mb-3">
-                 <Link
-  to="/login/forgot-password"
-  className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
->
-  Forgot password?
-</Link>
+                  <Link
+                    to="/login/forgot-password"
+                    className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+                  >
+                    Forgot password?
+                  </Link>
 
                 </div>
 

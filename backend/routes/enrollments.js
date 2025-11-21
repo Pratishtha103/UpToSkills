@@ -18,4 +18,26 @@ router.get("/count/:studentId", async (req, res) => {
   }
 });
 
+// Get list of courses a student is enrolled in
+router.get("/mycourses/:studentId", async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT c.*
+      FROM enrollments e
+      JOIN courses c ON e.course_id = c.id
+      WHERE e.student_id = $1
+    `,
+      [studentId]
+    );
+
+    res.json({ courses: result.rows }); 
+  } catch (error) {
+    console.error("Error fetching enrolled courses:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

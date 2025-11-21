@@ -13,11 +13,11 @@ const StudentDashboard = () => {
   const [isSidebarVisible, setSidebarVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // load from localStorage initially
     return localStorage.getItem("theme") === "dark";
   });
 
-  // 🔥 Whenever isDarkMode changes, update <html> class instantly
+  const studentId = localStorage.getItem("studentId");  
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
@@ -27,6 +27,7 @@ const StudentDashboard = () => {
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
+
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
@@ -59,7 +60,7 @@ const StudentDashboard = () => {
         />
         <div className="pt-24 px-4 sm:px-6 py-6 space-y-6 flex-grow">
           <WelcomeSection />
-          <StatsGrid />
+          <StatsGrid studentId={studentId} />
           {/* <NoticeBoard />
           <ChartSection />
           <AssignmentsSection />

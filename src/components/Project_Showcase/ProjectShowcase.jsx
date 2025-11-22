@@ -1,3 +1,4 @@
+// ProjectShowcase.jsx - IMPROVED VERSION
 import React, { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard";
 import ProjectModal from "./ProjectModal";
@@ -7,40 +8,47 @@ const ProjectShowcase = () => {
   const [projects, setProjects] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
-      return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark' || localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) { return false; }
+      return document.documentElement.classList.contains('dark') || 
+             localStorage.getItem('theme') === 'dark' || 
+             localStorage.getItem('isDarkMode') === 'true';
+    } catch (e) { 
+      return false; 
+    }
   });
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch projects from backend
   useEffect(() => {
-    // 🌟 FIX 1: Use the correct and consistent key "id" 
-    const studentId = localStorage.getItem("id"); 
-    const token = localStorage.getItem('token'); 
+    // ✅ Try multiple keys for backward compatibility
+    const studentId = localStorage.getItem("id") || 
+                      localStorage.getItem("studentId") || 
+                      localStorage.getItem("userId");
+    const token = localStorage.getItem('token');
 
-    console.log("ProjectShowcase useEffect - Student ID:", studentId);
+    console.log("ProjectShowcase - Student ID:", studentId);
+    console.log("ProjectShowcase - Token exists:", !!token);
     
-    // CRITICAL CHECK: Stop the fetch if the student ID or token is missing
+    // Check if credentials are missing
     if (!studentId || !token) {
-      console.log("ProjectShowcase: Student ID or Token is missing. Aborting fetch.");
+      console.warn("ProjectShowcase: Student ID or Token is missing.");
+      setError("Please log in to view your projects.");
       setLoading(false);
       return; 
     }
 
     setLoading(true);
+    setError(null);
 
-    // 🌟 FIX 2: Correct the API URL and Authorization Header
     fetch(`http://localhost:5000/api/projects/assigned/${studentId}`, {
       headers: {
         'Content-Type': 'application/json',
-        // ✅ FIX 2: Use the standard 'Authorization' header with 'Bearer'
-        'Authorization': `Bearer ${token}`, 
+        'Authorization': `Bearer ${token}`,
       },
     })
       .then((res) => {
         if (!res.ok) {
-          // If the status is NOT okay, log the error and throw
           console.error(`Fetch failed with status: ${res.status}`);
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -48,67 +56,95 @@ const ProjectShowcase = () => {
       })
       .then((data) => {
         console.log("Fetched projects:", data);
-        if (data.success) {
-          // data.data is the correct payload
+        if (data.success && Array.isArray(data.data)) {
           setProjects(data.data);
+        } else if (Array.isArray(data)) {
+          setProjects(data);
         } else {
           setProjects([]);
         }
-        // ✅ FIX 3: setLoading(false) in success block is correct
       })
       .catch((err) => {
         console.error("Error fetching projects:", err);
+        setError("Failed to load projects. Please try again later.");
         setProjects([]);
       })
       .finally(() => {
-         // ✅ BEST PRACTICE: Ensure loading state is turned off regardless of outcome
-         setLoading(false); 
+        setLoading(false); 
       });
 
-  }, []); // Reruns when component mounts (after login refresh)
+  }, []); // Only run once on mount
 
-  // ... (useEffect for dark mode remains the same)
+  // Dark mode effect
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     localStorage.getItem('theme') === 'dark';
+      setIsDarkMode(isDark);
+    };
 
-  // ----------------------------------------------------
-  // 3. Removed the redundant initial render check since the check is in useEffect now.
-  // We can let the component load and show a 'Please Wait' or skeleton until the fetch resolves.
-  // ----------------------------------------------------
-  
+    handleThemeChange();
+    window.addEventListener('storage', handleThemeChange);
+    
+    return () => window.removeEventListener('storage', handleThemeChange);
+  }, []);
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10">
-        {loading
-          ? // Skeleton loaders
-            Array.from({ length: 6 }).map((_, idx) => (
-              <motion.div
-                key={idx}
-                className="stat-card p-6 animate-pulse bg-gray-200 rounded-lg dark:bg-gray-700"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
+        {loading ? (
+          // Skeleton loaders
+          Array.from({ length: 6 }).map((_, idx) => (
+            <motion.div
+              key={idx}
+              className="stat-card p-6 animate-pulse bg-gray-200 rounded-lg dark:bg-gray-700"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <div className="h-6 w-3/4 bg-gray-300 mb-4 rounded dark:bg-gray-600"></div>
+              <div className="h-4 w-1/2 bg-gray-300 mb-2 rounded dark:bg-gray-600"></div>
+              <div className="h-4 w-1/3 bg-gray-300 rounded dark:bg-gray-600"></div>
+            </motion.div>
+          ))
+        ) : error ? (
+          // Error state
+          <div className="col-span-full flex items-center justify-center min-h-[300px]">
+            <div className="text-center p-8 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+              <h3 className="text-lg font-medium text-red-800 dark:text-red-300 mb-2">
+                {error}
+              </h3>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
-                <div className="h-6 w-3/4 bg-gray-300 mb-4 rounded dark:bg-gray-600"></div>
-                <div className="h-4 w-1/2 bg-gray-300 mb-2 rounded dark:bg-gray-600"></div>
-                <div className="h-4 w-1/3 bg-gray-300 rounded dark:bg-gray-600"></div>
-              </motion.div>
-            ))
-          : projects.length === 0
-          ? // Empty state
-            <div className="col-span-full flex items-center justify-center min-h-[300px]">
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No Projects Found</h3>
-                <p className="text-gray-500 dark:text-gray-400">You don't have any projects yet. Try adding one!</p>
-                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">Check console for fetch errors if this should not be empty.</p>
-              </div>
+                Retry
+              </button>
             </div>
-          : projects.map((proj, idx) => (
-              <ProjectCard
-                  key={idx}
-                  project={proj}
-                  onClick={() => setSelectedProject(proj)}
-                  isDarkMode={isDarkMode}
-                />
-            ))}
+          </div>
+        ) : projects.length === 0 ? (
+          // Empty state
+          <div className="col-span-full flex items-center justify-center min-h-[300px]">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                No Projects Found
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400">
+                You don't have any assigned projects yet.
+              </p>
+            </div>
+          </div>
+        ) : (
+          // Project cards
+          projects.map((proj, idx) => (
+            <ProjectCard
+              key={proj.id || idx}
+              project={proj}
+              onClick={() => setSelectedProject(proj)}
+              isDarkMode={isDarkMode}
+            />
+          ))
+        )}
       </div>
 
       {/* Modal */}

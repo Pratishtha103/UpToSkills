@@ -60,6 +60,27 @@ router.get('/search', searchStudentsByQuery);
 // Legacy param search: /api/students/search/:name
 router.get('/search/:name', searchStudents);
 
+// ✅ NEW: Autocomplete endpoint for interview scheduling
+// GET /api/students/autocomplete - Returns minimal student data for autocomplete
+router.get('/autocomplete', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+        s.id, 
+        COALESCE(u.full_name, s.full_name, s.username) as name,
+        s.email, 
+        s.phone 
+       FROM students s
+       LEFT JOIN user_details u ON s.id = u.student_id
+       ORDER BY COALESCE(u.full_name, s.full_name, s.username) ASC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching students for autocomplete:', error);
+    res.status(500).json({ error: 'Server error while fetching students' });
+  }
+});
+
 // Provide "all-students" alias for clients that expect it
 router.get('/all-students', getStudents);
 

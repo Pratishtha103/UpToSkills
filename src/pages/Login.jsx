@@ -246,6 +246,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import loginImage from "../assets/loginnew.jpg";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -404,18 +405,86 @@ const LoginForm = () => {
               </form>
             </div>
           </div>
+
+          <form className="max-w-xs mx-auto flex flex-col gap-4" onSubmit={handleSubmit}>
+            
+            {/* ROLE SELECT */}
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm"
+            >
+              <option value="admin">Login as Admin</option>
+              <option value="student">Login as Student</option>
+              <option value="company">Login as Company</option>
+              <option value="mentor">Login as Mentor</option>
+            </select>
+
+            {/* EMAIL */}
+            <input
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+              type="text"
+              placeholder="Enter email or username"
+              required
+            />
+
+            {/* PASSWORD */}
+            <div className="relative">
+              <input
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                required
+              />
+              <div
+                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword((s) => !s)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-500" />
+                )}
+              </div>
+            </div>
+
+            {/* FORGOT PASSWORD */}
+            <div className="text-right -mt-2">
+              <Link
+                to="/login/forgot-password"
+                className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* SUBMIT */}
+            <button
+              type="submit"
+              className="mt-3 bg-[#FF6D34] text-white w-full py-3 rounded-lg hover:bg-[#00BDA6] transition"
+            >
+              Login
+            </button>
+
+            {/* SIGNUP */}
+            <p className="text-center text-gray-600">
+              Don’t have an account?{" "}
+              <Link to="/register">
+                <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
+                  Sign up
+                </span>
+              </Link>
+            </p>
+          </form>
         </div>
 
-        {/* Right Image */}
-        <div className="flex-1 text-center hidden md:flex">
-          <div
-            className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-            style={{
-              backgroundImage:
-                "url(https://www.mahindrauniversity.edu.in/wp-content/uploads/2023/04/why20is20training2020placement20cell20important1.png)",
-            }}
-          />
-        </div>
       </div>
     </div>
   );

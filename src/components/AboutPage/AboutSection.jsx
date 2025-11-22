@@ -105,10 +105,6 @@ const AboutSection = () => {
             <div>
               <img src={communityImpact} alt="Community Success" className="max-w-[600px] w-full mx-auto rounded-xl shadow-lg" />
             </div>
-
-            
-
-
           </div>
         </div>
       </div>

@@ -25,12 +25,14 @@ import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/S
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
+import ForgotPassword from "./pages/ForgotPassword";
+
 
 // About Page Components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
-import Footer from './components/AboutPage/Footer';
+
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -68,12 +70,19 @@ function App() {
               <Header />
               <HeroSection />
               <AboutSection />
-              <Footer />
+              <footer
+                className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+              >
+                <p>© 2025 Uptoskills. Built by learners.</p>
+
+              </footer>
               <Chatbot />
             </>
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
+           <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
+
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
 

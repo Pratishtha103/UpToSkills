@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -23,8 +24,9 @@ const statsRoutes = require("./routes/stats");
 const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
-const companiesRouter = require("./routes/searchcompanies");       // Use the one companies router consistently
-const searchProjectRoutes = require('./routes/searchproject'); // Add your search project route
+const companiesRouter = require("./routes/companies.route");  // ✅ FIXED: Use the correct file
+const searchCompaniesRouter = require("./routes/searchcompanies");  // Keep this separate if it's for search
+const searchProjectRoutes = require('./routes/searchproject');
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
@@ -57,9 +59,18 @@ app.use('/api/mentors', mentorsRoutes);
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
-
-// ✅ Connect the interviews route
 app.use('/api/interviews', interviewRoutes);
+
+app.use("/api/enrollments", require("./routes/enrollments"));
+
+// ✅ FIXED: Mount the companies route
+app.use('/api/companies', companiesRouter);
+
+// If searchcompanies is different, mount it too
+app.use('/api/searchcompanies', searchCompaniesRouter);
+
+// Search routes
+app.use('/api/searchproject', searchProjectRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -74,7 +85,8 @@ app.get('/health', (req, res) => {
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
-        message: 'Route not found'
+        message: 'Route not found',
+        path: req.originalUrl
     });
 });
 
@@ -92,7 +104,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-    // console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
-    // console.log('Type:', typeof process.env.DB_PASSWORD);
-
+    
 });

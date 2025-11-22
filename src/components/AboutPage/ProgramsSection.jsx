@@ -14,6 +14,8 @@ const ProgramsSection = () => {
         // Optional: simulate loading delay to test shimmer
         // await new Promise(res => setTimeout(res, 1500));
         setCourses(response.data);
+        console.log(courses);
+
         setError(null);
       } catch (err) {
         console.error("Error fetching courses:", err);
@@ -105,20 +107,56 @@ const ProgramsSection = () => {
             {courses.map((program, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-[#1e293b] p-6 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-3 transition-all duration-300"
+                className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg hover:-translate-y-3 transition-all duration-300 flex flex-col overflow-hidden"
               >
+                {/* <div className="h-40 w-full rounded-md overflow-hidden mb-4">
+                  <img
+                    src={`http://localhost:5000${program.image_path}`}
+                    alt={program.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
                 <h3 className="text-xl font-semibold mb-2 dark:text-white">
                   {program.title}
                 </h3>
                 <p className="text-[#64748b] dark:text-slate-300 text-[15px] leading-snug mb-3">
                   {program.description}
                 </p>
-                <Link
-                  to={`/programForm/${program.id}`}
-                  className="inline-block bg-blue-500 text-white py-2 px-5 rounded-md font-semibold hover:bg-blue-600 transition-colors duration-300"
-                >
-                  Enroll Now
-                </Link>
+                <div className="mt-auto">
+                  <Link
+                    to={`/programForm/${program.id}`}
+                    className="inline-block bg-blue-500 text-white py-2 px-5 rounded-md font-semibold hover:bg-blue-600 transition-colors duration-300"
+                  >
+                    Enroll Now
+                  </Link>
+                </div>
+              </div> */}
+
+                <div className="h-40 w-full">
+                  <img
+                    src={`http://localhost:5000${program.image_path}`}
+                    alt={program.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Content section with padding */}
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2 dark:text-white">
+                    {program.title}
+                  </h3>
+                  <p className="text-[#64748b] dark:text-slate-300 text-[15px] mb-3">
+                    {program.description}
+                  </p>
+
+                  <Link
+                    to={`/programForm/${program.id}`}
+                    className="inline-block bg-blue-500 text-white py-2 px-5 rounded-md font-semibold hover:bg-blue-600 transition-colors duration-300"
+                  >
+                    Enroll Now
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

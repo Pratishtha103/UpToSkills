@@ -24,13 +24,8 @@ import CompanyProfilePage from './components/Company_Dashboard/companyProfilePag
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
-
 import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
 import ForgotPassword from "./pages/ForgotPassword";
-
-
-
-
 
 // About Page Components
 import Header from './components/AboutPage/Header';

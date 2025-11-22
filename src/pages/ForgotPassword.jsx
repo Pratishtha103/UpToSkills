@@ -13,10 +13,16 @@ const ForgotPassword = () => {
 
   const navigate = useNavigate();
 
+  // Password validation
+  const passwordsMatch =
+    password === confirmPassword && confirmPassword.length > 0;
+  const passwordsMismatch =
+    password !== confirmPassword && confirmPassword.length > 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (!passwordsMatch) {
       alert("Passwords do not match!");
       return;
     }
@@ -57,7 +63,7 @@ const ForgotPassword = () => {
           </h2>
 
           <p className="text-gray-500 mt-1 mb-6">
-            Enter your registered email and new password
+            Enter your registered email  or username and new password
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,11 +71,12 @@ const ForgotPassword = () => {
             {/* Email */}
             <input
               type="email"
-              placeholder="Enter registered email-id"
+              placeholder="Enter registered email-id or username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1]"
+              className="w-full border border-gray-300 rounded-md px-4 py-3 
+              focus:outline-none focus:ring-2 focus:ring-[#09C3A1]"
             />
 
             {/* New Password */}
@@ -80,8 +87,13 @@ const ForgotPassword = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1]"
+                className={`w-full rounded-md px-4 py-3 focus:outline-none
+                  ${passwordsMatch ? "border border-green-500" : ""}
+                  ${passwordsMismatch ? "border border-red-500" : ""}
+                  ${!passwordsMatch && !passwordsMismatch ? "border border-gray-300" : ""}
+                `}
               />
+
               <div
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
                 onClick={() => setShowPassword(!showPassword)}
@@ -98,8 +110,13 @@ const ForgotPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1]"
+                className={`w-full rounded-md px-4 py-3 focus:outline-none
+                  ${passwordsMatch ? "border border-green-500" : ""}
+                  ${passwordsMismatch ? "border border-red-500" : ""}
+                  ${!passwordsMatch && !passwordsMismatch ? "border border-gray-300" : ""}
+                `}
               />
+
               <div
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -108,10 +125,19 @@ const ForgotPassword = () => {
               </div>
             </div>
 
+            {/* Match / Mismatch Message */}
+            {passwordsMatch && (
+              <p className="text-green-600 text-sm">✔ Passwords match</p>
+            )}
+            {passwordsMismatch && (
+              <p className="text-red-600 text-sm">✖ Passwords do not match</p>
+            )}
+
             {/* Button */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-[#FF6600] hover:bg-[#e45600] text-white font-semibold rounded-md py-3 transition duration-300"
+              className="w-full flex items-center justify-center gap-2 bg-[#FF6600] hover:bg-[#e45600] 
+              text-white font-semibold rounded-md py-3 transition duration-300"
             >
               🔒 Reset Password
             </button>

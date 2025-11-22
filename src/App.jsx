@@ -24,8 +24,12 @@ import CompanyProfilePage from './components/Company_Dashboard/companyProfilePag
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
-import MyCourses from "./components/Student_Dashboard/dashboard/MyCourses";
+
+import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
 import ForgotPassword from "./pages/ForgotPassword";
+
+
+
 
 
 // About Page Components
@@ -91,7 +95,7 @@ function App() {
           <Route path="/dashboard/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
           <Route path="/dashboard/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
           <Route path="/dashboard/my-projects" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
-          <Route path="/dashboard/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+          <Route path="/dashboard/my-programs" element={<ProtectedRoute><MyPrograms /></ProtectedRoute>} />
           <Route path="/dashboard/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/dashboard/projects" element={<ProtectedRoute><Dashboard_Project /></ProtectedRoute>} />
           <Route path="/dashboard/aboutus" element={<ProtectedRoute><AboutUs /></ProtectedRoute>} />

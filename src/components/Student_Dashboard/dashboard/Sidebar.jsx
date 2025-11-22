@@ -23,10 +23,10 @@ const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
   { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
-  { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectshowcase" },
+  { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectShowcase" },
   { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
   { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
-  { id: "mycourses", label: "My Courses", icon: GraduationCap, path: "/dashboard/my-courses" },
+  { id: "myprograms", label: "My Programs", icon: GraduationCap, path: "/dashboard/my-programs" },
   { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
 ];
 
@@ -37,11 +37,15 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const currentItem = sidebarItems.find((item) =>
-      location.pathname.startsWith(item.path)
-    );
-    if (currentItem) setActiveItem(currentItem.id);
-  }, [location.pathname]);
+  // remove trailing slash
+  const cleanPath = location.pathname.replace(/\/+$/, "").toLowerCase();
+
+  const currentItem = sidebarItems.find(item =>
+    cleanPath === item.path.replace(/\/+$/, "").toLowerCase()
+  );
+
+  if (currentItem) setActiveItem(currentItem.id);
+}, [location.pathname]);
 
   useEffect(() => {
     const checkScreen = () => {

@@ -1,3 +1,4 @@
+// LoginForm.jsx - FIXED VERSION
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
@@ -51,10 +52,15 @@ const LoginForm = () => {
         role: "admin",
       };
 
+      // ✅ Store admin data
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
+      localStorage.setItem("role", "admin");
 
-      navigate("/adminPanel", { state: { updated: true } });
+      // ✅ Use setTimeout to ensure localStorage writes complete before navigation
+      setTimeout(() => {
+        navigate("/adminPanel", { state: { updated: true } });
+      }, 100);
       return;
     }
 
@@ -65,34 +71,70 @@ const LoginForm = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
+      console.log("Login response:", response.data); // Debug log
+
       alert(response.data.message || "Login successful");
 
-      if (response.data.token)
+      // ✅ CRITICAL FIX: Store all data BEFORE navigation
+      if (response.data.token) {
         localStorage.setItem("token", response.data.token);
+      }
 
       if (response.data.user) {
         const user = response.data.user;
         localStorage.setItem("user", JSON.stringify(user));
 
-        if (user.role === "student" || user.role === "learner") {
-          localStorage.setItem("studentId", user.id);
+        // ✅ Store user ID with MULTIPLE keys for compatibility
+        const userId = user.id || user.student_id || user.userId;
+        
+        if (userId) {
+          localStorage.setItem("id", userId);           // Primary key
+          localStorage.setItem("studentId", userId);    // Backup key
+          localStorage.setItem("userId", userId);       // Alternative key
+          console.log("Stored user ID:", userId);       // Debug log
+        }
+
+        // Store role
+        const roleToSave = (user.role || formData.role).toLowerCase();
+        localStorage.setItem("role", roleToSave);
+
+        // ✅ Store additional user info
+        if (user.name) localStorage.setItem("userName", user.name);
+        if (user.email) localStorage.setItem("userEmail", user.email);
+
+        // Store mentor-specific data
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(user));
+          localStorage.setItem("mentorId", userId);
+        }
+
+        // Store company-specific data
+        if (roleToSave === "company") {
+          localStorage.setItem("company", JSON.stringify(user));
+          localStorage.setItem("companyId", userId);
         }
       }
 
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
+      // ✅ Use setTimeout to ensure all localStorage operations complete
+      setTimeout(() => {
+        const roleToSave = (response.data.user?.role || formData.role).toLowerCase();
+        
+        // Navigate based on role
+        if (roleToSave === "admin") {
+          navigate("/adminPanel");
+        } else if (roleToSave === "student" || roleToSave === "learner") {
+          navigate("/dashboard");
+        } else if (roleToSave === "mentor") {
+          navigate("/mentor-dashboard");
+        } else if (roleToSave === "company") {
+          navigate("/company");
+        } else {
+          navigate("/login");
+        }
+      }, 150); // 150ms delay ensures localStorage writes complete
 
-      if (roleToSave === "mentor" && response.data.user) {
-        localStorage.setItem("mentor", JSON.stringify(response.data.user));
-      }
-
-      if (roleToSave === "admin") navigate("/adminPanel");
-      else if (roleToSave === "student" || roleToSave === "learner")
-        navigate("/dashboard");
-      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
-      else if (roleToSave === "company") navigate("/company");
-      else navigate("/login");
     } catch (err) {
+      console.error("Login error:", err); // Debug log
       const message =
         err.response?.data?.message ||
         err.message ||
@@ -130,7 +172,7 @@ const LoginForm = () => {
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm"
+              className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-[#00BDA6]"
             >
               <option value="admin">Login as Admin</option>
               <option value="student">Login as Student</option>
@@ -143,7 +185,7 @@ const LoginForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+              className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-[#00BDA6]"
               type="text"
               placeholder="Enter email or username"
               required
@@ -155,7 +197,7 @@ const LoginForm = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+                className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-[#00BDA6]"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 required
@@ -185,14 +227,14 @@ const LoginForm = () => {
             {/* SUBMIT */}
             <button
               type="submit"
-              className="mt-3 bg-[#FF6D34] text-white w-full py-3 rounded-lg hover:bg-[#00BDA6] transition"
+              className="mt-3 bg-[#FF6D34] text-white w-full py-3 rounded-lg hover:bg-[#00BDA6] transition duration-200 font-semibold"
             >
               Login
             </button>
 
             {/* SIGNUP */}
-            <p className="text-center text-gray-600">
-              Don’t have an account?{" "}
+            <p className="text-center text-gray-600 text-sm">
+              Don't have an account?{" "}
               <Link to="/register">
                 <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
                   Sign up

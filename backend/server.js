@@ -4,6 +4,8 @@ const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
 
+
+
 // Database connection
 const pool = require('./config/database');
 

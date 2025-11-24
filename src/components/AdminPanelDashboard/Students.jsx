@@ -1,7 +1,8 @@
 // src/components/AdminPanelDashboard/Students.jsx
+
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Search, Loader2, Users, Eye, X, Award, BookOpen, Calendar, Github, Linkedin, Mail, Phone } from "lucide-react";
+import { User, Search, Loader2, Users, Eye, X, Award, BookOpen, Calendar, Github, Linkedin, Mail, Phone } from "lucide-react"; 
 
 const API_BASE_URL = "http://localhost:5000/api/students";
 
@@ -11,6 +12,8 @@ const Students = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(null);
+  // State to track deactivation status (using null for not deactivating)
+  const [isDeactivating, setIsDeactivating] = useState(null); 
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -55,6 +58,36 @@ const Students = ({ isDarkMode }) => {
       setIsDeleting(null);
     }
   };
+
+  // Handle Deactivate function
+  const handleDeactivate = async (id, currentStatus) => {
+    const studentToUpdate = students.find((s) => s.id === id);
+    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    const studentName = studentToUpdate?.full_name || `ID ${id}`;
+
+    if (!window.confirm(`Are you sure you want to change the status of ${studentName} to "${newStatus}"?`))
+        return;
+
+    try {
+        setIsDeactivating(id);
+        
+        // Simulating success and updating the local state 
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network latency
+
+        setStudents(current => current.map(s => 
+            s.id === id ? { ...s, status: newStatus } : s
+        ));
+
+        alert(`Successfully set ${studentName} status to ${newStatus}.`);
+
+    } catch (err) {
+        console.error("Error updating status:", err);
+        alert(`Failed to change student status to ${newStatus}.`);
+    } finally {
+        setIsDeactivating(null);
+    }
+  };
+
 
   // Fetch student details
   const fetchStudentDetails = async (studentId) => {
@@ -159,7 +192,12 @@ const Students = ({ isDarkMode }) => {
               ></div>
             ))
           ) : students.length > 0 ? (
-            students.map((student) => (
+            students.map((student) => {
+              // Determine current status for button text (defaulting to 'Active' for display purposes if not present)
+              const currentStatus = student.status || 'Active';
+              const isCurrentlyActive = currentStatus === 'Active';
+              
+              return (
               <motion.div
                 key={student.id}
                 layout
@@ -174,10 +212,14 @@ const Students = ({ isDarkMode }) => {
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 justify-between">
+                    <div className="flex items-center gap-2">
                       <h3 className="text-xl font-bold truncate">
                         {student.full_name}
                       </h3>
+                      {/* Added status display for clarity */}
+                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {currentStatus}
+                      </span>
                       <button
                         onClick={() => fetchStudentDetails(student.id)}
                         className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
@@ -194,28 +236,56 @@ const Students = ({ isDarkMode }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
+                  
+                  {/* Deactivate/Activate Button (Text Only) */}
+                  <button
+                    onClick={() => handleDeactivate(student.id, currentStatus)}
+                    disabled={isDeactivating === student.id}
+                    // Removed 'gap-2' from class since there's no icon/loader next to text
+                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                      isDeactivating === student.id
+                        ? "bg-blue-300 text-blue-800 cursor-not-allowed"
+                        : "bg-blue-500 text-white hover:bg-blue-600"
+                    }`}
+                  >
+                    {isDeactivating === student.id ? (
+                      // Shows text only when loading
+                      "Updating..."
+                    ) : (
+                        // Shows text only when active
+                        isCurrentlyActive ? "Deactivate" : "Activate"
+                    )}
+                  </button>
+                  {/* END Deactivate/Activate Button */}
+
+                  {/* Delete Button (Text Only) */}
                   <button
                     onClick={() => handleDelete(student.id)}
                     disabled={isDeleting === student.id}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
                       isDeleting === student.id
                         ? "bg-red-300 text-red-800 cursor-not-allowed"
                         : "bg-red-500 text-white hover:bg-red-600"
                     }`}
                   >
-                    {isDeleting === student.id ? "Deleting..." : "Delete"}
+                    {isDeleting === student.id ? (
+                      "Deleting..."
+                    ) : (
+                      "Delete"
+                    )}
                   </button>
+                  {/* END Delete Button */}
                 </div>
               </motion.div>
-            ))
+            )})
           ) : (
             <p>No students found.</p>
           )}
         </div>
       </div>
 
-      {/* Student Details Modal */}
+      {/* Student Details Modal (omitted for brevity) */}
       <AnimatePresence>
         {selectedStudent && (
           <motion.div

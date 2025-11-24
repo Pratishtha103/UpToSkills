@@ -1,78 +1,149 @@
 // backend/routes/students.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const pool = require('../config/database'); // used below in count/delete
+const pool = require("../config/database");
+
+// Controllers
 const {
   getStudents,
   getStudentById,
   searchStudents,
   searchStudentsByQuery,
   getStudentDetails
-} = require('../controllers/students.controller');
+} = require("../controllers/students.controller");
 
-// Route: get student count (keeps your existing count route)
-router.get('/count', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT COUNT(*)::int AS total_students FROM students');
-    res.json({ totalStudents: result.rows[0].total_students });
-  } catch (err) {
-    console.error('❌ Error fetching student count:', err.message);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
+// Middlewares
+const verifyToken = require("../middleware/auth");
+const checkRole = require("../middleware/checkRole");
 
-// Delete student by ID (keep as-is)
-// Delete student by ID safely: remove dependent rows in user_details first (transaction)
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  const client = await pool.connect();
 
-  try {
-    await client.query('BEGIN');
-
-    // Remove dependent rows that reference this student to avoid FK violations.
-    // If you prefer cascading deletes at the DB level, alter the FK to use ON DELETE CASCADE instead.
-    await client.query('DELETE FROM user_details WHERE student_id = $1', [id]);
-
-    const result = await client.query('DELETE FROM students WHERE id = $1 RETURNING *', [id]);
-
-    if (result.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ success: false, message: 'Student not found' });
+// 🟢 GET student count
+router.get(
+  "/count",
+  verifyToken,
+  checkRole(["student"]),  
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        "SELECT COUNT(*)::int AS total_students FROM students"
+      );
+      res.json({ totalStudents: result.rows[0].total_students });
+    } catch (err) {
+      console.error("❌ Error fetching student count:", err.message);
+      res.status(500).json({ message: "Server Error" });
     }
-
-    await client.query('COMMIT');
-    res.json({ success: true, message: 'Student deleted', data: result.rows[0] });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('Error deleting student:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
-  } finally {
-    client.release();
   }
-});
+);
 
-// --- SEARCH ROUTES ---
-// Improved query-style search: /api/students/search?q=react
-router.get('/search', searchStudentsByQuery);
+// 🟡 DELETE student by ID (only admin should delete ideally)
+router.delete(
+  "/:id",
+  verifyToken,
+  checkRole(["admin"]), // ONLY ADMIN can delete
+  async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
 
-// Legacy param search: /api/students/search/:name
-router.get('/search/:name', searchStudents);
+    try {
+      await client.query("BEGIN");
 
-// Provide "all-students" alias for clients that expect it
-router.get('/all-students', getStudents);
+      await client.query("DELETE FROM user_details WHERE student_id = $1", [id]);
 
-// Keep root route (getStudents) at /api/students/
-router.get('/', getStudents);
+      const result = await client.query(
+        "DELETE FROM students WHERE id = $1 RETURNING *",
+        [id]
+      );
 
-// Get complete student details with all activities
-router.get('/:id/details', getStudentDetails);
+      if (result.rowCount === 0) {
+        await client.query("ROLLBACK");
+        return res
+          .status(404)
+          .json({ success: false, message: "Student not found" });
+      }
 
-// Provide "student/:id" alias (used by your frontend code) -> maps to getStudentById
-router.get('/student/:id', getStudentById);
+      await client.query("COMMIT");
+      res.json({
+        success: true,
+        message: "Student deleted",
+        data: result.rows[0]
+      });
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error("Error deleting student:", err);
+      res.status(500).json({ success: false, message: "Server error" });
+    } finally {
+      client.release();
+    }
+  }
+);
 
-// Also keep '/:id' for other clients
-router.get('/:id', getStudentById);
+/*==========================================================
+ 🔍 SEARCH ROUTES
+===========================================================*/
+
+// /api/students/search?q=react
+router.get(
+  "/search",
+  verifyToken,
+  checkRole(["student"]),
+  searchStudentsByQuery
+);
+
+// /api/students/search/:name
+router.get(
+  "/search/:name",
+  verifyToken,
+  checkRole(["student"]),
+  searchStudents
+);
+
+/*==========================================================
+ 👥 STUDENT LIST ROUTES
+===========================================================*/
+
+// /api/students/all-students
+router.get(
+  "/all-students",
+  verifyToken,
+  checkRole(["student"]),
+  getStudents
+);
+
+// /api/students/
+router.get(
+  "/",
+  verifyToken,
+  checkRole(["student"]),
+  getStudents
+);
+
+/*==========================================================
+ 📌 STUDENT DETAILS ROUTES
+===========================================================*/
+
+// /api/students/:id/details
+router.get(
+  "/:id/details",
+  verifyToken,
+  checkRole(["student"]),
+  getStudentDetails
+);
+
+// /api/students/student/:id
+router.get(
+  "/student/:id",
+  verifyToken,
+  checkRole(["student"]),
+  getStudentById
+);
+
+// /api/students/:id
+router.get(
+  "/:id",
+  verifyToken,
+  checkRole(["student"]),
+  getStudentById
+);
 
 module.exports = router;

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages & Components
 import Landing from './pages/Landing';
@@ -59,6 +61,15 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+
+      {/* 🔥 Toast Container (you must add this!) */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        pauseOnHover
+        theme="light"
+      />
       <Router>
         <Routes>
 
@@ -105,7 +116,9 @@ function App() {
           <Route path="/company/*" element={<ProtectedRoute><CompanyNotFound /></ProtectedRoute>} />
 
           {/* ===== Misc Routes ===== */}
+          
           <Route path="/projectShowcase" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
+
           <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} />
           <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />

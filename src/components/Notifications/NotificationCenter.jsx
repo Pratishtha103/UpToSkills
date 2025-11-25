@@ -56,6 +56,7 @@ const NotificationCenter = ({
     error,
     markAsRead,
     markAllAsRead,
+    refetch,
   } = useRealtimeNotifications({
     role: normalizedRole,
     recipientId: derivedRecipient,
@@ -70,9 +71,7 @@ const NotificationCenter = ({
 
   const handleSelectNotification = (notification) => {
     setSelectedNotification(notification);
-    if (!notification.isRead) {
-      markAsRead(notification.id);
-    }
+    // selection only; marking is handled by the drawer to avoid double-calls
   };
 
   const totalNotifications = notifications.length;
@@ -116,6 +115,8 @@ const NotificationCenter = ({
         error={error}
         unreadCount={unreadCount}
         onMarkAllRead={markAllAsRead}
+        onMarkAsRead={markAsRead}
+        onRefetch={() => refetch && refetch()}
       />
     </>
   );

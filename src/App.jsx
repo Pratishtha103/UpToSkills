@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// Sonner Toaster moved into company layout to appear below the header/nav
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

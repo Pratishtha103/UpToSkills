@@ -27,7 +27,7 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 border-b border-white/30 bg-white/70 pb-2 text-gray-900 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 dark:border-slate-800/60 dark:bg-slate-900/70 dark:text-white"
+      className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/30 bg-white/70 pb-2 text-gray-900 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 dark:border-slate-800/60 dark:bg-slate-900/70 dark:text-white"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -66,7 +66,7 @@ export default function Navbar({ onMenuClick }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <NotificationCenter role="company" />
+            <NotificationCenter role="company" />
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleTheme}>

@@ -50,14 +50,7 @@ export default function AdminNotifications({ isDarkMode }) {
           <Button variant="ghost" size="sm" onClick={refetch}>
             Refresh
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={markAllAsRead}
-            disabled={!unreadCount}
-          >
-            Mark all read ({unreadCount})
-          </Button>
+          {/* 'Mark all read' removed per request */}
         </div>
       </div>
 

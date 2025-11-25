@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, BellRing, X } from "lucide-react";
+import { ArrowUpRight, BellRing, X, Check, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "../Company_Dashboard/ui/button";
 
@@ -71,7 +71,7 @@ const roleThemes = {
   },
 };
 
-const NotificationDrawer = ({
+  const NotificationDrawer = ({
   role,
   notifications,
   isOpen,
@@ -82,7 +82,10 @@ const NotificationDrawer = ({
   error,
   unreadCount,
   onMarkAllRead,
+    onMarkAsRead,
+    onRefetch,
 }) => {
+  const [markingIds, setMarkingIds] = useState(new Set());
   const hasNotifications = notifications.length > 0;
   const theme = roleThemes[role] || roleThemes.default;
 
@@ -104,14 +107,14 @@ const NotificationDrawer = ({
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-slate-900/20 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
           <motion.aside
-            className="fixed inset-y-0 right-0 z-50 w-full rounded-none bg-white text-gray-900 shadow-[0_10px_50px_rgba(15,23,42,0.2)] ring-1 ring-slate-900/5 backdrop-blur-lg dark:bg-slate-950 dark:text-gray-100 sm:max-w-lg lg:max-w-xl xl:max-w-2xl lg:rounded-l-[32px]"
+            className="fixed inset-y-0 right-0 z-[10001] w-full rounded-none bg-white text-gray-900 shadow-[0_10px_50px_rgba(15,23,42,0.2)] ring-1 ring-slate-900/5 backdrop-blur-lg dark:bg-slate-950 dark:text-gray-100 sm:max-w-lg lg:max-w-xl xl:max-w-2xl lg:rounded-l-[32px]"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -135,10 +138,16 @@ const NotificationDrawer = ({
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    
                     {unreadCount > 0 && (
-                      <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-white/70 px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur dark:bg-slate-900/60 dark:text-gray-100">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
+                      <>
+                        <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-white/70 px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur dark:bg-slate-900/60 dark:text-gray-100">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                        {onMarkAllRead && (
+                          <Button size="sm" variant="ghost" onClick={onMarkAllRead} className="mr-2 text-xs">Mark all read</Button>
+                        )}
+                      </>
                     )}
                     <button
                       type="button"
@@ -156,9 +165,6 @@ const NotificationDrawer = ({
                       Unread
                     </span>
                     <div className="h-px flex-1 bg-slate-200/70 dark:bg-slate-800/70" />
-                    <Button size="sm" variant="ghost" onClick={onMarkAllRead} className="text-xs">
-                      Mark all read
-                    </Button>
                   </div>
                 )}
               </header>
@@ -182,7 +188,25 @@ const NotificationDrawer = ({
                         <li key={notification.id}>
                           <button
                             type="button"
-                            onClick={() => onSelectNotification(notification)}
+                            onClick={async () => {
+                              try {
+                                onSelectNotification(notification);
+                                if (!notification.isRead && onMarkAsRead) {
+                                  // avoid duplicate requests
+                                  if (markingIds.has(String(notification.id))) return;
+                                  setMarkingIds((s) => new Set([...Array.from(s), String(notification.id)]));
+                                  try {
+                                    await onMarkAsRead(notification.id);
+                                    if (onRefetch) onRefetch();
+                                  } finally {
+                                    setMarkingIds((s) => {
+                                      const next = new Set(Array.from(s).filter((x) => x !== String(notification.id)));
+                                      return next;
+                                    });
+                                  }
+                                }
+                              } catch (e) {}
+                            }}
                             className={`group flex w-full items-start gap-4 rounded-3xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-100 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:bg-slate-900 dark:ring-slate-800 ${
                               isActive ? "ring-2 ring-secondary shadow-lg" : ""
                             } ${notification.isRead ? "opacity-80" : ""}`}
@@ -199,15 +223,49 @@ const NotificationDrawer = ({
                                   {formatTimestamp(notification.createdAt)}
                                 </span>
                               </div>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-muted-foreground line-clamp-3">
                                 {notification.message}
                               </p>
-                              <div className="flex flex-wrap items-center gap-3 text-xs">
-                                {!notification.isRead && (
-                                  <span className="inline-flex items-center rounded-full bg-secondary/10 px-2 py-1 font-medium text-secondary">
-                                    New
-                                  </span>
+                              <div className="flex items-center gap-2">
+                                {/* per-item actions (mark read) */}
+                                {!notification.isRead && onMarkAsRead && (
+                                  <button
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      if (markingIds.has(String(notification.id))) return;
+                                      setMarkingIds((s) => new Set([...Array.from(s), String(notification.id)]));
+                                      try {
+                                        await onMarkAsRead(notification.id);
+                                        if (onRefetch) onRefetch();
+                                      } finally {
+                                        setMarkingIds((s) => {
+                                          const next = new Set(Array.from(s).filter((x) => x !== String(notification.id)));
+                                          return next;
+                                        });
+                                      }
+                                    }}
+                                    disabled={markingIds.has(String(notification.id))}
+                                    className={`inline-flex items-center gap-1 rounded-full px-2 py-1 ${markingIds.has(String(notification.id)) ? 'bg-emerald-200 text-emerald-900' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}
+                                    aria-label="Mark as read"
+                                  >
+                                    <Check className="w-4 h-4" />
+                                    <span className="text-xs font-medium">{markingIds.has(String(notification.id)) ? 'Marking…' : 'Mark read'}</span>
+                                  </button>
                                 )}
+                                {notification.link && (
+                                  <a
+                                    className="inline-flex items-center gap-1 font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                                    href={notification.link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={(event) => event.stopPropagation()}
+                                  >
+                                    Open
+                                    <ArrowUpRight className="h-4 w-4" />
+                                  </a>
+                                )}
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 text-xs">
                                 {notification.link && (
                                   <a
                                     className="inline-flex items-center gap-1 font-medium text-indigo-600 hover:underline dark:text-indigo-400"

@@ -67,6 +67,29 @@ exports.listNotifications = async (req, res, next) => {
   }
 };
 
+exports.countNotifications = async (req, res, next) => {
+  try {
+    const { role, recipientId } = req.query;
+    validateRole(role);
+
+    const params = [role];
+    let whereClause = "role = $1 AND recipient_id IS NULL AND is_read = FALSE";
+
+    if (recipientId) {
+      params.push(recipientId);
+      whereClause = "role = $1 AND (recipient_id IS NULL OR recipient_id = $2) AND is_read = FALSE";
+    }
+
+    const query = `SELECT COUNT(*)::int AS total FROM notifications WHERE ${whereClause}`;
+    const { rows } = await pool.query(query, params);
+    const total = rows[0]?.total ?? 0;
+
+    res.json({ success: true, data: { total } });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createNotification = async (req, res, next) => {
   try {
     const {

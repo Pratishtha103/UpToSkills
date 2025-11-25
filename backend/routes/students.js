@@ -15,14 +15,13 @@ const {
 
 // Middlewares
 const verifyToken = require("../middleware/auth");
-const checkRole = require("../middleware/checkRole");
 
-
-// 🟢 GET student count
+/*==========================================================
+ 🟢 COUNT  (NO ROLE CHECK)
+==========================================================*/
 router.get(
   "/count",
   verifyToken,
-  checkRole(["student"]),  
   async (req, res) => {
     try {
       const result = await pool.query(
@@ -36,19 +35,18 @@ router.get(
   }
 );
 
-// 🟡 DELETE student by ID (only admin should delete ideally)
+/*==========================================================
+ 🔴 DELETE (NO ROLE CHECK)
+==========================================================*/
 router.delete(
   "/:id",
   verifyToken,
-  checkRole(["admin"]), // ONLY ADMIN can delete
   async (req, res) => {
     const { id } = req.params;
     const client = await pool.connect();
 
     try {
       await client.query("BEGIN");
-
-      await client.query("DELETE FROM user_details WHERE student_id = $1", [id]);
 
       const result = await client.query(
         "DELETE FROM students WHERE id = $1 RETURNING *",
@@ -63,6 +61,7 @@ router.delete(
       }
 
       await client.query("COMMIT");
+
       res.json({
         success: true,
         message: "Student deleted",
@@ -78,72 +77,49 @@ router.delete(
   }
 );
 
-/*==========================================================
- 🔍 SEARCH ROUTES
-===========================================================*/
-
-// /api/students/search?q=react
-router.get(
-  "/search",
-  verifyToken,
-  checkRole(["student"]),
-  searchStudentsByQuery
-);
+// --- SEARCH ROUTES ---
+router.get('/search', searchStudentsByQuery);
 
 // /api/students/search/:name
 router.get(
   "/search/:name",
   verifyToken,
-  checkRole(["student"]),
   searchStudents
 );
 
-/*==========================================================
- 👥 STUDENT LIST ROUTES
-===========================================================*/
+// Autocomplete
+router.get('/autocomplete', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+        s.id, 
+        COALESCE(u.full_name, s.full_name, s.username) as name,
+        s.email, 
+        s.phone 
+       FROM students s
+       LEFT JOIN user_details u ON s.id = u.student_id
+       ORDER BY COALESCE(u.full_name, s.full_name, s.username) ASC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching students for autocomplete:', error);
+    res.status(500).json({ error: 'Server error while fetching students' });
+  }
+});
 
-// /api/students/all-students
-router.get(
-  "/all-students",
-  verifyToken,
-  checkRole(["student"]),
-  getStudents
-);
+// Alias for all students
+router.get('/all-students', getStudents);
 
-// /api/students/
-router.get(
-  "/",
-  verifyToken,
-  checkRole(["student"]),
-  getStudents
-);
+// Default root route
+router.get('/', getStudents);
 
-/*==========================================================
- 📌 STUDENT DETAILS ROUTES
-===========================================================*/
+// Get student details
+router.get('/:id/details', getStudentDetails);
 
-// /api/students/:id/details
-router.get(
-  "/:id/details",
-  verifyToken,
-  checkRole(["student"]),
-  getStudentDetails
-);
+// Alias route
+router.get('/student/:id', getStudentById);
 
-// /api/students/student/:id
-router.get(
-  "/student/:id",
-  verifyToken,
-  checkRole(["student"]),
-  getStudentById
-);
-
-// /api/students/:id
-router.get(
-  "/:id",
-  verifyToken,
-  checkRole(["student"]),
-  getStudentById
-);
+// Keep '/:id'
+router.get('/:id', getStudentById);
 
 module.exports = router;

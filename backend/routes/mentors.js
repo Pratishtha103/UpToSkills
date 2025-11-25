@@ -1,17 +1,15 @@
-// routes/mentors.js
+/// routes/mentors.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
 
 // Middlewares
 const verifyToken = require("../middleware/auth");
-const checkRole = require("../middleware/checkRole");
 
 // 🟢 GET Mentor Count
 router.get(
   "/count",
   verifyToken,
-  checkRole(["mentor"]),   // admin allowed automatically
   async (req, res) => {
     try {
       const result = await pool.query(
@@ -29,7 +27,6 @@ router.get(
 router.get(
   "/",
   verifyToken,
-  checkRole(["mentor"]),
   async (req, res) => {
     try {
       const result = await pool.query(`
@@ -56,11 +53,10 @@ router.get(
   }
 );
 
-// 🛑 DELETE Mentor (ADMIN ONLY)
+// 🛑 DELETE Mentor (ANY verified user now allowed — since checkRole removed)
 router.delete(
   "/:id",
   verifyToken,
-  checkRole(["admin"]),  // only admin can delete
   async (req, res) => {
     const { id } = req.params;
 

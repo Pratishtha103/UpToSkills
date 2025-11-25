@@ -108,3 +108,16 @@
     @apply bg-sidebar-primary text-sidebar-primary-foreground;
   }
 }
+
+
+/* Remove default browser eye icon completely (Chrome / Edge) */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+/* Remove default eye icon (Webkit – Chrome/Safari/Brave/Opera) */
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-password-toggle-button {
+  display: none !important;
+}

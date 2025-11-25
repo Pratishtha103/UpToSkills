@@ -1,8 +1,10 @@
+// scripts/initDB.js
 require("dotenv").config();
 const pool = require("../config/database");
 
 (async () => {
   try {
+    // COMPANIES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
@@ -15,6 +17,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // COMPANY PROFILES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS company_profiles (
         id SERIAL PRIMARY KEY,
@@ -29,6 +32,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // MENTORS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
@@ -41,16 +45,19 @@ const pool = require("../config/database");
       );
     `);
 
+    // SKILL BADGES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS skill_badges (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
         is_verified BOOLEAN DEFAULT FALSE,
+        given_by INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
+    // PROGRAMS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS programs (
         id SERIAL PRIMARY KEY,
@@ -71,6 +78,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // STUDENTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
@@ -84,6 +92,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // USER DETAILS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_details (
         id SERIAL PRIMARY KEY,
@@ -102,6 +111,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // ATTENDANCE
     await pool.query(`
       CREATE TABLE IF NOT EXISTS attendance (
         id SERIAL PRIMARY KEY,
@@ -113,6 +123,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // MENTOR PROJECTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentor_projects (
         id SERIAL PRIMARY KEY,
@@ -125,10 +136,12 @@ const pool = require("../config/database");
       );
     `);
 
+    // PROJECTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id SERIAL PRIMARY KEY,
         student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        mentor_project_id INTEGER REFERENCES mentor_projects(id) ON DELETE SET NULL,
         title TEXT NOT NULL,
         description TEXT,
         tech_stack TEXT,
@@ -140,6 +153,7 @@ const pool = require("../config/database");
       );
     `);
 
+    // PROJECT ASSIGNMENTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS project_assignments (
         id SERIAL PRIMARY KEY,
@@ -149,16 +163,18 @@ const pool = require("../config/database");
       );
     `);
 
+    // STUDENT BADGES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS student_badges (
         id SERIAL PRIMARY KEY,
         student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         badge_id INTEGER NOT NULL REFERENCES skill_badges(id) ON DELETE CASCADE,
+        given_by INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         awarded_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
-    console.log("✅ All tables created successfully with foreign keys.");
+    console.log("✅ All tables created successfully with foreign keys & extended relations.");
   } catch (err) {
     console.error("❌ DB Initialization Failed:", err);
   } finally {

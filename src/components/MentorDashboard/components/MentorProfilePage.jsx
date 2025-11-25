@@ -32,8 +32,16 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
         if (!d) {
           setUserData(null);
         } else {
+
+          const isProfileComplete =
+          (d.profile_full_name || d.mentor_name || "").trim() !== "" &&
+          (d.contact_number || "").trim() !== "" &&
+          (d.expertise_domains && d.expertise_domains.length > 0) &&
+          (d.mentor_email || d.student_email || "").trim() !== "";
+          
           // MAP mentor-shaped response to student-shaped fields your UI expects
           setUserData({
+            username: d.username || "",
             email: d.mentor_email || d.student_email || "",
             full_name: d.profile_full_name || d.mentor_name || d.student_name || "",
             contact_number: d.contact_number || d.mentor_phone || d.student_phone || "",
@@ -46,8 +54,9 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
             // domains: prefer mentor expertise_domains, but fall back if some alias exists
             domains_of_interest: d.expertise_domains || d.domains_of_interest || [],
             others_domain: d.others_domain || d.othersDomain || "",
-            profile_completed: d.profile_completed || false,
-          });
+            profile_completed: Boolean(isProfileComplete),
+            });
+
         }
       } catch (err) {
         console.error("Error fetching mentor profile:", err);
@@ -91,6 +100,7 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Personal Information</h2>
                     <div className="space-y-4">
+                      <Info label="Username" value={userData.username} />
                       <Info label="Full Name" value={userData.full_name} />
                       <Info label="Contact Number" value={userData.contact_number} />
                       <LinkInfo label="LinkedIn URL" url={userData.linkedin_url} />

@@ -33,18 +33,19 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ✅ Hardcoded admin login (fallback only — main flow still hits the API so notifications fire)
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
       role: "admin",
     };
-
-    if (
+    const isHardcodedAdmin =
       formData.email === hardcodedAdmin.email &&
       formData.password === hardcodedAdmin.password &&
-      formData.role === "admin"
-    ) {
-      toast.success("Admin login successful");
+      formData.role === "admin";
+
+    const fallbackAdminLogin = () => {
+      alert("Admin login successful (fallback mode)");
 
       const adminUser = {
         name: "Admin",
@@ -54,10 +55,10 @@ const LoginForm = () => {
 
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
+      localStorage.setItem("admin", JSON.stringify(adminUser));
 
-      setTimeout(() => navigate("/adminPanel", { state: { updated: true } }), 1000);
-      return;
-    }
+      navigate("/adminPanel", { state: { updated: true } });
+    };
 
     try {
       const response = await axios.post(
@@ -75,9 +76,17 @@ const LoginForm = () => {
         localStorage.setItem("id", response.data.user.id);
       }
 
-      const roleToSave = (response.data.user?.role || formData.role).toLowerCase();
-      if (roleToSave === "mentor" && response.data.user) {
-        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      const roleToSave = (
+        response.data.user?.role || formData.role
+      ).toLowerCase();
+
+      if (response.data.user) {
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
+        if (roleToSave === "admin") {
+          localStorage.setItem("admin", JSON.stringify(response.data.user));
+        }
       }
 
       setTimeout(() => {
@@ -90,6 +99,12 @@ const LoginForm = () => {
       }, 5000);
 
     } catch (err) {
+      if (isHardcodedAdmin) {
+        console.warn("Admin API login failed, using fallback mode:", err.message);
+        fallbackAdminLogin();
+        return;
+      }
+
       const message =
         err.response?.data?.message ||
         err.message ||

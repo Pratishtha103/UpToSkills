@@ -18,7 +18,16 @@ const domains = [
   'Other'
 ];
 
-export default function SearchFilters({ filters, onFilterChange, onClearFilters }) {
+export default function SearchFilters({
+  filters,
+  onFilterChange,
+  onClearFilters,
+  nameSuggestions = [],
+  showNameSuggestions = false,
+  onNameFocus,
+  onNameBlur,
+  onNameSuggestionSelect,
+}) {
   return (
     <motion.div
       className="bg-card border border-border rounded-lg p-4 mb-6"
@@ -32,7 +41,7 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-2 relative'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
             Name:
           </label>
@@ -40,9 +49,28 @@ export default function SearchFilters({ filters, onFilterChange, onClearFilters 
             type="text"
             value={filters.name}
             onChange={(e) => onFilterChange('name', e.target.value)}
+            onFocus={onNameFocus}
+            onBlur={onNameBlur}
             className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Enter name"
           />
+          {showNameSuggestions && nameSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-56 overflow-auto z-20">
+              {nameSuggestions.map((suggestion) => (
+                <button
+                  type="button"
+                  key={suggestion}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-primary/10"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onNameSuggestionSelect?.(suggestion);
+                  }}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className='flex items-center gap-2'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">

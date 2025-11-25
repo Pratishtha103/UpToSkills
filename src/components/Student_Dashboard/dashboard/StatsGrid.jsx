@@ -145,8 +145,8 @@ function StatsGrid({ studentId }) {
       delay: 0.2,
     },
     {
-      title: "Tasks in Progress",
-      value: "64%",
+      title: "Upcoming interviews",
+      value: "4",
       icon: Star,
       color: "accent",
       delay: 0.3,

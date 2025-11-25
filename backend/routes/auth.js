@@ -33,7 +33,6 @@ router.post('/register', async (req, res) => {
 
     if (!validateRole(role))
       return res.status(400).json({ success: false, message: 'Invalid role' });
-    }
     const normalizedRole = role.toLowerCase();
 
     if (normalizedRole === 'admin') {
@@ -41,18 +40,9 @@ router.post('/register', async (req, res) => {
     }
 
     // Choose table
-    let tableName;
-    if (normalizedRole === 'company') {
-      tableName = 'companies';
-    } else if (normalizedRole === 'mentor') {
-      tableName = 'mentors';
-    } else {
-      tableName = 'students';
-    }
-
-    let tableName = role === "company"
+    let tableName = normalizedRole === "company"
       ? "companies"
-      : role === "mentor"
+      : normalizedRole === "mentor"
         ? "mentors"
         : "students";
 
@@ -171,29 +161,18 @@ router.post('/login', async (req, res) => {
     const normalizedRole = role.toLowerCase();
 
     // Choose table
-    let tableName;
-    if (normalizedRole === 'admin') {
-      tableName = 'admins';
-    } else if (normalizedRole === 'student') {
-      tableName = 'students';
-    } else if (normalizedRole === 'mentor') {
-      tableName = 'mentors';
-    } else {
-      tableName = 'companies';
-    }
-
     let tableName =
-      role === "admin"
+      normalizedRole === "admin"
         ? "admins"
-        : role === "student"
+        : normalizedRole === "student"
           ? "students"
-          : role === "mentor"
+          : normalizedRole === "mentor"
             ? "mentors"
             : "companies";
 
     // Admin → ONLY email login
     let loginQuery =
-      role === "admin"
+      normalizedRole === "admin"
         ? `SELECT * FROM admins WHERE LOWER(email) = LOWER($1)`
         : `SELECT * FROM ${tableName}
            WHERE LOWER(email) = LOWER($1)

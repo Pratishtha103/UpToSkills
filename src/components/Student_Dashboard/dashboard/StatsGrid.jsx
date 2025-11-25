@@ -1,4 +1,3 @@
-// StatsGrid.jsx - CORRECTED VERSION
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Calendar, Star, TrendingUp } from "lucide-react";
@@ -8,14 +7,27 @@ function StatsGrid({ studentId }) {
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
   const [badgeCount, setBadgeCount] = useState(0);
+
+  //  Single GLOBAL loading state
   const [loading, setLoading] = useState(true);
+  const [loadedParts, setLoadedParts] = useState(0);
 
-  // ✅ Get studentId from localStorage if not passed as prop
-  const effectiveStudentId = studentId || localStorage.getItem('id') || localStorage.getItem('studentId');
+  // Helper to count how many API calls finished
+  const markLoaded = () => {
+    setLoadedParts((prev) => {
+      const next = prev + 1;
+      if (next === 3) setLoading(false); // All 3 API calls done
+      return next;
+    });
+  };
 
-  // ------------------------------
+  // Get student ID
+  const effectiveStudentId =
+    studentId || localStorage.getItem("id") || localStorage.getItem("studentId");
+
+  // --------------------------------
   // Fetch Enrollments
-  // ------------------------------
+  // --------------------------------
   useEffect(() => {
     if (!effectiveStudentId) {
       console.warn("StatsGrid: No student ID available");
@@ -32,34 +44,34 @@ function StatsGrid({ studentId }) {
       } catch (error) {
         console.error("Error fetching enrollment:", error);
         setEnrolledCount(0);
+      } finally {
+        markLoaded(); //  added
       }
     };
 
     fetchEnrollment();
   }, [effectiveStudentId]);
 
-  // ------------------------------
-  // ✅ FIXED: Fetch Projects Count with CORRECT endpoint
-  // ------------------------------
+  // --------------------------------
+  // Fetch Projects Count
+  // --------------------------------
   useEffect(() => {
     if (!effectiveStudentId) return;
 
     const fetchProjects = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
-        // ✅ Use the SAME endpoint as ProjectShowcase
+        const token = localStorage.getItem("token");
+
         const res = await axios.get(
           `http://localhost:5000/api/projects/assigned/${effectiveStudentId}`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
         );
 
-        // ✅ Handle the response structure correctly
         if (res.data.success && Array.isArray(res.data.data)) {
           setProjectCount(res.data.data.length);
         } else if (Array.isArray(res.data)) {
@@ -70,35 +82,31 @@ function StatsGrid({ studentId }) {
       } catch (error) {
         console.error("Error fetching project count:", error);
         setProjectCount(0);
+      } finally {
+        markLoaded(); 
       }
     };
 
     fetchProjects();
   }, [effectiveStudentId]);
 
-  // ------------------------------
+  // --------------------------------
   // Fetch Skill Badges Count
-  // ------------------------------
+  // --------------------------------
   useEffect(() => {
     if (!effectiveStudentId) return;
 
     const fetchBadgeCount = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          console.error("No authentication token found");
-          setBadgeCount(0);
-          return;
-        }
+        const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          'http://localhost:5000/api/skill-badges',
+          "http://localhost:5000/api/skill-badges",
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
         );
 
@@ -111,44 +119,44 @@ function StatsGrid({ studentId }) {
         console.error("Error fetching badge count:", error);
         setBadgeCount(0);
       } finally {
-        setLoading(false);
+        markLoaded(); 
       }
     };
 
     fetchBadgeCount();
   }, [effectiveStudentId]);
 
-  // ------------------------------
+  // --------------------------------
   // Stats Data
-  // ------------------------------
+  // --------------------------------
   const stats = [
-    { 
-      title: "Programs Enrolled", 
-      value: enrolledCount, 
-      icon: CheckCircle, 
-      color: "primary", 
-      delay: 0.1 
+    {
+      title: "Programs Enrolled",
+      value: loading ? "..." : enrolledCount,
+      icon: CheckCircle,
+      color: "primary",
+      delay: 0.1,
     },
-    { 
-      title: "My Projects", 
-      value: projectCount, 
-      icon: Calendar, 
-      color: "secondary", 
-      delay: 0.2 
-    }, 
-    { 
-      title: "Tasks in Progress", 
-      value: "64%", 
-      icon: Star, 
-      color: "accent", 
-      delay: 0.3 
+    {
+      title: "My Projects",
+      value: loading ? "..." : projectCount,
+      icon: Calendar,
+      color: "secondary",
+      delay: 0.2,
     },
-    { 
-      title: "Skill Badges Earned", 
-      value: loading ? "..." : badgeCount, 
-      icon: TrendingUp, 
-      color: "success", 
-      delay: 0.4 
+    {
+      title: "Upcoming interviews",
+      value: "4",
+      icon: Star,
+      color: "accent",
+      delay: 0.3,
+    },
+    {
+      title: "Skill Badges Earned",
+      value: loading ? "..." : badgeCount,
+      icon: TrendingUp,
+      color: "success",
+      delay: 0.4,
     },
   ];
 
@@ -159,7 +167,6 @@ function StatsGrid({ studentId }) {
     success: "bg-gradient-to-r from-green-500 to-emerald-500",
   };
 
-  // ✅ Show warning if no student ID
   if (!effectiveStudentId) {
     return (
       <section className="mb-8">
@@ -210,4 +217,3 @@ function StatsGrid({ studentId }) {
 }
 
 export default StatsGrid;
-

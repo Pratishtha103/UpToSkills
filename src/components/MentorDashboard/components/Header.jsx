@@ -1,14 +1,14 @@
 // Header.jsx
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bell, Settings, User, Search, Sun, Moon, Menu } from "lucide-react";
+import { User, Search, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
 import { Input } from "../../Company_Dashboard/ui/input";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
-import { Line } from "react-chartjs-2";
 import { Link } from "react-router-dom";
+import NotificationCenter from "../../Notifications/NotificationCenter";
 
 export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
   const navigate = useNavigate();
@@ -27,7 +27,6 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
-  // const handleNotificationsClick = () => navigate("/dashboard/notifications");
   const handleProfileClick = () => navigate("/mentor-dashboard/profile");
 
   // Menu toggle helper
@@ -94,20 +93,7 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          {/* Notifications */}
-          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              onClick={handleNotificationsClick}
-            >
-              <Bell className="w-5 h-5 relative z-10" />
-              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
-                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
-              </span>
-            </Button>
-          </motion.div> */}
+          <NotificationCenter role="mentor" />
 
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
@@ -119,13 +105,6 @@ export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
               )}
             </Button>
           </motion.div>
-
-          {/* Settings
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-5 h-5" />
-            </Button>
-          </motion.div> */}
 
           {/* User Profile */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>

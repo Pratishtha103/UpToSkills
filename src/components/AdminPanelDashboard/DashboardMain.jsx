@@ -92,7 +92,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
       onClick: () => onNavigateSection?.("companies_table"),
     },
     {
-      title: "Total Courses",
+      title: "Total Programs",
       value: stats.courses,
       loading: loadingStats,
       icon: <FaBookOpen className="w-6 h-6 text-white" />,

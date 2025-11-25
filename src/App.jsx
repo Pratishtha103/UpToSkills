@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Landing from './pages/Landing';
@@ -9,6 +11,7 @@ import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
 import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';
+import MyPrograms from './components/Student_Dashboard/myPrograms/MyPrograms';
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';
@@ -46,24 +49,31 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+
+      <ToastContainer position="top-right" autoClose={3000} pauseOnHover theme="light" />
+
       <Router>
         <Routes>
 
           {/* PUBLIC ROUTES */}
           <Route path="/" element={<Landing />} />
+
           <Route path="/about" element={
-            <div>
+            <>
               <Header />
               <HeroSection />
               <AboutSection />
               <Footer />
               <Chatbot />
-            </div>
-          } />
+            </>
+          }/>
+
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
+
+          {/* PROGRAM ROUTES */}
           <Route path="/programForm/:id" element={<Webdev />} />
           <Route path="/data-science" element={<Datascience />} />
           <Route path="/cloud-computing" element={<Cloudcompute />} />
@@ -72,101 +82,81 @@ function App() {
 
           {/* STUDENT PROTECTED ROUTES */}
           <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <Student_Dashboard />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><Student_Dashboard /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/profile" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <UserProfilePage />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><UserProfilePage /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/edit-profile" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <EditProfilePage />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><EditProfilePage /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/my-projects" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <MyProjects />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><MyProjects /></ProtectedRoute>
+          }/>
+
+          <Route path="/dashboard/my-programs" element={
+            <ProtectedRoute allowedRoles={["student"]}><MyPrograms /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/notifications" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <NotificationsPage />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><NotificationsPage /></ProtectedRoute>
+          }/>
 
           <Route path="/student/skill-badges" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <StudentSkillBadgesPage />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><StudentSkillBadgesPage /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/projects" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <Dashboard_Project />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><Dashboard_Project /></ProtectedRoute>
+          }/>
 
           <Route path="/dashboard/aboutus" element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <AboutUs />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["student"]}><AboutUs /></ProtectedRoute>
+          }/>
 
           {/* COMPANY PROTECTED ROUTES */}
           <Route path="/company" element={
-            <ProtectedRoute allowedRoles={["company"]}>
-              <CompanyDashboardHome />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["company"]}><CompanyDashboardHome /></ProtectedRoute>
+          }/>
 
           <Route path="/company-profile" element={
-            <ProtectedRoute allowedRoles={["company"]}>
-              <CompanyProfilePage />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["company"]}><CompanyProfilePage /></ProtectedRoute>
+          }/>
 
           <Route path="/company/*" element={
-            <ProtectedRoute allowedRoles={["company"]}>
-              <CompanyNotFound />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["company"]}><CompanyNotFound /></ProtectedRoute>
+          }/>
 
           {/* MENTOR PROTECTED ROUTES */}
           <Route path="/mentor-dashboard/skill-badges" element={
             <ProtectedRoute allowedRoles={["mentor"]}>
               <SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
             </ProtectedRoute>
-          } />
+          }/>
 
           <Route path="/mentor-dashboard/*" element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <MentorDashboardRoutes />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["mentor"]}><MentorDashboardRoutes /></ProtectedRoute>
+          }/>
 
           {/* ADMIN PROTECTED ROUTES */}
           <Route path="/adminPanel" element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminPanel />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute allowedRoles={["admin"]}><AdminPanel /></ProtectedRoute>
+          }/>
 
-          {/* UNAUTHORIZED */}
+          {/* GENERAL */}
+          <Route path="/projectShowcase" element={
+            <ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>
+          }/>
+
           <Route path="/unauthorized" element={<h1>403 - Unauthorized</h1>} />
-
-          {/* 404 PAGE */}
-         <Route path="*" element={<h1>404 - Page Not Found</h1>} />
-
+          <Route path="*" element={<h1>404 - Page Not Found</h1>} />
 
         </Routes>
       </Router>
+
     </QueryClientProvider>
   );
 }

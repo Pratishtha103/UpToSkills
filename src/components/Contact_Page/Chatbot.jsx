@@ -345,7 +345,7 @@ const Chatbot = () => {
       } else {
         botMessage = {
           sender: "bot",
-          text: "This feature is coming soon. Please select another action or go back.",
+          text: "You can contact support by visiting the home page and navigating to the 'Contact' section.",
           options: ["Back to User Type"],
         };
       }

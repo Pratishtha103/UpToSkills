@@ -1,5 +1,4 @@
-// src/Student_Dashboard/SkillBadges/StudentSkillBadgesPage.jsx (NO CHANGES NEEDED)
-
+// StudentSkillBadgesPage.jsx
 import React, { useState, useEffect } from "react"; 
 import Sidebar from "../dashboard/Sidebar";
 import Header from "../dashboard/Header";
@@ -7,15 +6,17 @@ import Footer from "../dashboard/Footer";
 import AchievementCard from "./AchievementCard"; 
 
 const StudentSkillBadgesPage = () => {
-    // ... (All original code remains the same)
     const [isSidebarVisible, setSidebarVisible] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(
         localStorage.getItem("theme") === "dark"
     );
     const [badges, setBadges] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Theme handling (Omitted for brevity)
+    // ------------------------------
+    // Theme handling
+    // ------------------------------
     useEffect(() => {
         if (isDarkMode) {
             document.documentElement.classList.add("dark");
@@ -28,7 +29,9 @@ const StudentSkillBadgesPage = () => {
 
     const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
-    // Sidebar responsive behavior (Omitted for brevity)
+    // ------------------------------
+    // Sidebar responsive behavior
+    // ------------------------------
     useEffect(() => {
         const checkScreenSize = () => {
             const mobile = window.innerWidth <= 1024;
@@ -39,29 +42,28 @@ const StudentSkillBadgesPage = () => {
         return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
-    // MODIFIED: Fetch Skill Badges with Authorization Header
+    // ------------------------------
+    // Fetch Skill Badges
+    // ------------------------------
     useEffect(() => {
         const fetchBadges = async () => {
             setLoading(true);
+            setError(null);
+            
             try {
-                // 1. Get the token from localStorage
                 const token = localStorage.getItem('token'); 
                 
-                // 2. Defensive check
                 if (!token) {
-                    console.error("No authentication token found. Aborting fetch.");
+                    setError("Authentication required. Please log in.");
                     setLoading(false);
                     return;
                 }
 
-                console.log("Token sent in request: Token present");
-
-                // 3. Send the token in the correct header
                 const response = await fetch("http://localhost:5000/api/skill-badges", {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`, // <--- FINAL CRITICAL FIX
+                        'Authorization': `Bearer ${token}`,
                     }
                 });
                 
@@ -70,14 +72,16 @@ const StudentSkillBadgesPage = () => {
                 if (response.ok && data.success) {
                     setBadges(data.data);
                 } else {
-                    console.error("Failed to fetch badges:", data.message); 
+                    setError(data.message || "Failed to fetch badges");
                 }
             } catch (err) {
                 console.error("Error fetching badges:", err);
+                setError("Network error. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
+        
         fetchBadges();
     }, []);
 
@@ -88,6 +92,7 @@ const StudentSkillBadgesPage = () => {
             }`}
         >
             <Sidebar isOpen={isSidebarVisible} setIsOpen={setSidebarVisible} />
+            
             <div
                 className={`flex-1 flex flex-col transition-all duration-300 ${
                     isSidebarVisible ? "lg:ml-64" : "ml-0"
@@ -98,24 +103,33 @@ const StudentSkillBadgesPage = () => {
                     toggleDarkMode={toggleDarkMode}
                 />
 
-                <div className="pt-24 px-4 sm:px-6 py-6">
+                <div className="pt-24 px-4 sm:px-6 py-6 flex-1">
                     <h1 className="text-3xl font-semibold mb-8 border-b pb-2 dark:border-gray-700">
                         🎖️ Student Skill Badges
                     </h1>
 
                     {loading ? (
-                        <p className="text-center text-gray-500 dark:text-gray-300">
-                            Loading your awesome achievements...
-                        </p>
+                        <div className="flex justify-center items-center p-10">
+                            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                            <p className="ml-4 text-gray-500 dark:text-gray-300">
+                                Loading your awesome achievements...
+                            </p>
+                        </div>
+                    ) : error ? (
+                        <div className="p-10 text-center bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                            <p className="text-xl text-red-600 dark:text-red-400">
+                                {error}
+                            </p>
+                        </div>
                     ) : badges.length === 0 ? (
-                        <div className="p-10 text-center bg-white dark:bg-gray-800 rounded-lg">
-                            <p className="text-xl text-gray-500 dark:text-gray-400">
+                        <div className="p-10 text-center bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                            <p className="text-xl text-gray-500 dark:text-gray-400 mb-2">
                                 No skill badges found. Time to earn some!
                             </p>
+                           
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                            {/* RENDER THE ACHIEVEMENT CARD */}
                             {badges.map((badge) => (
                                 <AchievementCard
                                     key={badge.id}

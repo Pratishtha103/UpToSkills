@@ -34,6 +34,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
 
   const token = localStorage.getItem("token");
 
+  // Fetch profile from backend
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
@@ -42,8 +43,8 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
       });
       const data = res.data?.data || {};
       setFormData({
-        full_name: data.full_name || "",
-        contact_number: data.phone || "",
+        full_name: data.profile_full_name || data.full_name || "",
+        contact_number: data.contact_number || "",
         linkedin_url: data.linkedin_url || "",
         github_url: data.github_url || "",
         about_me: data.about_me || "",
@@ -62,32 +63,41 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
     fetchProfile();
   }, [fetchProfile]);
 
+  // Save profile, accepting empty fields
   const saveProfile = async () => {
     try {
       setSaving(true);
+
+      // Trim string fields and prepare payload
+      const payload = {
+        full_name: (formData.full_name || '').trim(),
+        contact_number: (formData.contact_number || '').trim(),
+        linkedin_url: (formData.linkedin_url || '').trim(),
+        github_url: (formData.github_url || '').trim(),
+        about_me: (formData.about_me || '').trim(),
+        expertise_domains: Array.isArray(formData.expertise_domains) ? formData.expertise_domains : [],
+        others_domain: (formData.others_domain || '').trim(),
+      };
+
+      console.log('Sending mentor profile payload:', payload);
+
       const res = await axios.post(
         "http://localhost:5000/api/mentor/profile",
-        formData,
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      console.log('Mentor profile response:', res.data);
+
       if (res.data?.success) {
         toast.success("Profile updated successfully!");
-        setFormData({
-          full_name: "",
-          contact_number: "",
-          linkedin_url: "",
-          github_url: "",
-          about_me: "",
-          expertise_domains: [],
-          others_domain: "",
-        });
+        fetchProfile(); // refresh latest values
       } else {
-        toast.error("Failed to update profile.");
+        toast.error(res.data?.message || "Failed to update profile.");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Network error while saving profile.");
+      console.error('Mentor profile save error:', err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Network error while saving profile.");
     } finally {
       setSaving(false);
     }
@@ -112,6 +122,18 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
     e.preventDefault();
     saveProfile();
   };
+
+  // Check if profile is completed - ALL fields must be filled
+  const isProfileCompleted =
+    formData.full_name &&
+    formData.contact_number &&
+    formData.linkedin_url &&
+    formData.github_url &&
+    formData.about_me &&
+    formData.expertise_domains &&
+    formData.expertise_domains.length > 0
+      ? "Yes"
+      : "No";
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
@@ -246,7 +268,10 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
                   />
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 dark:text-white">
+                    Profile Completed: {isProfileCompleted}
+                  </span>
                   <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition"

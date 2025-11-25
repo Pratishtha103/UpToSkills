@@ -21,7 +21,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
-  // ✅ Fetch stats and courses from backend
+  // Fetch stats
   useEffect(() => {
     const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
     let isMounted = true;
@@ -29,26 +29,22 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
     const fetchStats = async () => {
       try {
         const res = await axios.get(`${API_BASE}/api/stats`);
-        console.log("Stats:", res.data);
         const data = res.data || {};
-        if (!isMounted) return;
 
-        // ✅ Fetch courses separately
         const courseRes = await axios.get(`${API_BASE}/api/courses`);
-        console.log("Courses:", courseRes.data);
-
-        // ✅ Correct way to extract the array and find its length
         const courses = Array.isArray(courseRes.data)
           ? courseRes.data
           : Array.isArray(courseRes.data.courses)
           ? courseRes.data.courses
           : [];
 
+        if (!isMounted) return;
+
         setStats({
           students: data.students ?? 0,
           mentors: data.mentors ?? 0,
           companies: data.companies ?? 0,
-          courses: courses.length ?? 0, // ✅ Total courses using array length
+          courses: courses.length ?? 0,
         });
       } catch (err) {
         console.error("Failed to load stats:", err);
@@ -64,14 +60,13 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
     };
   }, []);
 
-  // ✅ Helper to format numbers
   const formatNumber = (num) => {
     if (num === null || num === undefined) return "-";
     const n = typeof num === "number" ? num : Number(num);
     return n.toLocaleString("en-IN");
   };
 
-  // ✅ Cards data
+  // Cards data
   const cards = [
     {
       title: "Total Students",
@@ -97,8 +92,8 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
       onClick: () => onNavigateSection?.("companies_table"),
     },
     {
-      title: "Total Courses",
-      value: stats.courses, // ✅ Shows total courses from API correctly now
+      title: "Total Programs",
+      value: stats.courses,
       loading: loadingStats,
       icon: <FaBookOpen className="w-6 h-6 text-white" />,
       gradient: "from-purple-500 to-pink-500",
@@ -122,8 +117,8 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
         Platform Overview
       </motion.h2>
 
-      {/* === Stat Cards === */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* === Stat Cards (FIXED: 4 cards in one row) === */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card, index) => (
           <motion.div
             key={index}

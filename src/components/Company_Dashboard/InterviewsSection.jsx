@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Card } from "../Company_Dashboard/ui/card";
 import { Button } from "../Company_Dashboard/ui/button";
@@ -65,6 +65,14 @@ function InterviewsSection() {
     time: "",
   });
 
+  // Autocomplete states
+  const [candidates, setCandidates] = useState([]);
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const inputRef = useRef(null);
+  const suggestionsRef = useRef(null);
+
   const fetchInterviews = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/interviews");
@@ -86,6 +94,16 @@ function InterviewsSection() {
       setInterviewCount(sorted.length);
     } catch (err) {
       console.error("Error fetching interviews:", err);
+    }
+  };
+
+  // Fetch all candidates/students
+  const fetchCandidates = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/students/autocomplete");
+      setCandidates(res.data || []);
+    } catch (err) {
+      console.error("Error fetching candidates:", err);
     }
   };
 
@@ -124,6 +142,69 @@ function InterviewsSection() {
       try { window.removeEventListener('interview:created', onInterviewCreatedGlobal); } catch (e) {}
     };
   }, []);
+
+  // Filter candidates based on input
+  useEffect(() => {
+    if (newInterview.candidateName.trim() === "") {
+      setFilteredCandidates([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const filtered = candidates.filter((candidate) =>
+      candidate.name?.toLowerCase().includes(newInterview.candidateName.toLowerCase())
+    );
+
+    setFilteredCandidates(filtered);
+    setShowSuggestions(filtered.length > 0);
+    setSelectedIndex(-1);
+  }, [newInterview.candidateName, candidates]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || filteredCandidates.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < filteredCandidates.length - 1 ? prev + 1 : prev
+        );
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+
+      case "Tab":
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0 && filteredCandidates[selectedIndex]) {
+          selectCandidate(filteredCandidates[selectedIndex]);
+        } else if (filteredCandidates.length > 0) {
+          selectCandidate(filteredCandidates[0]);
+        }
+        break;
+
+      case "Escape":
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const selectCandidate = (candidate) => {
+    setNewInterview({
+      ...newInterview,
+      candidateName: candidate.name,
+    });
+    setShowSuggestions(false);
+    setSelectedIndex(-1);
+  };
 
   const handleScheduleInterview = async () => {
     if (!newInterview.candidateName || !newInterview.position || !newInterview.date || !newInterview.time || !newInterview.type) {
@@ -220,11 +301,61 @@ function InterviewsSection() {
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              {["candidateName", "position", "date", "time", "type"].map((field) => (
+              {/* Candidate Name with Autocomplete */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Candidate Name</Label>
+                <div className="col-span-3 relative">
+                  <Input
+                    ref={inputRef}
+                    type="text"
+                    value={newInterview.candidateName}
+                    onChange={(e) =>
+                      setNewInterview({ ...newInterview, candidateName: e.target.value })
+                    }
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => {
+                      if (filteredCandidates.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    placeholder="Enter Canditate Name"
+                    autoComplete="off"
+                  />
+
+                  {/* Autocomplete Dropdown */}
+                  {showSuggestions && filteredCandidates.length > 0 && (
+                    <div
+                      ref={suggestionsRef}
+                      className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                    >
+                      {filteredCandidates.map((candidate, index) => (
+                        <div
+                          key={candidate.id}
+                          className={`px-4 py-2 cursor-pointer transition-colors ${
+                            index === selectedIndex
+                              ? "bg-blue-100 dark:bg-blue-900"
+                              : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
+                          onClick={() => selectCandidate(candidate)}
+                          onMouseEnter={() => setSelectedIndex(index)}
+                        >
+                          <div className="font-medium">{candidate.name}</div>
+                          {candidate.email && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {candidate.email}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Other Fields */}
+              {["position", "date", "time", "type"].map((field) => (
                 <div key={field} className="grid grid-cols-4 items-center gap-4">
-                  <Label className="text-right capitalize">
-                    {field === "candidateName" ? "Candidate Name" : field}
-                  </Label>
+                  <Label className="text-right capitalize">{field}</Label>
                   {field === "type" ? (
                     <Select
                       value={newInterview.type}

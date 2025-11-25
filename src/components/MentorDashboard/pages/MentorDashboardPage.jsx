@@ -27,9 +27,11 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
 
   const dashboardFeatures = [
     {
-      icon: "🧑‍🏫",
-      title: "Projects",
-      description: "Projects at a glance",
+      icon: "📋",
+      title: "Glance",
+      description: "Programs assigned to me",
+      count: 0, // static total number of programs assigned
+      color: "primary",   // ⭐ add this
       onClick: () => navigate("open-source-contributions"),
     },
     {
@@ -67,9 +69,12 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
                 icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
+                count={feature.count}   // <-- ⭐ added
+                color={feature.color}     // ⭐ added
                 onClick={feature.onClick}
                 isDarkMode={isDarkMode}
               />
+
             ))}
           </div>
         </div>

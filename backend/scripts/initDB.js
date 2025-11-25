@@ -1,17 +1,16 @@
 // scripts/initDB.js
 require('dotenv').config();
 const pool = require('../config/database');
+const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable');
 
 (async () => {
   try {
-    // Create all required tables if they do not exist
-    // Order matters due to foreign key constraints
-
+    // COMPANIES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
-        company_name VARCHAR(255) NOT NULL,
         username VARCHAR(50),
+        company_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,
@@ -19,13 +18,11 @@ const pool = require('../config/database');
       );
     `);
 
-    // await pool.query(`
-    //   Alter TABLE companies
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
+    // COMPANY PROFILES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS company_profiles (
         id SERIAL PRIMARY KEY,
+        company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
         name TEXT NOT NULL,
         website TEXT,
         industry TEXT,
@@ -36,6 +33,7 @@ const pool = require('../config/database');
       );
     `);
 
+    // MENTORS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
@@ -47,21 +45,20 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    // await pool.query(`
-    //   Alter TABLE mentors
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
 
+    // SKILL BADGES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS skill_badges (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
         is_verified BOOLEAN DEFAULT FALSE,
+        given_by INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
+    // PROGRAMS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS programs (
         id SERIAL PRIMARY KEY,
@@ -82,11 +79,12 @@ const pool = require('../config/database');
       );
     `);
 
+    // STUDENTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
         username VARCHAR(50),
-        program_id INTEGER REFERENCES programs(id),
+        program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -94,14 +92,12 @@ const pool = require('../config/database');
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    // await pool.query(`
-    //   Alter TABLE students
-    //   ADD COLUMN IF NOT EXISTS username VARCHAR(50);
-    // `);
+
+    // USER DETAILS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_details (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         full_name VARCHAR(255),
         contact_number VARCHAR(15),
         linkedin_url TEXT,
@@ -116,10 +112,11 @@ const pool = require('../config/database');
       );
     `);
 
+    // ATTENDANCE
     await pool.query(`
       CREATE TABLE IF NOT EXISTS attendance (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         date DATE NOT NULL,
         status VARCHAR(10) NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -127,11 +124,12 @@ const pool = require('../config/database');
       );
     `);
 
+    // MENTOR PROJECTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentor_projects (
         id SERIAL PRIMARY KEY,
         project_title TEXT NOT NULL,
-        mentor_id INTEGER REFERENCES mentors(id),
+        mentor_id INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         mentor_name TEXT NOT NULL,
         total_students INTEGER DEFAULT 0,
         created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -139,10 +137,12 @@ const pool = require('../config/database');
       );
     `);
 
+    // PROJECTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        mentor_project_id INTEGER REFERENCES mentor_projects(id) ON DELETE SET NULL,
         title TEXT NOT NULL,
         description TEXT,
         tech_stack TEXT,
@@ -154,49 +154,24 @@ const pool = require('../config/database');
       );
     `);
 
+    // PROJECT ASSIGNMENTS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS project_assignments (
         id SERIAL PRIMARY KEY,
-        project_id INTEGER REFERENCES projects(id),
-        student_id INTEGER REFERENCES students(id),
+        project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
         assigned_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
+    // STUDENT BADGES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS student_badges (
         id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students(id),
-        badge_id INTEGER REFERENCES skill_badges(id),
-        awarded_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `);
-
-    // Create courses table first (from coursesController logic)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS courses (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        description TEXT NOT NULL,
-        image_path VARCHAR(255),
-        enrolled integer[],
-        skills TEXT[],
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await pool.query(`
-      ALTER TABLE courses ADD COLUMN IF NOT EXISTS enroll_url TEXT;
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS enrollments (
-        id SERIAL PRIMARY KEY,
         student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-        enrolled_at TIMESTAMPTZ DEFAULT NOW(),
-        status VARCHAR(20) DEFAULT 'active',
-        UNIQUE(student_id, course_id)
+        badge_id INTEGER NOT NULL REFERENCES skill_badges(id) ON DELETE CASCADE,
+        given_by INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
+        awarded_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
@@ -213,10 +188,11 @@ const pool = require('../config/database');
       CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
     `);
 
+    await ensureNotificationsTable();
+
     console.log('✅ All tables checked/created successfully');
   } catch (err) {
-    console.error('❌ Failed to initialize DB:', err);
-    process.exit(1);
+    console.error("❌ DB Initialization Failed:", err);
   } finally {
     await pool.end();
   }

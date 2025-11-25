@@ -170,7 +170,7 @@ export default function Company({ isDarkMode }) {
                     <Building2 className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between">
                       <h3 className="text-xl font-bold truncate">{company.company_name || company.name}</h3>
                       <button
                         onClick={() => fetchCompanyDetails(company.id)}

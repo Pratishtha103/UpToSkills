@@ -1,13 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LayoutDashboard,
-  Users,
-  Building2,
-  FolderOpen,
-  LogOut,
+import { 
+  LayoutDashboard, 
+  Users, 
+  Building2, 
+  BookOpen, 
+  FolderOpen, 
+  MessageSquare, 
+  LogOut, 
   X,
-  Bell,
-  BookOpen,
+  Bell
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,10 +18,11 @@ const sidebarItems = [
   { id: "students", label: "Students", icon: Users },
   { id: "mentors", label: "Mentors", icon: Users },
   { id: "companies", label: "Companies", icon: Building2 },
-  { id: "courses", label: "Courses", icon: BookOpen },
+  
   { id: "projects", label: "Projects", icon: FolderOpen },
-  { id: "programs", label: "Courses", icon: BookOpen },
-   { id: "testimonials", label: "Testimonials", icon: Bell },
+  { id: "programs", label: "Programs", icon: BookOpen },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // ✅ Changed from Bell to MessageSquare
 ];
 
 export default function AdminSidebar({
@@ -28,7 +30,7 @@ export default function AdminSidebar({
   setIsOpen,
   activeSection,
   setActiveSection,
-  isDarkMode, // ✅ added prop
+  isDarkMode,
 }) {
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
@@ -109,12 +111,9 @@ export default function AdminSidebar({
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-1">
               {sidebarItems.map((item, index) => {
-                if(item.id === "courses") {
-                  return null; // Hide Courses section
-                  // const Active = activeSection === item.courses;
-                }
                 const Icon = item.icon;
                 const isActive = activeSection === item.id;
+
                 return (
                   <motion.button
                     key={item.id}

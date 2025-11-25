@@ -1,6 +1,24 @@
+//interviews.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
+const verifyToken = require("../middleware/auth");
+const { pushNotification, notifyAdmins } = require("../utils/notificationService");
+
+const formatInterviewSlot = (date, time) => {
+  try {
+    const slot = new Date(`${date}T${time}`);
+    if (!Number.isNaN(slot.getTime())) {
+      return slot.toLocaleString("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    }
+  } catch (err) {
+    // ignore formatting errors
+  }
+  return `${date} ${time}`;
+};
 
 // ✅ GET all interviews (sorted by date & time)
 router.get("/", async (req, res) => {
@@ -14,22 +32,135 @@ router.get("/", async (req, res) => {
 });
 
 // ✅ POST - Add new interview
-router.post("/", async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
-    const { candidateName, position, date, time } = req.body;
+    const { candidateName, position, date, time, candidateId } = req.body;
 
     if (!candidateName || !position || !date || !time) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    // Insert candidate_id as nullable column (value may be null)
     const result = await pool.query(
-      `INSERT INTO interviews (candidate_name, role, date, time, status)
-       VALUES ($1, $2, $3, $4, 'Scheduled')
+      `INSERT INTO interviews (candidate_name, role, date, time, status, candidate_id)
+       VALUES ($1, $2, $3, $4, 'Scheduled', $5)
        RETURNING *`,
-      [candidateName, position, date, time]
+      [candidateName, position, date, time, candidateId ?? null]
     );
 
-    res.status(201).json(result.rows[0]);
+    const createdInterview = result.rows[0];
+      const slotLabel = formatInterviewSlot(createdInterview.date, createdInterview.time);
+      // also provide explicit readable date and time to avoid ambiguous concatenation in messages
+      let readableDate = String(createdInterview.date);
+      let readableTime = String(createdInterview.time);
+      try {
+        const dt = new Date(`${createdInterview.date}T${createdInterview.time}`);
+        if (!Number.isNaN(dt.getTime())) {
+          readableDate = dt.toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+          readableTime = dt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        }
+      } catch (err) {
+        // fall back to raw strings
+      }
+    const ioInstance = req.app.get("io");
+
+    // Notify the company/user who scheduled this interview (if authenticated)
+    try {
+      const actor = req.user || null;
+      if (actor && actor.id) {
+        await pushNotification({
+          role: "company",
+          recipientRole: "company",
+          recipientId: actor.id,
+          type: "interview",
+          title: "Interview scheduled",
+            message: `You scheduled an interview for ${candidateName} on ${readableDate} at ${readableTime}.`,
+          metadata: {
+            interviewId: createdInterview.id,
+            candidateName,
+            position,
+            date: createdInterview.date,
+            time: createdInterview.time,
+          },
+          io: ioInstance,
+        });
+      }
+    } catch (companyNotifyError) {
+      console.error("Company notification error (interview)", companyNotifyError);
+    }
+
+    try {
+      // If caller supplied a candidateId, prefer it for notifications instead of name matching
+      if (candidateId) {
+        // Verify student exists
+        const studentRow = await pool.query("SELECT id FROM students WHERE id = $1 LIMIT 1", [candidateId]);
+        if (studentRow.rows.length) {
+          await pushNotification({
+            role: "student",
+            recipientRole: "student",
+            recipientId: studentRow.rows[0].id,
+            type: "interview",
+            title: "Interview scheduled",
+              message: `Your interview for ${position} is scheduled for ${readableDate} at ${readableTime}.`,
+            metadata: {
+              interviewId: createdInterview.id,
+              candidateName: candidateName?.trim(),
+              position,
+              date: createdInterview.date,
+              time: createdInterview.time,
+            },
+            io: ioInstance,
+          });
+        }
+      } else {
+        const trimmedCandidate = candidateName?.trim();
+        if (trimmedCandidate) {
+          const studentMatch = await pool.query(
+            "SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1 LIMIT 1",
+            [trimmedCandidate]
+          );
+
+          if (studentMatch.rows.length) {
+            await pushNotification({
+              role: "student",
+              recipientRole: "student",
+              recipientId: studentMatch.rows[0].id,
+              type: "interview",
+              title: "Interview scheduled",
+                message: `Your interview for ${position} is scheduled for ${readableDate} at ${readableTime}.`,
+              metadata: {
+                interviewId: createdInterview.id,
+                candidateName: trimmedCandidate,
+                position,
+                date: createdInterview.date,
+                time: createdInterview.time,
+              },
+              io: ioInstance,
+            });
+          }
+        }
+      }
+    } catch (studentNotifyError) {
+      console.error("Student interview notification error", studentNotifyError);
+    }
+
+    try {
+      await notifyAdmins({
+        title: "Interview scheduled",
+          message: `${candidateName} has an interview for ${position} on ${readableDate} at ${readableTime}.`,
+        type: "interview",
+        metadata: {
+          interviewId: createdInterview.id,
+          candidateName,
+          position,
+        },
+        io: ioInstance,
+      });
+    } catch (adminInterviewError) {
+      console.error("Admin notification error (interview)", adminInterviewError);
+    }
+
+    res.status(201).json(createdInterview);
   } catch (error) {
     console.error("Error adding interview:", error);
     res.status(500).json({ error: "Server error while adding interview" });

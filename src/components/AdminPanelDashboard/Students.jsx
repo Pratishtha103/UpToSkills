@@ -1,7 +1,7 @@
 // src/components/AdminPanelDashboard/Students.jsx
+
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-// Removed ToggleLeft icon import as it's no longer used in the button display
 import { User, Search, Loader2, Users, Eye, X, Award, BookOpen, Calendar, Github, Linkedin, Mail, Phone } from "lucide-react"; 
 
 const API_BASE_URL = "http://localhost:5000/api/students";
@@ -70,14 +70,8 @@ const Students = ({ isDarkMode }) => {
 
     try {
         setIsDeactivating(id);
-        // Placeholder for API call: In a real app, you'd send a PATCH/PUT request to update the student status
-        // const res = await fetch(`${API_BASE_URL}/${id}/status`, { 
-        //     method: "PATCH", 
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ status: newStatus.toLowerCase() })
-        // });
         
-        // Simulating success and updating the local state (assuming a 'status' field exists in the student object)
+        // Simulating success and updating the local state 
         await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network latency
 
         setStudents(current => current.map(s => 
@@ -243,7 +237,8 @@ const Students = ({ isDarkMode }) => {
                 </div>
 
                 <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
-                  {/* Deactivate/Activate Button - ICON REMOVED */}
+                  
+                  {/* Deactivate/Activate Button (Text Only) */}
                   <button
                     onClick={() => handleDeactivate(student.id, currentStatus)}
                     disabled={isDeactivating === student.id}
@@ -255,13 +250,16 @@ const Students = ({ isDarkMode }) => {
                     }`}
                   >
                     {isDeactivating === student.id ? (
+                      // Shows text only when loading
                       "Updating..."
                     ) : (
+                        // Shows text only when active
                         isCurrentlyActive ? "Deactivate" : "Activate"
                     )}
                   </button>
                   {/* END Deactivate/Activate Button */}
 
+                  {/* Delete Button (Text Only) */}
                   <button
                     onClick={() => handleDelete(student.id)}
                     disabled={isDeleting === student.id}
@@ -277,6 +275,7 @@ const Students = ({ isDarkMode }) => {
                       "Delete"
                     )}
                   </button>
+                  {/* END Delete Button */}
                 </div>
               </motion.div>
             )})
@@ -286,7 +285,7 @@ const Students = ({ isDarkMode }) => {
         </div>
       </div>
 
-      {/* Student Details Modal */}
+      {/* Student Details Modal (omitted for brevity) */}
       <AnimatePresence>
         {selectedStudent && (
           <motion.div

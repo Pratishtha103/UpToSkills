@@ -19,6 +19,7 @@ import AdminNotifications from "../components/AdminPanelDashboard/AdminNotificat
 import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
 import Testimonials from "../components/AdminPanelDashboard/Testimonials";
+import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -80,6 +81,8 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+      case "courses_table":
+        return (<CoursesTable isDarkMode={isDarkMode} onNavigateSection={() => setActiveSection} />);
       case "mentors_table":
         return (
           <MentorsTable
@@ -104,8 +107,8 @@ function AdminPanel() {
   return (
     <div
       className={`flex min-h-screen transition-colors duration-500 ${isDarkMode
-          ? "bg-gray-900 text-gray-100"
-          : "bg-gray-50 text-gray-900"
+        ? "bg-gray-900 text-gray-100"
+        : "bg-gray-50 text-gray-900"
         }`}
     >
       {/* Sidebar */}
@@ -125,7 +128,6 @@ function AdminPanel() {
         {/* Navbar */}
         <AdminNavbar
           onMenuClick={toggleSidebar}
-          onNotificationsClick={() => setActiveSection("notifications")}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
         />
@@ -134,8 +136,8 @@ function AdminPanel() {
         <main className="pt-20 px-4 sm:px-6 py-6">
           <motion.section
             className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${isDarkMode
-                ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white"
-                : "bg-gradient-to-br from-white to-gray-100 text-gray-900"
+              ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white"
+              : "bg-gradient-to-br from-white to-gray-100 text-gray-900"
               }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -167,11 +169,12 @@ function AdminPanel() {
 
         {/* Footer */}
         <footer
-          className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300"
-        >
-          <p>© 2025 Uptoskills. Built by learners.</p>
-        </footer>
-      </div>
+    className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 
+    dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 
+    text-center py-4 text-sm transition-colors duration-300 mt-auto"
+  >
+    <p>© 2025 Uptoskills. Built by learners.</p>
+  </footer></div>
     </div>
   );
 }

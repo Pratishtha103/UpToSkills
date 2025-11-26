@@ -10,8 +10,9 @@ import Landing from './pages/Landing';
 import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
-import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';
-import MyPrograms from './components/Student_Dashboard/myPrograms/MyPrograms';
+import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';;
+import MyPrograms from './components/Student_Dashboard/dashboard/MyPrograms';
+
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';

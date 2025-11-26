@@ -1,10 +1,9 @@
 // src/components/Company_Dashboard/StudentProfileModal.jsx
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import {
   X,
-  Star,
-  MapPin,
   Calendar,
   ExternalLink,
   Link as LinkIcon,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import StatCard from "./StatCard";
 
 /**
  * StudentProfileModal
@@ -76,42 +76,64 @@ export default function StudentProfileModal({
   useEffect(() => {
     setStudent(initialStudent);
 
-    if (fetchFresh && initialStudent?.id) {
+    if (fetchFresh && (initialStudent?.id || initialStudent?.student_id)) {
       const fetchProfile = async () => {
         setLoading(true);
         try {
-          const res = await fetch(`${API_BASE}/api/students/${initialStudent.id}`, {
+          // Use the richer details endpoint which returns profile, projects, badges, enrollments, attendance, stats
+          const res = await fetch(`${API_BASE}/api/students/${initialStudent.id}/details`, {
             credentials: "include",
             headers: { Accept: "application/json" },
           });
           if (!res.ok) {
             const text = await res.text().catch(() => "");
-            throw new Error(`Failed to fetch profile: ${res.status} ${text}`);
+            throw new Error(`Failed to fetch profile details: ${res.status} ${text}`);
           }
           const json = await res.json();
-          const data = json?.data ?? json;
+          const payload = json?.data ?? json;
 
-          // Map backend fields to a consistent shape for UI
+          // payload expected shape: { profile, projects, badges, enrollments, attendance, stats }
+          const profile = payload.profile || {};
+
           const mapped = {
-            id: data.id ?? initialStudent.id,
-            // prefer profile_full_name (from user_details) over student table name
-            full_name: data.profile_full_name || data.full_name || data.student_name || initialStudent.full_name || initialStudent.name,
-            email: data.email || initialStudent.email,
-            phone: data.phone || initialStudent.phone || data.contact_number,
-            contact_number: data.contact_number || initialStudent.contact_number,
-            linkedin_url: data.linkedin_url || null,
-            github_url: data.github_url || null,
-            why_hire_me: data.why_hire_me || data.why_hire || "",
-            profile_completed: data.profile_completed === true || data.profile_completed === 't' || data.profile_completed === 1,
-            ai_skill_summary: data.ai_skill_summary || initialStudent.ai_skill_summary || initialStudent.ai_skills || "",
-            domains_of_interest: normalizeDomains(data.domains_of_interest || initialStudent.domains_of_interest || data.others_domain),
-            created_at: data.profile_created_at || data.created_at || initialStudent.created_at,
-            updated_at: data.profile_updated_at || data.updated_at || initialStudent.updated_at,
-            // keep raw for debugging if needed
-            __raw: data,
+            id: profile.id ?? initialStudent.id,
+            full_name: profile.profile_full_name || profile.full_name || profile.student_name || initialStudent.full_name || initialStudent.name,
+            email: profile.email || initialStudent.email,
+            phone: profile.phone || initialStudent.phone || profile.contact_number,
+            contact_number: profile.contact_number || initialStudent.contact_number,
+            linkedin_url: profile.linkedin_url || null,
+            github_url: profile.github_url || null,
+            why_hire_me: profile.why_hire_me || profile.why_hire || "",
+            profile_completed: profile.profile_completed === true || profile.profile_completed === 't' || profile.profile_completed === 1,
+            ai_skill_summary: profile.ai_skill_summary || initialStudent.ai_skill_summary || initialStudent.ai_skills || "",
+            domains_of_interest: normalizeDomains(profile.domains_of_interest || initialStudent.domains_of_interest || profile.others_domain),
+            created_at: profile.profile_created_at || profile.created_at || initialStudent.created_at,
+            updated_at: profile.profile_updated_at || profile.updated_at || initialStudent.updated_at,
+            // additional collections
+            projects: Array.isArray(payload.projects) ? payload.projects : [],
+            badges: Array.isArray(payload.badges) ? payload.badges : [],
+            enrollments: Array.isArray(payload.enrollments) ? payload.enrollments : [],
+            attendance: Array.isArray(payload.attendance) ? payload.attendance : [],
+            stats: payload.stats || {},
+            __raw: payload,
           };
 
-          setStudent((prev) => ({ ...(prev || {}), ...mapped }));
+          setStudent((prev) => {
+            const merged = { ...(prev || {}), ...mapped };
+            try {
+              window.dispatchEvent(new CustomEvent('student:updated', { detail: {
+                id: merged.id,
+                studentId: merged.id,
+                domains_of_interest: merged.domains_of_interest,
+                domain: merged.domain,
+                domains: merged.domains,
+                track: merged.track,
+                course: merged.course,
+                full_name: merged.full_name,
+              }}));
+            } catch (e) {}
+            return merged;
+          });
         } catch (err) {
           console.error("StudentProfileModal fetch error:", err);
         } finally {
@@ -122,8 +144,6 @@ export default function StudentProfileModal({
       fetchProfile();
     }
   }, [initialStudent, fetchFresh, API_BASE]);
-
-  if (!open) return null;
 
   // Safe guard: ensure student object exists
   const s = student || {};
@@ -138,7 +158,28 @@ export default function StudentProfileModal({
   const joinedDate = s.created_at ? new Date(s.created_at).toLocaleDateString() : "—";
   const updatedDate = s.updated_at ? new Date(s.updated_at).toLocaleDateString() : null;
 
-  return (
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevPaddingRight = document.body.style.paddingRight;
+
+    // hide body overflow to prevent background scroll
+    document.body.style.overflow = "hidden";
+
+    // compensate for scrollbar width to avoid layout shift
+    const scrollBarComp = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollBarComp > 0) {
+      document.body.style.paddingRight = `${scrollBarComp}px`;
+    }
+
+    return () => {
+      document.body.style.overflow = prevOverflow || "";
+      document.body.style.paddingRight = prevPaddingRight || "";
+    };
+  }, [open]);
+
+  const modal = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* backdrop */}
       <div
@@ -151,12 +192,12 @@ export default function StudentProfileModal({
       <motion.div
         role="dialog"
         aria-modal="true"
-        className="relative z-10 w-full max-w-3xl mx-4 bg-card rounded-2xl shadow-xl overflow-hidden"
+        className="relative z-10 w-full max-w-5xl mx-6 bg-card rounded-2xl shadow-xl overflow-hidden"
         initial={{ opacity: 0, y: 16, scale: 0.995 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.18 }}
       >
-        <div className="p-6">
+        <div className="p-6 max-h-[calc(90vh-64px)] overflow-auto">
           {/* header */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -168,9 +209,7 @@ export default function StudentProfileModal({
                 <h3 className="font-semibold text-xl truncate">{s.full_name}</h3>
                 <p className="text-sm text-muted-foreground truncate">{(s.domains_of_interest && s.domains_of_interest[0]) || "Domain not set"}</p>
                 <div className="flex items-center gap-2 mt-2 text-sm">
-                  <Star className="w-4 h-4 fill-warning text-warning" />
-                  <span className="font-medium">{s.rating ?? "N/A"}</span>
-                  <span className="text-xs text-muted-foreground ml-2">Joined: {joinedDate}</span>
+                  <span className="text-xs text-muted-foreground">Joined: {joinedDate}</span>
                   {updatedDate && (
                     <span className="text-xs text-muted-foreground ml-2">Updated: {updatedDate}</span>
                   )}
@@ -185,17 +224,74 @@ export default function StudentProfileModal({
             </div>
           </div>
 
-          {/* body */}
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* LEFT: basic contact and metadata */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-muted-foreground mt-1" />
-                <div>
-                  <div className="text-xs font-semibold text-muted-foreground">Location</div>
-                  <div className="text-sm">{s.location || "Unknown"}</div>
+          {/* Additional sections: Badges, Enrollments, Attendance (projects moved below details) */}
+          <div className="mt-6">
+            {/* Stats row */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="text-sm text-muted-foreground">Projects:</div>
+              <div className="font-medium">{(s.stats && s.stats.totalProjects) ?? (s.projects ? s.projects.length : 0)}</div>
+              <div className="text-sm text-muted-foreground ml-4">Badges:</div>
+              <div className="font-medium">{(s.stats && s.stats.totalBadges) ?? (s.badges ? s.badges.length : 0)}</div>
+              <div className="text-sm text-muted-foreground ml-4">Enrollments:</div>
+              <div className="font-medium">{(s.stats && s.stats.totalEnrollments) ?? (s.enrollments ? s.enrollments.length : 0)}</div>
+              {/* Attendance display intentionally commented out per design request
+              {s.stats && s.stats.attendanceRate != null && (
+                <div className="ml-auto text-sm text-muted-foreground">Attendance: <span className="font-medium">{s.stats.attendanceRate}%</span></div>
+              )}
+              */}
+            </div>
+
+            {/* Badges */}
+            {Array.isArray(s.badges) && s.badges.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-muted-foreground mb-2">Skill Badges</div>
+                <div className="flex flex-wrap gap-2">
+                  {s.badges.map((b) => (
+                    <Badge key={b.id || b.name || JSON.stringify(b)} className="text-xs" variant={b.is_verified ? 'secondary' : 'outline'}>{b.name || b}</Badge>
+                  ))}
                 </div>
               </div>
+            )}
+
+            {/* Enrollments */}
+            {Array.isArray(s.enrollments) && s.enrollments.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-muted-foreground mb-2">Enrollments</div>
+                <div className="space-y-2">
+                  {s.enrollments.map((en) => (
+                    <div key={en.id || en.course_name} className="p-3 border border-border rounded-md bg-card flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{en.course_name}</div>
+                        {en.course_description && <div className="text-sm text-muted-foreground">{en.course_description}</div>}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{(en.status || 'active').toString()}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Attendance (recent) */}
+            {Array.isArray(s.attendance) && s.attendance.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-muted-foreground mb-2">Recent Attendance</div>
+                <div className="flex flex-col gap-2 text-sm">
+                  {s.attendance.slice(0, 10).map((a, i) => (
+                    <div key={`${a.date || i}`} className="flex items-center justify-between p-2 border border-border rounded-md bg-card">
+                      <div>{a.date ? new Date(a.date).toLocaleDateString() : a.created_at ? new Date(a.created_at).toLocaleDateString() : '—'}</div>
+                      <div className="text-muted-foreground">{a.status}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* body */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
+            {/* LEFT: basic contact and metadata */}
+            <div className="space-y-4">
+              {/* Location removed per design: use profile modal details instead */}
 
               <div className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-muted-foreground mt-1" />
@@ -284,15 +380,34 @@ export default function StudentProfileModal({
               </div>
             </div>
           </div>
-
           {loading && (
             <div className="mt-4 text-sm text-muted-foreground flex items-center gap-2">
               <Clock className="w-4 h-4" />
               Loading fresh data…
             </div>
           )}
+
+          {/* Projects (displayed after the details) */}
+          {Array.isArray(s.projects) && s.projects.length > 0 && (
+            <div className="mt-6">
+              <div className="text-xs font-semibold text-muted-foreground mb-3">Projects</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {s.projects.map((p, i) => (
+                  <StatCard
+                    key={p.id || p.title || i}
+                    title={p.title || `Project ${i + 1}`}
+                    value={p.created_at ? new Date(p.created_at).toLocaleDateString() : ""}
+                    subtitle={p.tech_stack ? (Array.isArray(p.tech_stack) ? p.tech_stack.join(", ") : p.tech_stack) : ""}
+                    color="secondary"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
   );
+
+  return open ? createPortal(modal, document.body) : null;
 }

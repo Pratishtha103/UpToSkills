@@ -2,9 +2,27 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
+const verifyToken = require("../middleware/auth"); // make sure this exists
 
-// ✅ GET all mentors (with email joined from mentors table)
-router.get("/", async (req, res) => {
+// -----------------------------------------------
+// GET mentors count
+// -----------------------------------------------
+router.get("/count", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT COUNT(*)::int AS total_mentors FROM mentors"
+    );
+    res.json({ totalMentors: result.rows[0].total_mentors });
+  } catch (err) {
+    console.error("❌ Error fetching mentors count:", err.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// -----------------------------------------------
+// GET all mentors
+// -----------------------------------------------
+router.get("/", verifyToken, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
@@ -29,9 +47,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ DELETE mentor by id
-router.delete("/:id", async (req, res) => {
+// -----------------------------------------------
+// DELETE mentor
+// -----------------------------------------------
+router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
+
   try {
     await pool.query("DELETE FROM mentor_details WHERE id = $1", [id]);
     res.json({ message: "Mentor deleted successfully" });

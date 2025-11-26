@@ -1,20 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// Correct default import (no curly braces)
 import MentorDashboardPage from "../components/MentorDashboard/pages/MentorDashboardPage";
 import ProjectsProgress from "../components/MentorDashboard/pages/ProjectsProgress";
 import OpenSourceContributions from "../components/MentorDashboard/pages/OpenSourceContributions";
-// import Feedback from "../components/MentorDashboard/pages/Feedback";
 import MultiStudent from "../components/MentorDashboard/pages/MultiStudent";
 import MentorProfilePage from "../components/MentorDashboard/components/MentorProfilePage";
 import MentorEditProfilePage from "../components/MentorDashboard/components/MentorEditProfilePage";
 import AboutUs from "../components/MentorDashboard/pages/AboutUs";
 
-function MentorDashboardRoutes() {
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => localStorage.getItem("darkMode") === "true"
-  );
+function MentorDashboardRoutes({ isDarkMode, setIsDarkMode }) {
   return (
     <Routes>
       <Route
@@ -26,6 +21,7 @@ function MentorDashboardRoutes() {
           />
         }
       />
+
       <Route
         path="projects-progress"
         element={
@@ -35,6 +31,7 @@ function MentorDashboardRoutes() {
           />
         }
       />
+
       <Route
         path="open-source-contributions"
         element={
@@ -44,18 +41,17 @@ function MentorDashboardRoutes() {
           />
         }
       />
-      {/* <Route
-        path="feedback"
-        element={
-          <Feedback isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-        }
-      /> */}
+
       <Route
         path="multi-student"
         element={
-          <MultiStudent isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+          <MultiStudent
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+          />
         }
       />
+
       <Route
         path="profile"
         element={
@@ -65,6 +61,7 @@ function MentorDashboardRoutes() {
           />
         }
       />
+
       <Route
         path="edit-profile"
         element={
@@ -74,15 +71,10 @@ function MentorDashboardRoutes() {
           />
         }
       />
-    
 
-     <Route
-        path="AboutUs"
-        element={<AboutUs />}
-      />
-      </Routes>
+      <Route path="AboutUs" element={<AboutUs />} />
+    </Routes>
   );
 }
 
 export default MentorDashboardRoutes;
-

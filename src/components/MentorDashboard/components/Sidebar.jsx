@@ -10,7 +10,7 @@ const sidebarItems = [
   { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
   { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
   { name: "Skill Badges", icon: <Award size={18} />, path: "/mentor-dashboard/skill-badges" },
-  { name: "Project Showcase", icon: <Folder size={18} />, path: "/mentor-dashboard/project-showcase" },
+  // { name: "Project Showcase", icon: <Folder size={18} />, path: "/mentor-dashboard/project-showcase" },
   { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 

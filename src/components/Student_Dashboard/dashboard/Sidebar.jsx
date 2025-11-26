@@ -18,23 +18,37 @@ import {
   FaYoutube,
   FaTrophy,
 } from "react-icons/fa";
-
+ 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
-  { id: "projects", label: "Add Project", icon: FolderOpen, path: "/dashboard/my-projects" },
-  { id: "viewproject", label: "My Projects", icon: ViewIcon, path: "/projectShowcase" },
+  { id: "addProject", label: "Add Project", icon: FolderOpen, path: "/dashboard/add-project" },
+  { id: "myProjects", label: "My Projects", icon: ViewIcon, path: "/dashboard/my-projects" },
   { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
-  { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/projects" },
+  { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/project-showcase" },
   { id: "myprograms", label: "My Programs", icon: GraduationCap, path: "/dashboard/my-programs" },
   { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
+];
+
+const mentorSidebarItems = [
+
+  { id: "projectShowcase", label: "Project Showcase", path: "/mentor-dashboard/project-showcase", icon: Book },
 ];
 
 export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("dashboard");
-  const [isDesktop, setIsDesktop] = useState(false);
+const [isDesktop, setIsDesktop] = useState(false);
+
+// ROLE CHECK — only show sidebar for students
+const user = JSON.parse(localStorage.getItem("user"));
+const role = user?.role?.toLowerCase();
+
+if (role !== "student") {
+  return null; // hide sidebar for others
+}
+
 
   useEffect(() => {
   // remove trailing slash

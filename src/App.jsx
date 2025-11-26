@@ -34,10 +34,7 @@ import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
 import Footer from './components/AboutPage/Footer';
 
-<<<<<<< HEAD
 // Programs
-=======
->>>>>>> 311c96466f0b04f47a6d8de732c3128a3678ac8a
 import Webdev from './components/Programs/Webdev';
 import Cloudcompute from './components/Programs/Cloudcompute';
 import Cybersecurity from './components/Programs/Cybersecurity';
@@ -46,16 +43,13 @@ import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 
 const queryClient = new QueryClient();
 
-<<<<<<< HEAD
-// Protected Route Wrapper
-function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('token');
-  if (!token) return <LoginForm />;
-  return children;
-}
+// // Protected Route Wrapper
+// function ProtectedRoute({ children }) {
+//   const token = localStorage.getItem('token');
+//   if (!token) return <LoginForm />;
+//   return children;
+// }
 
-=======
->>>>>>> 311c96466f0b04f47a6d8de732c3128a3678ac8a
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
@@ -69,7 +63,6 @@ function App() {
       <Router>
         <Routes>
 
-<<<<<<< HEAD
           {/* Public */}
           <Route path="/" element={<Landing />} />
 
@@ -125,108 +118,10 @@ function App() {
 
           {/* Programs */}
           <Route path="/programForm/:id" element={<Webdev />} />
-=======
-          {/* PUBLIC ROUTES */}
-          <Route path="/" element={<Landing />} />
-
-          <Route path="/about" element={
-            <>
-              <Header />
-              <HeroSection />
-              <AboutSection />
-              <Footer />
-              <Chatbot />
-            </>
-          }/>
-
-          <Route path="/programs" element={<ProgramsPage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/contact" element={<ContactPage />} />
-
-          {/* PROGRAM ROUTES */}
-          <Route path="/programForm/:id" element={<Webdev />} />
-          <Route path="/data-science" element={<Datascience />} />
->>>>>>> 311c96466f0b04f47a6d8de732c3128a3678ac8a
           <Route path="/cloud-computing" element={<Cloudcompute />} />
           <Route path="/cybersecurity" element={<Cybersecurity />} />
           <Route path="/thankyou" element={<Thankyou />} />
 
-<<<<<<< HEAD
-=======
-          {/* STUDENT PROTECTED ROUTES */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={["student"]}><Student_Dashboard /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><UserProfilePage /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/edit-profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><EditProfilePage /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/my-projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyProjects /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/my-programs" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyPrograms /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/notifications" element={
-            <ProtectedRoute allowedRoles={["student"]}><NotificationsPage /></ProtectedRoute>
-          }/>
-
-          <Route path="/student/skill-badges" element={
-            <ProtectedRoute allowedRoles={["student"]}><StudentSkillBadgesPage /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><Dashboard_Project /></ProtectedRoute>
-          }/>
-
-          <Route path="/dashboard/aboutus" element={
-            <ProtectedRoute allowedRoles={["student"]}><AboutUs /></ProtectedRoute>
-          }/>
-
-          {/* COMPANY PROTECTED ROUTES */}
-          <Route path="/company" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyDashboardHome /></ProtectedRoute>
-          }/>
-
-          <Route path="/company-profile" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyProfilePage /></ProtectedRoute>
-          }/>
-
-          <Route path="/company/*" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyNotFound /></ProtectedRoute>
-          }/>
-
-          {/* MENTOR PROTECTED ROUTES */}
-          <Route path="/mentor-dashboard/skill-badges" element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-            </ProtectedRoute>
-          }/>
-
-          <Route path="/mentor-dashboard/*" element={
-            <ProtectedRoute allowedRoles={["mentor"]}><MentorDashboardRoutes /></ProtectedRoute>
-          }/>
-
-          {/* ADMIN PROTECTED ROUTES */}
-          <Route path="/adminPanel" element={
-            <ProtectedRoute allowedRoles={["admin"]}><AdminPanel /></ProtectedRoute>
-          }/>
-
-          {/* GENERAL */}
-          <Route path="/projectShowcase" element={
-            <ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>
-          }/>
-
-          <Route path="/unauthorized" element={<h1>403 - Unauthorized</h1>} />
->>>>>>> 311c96466f0b04f47a6d8de732c3128a3678ac8a
           <Route path="*" element={<h1>404 - Page Not Found</h1>} />
 
         </Routes>

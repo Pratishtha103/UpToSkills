@@ -34,7 +34,16 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("dashboard");
-  const [isDesktop, setIsDesktop] = useState(false);
+const [isDesktop, setIsDesktop] = useState(false);
+
+// ROLE CHECK — only show sidebar for students
+const user = JSON.parse(localStorage.getItem("user"));
+const role = user?.role?.toLowerCase();
+
+if (role !== "student") {
+  return null; // hide sidebar for others
+}
+
 
   useEffect(() => {
   // remove trailing slash

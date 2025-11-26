@@ -44,22 +44,63 @@ const Chatbot = () => {
             "Back to User Type",
           ],
         };
+      } else if (messageText === "Company") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Company! How can I assist you today? Choose an option.",
+          options: [
+            "Search Candidate",
+            "Interviews",
+            "Programs We Offer",
+            "View Testimonials",
+            "Connect With Us",
+            "Back to User Type",
+          ],
+        };
+      } else if (messageText === "Admin") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Admin! How can I assist you today? Choose an option.",
+          options: [
+            "Students",
+            "Mentors",
+            "Companies",
+            "Projects",
+            "Programs",
+            "Programs assigned to Mentors",
+            "Testimonials",
+            "Back to User Type",
+          ],
+        };
+      } else if (messageText === "Mentor") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Mentor! How can I assist you today? Choose an option.",
+          options: [
+            "Students.",
+            "Assigned Programs",
+            "Skill Badge",
+            "Project showcase",
+            "Programs We Offer",
+            "View Testimonials",
+            "Connect With Us",
+            "Back to User Type",
+          ],
+        };
       } else if (messageText === "General User") {
         botMessage = {
           sender: "bot",
-          text: "Welcome! As a general user, you can access these options:",
+          text:
+            "Welcome! As a general user, you have access to the following options:",
           options: [
-            "Explore Courses",
+            "Explore Programs",
             "View Testimonials",
             "Contact Support",
             "Back to User Type",
           ],
-        };
-      } else if (["Admin", "Company", "Mentor"].includes(messageText)) {
-        botMessage = {
-          sender: "bot",
-          text: `Hi ${messageText}, this chatbot currently offers personalized assistance for students and general users.\nPlease select another type or return to user type selection.`,
-          options: ["Back to User Type"],
         };
       } else if (messageText === "Back to User Type") {
         botMessage = {
@@ -67,49 +108,166 @@ const Chatbot = () => {
           text: "Welcome! Please select your user type.",
           options: ["Admin", "Company", "Mentor", "Student", "General User"],
         };
+      } else if (messageText === "Students") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Students and manage Students.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Mentors") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Mentors and manage Mentors.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Companies") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Companies and manage Companies.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Projects") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Projects and manage Projects.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Programs") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Programs and manage Programs.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Programs assigned to Mentors") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Programs assigned to Mentors and manage Programs assigned to Mentors.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Testimonials") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as Admin, navigate to Testimonials and manage Testimonials.",
+          options: ["Back to Admin Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Search Candidate") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as a Company, navigate to 'Search Candidate', there view available Candidates",
+          options: ["Back to Company Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Interviews") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as a Company, navigate to 'Interviews', there Schedule New Interview",
+          options: ["Back to Company Menu", "Back to User Type"],
+        };
       } else if (messageText === "Add Project") {
         botMessage = {
           sender: "bot",
           text:
-            "To submit a project, login as a student, navigate to 'Add Project', fill out the Student Project Submission form, and click the 🚀 Submit Project button.",
+            "To submit a project, please login as a student, navigate to 'Add Project', fill out the Student Project Submission form, and click the 🚀 Submit Project button.",
           options: ["Back to Student Menu", "Back to User Type"],
         };
       } else if (messageText === "My Projects") {
         botMessage = {
           sender: "bot",
-          text: "Login as a student and go to 'My Projects' to view your projects.",
+          text:
+            "Login as a student and navigate to 'My Projects' to view all your submissions and their status.",
           options: ["Back to Student Menu", "Back to User Type"],
         };
       } else if (messageText === "Skill Badges") {
         botMessage = {
           sender: "bot",
-          text: "View your earned skill badges by logging in as a student and selecting 'Skill Badges'.",
+          text:
+            "You can view your earned skill badges by logging in as a student and selecting the 'Skill Badges' section.",
           options: ["Back to Student Menu", "Back to User Type"],
         };
       } else if (messageText === "Project Showcase") {
         botMessage = {
           sender: "bot",
           text:
-            "Login as a student and go to 'Project Showcase' as a student to explore all available projects.",
+            "Login as a student and navigate to 'Project Showcase' to explore all available projects submitted by students.",
           options: ["Back to Student Menu", "Back to User Type"],
         };
       } else if (messageText === "My Courses") {
         botMessage = {
           sender: "bot",
-          text: "Login as a student and go to 'My Courses' to see your enrolled courses.",
+          text:
+            "Login as a student and go to the 'My Courses' page to view the courses you are enrolled in.",
           options: ["Back to Student Menu", "Back to User Type"],
         };
       } else if (messageText === "Programs We Offer") {
         botMessage = {
           sender: "bot",
-          text: "Visit the home page and navigate to the 'Programs' section to explore what we offer.",
-          options: ["Back to Student Menu", "Back to User Type"],
+          text:
+            "Please visit the home page and navigate to the 'Programs' section to explore the programs we offer.",
+          options: ["Back to Company Menu","Back to Mentor Menu","Back to Student Menu","Back to User Type"],
         };
       } else if (messageText === "Connect With Us") {
         botMessage = {
           sender: "bot",
-          text: "You can contact us by going to the home page and navigating to the 'Contact' section.",
-          options: ["Back to Student Menu", "Back to User Type"],
+          text:
+            "You can connect with us by going to the home page and navigating to the 'Contact' section.",
+          options: ["Back to Company Menu","Back to Mentor Menu","Back to Student Menu","Back to User Type"],
+        };
+      } else if (messageText === "Students.") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as a Mentor! and go to the 'Students' page to view the Multi-Student View",
+          options: ["Back to Mentor Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Assigned Programs") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as a Mentor and go to the 'Assigned Programs' section to view the programs assigned to you.",
+          options: ["Back to Mentor Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Skill Badge") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Logging in as a Mentor and selecting the 'Skill Badges' section.You can Award a Skill Badge to student.",
+          options: ["Back to Mentor Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Project showcase") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Login as a Mentor! and navigate to 'Project Showcase' to explore all available projects submitted by students.",
+          options: ["Back to Mentor Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Explore Programs") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "To explore Programs, please visit the home page and navigate to the 'Programs' section.",
+          options: ["Back to General User Menu", "Back to User Type"],
+        };
+      } else if (messageText === "View Testimonials") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "To view testimonials, please visit the home page and navigate to 'About' page. scroll down to the bottom section",
+          options: ["Back to Company Menu","Back to Mentor Menu","Back to General User Menu", "Back to User Type"],
+        };
+      } else if (messageText === "Contact Support") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "You can contact support by visiting the home page and navigating to the 'Contact' section.",
+          options: ["Back to General User Menu", "Back to User Type"],
         };
       } else if (messageText === "Back to Student Menu") {
         botMessage = {
@@ -126,10 +284,68 @@ const Chatbot = () => {
             "Back to User Type",
           ],
         };
+      } else if (messageText === "Back to Admin Menu") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Admin! How can I assist you today? Choose an option.",
+          options: [
+            "Students",
+            "Mentors",
+            "Companies",
+            "Projects",
+            "Programs",
+            "Programs assigned to Mentors",
+            "Testimonials",
+            "Back to User Type",
+          ],
+        };
+      } else if (messageText === "Back to Company Menu") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Company! How can I assist you today? Choose an option.",
+          options: [
+            "Search Candidate",
+            "Interviews",
+            "Programs We Offer",
+            "View Testimonials",
+            "Connect With Us",
+            "Back to User Type",
+          ],
+        };
+      } else if (messageText === "Back to Mentor Menu") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Hello Mentor! How can I assist you today? Choose an option.",
+          options: [
+            "Students.",
+            "Assigned Programs",
+            "Skill Badge",
+            "Project showcase",
+            "Programs We Offer",
+            "View Testimonials",
+            "Connect With Us",
+            "Back to User Type",
+          ],
+        };
+      } else if (messageText === "Back to General User Menu") {
+        botMessage = {
+          sender: "bot",
+          text:
+            "Welcome! As a general user, you have access to the following options:",
+          options: [
+            "Explore Programs",
+            "View Testimonials",
+            "Contact Support",
+            "Back to User Type",
+          ],
+        };
       } else {
         botMessage = {
           sender: "bot",
-          text: "This feature is coming soon. Please select another action or go back.",
+          text: "You can contact support by visiting the home page and navigating to the 'Contact' section.",
           options: ["Back to User Type"],
         };
       }
@@ -143,7 +359,8 @@ const Chatbot = () => {
         ...prev,
         {
           sender: "bot",
-          text: "Sorry, something went wrong. Please try again or contact support.",
+          text:
+            "Sorry, something went wrong. Please try again or contact support.",
           options: ["Back to User Type"],
         },
       ]);

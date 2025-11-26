@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import loginImage from "../assets/loginnew.jpg";
 
 const LoginForm = () => {
@@ -31,19 +33,19 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ---------------- HARD-CODED ADMIN ----------------
+    // ✅ Hardcoded admin login (fallback only — main flow still hits the API so notifications fire)
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
       role: "admin",
     };
-
-    if (
+    const isHardcodedAdmin =
       formData.email === hardcodedAdmin.email &&
       formData.password === hardcodedAdmin.password &&
-      formData.role === "admin"
-    ) {
-      alert("Admin login successful");
+      formData.role === "admin";
+
+    const fallbackAdminLogin = () => {
+      alert("Admin login successful (fallback mode)");
 
       const adminUser = {
         name: "Admin",
@@ -53,10 +55,11 @@ const LoginForm = () => {
 
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
+      localStorage.setItem("admin", JSON.stringify(adminUser));
 
       navigate("/adminPanel", { state: { updated: true } });
-      return;
-    }
+    };
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -64,35 +67,50 @@ const LoginForm = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      alert(response.data.message || "Login successful");
+      toast.success(response.data.message || "Login successful");
 
-      if (response.data.token)
-        localStorage.setItem("token", response.data.token);
-
+      if (response.data.token) localStorage.setItem("token", response.data.token);
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("studentId", response.data.user.id);
+        localStorage.setItem("id", response.data.user.id);
       }
 
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
+      const roleToSave = (
+        response.data.user?.role || formData.role
+      ).toLowerCase();
 
-      if (roleToSave === "mentor" && response.data.user) {
-        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+      if (response.data.user) {
+        if (roleToSave === "mentor") {
+          localStorage.setItem("mentor", JSON.stringify(response.data.user));
+        }
+        if (roleToSave === "admin") {
+          localStorage.setItem("admin", JSON.stringify(response.data.user));
+        }
       }
 
-      if (roleToSave === "admin") navigate("/adminPanel");
-      else if (roleToSave === "student" || roleToSave === "learner")
-        navigate("/dashboard");
-      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
-      else if (roleToSave === "company") navigate("/company");
-      else navigate("/login");
+      setTimeout(() => {
+        if (roleToSave === "admin") navigate("/adminPanel");
+        else if (roleToSave === "student" || roleToSave === "learner")
+          navigate("/dashboard");
+        else if (roleToSave === "mentor") navigate("/mentor-dashboard");
+        else if (roleToSave === "company") navigate("/company");
+        else navigate("/login");
+      }, 5000);
+
     } catch (err) {
+      if (isHardcodedAdmin) {
+        console.warn("Admin API login failed, using fallback mode:", err.message);
+        fallbackAdminLogin();
+        return;
+      }
+
       const message =
         err.response?.data?.message ||
         err.message ||
         "Login failed. Please try again.";
-      alert(message);
+
+      toast.error(message);
     }
   };
 
@@ -109,9 +127,21 @@ const LoginForm = () => {
         </div>
 
         {/* Form */}
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12 relative">
           <div className="flex flex-col items-center">
-            <div className="text-center">
+
+            {/* Toast Container positioned above heading */}
+            <ToastContainer
+              position="top-right"
+              autoClose={2500}
+              hideProgressBar={false}
+              pauseOnHover
+              closeOnClick
+              newestOnTop
+              style={{ top: '-40px', right: '110px', position: 'absolute', marginRight: '0', zIndex: 9999 }}
+            />
+
+            <div className="text-center w-full">
               <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
                 <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
@@ -120,11 +150,7 @@ const LoginForm = () => {
             </div>
 
             <div className="w-full flex-1 mt-8">
-              <form
-                className="mx-auto max-w-xs flex flex-col gap-4"
-                onSubmit={handleSubmit}
-              >
-               
+              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
                 <select
                   name="role"
                   value={formData.role}
@@ -169,21 +195,20 @@ const LoginForm = () => {
                   </div>
                 </div>
 
-               
                 <div className="text-right -mt-2 mb-3">
-                 <Link
-                 to="/login/forgot-password"
-                  className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
-                >
-                  Forgot password?
-                   </Link>
+                  <Link
+                    to="/login/forgot-password"
+                    className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
-                  className=" bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
-                > Login
+                  className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
+                >
+                  Login
                 </button>
 
                 <p className="text-center text-gray-600">
@@ -196,9 +221,9 @@ const LoginForm = () => {
                 </p>
               </form>
             </div>
-
           </div>
         </div>
+
       </div>
     </div>
   );

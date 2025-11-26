@@ -99,7 +99,11 @@ const enrollStudent = async (req, res) => {
     const { createEnrollment } = require('./enrollment.controller');
     
     // Create enrollment using the new enrollment system
-    const enrollment = await createEnrollment(studentId, id, 'active');
+    const enrollment = await createEnrollment(studentId, id, 'active', {
+      io: req.app?.get('io'),
+      actorRole: req.user?.role || 'course_admin',
+      actorId: req.user?.id || null,
+    });
     
     console.log('Enrollment created successfully:', enrollment);
     

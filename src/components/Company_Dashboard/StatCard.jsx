@@ -2,11 +2,11 @@
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 
-const colorClasses = {
-  primary: "bg-primary text-primary-foreground",
-  secondary: "bg-primary text-primary-foreground",
-  success: "bg-primary text-primary-foreground",
-  warning: "bg-primary text-primary-foreground",
+const accentClasses = {
+  primary: "bg-blue-500",
+  secondary: "bg-orange-500",
+  success: "bg-green-500",
+  warning: "bg-yellow-500",
 };
 
 export default function StatCard({
@@ -24,9 +24,9 @@ export default function StatCard({
   const handleMouseMove = (e) => {
     if (!divRef.current) return;
     const rect = divRef.current.getBoundingClientRect();
-    setPosition((prev) => ({
-      x: prev.x + (e.clientX - rect.left - prev.x) * 0.2, // smooth interpolation
-      y: prev.y + (e.clientY - rect.top - prev.y) * 0.2,
+    setPosition(() => ({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     }));
   };
 
@@ -35,49 +35,34 @@ export default function StatCard({
   return (
     <motion.div
       ref={divRef}
-      className="relative stat-card rounded-xl bg-white dark:bg-gray-800 overflow-hidden p-4 border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-out"
+      className="relative stat-card rounded-xl bg-card p-4 border border-border shadow-sm transition-all duration-300 ease-out"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      whileHover={{ scale: 1.03 }}
+      transition={{ duration: 0.45, delay }}
+      whileHover={{ scale: 1.02 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setOpacity(0.6)}
       onMouseLeave={() => setOpacity(0)}
     >
-      {/* 🔵 Smooth Blue Spotlight Effect */}
+      {/* Subtle spotlight */}
       <div
-        className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-in-out"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-in-out rounded-xl"
         style={{
           opacity,
-          background: `radial-gradient(circle at ${position.x}px ${position.y}px, rgba(0,102,255,0.3), transparent 80%)`,
-          transition: "background 0.1s ease-out",
+          background: `radial-gradient(circle at ${position.x}px ${position.y}px, rgba(59,130,246,0.08), transparent 60%)`,
+          transition: "background 0.12s ease-out",
         }}
       />
 
-      {/* 📊 Card Content */}
-      <div className="flex items-center justify-between relative z-10">
-        <div>
-          {/* Title */}
-          <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">
-            {title}
-          </p>
-
-          {/* Main Value */}
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-            {displayValue}
-          </p>
-
-          {/* Subtitle */}
-          {subtitle && (
-            <p className="text-gray-500 dark:text-gray-300 text-sm">
-              {subtitle}
-            </p>
-          )}
+      <div className="flex items-center justify-between relative z-10 gap-4">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
+          <p className="text-sm font-medium text-muted-foreground mt-1 truncate">{displayValue}</p>
+          {subtitle && <p className="text-sm text-muted-foreground mt-1 truncate">{subtitle}</p>}
         </div>
 
-        {/* Icon Container */}
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
-          {Icon ? <Icon className="w-6 h-6" /> : null}
+        <div className="flex flex-col items-end gap-3">
+          {Icon ? <Icon className="w-6 h-6 text-muted-foreground" /> : null}
         </div>
       </div>
     </motion.div>

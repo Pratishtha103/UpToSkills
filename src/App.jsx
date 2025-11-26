@@ -49,9 +49,9 @@ function ProtectedRoute({ children }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const location = useLocation();
 
-  if (!token) {
-    return <LoginForm />;
-  }
+  // if (!token) {
+  //   return <LoginForm />;
+  // }
   return children;
 }
 

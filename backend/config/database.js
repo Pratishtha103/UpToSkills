@@ -17,17 +17,6 @@ const sslConfig = useSsl
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-<<<<<<< HEAD
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER || process.env.ADMIN_DB_USER,
-  password: String(process.env.DB_PASSWORD) || String(process.env.ADMIN_DB_PASSWORD),
-  // Ensure DB_PORT is an integer if required by pg
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
-  ssl: process.env.DB_SSLMODE === 'require' ? { 
-    // Recommended for self-signed certificates or services like Neon
-    rejectUnauthorized: false 
-  } : false,
-=======
   port: dbPort,
   database: process.env.DB_NAME,
   user: process.env.DB_USER || process.env.ADMIN_DB_USER,
@@ -37,7 +26,6 @@ const pool = new Pool({
   connectionTimeoutMillis: parseInt(process.env.DB_CONN_TIMEOUT_MS, 10) || 20000,
   idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT_MS, 10) || 30000,
   max: parseInt(process.env.DB_POOL_MAX, 10) || 10,
->>>>>>> 8a0cfd5728afac379afced3934b07f4b033ac553
 });
 
 // REMOVE THE pool.connect() BLOCK ENTIRELY. 

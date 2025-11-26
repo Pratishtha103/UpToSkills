@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
-const verifyToken = require("../middlewares/auth"); // make sure this exists
+const verifyToken = require("../middleware/auth"); // make sure this exists
 
 // -----------------------------------------------
 // GET mentors count

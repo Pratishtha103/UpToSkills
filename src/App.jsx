@@ -98,9 +98,6 @@ function App() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
 
-<<<<<<< HEAD
-          {/* Program Routes */}
-=======
           {/* ===== Dashboard Routes ===== */}
           <Route path="/dashboard" element={<ProtectedRoute><Student_Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
@@ -134,7 +131,6 @@ function App() {
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
           {/* ===== Program Forms ===== */}
->>>>>>> 7bbe882 (updation of student-dashbord)
           <Route path="/programForm/:id" element={<Webdev />} />
           <Route path="/cloud-computing" element={<Cloudcompute />} />
           <Route path="/cybersecurity" element={<Cybersecurity />} />

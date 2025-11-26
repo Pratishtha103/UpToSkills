@@ -87,9 +87,7 @@ function App() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
 
-<<<<<<< HEAD
           {/* Program Routes */}
-=======
           {/* ===== Dashboard Routes ===== */}
           <Route path="/dashboard" element={<ProtectedRoute><Student_Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
@@ -97,11 +95,8 @@ function App() {
           <Route path="/dashboard/my-programs" element={<ProtectedRoute><MyPrograms /></ProtectedRoute>} />
           <Route path="/dashboard/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/dashboard/aboutus" element={<ProtectedRoute><AboutUs /></ProtectedRoute>} />
-{/* ===== Add Project (Project Submission Form) ===== */}
-<Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
-
-{/* ===== My Projects (Student’s submitted projects) ===== */}
-<Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
+          <Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
+          <Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
 
 
 
@@ -123,7 +118,7 @@ function App() {
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
           {/* ===== Program Forms ===== */}
->>>>>>> 7bbe882 (updation of student-dashbord)
+          (updation of student-dashbord)
           <Route path="/programForm/:id" element={<Webdev />} />
           <Route path="/cloud-computing" element={<Cloudcompute />} />
           <Route path="/cybersecurity" element={<Cybersecurity />} />

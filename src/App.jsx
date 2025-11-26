@@ -64,17 +64,23 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} pauseOnHover theme="light" />
       <Router>
         <Routes>
+
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
-          <Route path="/about" element={
-            <>
-              <Header />
-              <HeroSection />
-              <AboutSection />
-              <Footer />
-              <Chatbot />
-            </>
-          }/>
+
+          <Route
+            path="/about"
+            element={
+              <>
+                <Header />
+                <HeroSection />
+                <AboutSection />
+                <Footer />
+                <Chatbot />
+              </>
+            }
+          />
+
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/login/forgot-password" element={<ForgotPassword />} />
@@ -87,69 +93,151 @@ function App() {
           <Route path="/cybersecurity" element={<Cybersecurity />} />
           <Route path="/thankyou" element={<Thankyou />} />
 
-          {/* Student Protected Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={["student"]}><Student_Dashboard /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><UserProfilePage /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/edit-profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><EditProfilePage /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/my-projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyProjects /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/my-programs" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyPrograms /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/notifications" element={
-            <ProtectedRoute allowedRoles={["student"]}><NotificationsPage /></ProtectedRoute>
-          }/>
-          <Route path="/student/skill-badges" element={
-            <ProtectedRoute allowedRoles={["student"]}><StudentSkillBadgesPage /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><Dashboard_Project /></ProtectedRoute>
-          }/>
-          <Route path="/dashboard/aboutus" element={
-            <ProtectedRoute allowedRoles={["student"]}><AboutUs /></ProtectedRoute>
-          }/>
+          {/* -------------------- STUDENT ROUTES -------------------- */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <Student_Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/profile"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <UserProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/edit-profile"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <EditProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/my-projects"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <MyProjects />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/my-programs"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <MyPrograms />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/notifications"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/skill-badges"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <StudentSkillBadgesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/projects"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <Dashboard_Project />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/aboutus"
+            element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <AboutUs />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Mentor Protected Routes */}
-          <Route path="/mentor-dashboard/skill-badges" element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <SkillBadgeForm isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/mentor-dashboard/*" element={
-            <ProtectedRoute allowedRoles={["mentor"]}><MentorDashboardRoutes /></ProtectedRoute>
-          }/>
+          {/* -------------------- MENTOR ROUTES -------------------- */}
+          <Route
+            path="/mentor-dashboard/skill-badges"
+            element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <SkillBadgeForm isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Company Protected Routes */}
-          <Route path="/company" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyDashboardHome /></ProtectedRoute>
-          }/>
-          <Route path="/company-profile" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyProfilePage /></ProtectedRoute>
-          }/>
-          <Route path="/company/*" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyNotFound /></ProtectedRoute>
-          }/>
+          <Route
+            path="/mentor-dashboard/*"
+            element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <MentorDashboardRoutes />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Admin Protected Routes */}
-          <Route path="/adminPanel" element={
-            <ProtectedRoute allowedRoles={["admin"]}><AdminPanel /></ProtectedRoute>
-          }/>
+          {/* -------------------- COMPANY ROUTES -------------------- */}
+          <Route
+            path="/company"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyDashboardHome />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* General Protected Routes */}
-          <Route path="/projectShowcase" element={
-            <ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>
-          }/>
+          <Route
+            path="/company-profile"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyProfilePage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Unauthorized / Fallback */}
+          <Route
+            path="/company/*"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyNotFound />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* -------------------- ADMIN ROUTES -------------------- */}
+          <Route
+            path="/adminPanel"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* -------------------- GENERAL PROTECTED -------------------- */}
+          <Route
+            path="/projectShowcase"
+            element={
+              <ProtectedRoute>
+                <ProjectShowcasePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback */}
           <Route path="/unauthorized" element={<h1>403 - Unauthorized</h1>} />
           <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+
         </Routes>
       </Router>
     </QueryClientProvider>

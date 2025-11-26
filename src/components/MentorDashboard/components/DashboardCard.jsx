@@ -1,6 +1,6 @@
 import React from "react";
 
-const DashboardCard = ({ icon, title, description, onClick, isDarkMode }) => (
+const DashboardCard = ({ icon, title, description,count, onClick, isDarkMode }) => (
   <div
     onClick={onClick}
     className={`p-10 m-2 rounded-xl shadow-md max-w-sm w-11/12 text-left transition duration-200
@@ -17,6 +17,11 @@ const DashboardCard = ({ icon, title, description, onClick, isDarkMode }) => (
     <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
       {description}
     </p>
+  {/* show count */}
+      {count !== undefined && (
+        <p className="mt-2 font-semibold text-blue-600">Total: {count}</p>
+      )}
+
   </div>
 );
 

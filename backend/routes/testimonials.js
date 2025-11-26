@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
+const { notifyAdmins } = require("../utils/notificationService");
 
 // ✅ Fetch all testimonials
 router.get("/", async (req, res) => {
@@ -25,6 +26,22 @@ router.post("/", async (req, res) => {
       "INSERT INTO testimonials (name, role, message) VALUES ($1, $2, $3) RETURNING *",
       [name, role, message]
     );
+
+    try {
+      await notifyAdmins({
+        title: "New testimonial submitted",
+        message: `${name || "Someone"} shared feedback${role ? ` as ${role}` : ""}.`,
+        type: "testimonial",
+        metadata: {
+          testimonialId: result.rows[0].id,
+          name,
+          role,
+        },
+        io: req.app.get("io"),
+      });
+    } catch (adminTestimonialError) {
+      console.error("Admin notification error (testimonial):", adminTestimonialError);
+    }
 
     res.status(201).json(result.rows[0]);
   } catch (err) {

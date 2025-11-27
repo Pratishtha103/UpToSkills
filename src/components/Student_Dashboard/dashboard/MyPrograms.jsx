@@ -110,10 +110,16 @@ const MyPrograms = () => {
             ))}
           </div>
         </main>
+<footer
+  className="
+    py-4 text-center border-t
+    bg-gray-100 text-gray-700 border-gray-300 
+    dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700
+  "
+>
+  <p className="text-sm">© 2025 UpToSkills. Built by learners.</p>
+</footer>
 
-        <footer className="bg-gray-900 text-gray-300 border-t border-gray-700 py-4 text-center">
-          <p className="text-sm">© 2025 UpToSkills. Built by learners.</p>
-        </footer>
       </div>
     </div>
   );

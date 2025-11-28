@@ -20,6 +20,7 @@ import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
 import Testimonials from "../components/AdminPanelDashboard/Testimonials";
 import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
+import AssignedPrograms from "../components/AdminPanelDashboard/AssignedPrograms";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -81,6 +82,8 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+      case "assigned_programs":
+        return <AssignedPrograms isDarkMode={isDarkMode} />;
       case "courses_table":
         return (<CoursesTable isDarkMode={isDarkMode} onNavigateSection={() => setActiveSection} />);
       case "mentors_table":

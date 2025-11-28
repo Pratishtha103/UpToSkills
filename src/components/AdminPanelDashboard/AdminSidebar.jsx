@@ -21,7 +21,7 @@ const sidebarItems = [
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "programs", label: "Programs", icon: BookOpen },
-  { id: "assigned_programs", label: "Assigned Programs", icon: UserCheck }, // 🆕 NEW MENU ITEM
+  { id: "assigned_programs", label: "Assign Programs", icon: BookOpen },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
 ];

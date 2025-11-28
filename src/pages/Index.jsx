@@ -529,8 +529,51 @@ useEffect(() => {
             </div>
           </motion.section>
 
-          {/* Replace hiring overview with company-style progress stats */}
-          <StatsGrid />
+
+           <section className="mb-8">
+            <motion.h2
+              className="text-2xl font-bold text-foreground mb-6"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              Hiring Overview
+            </motion.h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
+              <StatCard
+                title="Total Students Available"
+                value={students.length}
+                subtitle="+12% from last month"
+                icon={Users}
+                color="primary"
+                delay={0.1}
+              />
+              <StatCard
+                title="Interviews Scheduled"
+                value={interviewCount}
+                subtitle="This week"
+                icon={CalIcon}
+                color="secondary"
+                delay={0.3}
+              />
+              <StatCard
+                title="Total Mentors"
+                value={totalMentors}
+                subtitle="Active mentors"
+                icon={UserCheck}
+                color="success"
+                delay={0.2}
+              />
+              <StatCard
+                title="Verified Skill Badges"
+                value={totalBadges}
+                subtitle="Across all students"
+                icon={Award}
+                color="warning"
+                delay={0.4}
+              />
+            </div>
+          </section>
 
           {/* Students moved to the dedicated Search page */}
 

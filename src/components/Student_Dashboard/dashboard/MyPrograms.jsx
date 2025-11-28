@@ -64,11 +64,11 @@ const MyPrograms = () => {
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
             <h1 className="text-3xl font-bold mb-4 md:mb-0">My Programs</h1>
 
-            <div className="flex gap-4">
+            {/* <div className="flex gap-4">
               <button className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                 Filter
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Loading */}
@@ -103,17 +103,23 @@ const MyPrograms = () => {
                   {program.description || "No description available"}
                 </p>
 
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                   View Program
-                </button>
+                </button> */}
               </div>
             ))}
           </div>
         </main>
+<footer
+  className="
+    py-4 text-center border-t
+    bg-gray-100 text-gray-700 border-gray-300 
+    dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700
+  "
+>
+  <p className="text-sm">© 2025 UpToSkills. Built by learners.</p>
+</footer>
 
-        <footer className="bg-gray-900 text-gray-300 border-t border-gray-700 py-4 text-center">
-          <p className="text-sm">© 2025 UpToSkills. Built by learners.</p>
-        </footer>
       </div>
     </div>
   );

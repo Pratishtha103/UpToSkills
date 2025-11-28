@@ -8,7 +8,8 @@ import {
   MessageSquare, 
   LogOut, 
   X,
-  Bell
+  Bell,
+  UserCheck // 🆕 NEW ICON for Assigned Programs
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,11 +19,11 @@ const sidebarItems = [
   { id: "students", label: "Students", icon: Users },
   { id: "mentors", label: "Mentors", icon: Users },
   { id: "companies", label: "Companies", icon: Building2 },
-  
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "programs", label: "Programs", icon: BookOpen },
+  { id: "assigned_programs", label: "Assigned Programs", icon: UserCheck }, // 🆕 NEW MENU ITEM
   { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // ✅ Changed from Bell to MessageSquare
+  { id: "testimonials", label: "Testimonials", icon: MessageSquare },
 ];
 
 export default function AdminSidebar({
@@ -108,7 +109,7 @@ export default function AdminSidebar({
 
         <div className="flex flex-col h-full pt-16">
           {/* Navigation Items */}
-          <nav className="flex-1 pt-6 px-4">
+          <nav className="flex-1 pt-6 px-4 overflow-y-auto">
             <div className="space-y-1">
               {sidebarItems.map((item, index) => {
                 const Icon = item.icon;

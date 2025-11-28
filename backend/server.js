@@ -7,6 +7,7 @@ require('dotenv').config();
 const path = require('path');
 const { ensureNotificationsTable } = require('./utils/ensureNotificationsTable');
 const { ensureAdminBootstrap } = require('./utils/ensureAdminBootstrap');
+const { ensureProgramAssignmentsTable } = require('./utils/ensureProgramAssignmentsTable');
 
 
 
@@ -43,6 +44,13 @@ ensureAdminBootstrap()
     .then(() => console.log('✅ Admin table ready'))
     .catch((err) => {
         console.error('❌ Failed to ensure admin bootstrap', err);
+        process.exit(1);
+    });
+
+ensureProgramAssignmentsTable()
+    .then(() => console.log('✅ program_assignments table ready'))
+    .catch((err) => {
+        console.error('❌ Failed to ensure program_assignments table', err);
         process.exit(1);
     });
 
@@ -114,6 +122,8 @@ app.use('/api/mentors', mentorsRoutes);
 app.use('/api/form', formRoute);
 app.use('/api/skill-badges', skillBadgesRoutes);
 app.use('/api/courses', coursesRoutes);
+// Assigned programs route (assign/lookup programs to mentors)
+app.use('/api/assigned-programs', require('./routes/assignedPrograms'));
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 

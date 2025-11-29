@@ -21,15 +21,20 @@ import ProjectShowcasePage from './pages/ProjectShowcasePage';
 import MentorDashboardRoutes from './pages/MentorDashboardRoutes';
 import AdminPanel from './pages/AdminPanel';
 import ProgramsPage from './pages/ProgramsPage';
+import ForgotPassword from './pages/ForgotPassword';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
+<<<<<<< HEAD
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
 import ForgotPassword from "./pages/ForgotPassword";
 
 // About Page Components
+=======
+// About Page components
+>>>>>>> 7a437c6746659c24aaa727979aca6805923775d6
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
@@ -91,6 +96,7 @@ function App() {
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
+<<<<<<< HEAD
            <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
 
           <Route path="/register" element={<RegistrationForm />} />
@@ -129,6 +135,14 @@ function App() {
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
           {/* ===== Program Forms ===== */}
+=======
+          <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
+          <Route path="/register" element={<RegistrationForm />} />
+          <Route path="/contact" element={<ContactPage />} />
+
+
+          {/* PROGRAM ROUTES */}
+>>>>>>> 7a437c6746659c24aaa727979aca6805923775d6
           <Route path="/programForm/:id" element={<Webdev />} />
           {/* <Route path="/data-science" element={<Datascience />} /> */}
           <Route path="/cloud-computing" element={<Cloudcompute />} />

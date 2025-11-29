@@ -171,10 +171,12 @@ export default function InterviewGallery() {
   const saveEdit = async () => {
     if (!editInterview.date || !editInterview.time) return alert("Select date and time");
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       await axios.put(`${API_BASE}/api/interviews/${editInterview.id}`, {
         date: editInterview.date,
         time: editInterview.time,
-      });
+      }, { headers });
       setIsEditOpen(false);
       setEditInterview({ id: "", date: "", time: "" });
       fetchInterviews();
@@ -235,10 +237,12 @@ export default function InterviewGallery() {
         </div>
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent>
+          <DialogContent aria-describedby="reschedule-desc">
             <DialogHeader>
               <DialogTitle>Reschedule Interview</DialogTitle>
             </DialogHeader>
+
+            <p id="reschedule-desc" className="sr-only">Reschedule interview dialog. Choose a new date and time.</p>
 
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 gap-4 items-center">
@@ -261,10 +265,11 @@ export default function InterviewGallery() {
 
         {/* Confirm Delete Dialog */}
         <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-          <DialogContent>
+          <DialogContent aria-describedby="delete-desc">
             <DialogHeader>
               <DialogTitle>Delete Interview</DialogTitle>
             </DialogHeader>
+            <p id="delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
             <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
             <div className="flex justify-end gap-2 mt-4">
               <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>

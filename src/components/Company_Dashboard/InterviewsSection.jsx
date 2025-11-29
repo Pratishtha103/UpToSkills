@@ -295,10 +295,11 @@ function InterviewsSection() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent>
+          <DialogContent aria-describedby="schedule-desc">
             <DialogHeader>
               <DialogTitle>Schedule New Interview</DialogTitle>
             </DialogHeader>
+            <p id="schedule-desc" className="sr-only">Schedule a new interview by providing candidate, position, date, time and type.</p>
 
             <div className="grid gap-4 py-4">
               {/* Candidate Name with Autocomplete */}
@@ -406,10 +407,11 @@ function InterviewsSection() {
         </Dialog>
         {/* Find candidate dialog (embedded search) */}
         <Dialog open={isFindOpen} onOpenChange={setIsFindOpen}>
-          <DialogContent>
+          <DialogContent aria-describedby="find-desc">
             <DialogHeader>
               <DialogTitle>Find Candidate</DialogTitle>
             </DialogHeader>
+            <p id="find-desc" className="sr-only">Search and select a candidate from existing students.</p>
             <div style={{ minHeight: 400 }} className="py-2">
               <SearchStudents />
             </div>
@@ -510,10 +512,11 @@ function InterviewsSection() {
       </div>
 
       <Dialog open={!!viewInterview} onOpenChange={(open) => { if (!open) setViewInterview(null); }}>
-        <DialogContent>
+        <DialogContent aria-describedby="details-desc">
           <DialogHeader>
             <DialogTitle>Interview Details</DialogTitle>
           </DialogHeader>
+          <p id="details-desc" className="sr-only">View detailed information about the selected interview.</p>
 
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-4 gap-4 items-center">
@@ -598,10 +601,11 @@ function InterviewsSection() {
       <StudentProfileModal open={isProfileOpen} onClose={() => setIsProfileOpen(false)} student={profileStudent} fetchFresh />
 
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby="edit-desc">
           <DialogHeader>
             <DialogTitle>Reschedule Interview</DialogTitle>
           </DialogHeader>
+          <p id="edit-desc" className="sr-only">Reschedule the selected interview by choosing a new date and time.</p>
 
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 gap-4">
@@ -633,10 +637,11 @@ function InterviewsSection() {
       </Dialog>
       {/* Confirm Delete Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby="confirm-delete-desc">
           <DialogHeader>
             <DialogTitle>Delete Interview</DialogTitle>
           </DialogHeader>
+          <p id="confirm-delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
           <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>

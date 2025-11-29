@@ -235,7 +235,6 @@ router.get('/profile', verifyToken, async (req, res) => {
 });
 
 
-
 // ===============================
 // MENTOR PROFILE ROUTES
 // ===============================
@@ -257,62 +256,98 @@ router.post('/mentor/profile', verifyToken, async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid token: mentor ID missing' });
     }
 
-    // ✅ Basic validation
-    if (!full_name || !/^[A-Za-z ]+$/.test(full_name)) {
-      return res.status(400).json({ success: false, message: 'Valid full name is required' });
+    // Log incoming data for debugging
+    console.log('Incoming mentor profile data:', {
+      full_name,
+      contact_number,
+      linkedin_url,
+      github_url,
+      about_me,
+      expertise_domains,
+      others_domain
+    });
+
+    // ✅ Optional validation: only validate if value exists and is not empty
+    if (full_name && full_name.trim() && !/^[A-Za-z ]+$/.test(full_name)) {
+      return res.status(400).json({ success: false, message: 'Full name must contain only alphabets' });
     }
-    if (!contact_number || !/^[0-9]{10}$/.test(contact_number)) {
+
+    if (contact_number && contact_number.trim() && !/^[0-9]{10}$/.test(contact_number)) {
       return res.status(400).json({ success: false, message: 'Contact number must be 10 digits' });
     }
 
-    // ✅ Check if mentor profile exists
+    if (linkedin_url && linkedin_url.trim() && !/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(linkedin_url)) {
+      return res.status(400).json({ success: false, message: 'Invalid LinkedIn URL' });
+    }
+
+    if (github_url && github_url.trim() && !/^https?:\/\/(www\.)?github\.com\/.*$/.test(github_url)) {
+      return res.status(400).json({ success: false, message: 'Invalid GitHub URL' });
+    }
+
+    // Prepare expertise_domains:
+    // - if an array with items -> convert to PostgreSQL array literal: '{"a","b"}'
+    // - if an empty array -> set to '{}' (explicit empty array)
+    // - if not provided (undefined/null) -> leave as null so we don't change existing value
+    let expertiseDomainValue = null;
+    if (Array.isArray(expertise_domains)) {
+      if (expertise_domains.length > 0) {
+        expertiseDomainValue = '{' + expertise_domains.map(d => `"${String(d).replace(/"/g, '\\"')}"`).join(',') + '}';
+      } else {
+        expertiseDomainValue = '{}';
+      }
+    }
+
+    // Check if mentor profile exists
     const checkQuery = 'SELECT id FROM mentor_details WHERE mentor_id = $1';
     const checkResult = await pool.query(checkQuery, [mentorId]);
 
     let result;
     if (checkResult.rows.length > 0) {
-      // ✅ Update
+      // Update existing - use CASE to conditionally update only non-empty fields
       const updateQuery = `
         UPDATE mentor_details
-        SET full_name = $1,
-            contact_number = $2,
-            linkedin_url = $3,
-            github_url = $4,
-            about_me = $5,
-            expertise_domains = $6,
-            others_domain = $7,
-            updated_at = CURRENT_TIMESTAMP
+        SET 
+          full_name = CASE WHEN $1::text IS NOT NULL THEN $1::text ELSE full_name END,
+          contact_number = CASE WHEN $2::text IS NOT NULL THEN $2::text ELSE contact_number END,
+          linkedin_url = CASE WHEN $3::text IS NOT NULL THEN $3::text ELSE linkedin_url END,
+          github_url = CASE WHEN $4::text IS NOT NULL THEN $4::text ELSE github_url END,
+          about_me = CASE WHEN $5::text IS NOT NULL THEN $5::text ELSE about_me END,
+          expertise_domains = CASE WHEN $6::text[] IS NOT NULL THEN $6::text[] ELSE expertise_domains END,
+          others_domain = CASE WHEN $7::text IS NOT NULL THEN $7::text ELSE others_domain END,
+          updated_at = CURRENT_TIMESTAMP
         WHERE mentor_id = $8
         RETURNING *;
       `;
-      result = await pool.query(updateQuery, [
-        full_name,
-        contact_number,
-        linkedin_url,
-        github_url,
-        about_me,
-        expertise_domains,
-        others_domain,
-        mentorId
-      ]);
+
+      // Pass parameter values as-is, but convert undefined -> null so that
+      // a sent empty string ("" ) will overwrite existing DB value.
+      const p1 = typeof full_name === 'undefined' ? null : full_name;
+      const p2 = typeof contact_number === 'undefined' ? null : contact_number;
+      const p3 = typeof linkedin_url === 'undefined' ? null : linkedin_url;
+      const p4 = typeof github_url === 'undefined' ? null : github_url;
+      const p5 = typeof about_me === 'undefined' ? null : about_me;
+      const p6 = typeof expertiseDomainValue === 'undefined' ? null : expertiseDomainValue;
+      const p7 = typeof others_domain === 'undefined' ? null : others_domain;
+
+      result = await pool.query(updateQuery, [p1, p2, p3, p4, p5, p6, p7, mentorId]);
     } else {
-      // ✅ Insert new mentor profile
+      // Insert new profile
       const insertQuery = `
         INSERT INTO mentor_details
         (mentor_id, full_name, contact_number, linkedin_url, github_url, about_me, expertise_domains, others_domain)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        VALUES ($1, $2, $3, $4, $5, $6, $7::text[], $8)
         RETURNING *;
       `;
-      result = await pool.query(insertQuery, [
-        mentorId,
-        full_name,
-        contact_number,
-        linkedin_url,
-        github_url,
-        about_me,
-        expertise_domains,
-        others_domain
-      ]);
+
+      const i2 = typeof full_name === 'undefined' ? null : full_name;
+      const i3 = typeof contact_number === 'undefined' ? null : contact_number;
+      const i4 = typeof linkedin_url === 'undefined' ? null : linkedin_url;
+      const i5 = typeof github_url === 'undefined' ? null : github_url;
+      const i6 = typeof about_me === 'undefined' ? null : about_me;
+      const i7 = typeof expertiseDomainValue === 'undefined' ? null : expertiseDomainValue;
+      const i8 = typeof others_domain === 'undefined' ? null : others_domain;
+
+      result = await pool.query(insertQuery, [mentorId, i2, i3, i4, i5, i6, i7, i8]);
     }
 
     res.status(200).json({
@@ -329,6 +364,7 @@ router.post('/mentor/profile', verifyToken, async (req, res) => {
     });
   }
 });
+
 
 // ✅ Fetch mentor profile
 router.get('/mentor/profile', verifyToken, async (req, res) => {
@@ -360,7 +396,26 @@ router.get('/mentor/profile', verifyToken, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Mentor profile not found' });
     }
 
-    res.status(200).json({ success: true, data: result.rows[0] });
+    // Handle expertise_domains - PostgreSQL returns as array
+    const data = result.rows[0];
+    if (data.expertise_domains) {
+      // If it's already an array, keep it
+      if (Array.isArray(data.expertise_domains)) {
+        // It's already an array, good!
+      } else if (typeof data.expertise_domains === 'string') {
+        // Try to parse if it's a JSON string
+        try {
+          data.expertise_domains = JSON.parse(data.expertise_domains);
+        } catch (e) {
+          console.warn('Could not parse expertise_domains:', data.expertise_domains);
+          data.expertise_domains = [];
+        }
+      }
+    } else {
+      data.expertise_domains = [];
+    }
+
+    res.status(200).json({ success: true, data });
   } catch (error) {
     console.error('Error fetching mentor profile:', error);
     res.status(500).json({

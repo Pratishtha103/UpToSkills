@@ -7,7 +7,8 @@ import {
   FolderOpen, 
   MessageSquare, 
   LogOut, 
-  X 
+  X,
+  Bell
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,9 +18,10 @@ const sidebarItems = [
   { id: "students", label: "Students", icon: Users },
   { id: "mentors", label: "Mentors", icon: Users },
   { id: "companies", label: "Companies", icon: Building2 },
-  
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "programs", label: "Programs", icon: BookOpen },
+  { id: "assigned_programs", label: "Assign Programs", icon: BookOpen },
+  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // ✅ Changed from Bell to MessageSquare
 ];
 

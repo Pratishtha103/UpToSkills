@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Company_Dashboard/Sidebar";
 import Navbar from "../components/Company_Dashboard/Navbar";
@@ -6,6 +6,7 @@ import StatCard from "../components/Company_Dashboard/StatCard";
 import StudentCard from "../components/Company_Dashboard/StudentCard";
 import SearchFilters from "../components/Company_Dashboard/SearchFilters";
 import InterviewsSection from "../components/Company_Dashboard/InterviewsSection";
+import InterviewGallery from "../components/Company_Dashboard/InterviewGallery";
 import CompanyNotificationsPage from "../components/Company_Dashboard/CompanyNotificationsPage";
 import SearchStudents from "../components/Company_Dashboard/SearchStudents";
 import EditProfile from "../components/Company_Dashboard/EditProfile";
@@ -15,6 +16,7 @@ import { Users, Calendar as CalIcon, Award, UserCheck } from "lucide-react";
 import buisness from "../assets/buisness.jpeg";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
 import ContactModal from "../components/Company_Dashboard/ContactModal";
+import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
 
 const VALID_VIEWS = new Set([
   "dashboard",
@@ -33,6 +35,9 @@ export default function Index() {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [totalMentors, setTotalMentors] = useState(0);
   const [totalBadges, setTotalBadges] = useState(0);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const [allStudentNames, setAllStudentNames] = useState([]);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -78,7 +83,29 @@ export default function Index() {
   }, [isDarkMode]);
   const toggleDarkMode = () => setIsDarkMode((p) => !p);
 
-  const interviewRef = useRef(null);
+  
+  const suggestionPool = useMemo(() => {
+    const dedupe = (items) => {
+      const seen = new Set();
+      const result = [];
+      items.forEach((value) => {
+        const name = value?.toString().trim();
+        if (!name) return;
+        const key = name.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(name);
+        }
+      });
+      return result;
+    };
+
+    if (allStudentNames.length) {
+      return dedupe(allStudentNames);
+    }
+
+    return dedupe(students.map((student) => student.full_name));
+  }, [students, allStudentNames]);
 
   // ---------- Fetch Students + Mentor count ----------
   useEffect(() => {
@@ -133,7 +160,7 @@ export default function Index() {
               : ["Profile"],
             location: r.location || "Unknown",
             experience: r.experience || "1 year",
-            rating: r.rating ?? Math.round((4 + Math.random()) * 10) / 10,
+            rating: r.rating ?? null,
             lastActive: r.last_active || "Recently active",
             ai_skill_summary: r.ai_skill_summary || r.ai_skills || "",
             created_at:
@@ -186,65 +213,124 @@ export default function Index() {
     setFilteredStudents(filtered);
   }, [filters, students]);
 
+  useEffect(() => {
+    const fetchAllStudentNames = async () => {
+      try {
+        const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await axios.get(`${API_BASE}/api/students/all-students`);
+        const rows = Array.isArray(res.data?.data)
+          ? res.data.data
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+        const names = rows.map(
+          (r) =>
+            (r.full_name || r.name || r.student_name || r.profile_full_name || "")
+              .toString()
+              .trim()
+        );
+        setAllStudentNames(names.filter(Boolean));
+      } catch (err) {
+        console.warn("Unable to fetch student names for suggestions", err);
+      }
+    };
+
+    fetchAllStudentNames();
+  }, []);
+
+  useEffect(() => {
+    const query = filters.name.trim().toLowerCase();
+    if (!query) {
+      setNameSuggestions(suggestionPool.slice(0, 8));
+      return;
+    }
+    setNameSuggestions(
+      suggestionPool.filter((name) => name.toLowerCase().includes(query)).slice(0, 8)
+    );
+  }, [filters.name, suggestionPool]);
+
   // ---------- LocalStorage view handling ----------
   useEffect(() => {
     try {
       const view = localStorage.getItem("company_view");
       if (view && VALID_VIEWS.has(view)) {
-        if (view === "interviews") {
-          setCurrentView("dashboard");
-          setTimeout(() => {
-            interviewRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }, 80);
-        } else {
-          setCurrentView(view);
-        }
+        // Open the view directly; interviews should show the dedicated interviews page
+        setCurrentView(view === "interviews" ? "interviews" : view);
       }
       localStorage.removeItem("company_view");
-    } catch {}
-  }, []);
-  // ---------- Fetch Interviews (For Both Count + Upcoming Section) ----------
-  const [interviews, setInterviews] = useState([]);
+    } catch { }
+  }, 
+  
+  []);
+// ---------- Fetch Interviews (For Both Count + Upcoming Section) ----------
+const [interviews, setInterviews] = useState([]);
 
-  useEffect(() => {
-    const fetchInterviews = async () => {
-      try {
-        const API_BASE =
-          process.env.REACT_APP_API_URL || "http://localhost:5000";
-        const res = await axios.get(`${API_BASE}/api/interviews`);
+const fetchInterviews = async () => {
+  try {
+    const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+    const res = await axios.get(`${API_BASE}/api/interviews`);
 
-        if (Array.isArray(res.data)) {
-          setInterviews(res.data);
-          setInterviewCount(res.data.length);
-        } else {
-          setInterviews([]);
-          setInterviewCount(0);
-        }
-      } catch (err) {
-        console.error("Error fetching interviews:", err);
-        setInterviews([]);
-        setInterviewCount(0);
+    if (Array.isArray(res.data)) {
+      setInterviews(res.data);
+      setInterviewCount(res.data.length);
+    } else {
+      setInterviews([]);
+      setInterviewCount(0);
+    }
+  } catch (err) {
+    console.error("Error fetching interviews:", err);
+    setInterviews([]);
+    setInterviewCount(0);
+  }
+};
+
+useEffect(() => {
+  fetchInterviews();
+
+  // Listen for newly created interviews to refresh the list and optionally notify
+  const normalizeInterview = (r) => ({
+    id: r.id ?? r._id ?? r.interview_id ?? r.interviewId ?? null,
+    candidate_name: r.candidate_name ?? r.candidateName ?? r.name ?? "",
+    role: r.role ?? r.position ?? r.job ?? "",
+    date: r.date ?? r.scheduled_date ?? r.slot_date ?? null,
+    time: r.time ?? r.scheduled_time ?? r.slot_time ?? null,
+    status: r.status ?? (r.state || "Scheduled"),
+    raw: r.raw ?? r,
+  });
+
+  const onCreated = (e) => {
+    try {
+      const created = e?.detail;
+      if (created) {
+        const normalized = normalizeInterview(created);
+        // Append only if not already present
+        setInterviews((prev) => {
+          if (!normalized.id) return [normalized, ...prev];
+          if (prev.some((p) => p.id === normalized.id)) return prev;
+          return [normalized, ...prev];
+        });
+        setInterviewCount((c) => c + 1);
+        return;
       }
-    };
-
+    } catch (err) {
+      // fallback to refetch
+    }
+    // Fallback: refresh from server
     fetchInterviews();
-  }, []);
+  };
+
+  window.addEventListener("interview:created", onCreated);
+  return () => window.removeEventListener("interview:created", onCreated);
+}, []);
+
+    
 
   // ---------- Handlers ----------
   const toggleSidebar = () => setIsSidebarOpen((p) => !p);
   const handleSidebarClick = (v) => {
     if (!v) return;
     if (v === "interviews") {
-      setCurrentView("dashboard");
-      setTimeout(() => {
-        interviewRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 60);
+      setCurrentView("interviews");
       return;
     }
     if (VALID_VIEWS.has(v)) {
@@ -262,6 +348,10 @@ export default function Index() {
       projectExperience: "All Levels",
       skillLevel: "All Skills",
     });
+  const handleNameSuggestionSelect = (value) => {
+    setFilters((prev) => ({ ...prev, name: value }));
+    setShowNameSuggestions(false);
+  };
 
   const handleViewProfile = (student) => {
     setSelectedStudent(student);
@@ -334,6 +424,24 @@ export default function Index() {
           <div className="pt-20 px-2 sm:px-4 pb-6 max-w-[1400px] mx-auto">
             <EditProfile />
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === "interviews") {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+          onItemClick={handleSidebarClick}
+        />
+        <div className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}>
+          <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
+          <main className="flex-1 pt-16">
+            <InterviewGallery />
+          </main>
         </div>
       </div>
     );
@@ -459,8 +567,8 @@ export default function Index() {
             </div>
           </motion.section>
 
-          {/* Stats */}
-          <section className="mb-8">
+
+           <section className="mb-8">
             <motion.h2
               className="text-2xl font-bold text-foreground mb-6"
               initial={{ opacity: 0, x: -20 }}
@@ -469,7 +577,7 @@ export default function Index() {
             >
               Hiring Overview
             </motion.h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
               <StatCard
                 title="Total Students Available"
                 value={students.length}
@@ -501,48 +609,9 @@ export default function Index() {
             </div>
           </section>
 
-          {/* Students */}
-          <section className="mb-8">
-            <motion.h2
-              className="text-2xl font-bold text-foreground mb-6"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              Find the Perfect Candidate
-            </motion.h2>
-            <SearchFilters
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onClearFilters={clearFilters}
-            />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loadingStudents ? (
-                <div className="col-span-full text-center py-12">
-                  Loading students…
-                </div>
-              ) : filteredStudents.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  No students found.
-                </div>
-              ) : (
-                filteredStudents.map((student, index) => (
-                  <StudentCard
-                    key={student.id}
-                    student={student}
-                    onViewProfile={handleViewProfile}
-                    onContact={handleContact}
-                    delay={index * 0.06}
-                  />
-                ))
-              )}
-            </div>
-          </section>
+          {/* Students moved to the dedicated Search page */}
 
-          {/* Interviews */}
-          <section ref={interviewRef} className="mb-8">
-            <InterviewsSection />
-          </section>
+          {/* Upcoming Interviews removed from dashboard - use dedicated Interviews view from sidebar */}
         </div>
 
         <StudentProfileModal

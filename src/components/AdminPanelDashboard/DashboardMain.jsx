@@ -61,7 +61,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   }, []);
 
   const formatNumber = (num) => {
-    if (num === null || num === undefined) return "-";
+    if (num === null || num === undefined) return "...";
     const n = typeof num === "number" ? num : Number(num);
     return n.toLocaleString("en-IN");
   };
@@ -92,7 +92,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
       onClick: () => onNavigateSection?.("companies_table"),
     },
     {
-      title: "Total Courses",
+      title: "Total Programs",
       value: stats.courses,
       loading: loadingStats,
       icon: <FaBookOpen className="w-6 h-6 text-white" />,

@@ -76,7 +76,11 @@ const createProgram = async (req, res) => {
         // Create enrollment
         console.log('📚 Creating enrollment for student:', studentId, 'course:', courseId);
         const { createEnrollment } = require('./enrollment.controller');
-        const enrollment = await createEnrollment(studentId, courseId, 'active');
+        const enrollment = await createEnrollment(studentId, courseId, 'active', {
+          io: req.app?.get('io'),
+          actorRole: 'program_form',
+          actorId: studentId,
+        });
         console.log('✅ ENROLLMENT CREATED SUCCESSFULLY:', enrollment);
 
         res.json({ 

@@ -1,23 +1,24 @@
 const pool = require('../config/database');
+const { pushNotification, notifyAdmins } = require('../utils/notificationService');
 
 // Validation functions
 const validateStudentExists = async (studentId) => {
   try {
-    const result = await pool.query('SELECT id FROM students WHERE id = $1', [studentId]);
-    return result.rows.length > 0;
+    const result = await pool.query('SELECT id, full_name FROM students WHERE id = $1', [studentId]);
+    return result.rows[0] || null;
   } catch (error) {
     console.error('Error validating student:', error);
-    return false;
+    return null;
   }
 };
 
 const validateCourseExists = async (courseId) => {
   try {
-    const result = await pool.query('SELECT id FROM courses WHERE id = $1', [courseId]);
-    return result.rows.length > 0;
+    const result = await pool.query('SELECT id, title FROM courses WHERE id = $1', [courseId]);
+    return result.rows[0] || null;
   } catch (error) {
     console.error('Error validating course:', error);
-    return false;
+    return null;
   }
 };
 
@@ -35,51 +36,89 @@ const checkDuplicateEnrollment = async (studentId, courseId) => {
 };
 
 // Database operations
-const createEnrollment = async (studentId, courseId, status = 'active') => {
+const createEnrollment = async (studentId, courseId, status = 'active', options = {}) => {
   console.log('Creating enrollment:', { studentId, courseId, status });
-  
+
   const client = await pool.connect();
-  
+  const { io = null, actorRole = 'system', actorId = null } = options || {};
+
   try {
     await client.query('BEGIN');
-    
-    // Validate student exists
+
     console.log('Validating student exists:', studentId);
-    const studentExists = await validateStudentExists(studentId);
-    console.log('Student exists:', studentExists);
-    if (!studentExists) {
+    const student = await validateStudentExists(studentId);
+    console.log('Student exists:', Boolean(student));
+    if (!student) {
       throw new Error('Student not found');
     }
-    
-    // Validate course exists
+
     console.log('Validating course exists:', courseId);
-    const courseExists = await validateCourseExists(courseId);
-    console.log('Course exists:', courseExists);
-    if (!courseExists) {
+    const course = await validateCourseExists(courseId);
+    console.log('Course exists:', Boolean(course));
+    if (!course) {
       throw new Error('Course not found');
     }
-    
-    // Check for duplicate enrollment
+
     console.log('Checking for duplicate enrollment');
     const isDuplicate = await checkDuplicateEnrollment(studentId, courseId);
     console.log('Is duplicate:', isDuplicate);
     if (isDuplicate) {
       throw new Error('Student already enrolled in this course');
     }
-    
-    // Create enrollment
+
     console.log('Creating enrollment record');
     const result = await client.query(
       `INSERT INTO enrollments (student_id, course_id, status, enrolled_at)
        VALUES ($1, $2, $3, NOW()) RETURNING *`,
       [studentId, courseId, status]
     );
-    
-    console.log('Enrollment record created:', result.rows[0]);
-    
+
+    const enrollment = result.rows[0];
+    console.log('Enrollment record created:', enrollment);
+
     await client.query('COMMIT');
-    return result.rows[0];
-    
+
+    const courseTitle = course.title || 'your course';
+
+    try {
+      await pushNotification({
+        role: 'student',
+        recipientRole: 'student',
+        recipientId: student.id,
+        type: 'course_enrollment',
+        title: `Enrolled in ${courseTitle}`,
+        message: `You're now enrolled in ${courseTitle}. Check your dashboard for course materials.`,
+        metadata: {
+          enrollmentId: enrollment.id,
+          studentId: student.id,
+          courseId: course.id,
+          courseTitle,
+        },
+        io,
+      });
+    } catch (studentNotificationError) {
+      console.error('Enrollment notification error (student):', studentNotificationError);
+    }
+
+    try {
+      await notifyAdmins({
+        title: 'New course enrollment',
+        message: `${student.full_name || 'A student'} enrolled in ${courseTitle}.`,
+        type: 'course_enrollment',
+        metadata: {
+          enrollmentId: enrollment.id,
+          studentId: student.id,
+          courseId: course.id,
+          actorRole,
+          actorId,
+        },
+        io,
+      });
+    } catch (adminNotificationError) {
+      console.error('Enrollment notification error (admin):', adminNotificationError);
+    }
+
+    return enrollment;
   } catch (error) {
     console.error('Error in createEnrollment:', error);
     await client.query('ROLLBACK');

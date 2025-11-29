@@ -29,34 +29,31 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
         });
 
         const d = res.data && res.data.data ? res.data.data : null;
+        console.log('Fetched mentor profile data:', d);
+        
         if (!d) {
           setUserData(null);
         } else {
-
           const isProfileComplete =
-          (d.profile_full_name || d.mentor_name || "").trim() !== "" &&
-          (d.contact_number || "").trim() !== "" &&
-          (d.expertise_domains && d.expertise_domains.length > 0) &&
-          (d.mentor_email || d.student_email || "").trim() !== "";
+            (d.profile_full_name || d.mentor_name || "").trim() !== "" &&
+            (d.contact_number || "").trim() !== "" &&
+            (d.expertise_domains && Array.isArray(d.expertise_domains) && d.expertise_domains.length > 0) &&
+            (d.mentor_email || d.student_email || "").trim() !== "";
           
-          // MAP mentor-shaped response to student-shaped fields your UI expects
-          setUserData({
+          const newUserData = {
             username: d.username || "",
             email: d.mentor_email || d.student_email || "",
             full_name: d.profile_full_name || d.mentor_name || d.student_name || "",
             contact_number: d.contact_number || d.mentor_phone || d.student_phone || "",
             linkedin_url: d.linkedin_url || "",
             github_url: d.github_url || "",
-            // Use mentor about_me as why_hire_me in student UI (no styling change)
-            // why_hire_me: d.about_me || d.why_hire_me || "",
-            // if backend sent ai_skill_summary (unlikely for mentor) use it, else blank
-            // ai_skill_summary: d.ai_skill_summary || "",
-            // domains: prefer mentor expertise_domains, but fall back if some alias exists
-            domains_of_interest: d.expertise_domains || d.domains_of_interest || [],
+            domains_of_interest: Array.isArray(d.expertise_domains) ? d.expertise_domains : (d.domains_of_interest || []),
             others_domain: d.others_domain || d.othersDomain || "",
             profile_completed: Boolean(isProfileComplete),
-            });
-
+          };
+          
+          console.log('Setting user data:', newUserData);
+          setUserData(newUserData);
         }
       } catch (err) {
         console.error("Error fetching mentor profile:", err);
@@ -67,6 +64,16 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
     };
 
     fetchProfile();
+
+    // Refresh profile when page becomes visible (user switches tabs back)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchProfile();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   return (

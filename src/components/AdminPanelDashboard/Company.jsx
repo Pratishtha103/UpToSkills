@@ -8,7 +8,6 @@ export default function Company({ isDarkMode }) {
   const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [searching, setSearching] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -20,7 +19,7 @@ export default function Company({ isDarkMode }) {
     else root.classList.remove("dark");
   }, [isDarkMode]);
 
-  // Fetch all companies initially and on search reset
+  // Fetch all companies
   const fetchAllCompanies = useCallback(async () => {
     try {
       setLoading(true);
@@ -41,32 +40,17 @@ export default function Company({ isDarkMode }) {
     fetchAllCompanies();
   }, [fetchAllCompanies]);
 
-  // Debounced search effect (500ms delay)
-  useEffect(() => {
-    const timeout = setTimeout(async () => {
-      if (!searchTerm.trim()) {
-        fetchAllCompanies();
-        return;
-      }
-      try {
-        setSearching(true);
-        const response = await fetch(
-          `${API_BASE_URL}/search/${encodeURIComponent(searchTerm)}`
-        );
-        if (!response.ok)
-          throw new Error(`Search failed: ${response.status}`);
-        const data = await response.json();
-        setCompanies(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Error searching companies:", error);
-        setCompanies([]);
-      } finally {
-        setSearching(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [searchTerm, fetchAllCompanies]);
+  // ✅ FIXED: Client-side filtering
+  const filteredCompanies = companies.filter((company) => {
+    if (!searchTerm.trim()) return true;
+    
+    const term = searchTerm.toLowerCase();
+    const nameMatch = company.company_name?.toLowerCase().includes(term);
+    const emailMatch = company.email?.toLowerCase().includes(term);
+    const phoneMatch = company.phone?.toLowerCase().includes(term);
+    
+    return nameMatch || emailMatch || phoneMatch;
+  });
 
   // Handler for removing a company
   const handleRemoveCompany = async (id) => {
@@ -147,7 +131,7 @@ export default function Company({ isDarkMode }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search companies..."
+              placeholder="Search companies by name, email, or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${isDarkMode
@@ -156,11 +140,6 @@ export default function Company({ isDarkMode }) {
                 }`}
               autoFocus
             />
-            {searching && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-              </div>
-            )}
           </div>
         </div>
 
@@ -174,8 +153,8 @@ export default function Company({ isDarkMode }) {
                   }`}
               ></div>
             ))
-          ) : companies.length > 0 ? (
-            companies.map((company) => (
+          ) : filteredCompanies.length > 0 ? (
+            filteredCompanies.map((company) => (
               <motion.div
                 key={company.id}
                 layout
@@ -217,7 +196,11 @@ export default function Company({ isDarkMode }) {
               </motion.div>
             ))
           ) : (
-            <p>No companies found.</p>
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                {searchTerm ? `No companies match "${searchTerm}"` : "No companies found."}
+              </p>
+            </div>
           )}
         </div>
       </div>

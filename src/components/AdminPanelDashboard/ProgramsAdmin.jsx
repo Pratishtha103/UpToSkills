@@ -69,6 +69,15 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
     });
   }, [courses, query, selectedTag]);
 
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigateSection) {
+      onNavigateSection('dashboard');
+    } else {
+      console.error('onNavigateSection is not defined');
+    }
+  };
+
   return (
     <main className={`${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} min-h-screen p-6`}>
       <header className="mb-6">
@@ -79,8 +88,19 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={() => onNavigateSection && onNavigateSection('dashboard')} className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'} shadow-sm border`}>← Back</button>
-            <button onClick={() => onNavigateSection && onNavigateSection('courses')} className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Add New Program</button>
+            {/* ✅ FIXED BACK BUTTON */}
+            <button 
+              onClick={handleBackClick}
+              className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-gray-100 hover:bg-gray-700' : 'bg-white text-gray-800 hover:bg-gray-50'} shadow-sm border transition-colors`}
+            >
+              ← Back
+            </button>
+            <button 
+              onClick={() => onNavigateSection && onNavigateSection('courses')} 
+              className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+            >
+              Add New Program
+            </button>
           </div>
         </div>
 
@@ -185,7 +205,7 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
 
                   <button
                     onClick={() => removeCourse(course.id)}
-                    className="flex items-center gap-1 border border-gray-100 px-3 py-1 bg-red-600 text-white rounded-full text-sm"
+                    className="flex items-center gap-1 border border-gray-100 px-3 py-1 bg-red-600 text-white rounded-full text-sm hover:bg-red-700 transition-colors"
                   >
                     <FaTrash className="w-4 h-4" /> Delete
                   </button>

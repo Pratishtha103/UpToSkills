@@ -76,6 +76,23 @@ export default function Company({ isDarkMode }) {
       const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete company");
       setCompanies(current => current.filter(c => c.id !== id));
+      // Notify admins about company removal (best-effort)
+      try {
+        const notifEndpoint = API_BASE_URL.replace('/api/companies', '') + '/api/notifications';
+        await fetch(notifEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role: 'admin',
+            type: 'deletion',
+            title: 'Company removed',
+            message: `${companyName} was removed (id: ${id}).`,
+            metadata: { entity: 'company', id }
+          })
+        });
+      } catch (notifErr) {
+        console.error('Failed to create notification for company removal', notifErr);
+      }
     } catch (error) {
       console.error("Error deleting company:", error);
       alert("Failed to delete company");

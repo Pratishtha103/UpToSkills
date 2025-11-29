@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Folder, LogOut, Edit3, Award, Info } from "lucide-react";
+import { Home, Users, Folder, LogOut, Edit3, Award, Info, BookOpen } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
+  { name: "My Programs", icon: <BookOpen size={18} />, path: "/mentor-dashboard/assigned-programs" },
   { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
   { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
   { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },

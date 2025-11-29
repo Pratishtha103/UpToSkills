@@ -9,13 +9,16 @@ const verifyToken = require("../middleware/auth");
 ==========================================================*/
 router.get("/count", async (req, res) => {
   try {
-    const result = await pool.query(
+    const totalRes = await pool.query(
       "SELECT COUNT(*)::int AS total_mentors FROM mentors"
+    );
+    const profilesRes = await pool.query(
+      "SELECT COUNT(*)::int AS total_profiles FROM mentor_details"
     );
 
     res.json({
-      success: true,
-      totalMentors: result.rows[0].total_mentors,
+      totalMentors: totalRes.rows[0].total_mentors,
+      totalProfiles: profilesRes.rows[0].total_profiles,
     });
   } catch (err) {
     console.error("❌ Error fetching mentors count:", err.message);
@@ -26,22 +29,28 @@ router.get("/count", async (req, res) => {
 /*==========================================================
  🧑‍🏫 GET ALL MENTORS  (TOKEN REQUIRED)
 ==========================================================*/
+// -----------------------------------------------
+// GET all mentors (returns all registered mentors and includes optional profile fields)
+// -----------------------------------------------
 router.get("/", verifyToken, async (req, res) => {
   try {
+    // Return mentors with legacy field names to keep frontend compatibility.
+    // Prefer profile fields when present (mentor_details) but always include `id` and `full_name`.
     const result = await pool.query(`
-      SELECT 
-        md.id,
-        md.full_name,
-        md.contact_number AS phone,
-        md.linkedin_url,
-        md.github_url,
-        md.about_me,
-        md.expertise_domains,
-        md.others_domain,
-        m.email
-      FROM mentor_details md
-      LEFT JOIN mentors m ON md.mentor_id = m.id
-      ORDER BY md.id DESC
+      SELECT
+        m.id AS id,
+        COALESCE(md.full_name, m.full_name) AS full_name,
+        m.email,
+        COALESCE(md.contact_number, m.phone) AS phone,
+        COALESCE(md.linkedin_url, '') AS linkedin_url,
+        COALESCE(md.github_url, '') AS github_url,
+        COALESCE(md.about_me, '') AS about_me,
+        COALESCE(md.expertise_domains, ARRAY[]::text[]) AS expertise_domains,
+        COALESCE(md.others_domain, '') AS others_domain,
+        md.id AS profile_id
+      FROM mentors m
+      LEFT JOIN mentor_details md ON md.mentor_id = m.id
+      ORDER BY m.id DESC
     `);
 
     res.json({

@@ -278,6 +278,7 @@ const Webdev = () => {
                             >
                               <option value="">Select your education level</option>
                               <option value="high-school">High School</option>
+                              <option value="high-school">Intermediate</option>
                               <option value="bachelor's-degree">Bachelor's Degree</option>
                               <option value="master's-degree">Master's Degree</option>
                             </select>
@@ -301,7 +302,7 @@ const Webdev = () => {
                             </select>
                           </div>
 
-                          {/* Resume Upload */}
+                          {/* Resume Upload
                           <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Upload Resume</label>
                             <input
@@ -312,7 +313,7 @@ const Webdev = () => {
                               accept=".pdf"
                               className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                             />
-                          </div>
+                          </div> */}
 
                           {/* Course */}
                           <div>

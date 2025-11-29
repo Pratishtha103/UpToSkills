@@ -12,7 +12,6 @@ const Students = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(null);
-  // State to track deactivation status (using null for not deactivating)
   const [isDeactivating, setIsDeactivating] = useState(null); 
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
@@ -59,7 +58,6 @@ const Students = ({ isDarkMode }) => {
     }
   };
 
-  // Handle Deactivate function
   const handleDeactivate = async (id, currentStatus) => {
     const studentToUpdate = students.find((s) => s.id === id);
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
@@ -70,16 +68,11 @@ const Students = ({ isDarkMode }) => {
 
     try {
         setIsDeactivating(id);
-        
-        // Simulating success and updating the local state 
-        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network latency
-
+        await new Promise(resolve => setTimeout(resolve, 800));
         setStudents(current => current.map(s => 
             s.id === id ? { ...s, status: newStatus } : s
         ));
-
         alert(`Successfully set ${studentName} status to ${newStatus}.`);
-
     } catch (err) {
         console.error("Error updating status:", err);
         alert(`Failed to change student status to ${newStatus}.`);
@@ -88,8 +81,6 @@ const Students = ({ isDarkMode }) => {
     }
   };
 
-
-  // Fetch student details
   const fetchStudentDetails = async (studentId) => {
     try {
       setLoadingDetails(true);
@@ -116,25 +107,36 @@ const Students = ({ isDarkMode }) => {
     setStudentDetails(null);
   };
 
-  // Search functionality
+  // ✅ FIXED: Search functionality using correct endpoint
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      if (!searchTerm.trim()) {
+      const trimmedSearch = searchTerm.trim();
+      
+      // If search is empty, fetch all students
+      if (!trimmedSearch) {
         fetchAllStudents();
         return;
       }
+      
       try {
         setSearching(true);
-        const res = await fetch(`${API_BASE_URL}/search/${searchTerm}`);
+        // ✅ CHANGED: Use /search?q= instead of /search/:name
+        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`);
         const data = await res.json();
-        if (data.success) setStudents(data.data);
-        else setStudents([]);
+        
+        if (data.success) {
+          setStudents(data.data || []);
+        } else {
+          setStudents([]);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Search error:", err);
+        setStudents([]);
       } finally {
         setSearching(false);
       }
-    }, 500);
+    }, 500); // 500ms debounce
+    
     return () => clearTimeout(timeout);
   }, [searchTerm, fetchAllStudents]);
 
@@ -163,7 +165,7 @@ const Students = ({ isDarkMode }) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search students..."
+              placeholder="Search by name"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${
@@ -193,7 +195,6 @@ const Students = ({ isDarkMode }) => {
             ))
           ) : students.length > 0 ? (
             students.map((student) => {
-              // Determine current status for button text (defaulting to 'Active' for display purposes if not present)
               const currentStatus = student.status || 'Active';
               const isCurrentlyActive = currentStatus === 'Active';
               
@@ -216,7 +217,6 @@ const Students = ({ isDarkMode }) => {
                       <h3 className="text-xl font-bold truncate">
                         {student.full_name}
                       </h3>
-                      {/* Added status display for clarity */}
                       <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {currentStatus}
                       </span>
@@ -237,29 +237,18 @@ const Students = ({ isDarkMode }) => {
                 </div>
 
                 <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
-                  
-                  {/* Deactivate/Activate Button (Text Only) */}
                   <button
                     onClick={() => handleDeactivate(student.id, currentStatus)}
                     disabled={isDeactivating === student.id}
-                    // Removed 'gap-2' from class since there's no icon/loader next to text
                     className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
                       isDeactivating === student.id
                         ? "bg-blue-300 text-blue-800 cursor-not-allowed"
                         : "bg-blue-500 text-white hover:bg-blue-600"
                     }`}
                   >
-                    {isDeactivating === student.id ? (
-                      // Shows text only when loading
-                      "Updating..."
-                    ) : (
-                        // Shows text only when active
-                        isCurrentlyActive ? "Deactivate" : "Activate"
-                    )}
+                    {isDeactivating === student.id ? "Updating..." : (isCurrentlyActive ? "Deactivate" : "Activate")}
                   </button>
-                  {/* END Deactivate/Activate Button */}
 
-                  {/* Delete Button (Text Only) */}
                   <button
                     onClick={() => handleDelete(student.id)}
                     disabled={isDeleting === student.id}
@@ -269,23 +258,22 @@ const Students = ({ isDarkMode }) => {
                         : "bg-red-500 text-white hover:bg-red-600"
                     }`}
                   >
-                    {isDeleting === student.id ? (
-                      "Deleting..."
-                    ) : (
-                      "Delete"
-                    )}
+                    {isDeleting === student.id ? "Deleting..." : "Delete"}
                   </button>
-                  {/* END Delete Button */}
                 </div>
               </motion.div>
             )})
           ) : (
-            <p>No students found.</p>
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500">
+                {searchTerm ? "No students found matching your search." : "No students found."}
+              </p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Student Details Modal (omitted for brevity) */}
+      {/* Student Details Modal */}
       <AnimatePresence>
         {selectedStudent && (
           <motion.div

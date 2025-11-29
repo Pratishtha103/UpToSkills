@@ -65,16 +65,19 @@ router.post("/", verifyToken, async (req, res) => {
     const ioInstance = req.app.get("io");
 
     // Notify the company/user who scheduled this interview (if authenticated)
+    let schedulingCompanyName = null;
     try {
       const actor = req.user || null;
       if (actor && actor.id) {
+        // derive a friendly company name from the actor payload
+        schedulingCompanyName = actor.company_name || actor.name || actor.full_name || actor.username || null;
         await pushNotification({
           role: "company",
           recipientRole: "company",
           recipientId: actor.id,
           type: "interview",
           title: "Interview scheduled",
-            message: `You scheduled an interview for ${candidateName} on ${readableDate} at ${readableTime}.`,
+          message: `You scheduled an interview for ${candidateName} on ${readableDate} at ${readableTime}.`,
           metadata: {
             interviewId: createdInterview.id,
             candidateName,
@@ -95,23 +98,25 @@ router.post("/", verifyToken, async (req, res) => {
         // Verify student exists
         const studentRow = await pool.query("SELECT id FROM students WHERE id = $1 LIMIT 1", [candidateId]);
         if (studentRow.rows.length) {
-          await pushNotification({
-            role: "student",
-            recipientRole: "student",
-            recipientId: studentRow.rows[0].id,
-            type: "interview",
-            title: "Interview scheduled",
-              message: `Your interview for ${position} is scheduled for ${readableDate} at ${readableTime}.`,
-            metadata: {
-              interviewId: createdInterview.id,
-              candidateName: candidateName?.trim(),
-              position,
-              date: createdInterview.date,
-              time: createdInterview.time,
-            },
-            io: ioInstance,
-          });
-        }
+            const studentIdToNotify = studentRow.rows[0].id;
+            const companyPart = schedulingCompanyName ? ` by ${schedulingCompanyName}` : "";
+            await pushNotification({
+              role: "student",
+              recipientRole: "student",
+              recipientId: studentIdToNotify,
+              type: "interview",
+              title: "Interview scheduled",
+              message: `Your interview for ${position}${companyPart} is scheduled for ${readableDate} at ${readableTime}.`,
+              metadata: {
+                interviewId: createdInterview.id,
+                candidateName: candidateName?.trim(),
+                position,
+                date: createdInterview.date,
+                time: createdInterview.time,
+              },
+              io: ioInstance,
+            });
+          }
       } else {
         const trimmedCandidate = candidateName?.trim();
         if (trimmedCandidate) {
@@ -121,13 +126,14 @@ router.post("/", verifyToken, async (req, res) => {
           );
 
           if (studentMatch.rows.length) {
+            const companyPart = schedulingCompanyName ? ` by ${schedulingCompanyName}` : "";
             await pushNotification({
               role: "student",
               recipientRole: "student",
               recipientId: studentMatch.rows[0].id,
               type: "interview",
               title: "Interview scheduled",
-                message: `Your interview for ${position} is scheduled for ${readableDate} at ${readableTime}.`,
+              message: `Your interview for ${position}${companyPart} is scheduled for ${readableDate} at ${readableTime}.`,
               metadata: {
                 interviewId: createdInterview.id,
                 candidateName: trimmedCandidate,
@@ -145,9 +151,10 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     try {
+      const companyPart = schedulingCompanyName ? ` by ${schedulingCompanyName}` : "";
       await notifyAdmins({
         title: "Interview scheduled",
-          message: `${candidateName} has an interview for ${position} on ${readableDate} at ${readableTime}.`,
+        message: `${candidateName} has an interview for ${position}${companyPart} on ${readableDate} at ${readableTime}.`,
         type: "interview",
         metadata: {
           interviewId: createdInterview.id,
@@ -168,7 +175,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // ✅ PUT - Update (Reschedule) interview
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { date, time } = req.body;
@@ -186,7 +193,106 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ error: "Interview not found" });
     }
 
-    res.json(result.rows[0]);
+    const updated = result.rows[0];
+
+    // Friendly readable date/time
+    let readableDate = String(updated.date);
+    let readableTime = String(updated.time);
+    try {
+      const dt = new Date(`${updated.date}T${updated.time}`);
+      if (!Number.isNaN(dt.getTime())) {
+        readableDate = dt.toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+        readableTime = dt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      }
+    } catch (e) {}
+
+    const ioInstance = req.app.get("io");
+
+    // Notify admins
+    try {
+      await notifyAdmins({
+        title: "Interview rescheduled",
+        message: `${updated.candidate_name} interview rescheduled to ${readableDate} at ${readableTime}.`,
+        type: "interview:reschedule",
+        metadata: { interviewId: updated.id, date: updated.date, time: updated.time },
+        io: ioInstance,
+      });
+    } catch (adminErr) {
+      console.error("Admin notify error (reschedule):", adminErr);
+    }
+
+    // Notify student (if candidate_id present)
+    try {
+      const candidateId = updated.candidate_id || updated.candidateId || null;
+      if (candidateId) {
+        await pushNotification({
+          role: "student",
+          recipientRole: "student",
+          recipientId: candidateId,
+          type: "interview:reschedule",
+          title: "Interview rescheduled",
+          message: `Your interview for ${updated.role || 'the role'} has been rescheduled to ${readableDate} at ${readableTime}.`,
+          metadata: { interviewId: updated.id },
+          io: ioInstance,
+        });
+      } else if (updated.candidate_name) {
+        // Try to match by name as a fallback
+        try {
+          const trimmed = String(updated.candidate_name).trim();
+          const match = await pool.query("SELECT id FROM students WHERE TRIM(full_name) ILIKE $1 LIMIT 1", [trimmed]);
+          if (match.rows.length) {
+            await pushNotification({
+              role: "student",
+              recipientRole: "student",
+              recipientId: match.rows[0].id,
+              type: "interview:reschedule",
+              title: "Interview rescheduled",
+              message: `Your interview for ${updated.role || 'the role'} has been rescheduled to ${readableDate} at ${readableTime}.`,
+              metadata: { interviewId: updated.id },
+              io: ioInstance,
+            });
+          }
+        } catch (e) {
+          console.error('Student lookup error (reschedule):', e);
+        }
+      }
+    } catch (studentErr) {
+      console.error("Student notify error (reschedule):", studentErr);
+    }
+
+    // Notify company if we can identify a company or actor
+    try {
+      // If interview row contains a company_id or company field, prefer that
+      const companyId = updated.company_id || updated.companyId || updated.created_by || null;
+      if (companyId) {
+        await pushNotification({
+          role: "company",
+          recipientRole: "company",
+          recipientId: companyId,
+          type: "interview:reschedule",
+          title: "Interview rescheduled",
+          message: `Interview for ${updated.candidate_name || 'candidate'} has been rescheduled to ${readableDate} at ${readableTime}.`,
+          metadata: { interviewId: updated.id },
+          io: ioInstance,
+        });
+      } else if (req.user && req.user.id && String(req.user.role).toLowerCase() === 'company') {
+        // If the requester is an authenticated company, notify them
+        await pushNotification({
+          role: 'company',
+          recipientRole: 'company',
+          recipientId: req.user.id,
+          type: 'interview:reschedule',
+          title: 'Interview rescheduled',
+          message: `You rescheduled the interview for ${updated.candidate_name || 'candidate'} to ${readableDate} at ${readableTime}.`,
+          metadata: { interviewId: updated.id },
+          io: ioInstance,
+        });
+      }
+    } catch (companyErr) {
+      console.error("Company notify error (reschedule):", companyErr);
+    }
+
+    res.json(updated);
   } catch (error) {
     console.error("Error updating interview:", error);
     res.status(500).json({ error: "Server error while updating interview" });

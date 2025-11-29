@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import loginImage from "../assets/loginnew.jpg";
+import loginImage from "../assets/loginnew2.jpg";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -114,20 +115,64 @@ const LoginForm = () => {
     }
   };
 
-  return (
-    <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
-      <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
 
-        {/* Image */}
-        <div className="w-full md:w-1/2 p-3 flex items-center">
-          <div
-            className="w-full h-[420px] md:h-[400px] lg:h-[600px] bg-cover bg-center rounded-2xl shadow-sm"
-            style={{ backgroundImage: `url(${loginImage})` }}
-          />
-        </div>
+  return (
+    // <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
+    //   <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
+      
+    //     {/* Image */}
+    //     <div className="hidden md:block  md:w-1/2 lg:w-1/2 xl:w-7/12 p-0 m-0">
+    
+    //       <div
+    //         className="h-full w-full bg-cover bg-no-repeat"
+    //         style={{ backgroundImage: `url(${loginImage})` }}
+    //       />
+    //     </div>
+      //   <div className="h-[100vh] flex items-center justify-center px-5 lg:px-0 bg-gray-50">
+      // <div className="max-w-screen-xl bg-white shadow-md sm:rounded-lg flex justify-center flex-1">
+
+      //   {/* LEFT IMAGE */}
+      //   <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
+      //     <div
+      //       className="h-full w-full bg-cover rounded-2xl"
+      //       style={{ backgroundImage: `url(${loginImage})` }}
+      //     />
+      //   </div>
+
+  //     <div className="h-screen flex justify-center bg-gray-50 p-0 m-0">
+  // <div className="w-full max-w-screen-xl bg-white shadow-md flex p-0 m-0">
+  //   {/* LEFT IMAGE */}
+  //   <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12 h-full p-0 m-0">
+  //     <div
+  //       className="h-full w-full bg-cover bg-no-repeat"
+  //       style={{
+  //         backgroundImage: `url(${loginImage})`,
+  //         borderRadius: 0, // absolutely no curve
+  //       }}
+  //     />
+  //   </div>
+
+  
+  
+  <div className="w-full  min-h-screen flex justify-center items-center bg-gray-50 py-10 ">
+    <div className="flex w-[80%] h-[70vh] bg-white shadow-lg  overflow-hidden ">
+    {/* LEFT: Image */}
+   
+<div className="w-1/2 h-full overflow-hidden p-0 m-0 rounded-xl">
+  <img
+    src={loginImage}
+    className="w-full h-full    object-cover object-center block rounded-xl"
+  />
+</div>
+
 
         {/* Form */}
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12 relative">
+
+    <div className="w-1/2 h-full flex items-center justify-center">
+ 
+
+      
+      
           <div className="flex flex-col items-center">
 
             {/* Toast Container positioned above heading */}
@@ -227,6 +272,11 @@ const LoginForm = () => {
       </div>
     </div>
   );
+
+
 };
 
+
 export default LoginForm;
+
+

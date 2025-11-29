@@ -72,6 +72,39 @@ export default function Project({ isDarkMode }) {
         setNewProjectTitle("");
         setNewProjectMentor("");
         setNewProjectStudents("");
+        // Notify admins and the mentor about the new project (best-effort)
+        try {
+          // Admin notification
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "creation",
+              title: "Project added",
+              message: `${newProj.project_title} was added by admin (mentor: ${newProj.mentor_name}).`,
+              metadata: { entity: "project", id: newProj.id },
+            }),
+          });
+
+          // Mentor notification (if mentor_id available)
+          if (newProj.mentor_id) {
+            await fetch("http://localhost:5000/api/notifications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                role: "mentor",
+                recipientId: newProj.mentor_id,
+                type: "creation",
+                title: "New project assigned",
+                message: `A new project \"${newProj.project_title}\" was assigned to you.`,
+                metadata: { entity: "project", id: newProj.id },
+              }),
+            });
+          }
+        } catch (notifErr) {
+          console.error("Failed to create project notifications:", notifErr);
+        }
       } else {
         alert(data.message || "Failed to add project");
       }
@@ -89,6 +122,41 @@ export default function Project({ isDarkMode }) {
       if (data.success) {
         setProjects((prev) => prev.filter((p) => p.id !== id));
         setNewProjects((prev) => prev.filter((p) => p.id !== id));
+        // Notify admins (and mentor) about deletion
+        try {
+          // Admin notification
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "deletion",
+              title: "Project deleted",
+              message: `Project with id ${id} was deleted.`,
+              metadata: { entity: "project", id },
+            }),
+          });
+
+          // If API returned deleted project with mentor_id, notify mentor
+          const deleted = data.deleted || data.deleted_project || null;
+          const mentorId = deleted?.mentor_id || deleted?.mentorId || null;
+          if (mentorId) {
+            await fetch("http://localhost:5000/api/notifications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                role: "mentor",
+                recipientId: mentorId,
+                type: "deletion",
+                title: "Project removed",
+                message: `A project assigned to you was removed (id: ${id}).`,
+                metadata: { entity: "project", id },
+              }),
+            });
+          }
+        } catch (notifErr) {
+          console.error("Failed to create project deletion notifications:", notifErr);
+        }
       } else {
         alert(data.message || "Failed to delete project");
       }

@@ -47,6 +47,22 @@ const Students = ({ isDarkMode }) => {
       const result = await res.json();
       if (result.success) {
         setStudents((current) => current.filter((s) => s.id !== id));
+        // Notify admins about this deletion
+        try {
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "deletion",
+              title: "Student deleted",
+              message: `${studentName} was deleted (id: ${id}).`,
+              metadata: { entity: "student", id },
+            }),
+          });
+        } catch (notifErr) {
+          console.error("Failed to create notification:", notifErr);
+        }
       } else {
         alert(result.message || "Failed to delete student");
       }
@@ -73,6 +89,24 @@ const Students = ({ isDarkMode }) => {
             s.id === id ? { ...s, status: newStatus } : s
         ));
         alert(`Successfully set ${studentName} status to ${newStatus}.`);
+
+        // Notify admins about status change
+        try {
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "status-change",
+              title: "Student status updated",
+              message: `${studentName} status changed to ${newStatus} (id: ${id}).`,
+              metadata: { entity: "student", id, status: newStatus },
+            }),
+          });
+        } catch (notifErr) {
+          console.error("Failed to create notification:", notifErr);
+        }
+
     } catch (err) {
         console.error("Error updating status:", err);
         alert(`Failed to change student status to ${newStatus}.`);

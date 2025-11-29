@@ -28,7 +28,6 @@ import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
-import ForgotPassword from './pages/ForgotPassword';
 // About Page components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
@@ -73,7 +72,6 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
           <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
           <Route path="/contact" element={<ContactPage />} />
 
 

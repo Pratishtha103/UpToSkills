@@ -118,7 +118,10 @@ export default function Mentors({ isDarkMode }) {
   const fetchMentors = async () => {
     try {
       setSearching(true);
-      const res = await axios.get(`${API_BASE}/api/mentors`);
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_BASE}/api/mentors`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       setMentors(res.data || []);
     } catch (err) {
       console.error("Failed to load mentors", err);
@@ -136,7 +139,8 @@ export default function Mentors({ isDarkMode }) {
   const deleteMentor = async (id) => {
     if (!window.confirm("Delete this mentor?")) return;
     try {
-      await axios.delete(`${API_BASE}/api/mentors/${id}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE}/api/mentors/${id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       setMentors((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
       console.error("Failed to delete mentor", err);

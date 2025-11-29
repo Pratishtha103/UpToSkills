@@ -46,6 +46,23 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
       );
     `);
 
+    // Mentor details table (profiles for mentors)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS mentor_details (
+        id SERIAL PRIMARY KEY,
+        mentor_id INTEGER UNIQUE REFERENCES mentors(id) ON DELETE CASCADE,
+        full_name TEXT,
+        contact_number VARCHAR(15),
+        linkedin_url TEXT,
+        github_url TEXT,
+        about_me TEXT,
+        expertise_domains TEXT[],
+        others_domain TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
     // SKILL BADGES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS skill_badges (
@@ -172,6 +189,18 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
         badge_id INTEGER NOT NULL REFERENCES skill_badges(id) ON DELETE CASCADE,
         given_by INTEGER REFERENCES mentors(id) ON DELETE SET NULL,
         awarded_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // PROGRAM ASSIGNMENTS (assign programs/courses to mentors)
+    // Use mentor_id referencing mentors.id (accounts). If legacy column exists, keep it unchanged here;
+    // startup migration is handled by ensureProgramAssignmentsTable utility which runs at server boot.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS program_assignments (
+        id SERIAL PRIMARY KEY,
+        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        mentor_id INTEGER REFERENCES mentors(id) ON DELETE CASCADE,
+        assigned_on TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 

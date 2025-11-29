@@ -24,10 +24,10 @@ export default function StatCard({
   const handleMouseMove = (e) => {
     if (!divRef.current) return;
     const rect = divRef.current.getBoundingClientRect();
-    setPosition(() => ({
+    setPosition({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
-    }));
+    });
   };
 
   const displayValue = typeof value === "number" ? value.toLocaleString() : value;
@@ -35,34 +35,48 @@ export default function StatCard({
   return (
     <motion.div
       ref={divRef}
-      className="relative stat-card rounded-xl bg-card p-4 border border-border shadow-sm transition-all duration-300 ease-out"
+      className="relative stat-card rounded-2xl bg-card p-6 border border-border shadow-md transition-all duration-300 ease-out"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay }}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.03 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setOpacity(0.6)}
       onMouseLeave={() => setOpacity(0)}
     >
-      {/* Subtle spotlight */}
+      {/* Spotlight effect */}
       <div
-        className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-in-out rounded-xl"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-in-out rounded-2xl"
         style={{
           opacity,
-          background: `radial-gradient(circle at ${position.x}px ${position.y}px, rgba(59,130,246,0.08), transparent 60%)`,
+          background: `radial-gradient(circle at ${position.x}px ${position.y}px, rgba(59,130,246,0.10), transparent 60%)`,
           transition: "background 0.12s ease-out",
         }}
       />
 
       <div className="flex items-center justify-between relative z-10 gap-4">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
-          <p className="text-sm font-medium text-muted-foreground mt-1 truncate">{displayValue}</p>
-          {subtitle && <p className="text-sm text-muted-foreground mt-1 truncate">{subtitle}</p>}
+          {/* Title */}
+          <p className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1 truncate">
+            {title}
+          </p>
+
+          {/* Value */}
+          <p className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+            {displayValue}
+          </p>
+
+          {/* Subtitle */}
+          {/* {subtitle && (
+            <p className="text-sm text-muted-foreground mt-1 truncate">
+              {subtitle}
+            </p>
+          )} */}
         </div>
 
+        {/* Icon */}
         <div className="flex flex-col items-end gap-3">
-          {Icon ? <Icon className="w-6 h-6 text-muted-foreground" /> : null}
+          {Icon ? <Icon className="w-8 h-8 text-muted-foreground" /> : null}
         </div>
       </div>
     </motion.div>

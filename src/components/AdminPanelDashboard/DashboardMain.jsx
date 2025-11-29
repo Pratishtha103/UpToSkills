@@ -61,7 +61,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   }, []);
 
   const formatNumber = (num) => {
-    if (num === null || num === undefined) return "-";
+    if (num === null || num === undefined) return "...";
     const n = typeof num === "number" ? num : Number(num);
     return n.toLocaleString("en-IN");
   };

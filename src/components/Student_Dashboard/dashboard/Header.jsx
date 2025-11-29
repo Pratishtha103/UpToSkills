@@ -86,7 +86,7 @@ export default function Header({ onMenuClick }) {
         </div>
 
         {/* Search Bar */}
-        <div className="hidden md:flex items-center max-w-md w-full mx-4 sm:mx-8">
+        {/* <div className="hidden md:flex items-center max-w-md w-full mx-4 sm:mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -94,7 +94,7 @@ export default function Header({ onMenuClick }) {
               className="pl-10 w-full"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Right actions */}
         <div className="flex items-center gap-2">

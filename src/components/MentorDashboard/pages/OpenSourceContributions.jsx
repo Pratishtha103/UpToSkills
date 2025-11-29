@@ -37,11 +37,10 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
       <div className="flex flex-col flex-grow bg-gray-50 dark:bg-gray-900">
         <main className="px-8 lg:px-12 py-10 flex-grow w-full">
           <h1 className="text-3xl font-bold text-center mb-2 text-gray-800 dark:text-gray-300">
-            My Projects
+            My Programs
           </h1>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
-            Monitor, review and approve your student’s commits, pull requests,
-            and milestones across open-source platforms.
+            Manage and track all programs created by mentors.
           </p>
 
           <section className="mb-10">
@@ -49,7 +48,7 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
               <table className="min-w-full text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl overflow-hidden">
                 <thead className="text-sm uppercase tracking-wide bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-4 text-left text-gray-700 dark:text-gray-300">Project Title</th>
+                    <th className="px-6 py-4 text-left text-gray-700 dark:text-gray-300">Program Title</th>
                     <th className="px-6 py-4 text-left text-gray-700 dark:text-gray-300">Total Students</th>
                   </tr>
                 </thead>

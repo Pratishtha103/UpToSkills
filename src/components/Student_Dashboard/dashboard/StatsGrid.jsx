@@ -146,7 +146,7 @@ function StatsGrid({ studentId }) {
     },
     {
       title: "Upcoming interviews",
-      value: "4",
+      value: "...",
       icon: Star,
       color: "accent",
       delay: 0.3,

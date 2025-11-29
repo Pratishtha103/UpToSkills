@@ -23,6 +23,7 @@ import ProjectShowcasePage from './pages/ProjectShowcasePage';
 import MentorDashboardRoutes from './pages/MentorDashboardRoutes';
 import AdminPanel from './pages/AdminPanel';
 import ProgramsPage from './pages/ProgramsPage';
+import ForgotPassword from './pages/ForgotPassword';
 import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
@@ -70,9 +71,11 @@ function App() {
 
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
           <Route path="/contact" element={<ContactPage />} />
+
 
           {/* PROGRAM ROUTES */}
           <Route path="/programForm/:id" element={<Webdev />} />

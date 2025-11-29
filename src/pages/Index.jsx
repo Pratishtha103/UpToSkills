@@ -11,13 +11,8 @@ import SearchStudents from "../components/Company_Dashboard/SearchStudents";
 import EditProfile from "../components/Company_Dashboard/EditProfile";
 import AboutCompanyPage from "../components/Company_Dashboard/AboutCompanyPage";
 import { motion } from "framer-motion";
-import {
-  Users,
-  Calendar as CalIcon,
-  Award,
-  UserCheck,
-} from "lucide-react";
-import boy from "../assets/boy2.png";
+import { Users, Calendar as CalIcon, Award, UserCheck } from "lucide-react";
+import buisness from "../assets/buisness.jpeg";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
 import ContactModal from "../components/Company_Dashboard/ContactModal";
 
@@ -52,8 +47,8 @@ export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactStudentId, setContactStudentId] = useState(null);
-// Interview count
-const [interviewCount, setInterviewCount] = useState(0);
+  // Interview count
+  const [interviewCount, setInterviewCount] = useState(0);
 
   // Current user
   const rawUser =
@@ -209,37 +204,34 @@ const [interviewCount, setInterviewCount] = useState(0);
         }
       }
       localStorage.removeItem("company_view");
-    } catch { }
-  }, 
-  
-  []);
- // ---------- Fetch Interviews (For Both Count + Upcoming Section) ----------
-const [interviews, setInterviews] = useState([]);
+    } catch {}
+  }, []);
+  // ---------- Fetch Interviews (For Both Count + Upcoming Section) ----------
+  const [interviews, setInterviews] = useState([]);
 
-useEffect(() => {
-  const fetchInterviews = async () => {
-    try {
-      const API_BASE =
-        process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await axios.get(`${API_BASE}/api/interviews`);
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const API_BASE =
+          process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await axios.get(`${API_BASE}/api/interviews`);
 
-      if (Array.isArray(res.data)) {
-        setInterviews(res.data);
-        setInterviewCount(res.data.length);
-      } else {
+        if (Array.isArray(res.data)) {
+          setInterviews(res.data);
+          setInterviewCount(res.data.length);
+        } else {
+          setInterviews([]);
+          setInterviewCount(0);
+        }
+      } catch (err) {
+        console.error("Error fetching interviews:", err);
         setInterviews([]);
         setInterviewCount(0);
       }
-    } catch (err) {
-      console.error("Error fetching interviews:", err);
-      setInterviews([]);
-      setInterviewCount(0);
-    }
-  };
+    };
 
-  fetchInterviews();
-}, []);
-
+    fetchInterviews();
+  }, []);
 
   // ---------- Handlers ----------
   const toggleSidebar = () => setIsSidebarOpen((p) => !p);
@@ -290,8 +282,9 @@ useEffect(() => {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-            }`}
+          className={`flex-1 flex flex-col ${
+            isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex-1 pt-16">
@@ -311,8 +304,9 @@ useEffect(() => {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-            }`}
+          className={`flex-1 flex flex-col ${
+            isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex-1 pt-16">
@@ -332,8 +326,9 @@ useEffect(() => {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-            }`}
+          className={`flex-1 flex flex-col ${
+            isSidebarOpen ? "lg:ml-64" : "ml-0"
+          }`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <div className="pt-20 px-2 sm:px-4 pb-6 max-w-[1400px] mx-auto">
@@ -353,8 +348,9 @@ useEffect(() => {
           onItemClick={handleSidebarClick}
         />
         <div
-          className={`flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-            } text-gray-900 dark:text-white`}
+          className={`flex flex-col ${
+            isSidebarOpen ? "lg:ml-64" : "ml-0"
+          } text-gray-900 dark:text-white`}
         >
           <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
           <main className="flex flex-grow">
@@ -374,19 +370,21 @@ useEffect(() => {
         onItemClick={handleSidebarClick}
       />
       <div
-        className={`flex-1 flex flex-col ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+        className={`flex-1 flex flex-col ${
+          isSidebarOpen ? "lg:ml-64" : "ml-0"
+        }`}
       >
         <Navbar onMenuClick={toggleSidebar} userName={currentUserName} />
         <div className="pt-20 px-2 sm:px-4 py-6 max-w-[1400px] mx-auto w-full">
           {/* Hero */}
-          <motion.section
+          {/* <motion.section
             className="hero-gradient rounded-2xl p-6 sm:p-6 mb-8"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 items-center">
+    
               <div>
                 <motion.h1
                   className="text-3xl sm:text-4xl font-bold mb-8 text-gray-800 dark:text-white"
@@ -409,17 +407,54 @@ useEffect(() => {
                   Discover talented students, schedule interviews, and build
                   your dream team with our comprehensive hiring platform.
                 </motion.p>
+              </div> */}
+          <motion.section
+            className="mb-8 p-0" 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-flow-col-dense gap-6 items-center">
+              {/* (Right Side) */}
+
+              <div className="mt-6 lg:mt-0 lg:order-2 flex justify-center lg:justify-end self-center">
+                <div className="overflow-hidden">
+                  <motion.img
+                    src={buisness} 
+                    alt="Business Meeting & Analytics"
+                    className="w-full max-w-xs sm:max-w-sm lg:max-w-[400px] object-cover rounded-xl"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                  />
+                </div>
               </div>
-              <div className="mt-6 lg:mt-0">
-                <motion.img
-                  src={boy}
-                  alt="Programmer"
-                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-[340px] mx-auto"
-                  style={{ borderRadius: "2rem" }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
+
+              {/* (Left Side) */}
+              
+              <div className="lg:col-span-2 lg:order-1 self-center">
+                <motion.h1
+                  className="text-3xl sm:text-4xl font-bold mb-8 text-gray-800 dark:text-white"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Welcome to{" "}
+                  <span className="bg-gradient-to-r from-[#01BDA5] via-[#43cea2] to-[#FF824C] bg-clip-text text-transparent font-extrabold">
+                    UptoSkill
+                  </span>{" "}
+                  Hiring Dashboard
+                </motion.h1>
+                <motion.p
+                  className="text-base sm:text-xl mb-4 text-gray-600 dark:text-gray-300"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Discover talented students, schedule interviews, and build
+                  your dream team with our comprehensive hiring platform.
+                </motion.p>
               </div>
             </div>
           </motion.section>
@@ -438,7 +473,6 @@ useEffect(() => {
               <StatCard
                 title="Total Students Available"
                 value={students.length}
-                subtitle="+12% from last month"
                 icon={Users}
                 color="primary"
                 delay={0.1}
@@ -446,7 +480,6 @@ useEffect(() => {
               <StatCard
                 title="Interviews Scheduled"
                 value={interviewCount}
-                subtitle="This week"
                 icon={CalIcon}
                 color="secondary"
                 delay={0.3}
@@ -454,7 +487,6 @@ useEffect(() => {
               <StatCard
                 title="Total Mentors"
                 value={totalMentors}
-                subtitle="Active mentors"
                 icon={UserCheck}
                 color="success"
                 delay={0.2}
@@ -462,7 +494,6 @@ useEffect(() => {
               <StatCard
                 title="Verified Skill Badges"
                 value={totalBadges}
-                subtitle="Across all students"
                 icon={Award}
                 color="warning"
                 delay={0.4}

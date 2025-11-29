@@ -91,7 +91,7 @@ export default function AboutCompanyPage() {
         </motion.div>
 
         {/* Distinct Contact Info Section */}
-        <section className="mt-12 text-center">
+         <section className="mt-12 mb-12 text-center">
           <p className="text-orange-500 text-3xl font-bold uppercase tracking-wide mb-3">
             Our Contacts
           </p>
@@ -105,12 +105,13 @@ export default function AboutCompanyPage() {
             Reach out to us anytime — our team is happy to assist you with inquiries, collaborations, or support.
           </p>
 
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-5xl mx-auto">
+          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-5xl mx-auto">
+     
             {/* Phone Section */}
             <a href="tel:+919319772294">
               <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-transform">
-                <FaPhone className="text-[#F97316] mx-auto mb-5" size={50} />
-                <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">
+                <FaPhone className="text-[#F97316] mx-auto mb-4" size={40} />
+                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">
                   Phone Us 24/7
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -126,8 +127,8 @@ export default function AboutCompanyPage() {
               rel="noopener noreferrer"
             >
               <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-transform">
-                <FaEnvelope className="text-[#F97316] mx-auto mb-5" size={50} />
-                <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">
+                <FaEnvelope className="text-[#F97316] mx-auto mb-4" size={40} />
+                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">
                   Mail Us 24/7
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">

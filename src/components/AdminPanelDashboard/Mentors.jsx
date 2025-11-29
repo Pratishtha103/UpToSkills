@@ -142,6 +142,20 @@ export default function Mentors({ isDarkMode }) {
       const token = localStorage.getItem('token');
       await axios.delete(`${API_BASE}/api/mentors/${id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       setMentors((prev) => prev.filter((m) => m.id !== id));
+      // Notify admins about mentor deletion
+      try {
+        const mentorName = mentors.find(m => m.id === id)?.full_name || `ID ${id}`;
+        await axios.post(`${API_BASE}/api/notifications`, {
+          role: 'admin',
+          type: 'deletion',
+          title: 'Mentor deleted',
+          message: `${mentorName} was deleted (id: ${id}).`,
+          metadata: { entity: 'mentor', id }
+        });
+      } catch (notifErr) {
+        // best-effort: log and continue
+        console.error('Failed to create mentor deletion notification', notifErr);
+      }
     } catch (err) {
       console.error("Failed to delete mentor", err);
       alert("Failed to delete mentor");

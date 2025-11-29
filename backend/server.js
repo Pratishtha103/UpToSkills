@@ -106,7 +106,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.post('/api/forgot-password', async (req, res) => {
-    console.log('🔑 Forgot password route hit:', req.body);
+    console.log('🔑 Forgot password route hit');
     
     try {
         const { email, password } = req.body;
@@ -122,7 +122,6 @@ app.post('/api/forgot-password', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // ✅ UPDATE STUDENTS TABLE (your main account)
         const updateQuery = `
             UPDATE students 
             SET password = $1, updated_at = NOW() 
@@ -139,19 +138,20 @@ app.post('/api/forgot-password', async (req, res) => {
             });
         }
 
-        console.log('✅ Student password updated successfully for:', email);
+        console.log('✅ Password reset successful');
         res.status(200).json({
             success: true,
-            message: 'Password reset successfully for student account'
+            message: 'Password reset successfully'
         });
     } catch (error) {
-        console.error('❌ Forgot password error:', error);
+        console.error('❌ Forgot password error:', error.message);
         res.status(500).json({
             success: false,
             message: 'Server error'
         });
     }
 });
+
 
 // Mount routes in proper order (AFTER forgot-password route)
 app.use('/api/auth', authRoutes);

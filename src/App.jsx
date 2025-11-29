@@ -11,7 +11,7 @@ import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
 import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';
-import MyPrograms from './components/Student_Dashboard/myPrograms/MyPrograms';
+import MyPrograms from './components/Student_Dashboard/dashboard/MyPrograms';
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';
@@ -27,7 +27,7 @@ import Chatbot from './components/Contact_Page/Chatbot';
 import CompanyProfilePage from './components/Company_Dashboard/companyProfilePage';
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
-
+import ForgotPassword from './pages/ForgotPassword';
 // About Page components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
@@ -71,6 +71,7 @@ function App() {
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegistrationForm />} />
+          <Route path="/login/forgot-password" element={<ForgotPassword/>}/>
           <Route path="/contact" element={<ContactPage />} />
 
           {/* PROGRAM ROUTES */}

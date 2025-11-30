@@ -6,7 +6,7 @@ const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-const verifyToken= require('../middleware/auth');
+const verifyToken = require('../middleware/auth');
 const { ensureWelcomeNotification, pushNotification, notifyAdmins } = require('../utils/notificationService');
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -18,21 +18,24 @@ const validateRole = (role) => {
   return roles.includes(role.toLowerCase());
 };
 
-const formatRoleLabel = (role = '') => role.charAt(0).toUpperCase() + role.slice(1);
+const formatRoleLabel = (role = '') =>
+  role.charAt(0).toUpperCase() + role.slice(1);
 
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
   try {
     const { name, email, phone, password, role, username } = req.body;
 
-    if (!name || !email || !phone || !password || !role || !username)
+    if (!name || !email || !phone || !password || !role || !username) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
 
     if (!validateEmail(email))
       return res.status(400).json({ success: false, message: 'Invalid email format' });
 
     if (!validateRole(role))
       return res.status(400).json({ success: false, message: 'Invalid role' });
+
     const normalizedRole = role.toLowerCase();
 
     if (normalizedRole === 'admin') {
@@ -40,11 +43,12 @@ router.post('/register', async (req, res) => {
     }
 
     // Choose table
-    let tableName = normalizedRole === "company"
-      ? "companies"
-      : normalizedRole === "mentor"
-        ? "mentors"
-        : "students";
+    let tableName =
+      normalizedRole === "company"
+        ? "companies"
+        : normalizedRole === "mentor"
+          ? "mentors"
+          : "students";
 
     // Check existing email
     const existingEmail = await pool.query(
@@ -67,12 +71,14 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let insertQuery, values;
+
     if (normalizedRole === 'company') {
       insertQuery = `
         INSERT INTO companies (company_name, email, phone, password, username)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id, company_name AS name, email, username`;
       values = [name, email, phone, hashedPassword, username];
+
     } else if (normalizedRole === 'mentor') {
       insertQuery = `
         INSERT INTO mentors (full_name, email, phone, password, username)
@@ -92,6 +98,7 @@ router.post('/register', async (req, res) => {
     const result = await pool.query(insertQuery, values);
     const newUser = { ...result.rows[0], role: normalizedRole };
 
+    // Welcome Notification
     try {
       await pushNotification({
         role: normalizedRole,
@@ -111,6 +118,7 @@ router.post('/register', async (req, res) => {
       console.error('Welcome notification error:', welcomeError);
     }
 
+    // Notify Admins
     try {
       await notifyAdmins({
         title: `New ${formatRoleLabel(normalizedRole)} registered`,
@@ -136,11 +144,12 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     console.error('Registration error:', error);
 
-    if (error.code === '23505')
+    if (error.code === '23505') {
       return res.status(400).json({
         success: false,
         message: 'Email or username already exists'
       });
+    }
 
     res.status(500).json({ success: false, message: 'Server error during registration' });
   }
@@ -150,9 +159,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password, role } = req.body;
-    const identifier = email; // email or username
 
-    if (!identifier || !password || !role)
+    if (!email || !password || !role)
       return res.status(400).json({
         success: false,
         message: 'Email/Username, password and role are required'
@@ -178,16 +186,38 @@ router.post('/login', async (req, res) => {
            WHERE LOWER(email) = LOWER($1)
            OR LOWER(username) = LOWER($1)`;
 
-    const userResult = await pool.query(loginQuery, [identifier]);
+    const userResult = await pool.query(loginQuery, [email]);
 
     if (userResult.rows.length === 0)
-      return res
-        .status(400)
-        .json({ success: false, message: "Incorrect email/username or password" });
+      return res.status(400).json({ success: false, message: "Incorrect email/username or password" });
 
     const user = userResult.rows[0];
 
+    // CHECK PASSWORD
     const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect email/username or password"
+      });
+
+    // DETECT REAL ROLE
+    const realRole =
+      tableName === "students"
+        ? "student"
+        : tableName === "mentors"
+          ? "mentor"
+          : tableName === "companies"
+            ? "company"
+            : "admin";
+
+    // BLOCK ROLE MISMATCH
+    if (realRole !== normalizedRole) {
+      return res.status(401).json({
+        success: false,
+        message: "Incorrect role selected. You cannot log in as this role."
+      });
+    }
 
     const displayName =
       user.full_name ||
@@ -196,7 +226,7 @@ router.post('/login', async (req, res) => {
       (normalizedRole === 'admin' ? 'Admin' : null) ||
       user.email;
 
-    // Build JWT payload (IMPORTANT: nested under `user`)
+    // Build JWT
     const payload = {
       user: {
         id: user.id,
@@ -210,13 +240,15 @@ router.post('/login', async (req, res) => {
 
     const ioInstance = req.app.get('io');
 
+    // Send Welcome Notification
     await ensureWelcomeNotification({
       role: normalizedRole,
       recipientId: user.id,
-      name: user.full_name || user.company_name,
+      name: displayName,
       io: ioInstance,
     });
 
+    // Login Notification
     try {
       const timestamp = new Date();
       const friendlyTime = timestamp.toLocaleString('en-US', {
@@ -242,10 +274,11 @@ router.post('/login', async (req, res) => {
       console.error('Login notification error:', notificationError);
     }
 
+    // Admin Notification
     try {
       await notifyAdmins({
         title: `${formatRoleLabel(normalizedRole)} signed in`,
-        message: `${displayName || 'A user'} logged in at ${new Date().toLocaleTimeString('en-US')}.`,
+        message: `${displayName} logged in at ${new Date().toLocaleTimeString('en-US')}.`,
         type: 'user_login',
         metadata: {
           role: normalizedRole,
@@ -266,7 +299,7 @@ router.post('/login', async (req, res) => {
         id: user.id,
         name: displayName,
         email: user.email,
-        role: role.toLowerCase()
+        role: normalizedRole
       }
     });
 

@@ -181,9 +181,9 @@ const LoginForm = () => {
               autoClose={2500}
               hideProgressBar={false}
               pauseOnHover
+              style={{ marginTop: '20px',right:'250px', zIndex: 9999 }}
               closeOnClick
-              newestOnTop
-              style={{ top: '-40px', right: '110px', position: 'absolute', marginRight: '0', zIndex: 9999 }}
+             
             />
 
             <div className="text-center w-full">

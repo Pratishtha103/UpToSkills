@@ -186,6 +186,7 @@ export default function InterviewGallery() {
   };
 
   return (
+    <>
     <div className="min-h-screen dark:bg-gray-900">
       <div className="pt-20 px-4 max-w-[1200px] mx-auto">
         <h1 className="text-2xl font-bold mb-4">Upcoming Interviews ({interviews.length})</h1>
@@ -279,5 +280,11 @@ export default function InterviewGallery() {
         </Dialog>
       </div>
     </div>
+     {/* <footer
+    className="w-full  bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+  >
+    <p>© 2025 Uptoskills. Built by learners.</p>
+  </footer> */}
+    </>
   );
 }

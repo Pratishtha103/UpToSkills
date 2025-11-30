@@ -470,9 +470,6 @@ export default function AboutUs() {
             </section>
           </div>
         </main>
-
-        {/* Footer */}
-        <Footer />
       </div>
     </div>
   );

@@ -122,7 +122,12 @@ export default function Mentors({ isDarkMode }) {
       const res = await axios.get(`${API_BASE}/api/mentors`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      setMentors(res.data || []);
+      // API may return { success, data } or an array directly
+      const payload = res.data;
+      if (Array.isArray(payload)) setMentors(payload);
+      else if (payload && Array.isArray(payload.data)) setMentors(payload.data);
+      else if (payload && Array.isArray(payload.mentors)) setMentors(payload.mentors);
+      else setMentors([]);
     } catch (err) {
       console.error("Failed to load mentors", err);
       setError("Unable to load mentors");
@@ -167,7 +172,8 @@ export default function Mentors({ isDarkMode }) {
     else document.documentElement.classList.remove("dark");
   }, [isDarkMode]);
 
-  const filteredMentors = mentors.filter((m) => {
+  const safeMentors = Array.isArray(mentors) ? mentors : [];
+  const filteredMentors = safeMentors.filter((m) => {
     const nameMatch = m.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const expertiseMatch = m.expertise_domains
       ?.join(", ")

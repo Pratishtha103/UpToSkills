@@ -2,30 +2,25 @@ import React, { useState, useEffect } from "react";
 import { FolderOpen, User, Users, Plus, Trash2, Award, Search, Loader2 } from "lucide-react";
 
 export default function Project({ isDarkMode }) {
-  const [projects, setProjects] = useState([]);          // DB Projects
-  const [newProjects, setNewProjects] = useState([]);     // Newly added local projects
+  const [projects, setProjects] = useState([]);          
+  const [newProjects, setNewProjects] = useState([]);     
   const [loading, setLoading] = useState(true);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectMentor, setNewProjectMentor] = useState("");
   const [newProjectStudents, setNewProjectStudents] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
     isDarkMode ? root.classList.add("dark") : root.classList.remove("dark");
   }, [isDarkMode]);
 
+  // Load projects from backend
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        let url = "http://localhost:5000/api/mentor_projects";
-        if (searchTerm.trim()) {
-          url = `http://localhost:5000/api/mentor_projects/search/${encodeURIComponent(searchTerm.trim())}`;
-          setSearching(true);
-        }
-        const res = await fetch(url);
+        const res = await fetch("http://localhost:5000/api/mentor_projects");
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -39,19 +34,23 @@ export default function Project({ isDarkMode }) {
         setProjects([]);
       } finally {
         setLoading(false);
-        setSearching(false);
       }
     };
 
-    const debounceTimeout = setTimeout(fetchProjects, 500);
-    return () => clearTimeout(debounceTimeout);
-  }, [searchTerm]);
+    fetchProjects();
+  }, []);
+
+  // ⭐ LOCAL SEARCH FILTER
+  const filteredProjects = projects.filter((proj) =>
+    proj.project_title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const addProject = async () => {
     if (!newProjectTitle || !newProjectMentor || !newProjectStudents) {
       alert("Please fill out all fields before adding a project.");
       return;
     }
+
     try {
       const res = await fetch("http://localhost:5000/api/mentor_projects", {
         method: "POST",
@@ -64,6 +63,7 @@ export default function Project({ isDarkMode }) {
       });
 
       const data = await res.json();
+
       if (data.success) {
         const newProj = data.project;
         setProjects((prev) => [...prev, newProj]);
@@ -83,9 +83,14 @@ export default function Project({ isDarkMode }) {
 
   const removeProject = async (id) => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
+
     try {
-      const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, { method: "DELETE" });
+      const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, {
+        method: "DELETE",
+      });
+
       const data = await res.json();
+
       if (data.success) {
         setProjects((prev) => prev.filter((p) => p.id !== id));
         setNewProjects((prev) => prev.filter((p) => p.id !== id));
@@ -96,19 +101,6 @@ export default function Project({ isDarkMode }) {
       console.error(err);
       alert("Error deleting project");
     }
-  };
-
-  const handleAddStudent = (id) => {
-    setProjects((prev) =>
-      prev.map((project) =>
-        project.id === id ? { ...project, total_students: project.total_students + 1 } : project
-      )
-    );
-    setNewProjects((prev) =>
-      prev.map((project) =>
-        project.id === id ? { ...project, total_students: project.total_students + 1 } : project
-      )
-    );
   };
 
   return (
@@ -140,42 +132,35 @@ export default function Project({ isDarkMode }) {
             }`}
             autoFocus
           />
-          {searching && (
-            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 animate-spin" />
-          )}
         </div>
       </div>
 
       {/* ALL PROJECTS SECTION */}
-      <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-          <FolderOpen className="w-6 h-6 text-indigo-500" />
-          All Projects
-        </h2>
-      </div>
+      <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+        <FolderOpen className="w-6 h-6 text-indigo-500" /> All Projects
+      </h2>
 
       {/* Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading
-          ? Array.from({ length: 6 }).map((_, idx) => (
-              <div key={idx} className={`p-6 rounded-lg animate-pulse ${isDarkMode ? "bg-gray-800" : "bg-white"}`} />
-            ))
-          : projects.length > 0 ? (
-              projects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  isDarkMode={isDarkMode}
-                  removeProject={removeProject}
-                  handleAddStudent={handleAddStudent}
-                />
-              ))
-            ) : (
-              <p>No projects found.</p>
-            )}
+        {loading ? (
+          Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className={`p-6 rounded-lg animate-pulse ${isDarkMode ? "bg-gray-800" : "bg-white"}`} />
+          ))
+        ) : filteredProjects.length > 0 ? (
+          filteredProjects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              isDarkMode={isDarkMode}
+              removeProject={removeProject}
+            />
+          ))
+        ) : (
+          <p>No projects found.</p>
+        )}
       </div>
 
-      {/* ADD NEW PROJECT FORM */}
+      {/* ADD NEW PROJECT
       <div
         className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
           isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
@@ -189,24 +174,18 @@ export default function Project({ isDarkMode }) {
             placeholder="Project Title"
             value={newProjectTitle}
             onChange={(e) => setNewProjectTitle(e.target.value)}
-          className={`rounded-md p-2 border w-full transition-colors duration-300 ${
-  isDarkMode
-    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
-    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-}`}
-
+            className={`rounded-md p-2 border w-full ${
+              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
+            }`}
           />
           <input
             type="text"
             placeholder="Mentor Name"
             value={newProjectMentor}
             onChange={(e) => setNewProjectMentor(e.target.value)}
-            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
-  isDarkMode
-    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
-    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-}`}
-
+            className={`rounded-md p-2 border w-full ${
+              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
+            }`}
           />
           <input
             type="number"
@@ -214,20 +193,10 @@ export default function Project({ isDarkMode }) {
             value={newProjectStudents}
             min="1"
             max="20"
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              if (value >= 1 && value <= 20) {
-                setNewProjectStudents(value);
-              } else if (e.target.value === "") {
-                setNewProjectStudents("");
-              }
-            }}
-            className={`rounded-md p-2 border w-full transition-colors duration-300 ${
-  isDarkMode
-    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-300"
-    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-}`}
-
+            onChange={(e) => setNewProjectStudents(e.target.value)}
+            className={`rounded-md p-2 border w-full ${
+              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
+            }`}
           />
         </div>
 
@@ -237,14 +206,12 @@ export default function Project({ isDarkMode }) {
         >
           <Plus className="w-4 h-4" /> Add Project
         </button>
-      </div>
+      </div> */}
 
-      {/* NEWLY ADDED PROJECTS SECTION */}
+      {/* NEW PROJECTS SECTION */}
       {newProjects.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2 mb-3">
-             New Projects
-          </h2>
+          <h2 className="text-2xl font-bold mb-3">New Projects</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newProjects.map((project) => (
@@ -253,7 +220,6 @@ export default function Project({ isDarkMode }) {
                 project={project}
                 isDarkMode={isDarkMode}
                 removeProject={removeProject}
-                handleAddStudent={handleAddStudent}
               />
             ))}
           </div>
@@ -263,8 +229,7 @@ export default function Project({ isDarkMode }) {
   );
 }
 
-/* Card Component */
-function ProjectCard({ project, removeProject, handleAddStudent, isDarkMode }) {
+function ProjectCard({ project, removeProject, isDarkMode }) {
   return (
     <div
       className={`p-6 rounded-lg shadow-md transition-colors duration-300 ${
@@ -272,7 +237,7 @@ function ProjectCard({ project, removeProject, handleAddStudent, isDarkMode }) {
       }`}
     >
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 rounded-2xl flex-shrink-0 bg-gradient-to-r from-blue-500 to-indigo-600">
+        <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600">
           <FolderOpen className="w-6 h-6 text-white" />
         </div>
         <h3 className="text-lg font-bold break-words">{project.project_title}</h3>
@@ -287,20 +252,12 @@ function ProjectCard({ project, removeProject, handleAddStudent, isDarkMode }) {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => removeProject(project.id)}
-          className="flex-1 flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
-        >
-          <Trash2 className="w-4 h-4" /> Delete
-        </button>
-        {/* <button
-          onClick={() => handleAddStudent(project.id)}
-          className="flex-1 flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-white"
-        >
-          <Award className="w-4 h-4" /> Add Student
-        </button> */}
-      </div>
+      <button
+        onClick={() => removeProject(project.id)}
+        className="w-full flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
+      >
+        <Trash2 className="w-4 h-4" /> Delete
+      </button>
     </div>
   );
 }

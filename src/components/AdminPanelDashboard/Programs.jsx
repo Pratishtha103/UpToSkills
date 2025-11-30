@@ -128,8 +128,13 @@ export default function Programs({ onCoursesUpdate }) {
   const removeCourse = async (id) => {
     if (!window.confirm("Are you sure you want to delete this course?")) return;
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`http://localhost:5000/api/courses/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       });
       const data = await res.json();
       if (data.success) {
@@ -137,13 +142,17 @@ export default function Programs({ onCoursesUpdate }) {
         onCoursesUpdate && onCoursesUpdate(courses.filter((c) => c.id !== id));
         // Notify admins about course deletion (best-effort)
         try {
-          await axios.post("http://localhost:5000/api/notifications", {
-            role: "admin",
-            type: "deletion",
-            title: "Program deleted",
-            message: `Program with id ${id} was deleted.`,
-            metadata: { entity: "program", id },
-          });
+          await axios.post(
+            "http://localhost:5000/api/notifications",
+            {
+              role: "admin",
+              type: "deletion",
+              title: "Program deleted",
+              message: `Program with id ${id} was deleted.`,
+              metadata: { entity: "program", id },
+            },
+            { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } }
+          );
         } catch (notifErr) {
           console.error("Failed to create program deletion notification:", notifErr);
         }

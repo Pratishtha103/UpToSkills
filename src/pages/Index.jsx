@@ -115,9 +115,12 @@ export default function Index() {
         const API_BASE =
           process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+        const token = localStorage.getItem('token');
+        const headers = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
         const [studentsRes, mentorRes] = await Promise.all([
-          axios.get(`${API_BASE}/api/students`),
-          axios.get(`${API_BASE}/api/mentors/count`),
+          axios.get(`${API_BASE}/api/students`, headers),
+          axios.get(`${API_BASE}/api/mentors/count`, headers),
         ]);
 
         const rows = Array.isArray(studentsRes.data.data)

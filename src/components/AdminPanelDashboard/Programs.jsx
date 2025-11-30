@@ -72,9 +72,22 @@ export default function Programs({ onCoursesUpdate }) {
       setPreview(null);
 
       // Update courses list in this component
-      setCourses((prev) => [res.data, ...prev]);
+      const added = res.data?.course || res.data;
+      setCourses((prev) => [added, ...prev]);
       // Notify parent about the updated courses list
       onCoursesUpdate && onCoursesUpdate(res.data);
+      // Create a notification for admins about the new program (best-effort)
+      try {
+        await axios.post("http://localhost:5000/api/notifications", {
+          role: "admin",
+          type: "creation",
+          title: "Program added",
+          message: `${added.title || formData.title} was added.`,
+          metadata: { entity: "program", id: added.id || null },
+        });
+      } catch (notifErr) {
+        console.error("Failed to create program notification:", notifErr);
+      }
     } catch (error) {
       console.error("Error adding course:", error);
       setMessage("❌ Failed to add course. Please try again.");
@@ -122,6 +135,18 @@ export default function Programs({ onCoursesUpdate }) {
       if (data.success) {
         setCourses((prev) => prev.filter((c) => c.id !== id));
         onCoursesUpdate && onCoursesUpdate(courses.filter((c) => c.id !== id));
+        // Notify admins about course deletion (best-effort)
+        try {
+          await axios.post("http://localhost:5000/api/notifications", {
+            role: "admin",
+            type: "deletion",
+            title: "Program deleted",
+            message: `Program with id ${id} was deleted.`,
+            metadata: { entity: "program", id },
+          });
+        } catch (notifErr) {
+          console.error("Failed to create program deletion notification:", notifErr);
+        }
       } else {
         alert(data.message || "Failed to delete course");
       }

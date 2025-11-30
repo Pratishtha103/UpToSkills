@@ -198,8 +198,20 @@ export default function StudentCard({
         if (match && !cancelled) {
           const status = (match.status || match.state || "Scheduled").toString().toLowerCase();
           if (status !== "completed" && status !== "cancelled") {
-            setInterviewScheduled(true);
-            setStudent((s) => ({ ...s, interviewScheduled: true, interviewDate: match.date, interviewTime: match.time }));
+            // Only update state if it would actually change to avoid update loops
+            setInterviewScheduled((prev) => {
+              if (prev) return prev;
+              return true;
+            });
+
+            setStudent((s) => {
+              if (!s) return s;
+              const alreadyScheduled = Boolean(s.interviewScheduled || s.interviewDate || s.interviewTime);
+              const sameDate = String(s.interviewDate) === String(match.date);
+              const sameTime = String(s.interviewTime) === String(match.time);
+              if (alreadyScheduled && sameDate && sameTime) return s;
+              return { ...s, interviewScheduled: true, interviewDate: match.date, interviewTime: match.time };
+            });
           }
         }
       } catch (err) { /* ignore */ }

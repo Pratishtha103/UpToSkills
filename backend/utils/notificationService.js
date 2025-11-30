@@ -36,7 +36,6 @@ async function pushNotification({
   if (!role || !title || !message) {
     throw new Error("role, title and message are required to push a notification");
   }
-
   const { rows } = await pool.query(INSERT_NOTIFICATION, [
     role,
     recipientRole || role,

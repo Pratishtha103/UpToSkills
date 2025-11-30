@@ -3,7 +3,12 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import loginImage from "../assets/loginnew2.jpg";
+<<<<<<< HEAD
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+=======
 import { ToastContainer, toast } from 'react-toastify';
+>>>>>>> 5b1064be5ed2652d69c17ba99ea7c65141da9fed
 import 'react-toastify/dist/ReactToastify.css';
 
 

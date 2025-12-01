@@ -117,6 +117,7 @@ const coursesRoutes = require('./routes/courses.route');
 const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
 
+
 // ✅ MIDDLEWARE SETUP FIRST (CRITICAL for req.body to work)
 app.use(cors({
     origin: ALLOWED_ORIGINS,
@@ -199,6 +200,9 @@ app.use("/api/enrollments", require("./routes/enrollments"));
 app.use('/api/companies', companiesRouter);
 app.use('/api/searchcompanies', searchCompaniesRouter);
 app.use('/api/searchproject', searchProjectRoutes);
+// Add this line with other routes (around line 20-30)
+app.use('/api/student-projects', require('./routes/studentProjects'));
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {

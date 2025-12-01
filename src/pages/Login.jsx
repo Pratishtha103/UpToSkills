@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import loginImage from "../assets/loginnew.jpg";
+import loginImage from "../assets/loginnew.jpg";  
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -80,17 +80,20 @@ const LoginForm = () => {
 
       const role = response.data.user?.role || formData.role;
 
-      if (role === "mentor") localStorage.setItem("mentor", JSON.stringify(response.data.user));
-      if (role === "admin") localStorage.setItem("admin", JSON.stringify(response.data.user));
+      if (role === "mentor")
+        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+
+      if (role === "admin")
+        localStorage.setItem("admin", JSON.stringify(response.data.user));
 
       setTimeout(() => {
         if (role === "admin") navigate("/adminPanel");
-        else if (role === "student" || role === "learner") navigate("/dashboard");
+        else if (role === "student" || role === "learner")
+          navigate("/dashboard");
         else if (role === "mentor") navigate("/mentor-dashboard");
         else if (role === "company") navigate("/company");
         else navigate("/login");
       }, 5000);
-
     } catch (err) {
       if (isHardcodedAdmin) {
         fallbackAdminLogin();
@@ -110,17 +113,16 @@ const LoginForm = () => {
       <div
         className="shadow-lg bg-white overflow-hidden flex"
         style={{ width: "1237px", height: "651px", borderRadius: "12px" }}
-
       >
-        {/* LEFT IMAGE */}
-       <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
-  <img
-    src={loginImage}
-    className="w-full h-full object-cover object-center"
-    alt="Login Visual"
-  />
-</div>
 
+        {/* LEFT IMAGE */}
+        <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
+          <img
+            src={loginImage}
+            className="w-full h-full object-cover object-center"
+            alt="Login Visual"
+          />
+        </div>
 
         {/* RIGHT FORM */}
         <div className="w-1/2 h-full flex items-center justify-center">
@@ -137,14 +139,19 @@ const LoginForm = () => {
 
             <div className="text-center w-full">
               <h1 className="text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
+                <span className="text-[#00BDA6] capitalize">
+                  {formData.role}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
               <p className="text-[16px] text-gray-500">Enter your details</p>
             </div>
 
             <div className="w-full flex-1 mt-8">
-              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
+              <form
+                className="mx-auto max-w-xs flex flex-col gap-4"
+                onSubmit={handleSubmit}
+              >
 
                 <select
                   name="role"
@@ -220,6 +227,7 @@ const LoginForm = () => {
 
           </div>
         </div>
+
       </div>
     </div>
   );

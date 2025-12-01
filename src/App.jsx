@@ -90,7 +90,7 @@ function App() {
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
-           <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
+          <Route path="/login/forgot-password" element={<ForgotPassword />} />
 
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -102,11 +102,11 @@ function App() {
           <Route path="/dashboard/my-programs" element={<ProtectedRoute><MyPrograms /></ProtectedRoute>} />
           <Route path="/dashboard/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/dashboard/aboutus" element={<ProtectedRoute><AboutUs /></ProtectedRoute>} />
-{/* ===== Add Project (Project Submission Form) ===== */}
-<Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
+          {/* ===== Add Project (Project Submission Form) ===== */}
+          <Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
 
-{/* ===== My Projects (Student’s submitted projects) ===== */}
-<Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
+          {/* ===== My Projects (Student’s submitted projects) ===== */}
+          <Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
 
 
 
@@ -120,10 +120,18 @@ function App() {
           <Route path="/company/*" element={<ProtectedRoute><CompanyNotFound /></ProtectedRoute>} />
 
           {/* ===== Misc Routes ===== */}
-          
-           <Route path="/dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view = "student" /></ProtectedRoute>} />
-          <Route path="/mentor-dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view = "mentor" /></ProtectedRoute>} />
-          <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} />
+
+          <Route path="/dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="student" /></ProtectedRoute>} />
+          <Route path="/mentor-dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="mentor" /></ProtectedRoute>} />
+          {/* <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} /> */}
+          <Route path="/mentor-dashboard/*" element={
+            <ProtectedRoute allowedRoles={["mentor"]}>
+              <MentorDashboardRoutes
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+              />
+            </ProtectedRoute>
+          } />
           <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
@@ -214,4 +222,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

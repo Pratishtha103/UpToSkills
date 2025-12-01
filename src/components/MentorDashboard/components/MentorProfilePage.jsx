@@ -3,7 +3,7 @@ import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
-const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ const MentorProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
       {/* Main Content */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? "" : "ml-20"}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
         <main className="flex-1 overflow-y-auto px-8 py-6">
           <div className="max-w-6xl mx-auto">

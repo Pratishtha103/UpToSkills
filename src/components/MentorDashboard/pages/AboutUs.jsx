@@ -140,7 +140,7 @@ export default function AboutUs() {
         rel="noopener noreferrer"
         
         >
-          <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition h-full">
             <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
             <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
             <p className="text-gray-600">info@uptoskills.com</p>

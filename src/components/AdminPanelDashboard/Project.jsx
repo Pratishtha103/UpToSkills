@@ -2,13 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FolderOpen, User, Users, Plus, Trash2, Award, Search, Loader2 } from "lucide-react";
 
 export default function Project({ isDarkMode }) {
-<<<<<<< HEAD
-  const [projects, setProjects] = useState([]);          
-  const [newProjects, setNewProjects] = useState([]);     
-=======
   const [projects, setProjects] = useState([]);
   const [newProjects, setNewProjects] = useState([]);
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
   const [loading, setLoading] = useState(true);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectMentor, setNewProjectMentor] = useState("");
@@ -25,16 +20,12 @@ export default function Project({ isDarkMode }) {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-<<<<<<< HEAD
-        const res = await fetch("http://localhost:5000/api/mentor_projects");
-=======
         let url = "http://localhost:5000/api/student-projects";
         if (searchTerm.trim()) {
           url = `http://localhost:5000/api/student-projects?search=${encodeURIComponent(searchTerm.trim())}`;
           setSearching(true);
         }
         const res = await fetch(url);
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -132,14 +123,7 @@ export default function Project({ isDarkMode }) {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
-<<<<<<< HEAD
-      const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, {
-        method: "DELETE",
-      });
-
-=======
       const res = await fetch(`http://localhost:5000/api/student-projects/${id}`, { method: "DELETE" });
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
       const data = await res.json();
 
       if (data.success) {
@@ -189,8 +173,6 @@ export default function Project({ isDarkMode }) {
     }
   };
 
-<<<<<<< HEAD
-=======
   const handleAddStudent = (id) => {
     setProjects((prev) =>
       prev.map((project) =>
@@ -204,7 +186,6 @@ export default function Project({ isDarkMode }) {
     );
   };
 
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
   return (
     <main
       className={`p-4 sm:p-6 flex flex-col gap-6 transition-colors duration-300 ${
@@ -262,67 +243,12 @@ export default function Project({ isDarkMode }) {
         )}
       </div>
 
-<<<<<<< HEAD
-      {/* ADD NEW PROJECT
-      <div
-        className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
-          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
-        }`}
-      >
-        <h3 className="text-xl font-bold mb-4">Add New Project</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Project Title"
-            value={newProjectTitle}
-            onChange={(e) => setNewProjectTitle(e.target.value)}
-            className={`rounded-md p-2 border w-full ${
-              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
-            }`}
-          />
-          <input
-            type="text"
-            placeholder="Mentor Name"
-            value={newProjectMentor}
-            onChange={(e) => setNewProjectMentor(e.target.value)}
-            className={`rounded-md p-2 border w-full ${
-              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
-            }`}
-          />
-          <input
-            type="number"
-            placeholder="Students"
-            value={newProjectStudents}
-            min="1"
-            max="20"
-            onChange={(e) => setNewProjectStudents(e.target.value)}
-            className={`rounded-md p-2 border w-full ${
-              isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"
-            }`}
-          />
-        </div>
-
-        <button
-          onClick={addProject}
-          className="flex items-center gap-2 rounded-md px-4 py-2 font-medium bg-indigo-600 hover:bg-indigo-500 text-white"
-        >
-          <Plus className="w-4 h-4" /> Add Project
-        </button>
-      </div> */}
-
-      {/* NEW PROJECTS SECTION */}
-      {newProjects.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-3">New Projects</h2>
-=======
       {/* NEWLY ADDED PROJECTS SECTION */}
       {newProjects.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-bold flex items-center gap-2 mb-3">
             New Projects
           </h2>
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newProjects.map((project) => (
@@ -366,14 +292,6 @@ function ProjectCard({ project, removeProject, isDarkMode }) {
         )}
       </div>
 
-<<<<<<< HEAD
-      <button
-        onClick={() => removeProject(project.id)}
-        className="w-full flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
-      >
-        <Trash2 className="w-4 h-4" /> Delete
-      </button>
-=======
       <div className="flex gap-2">
         <button
           onClick={() => removeProject(project.id)}
@@ -382,7 +300,6 @@ function ProjectCard({ project, removeProject, isDarkMode }) {
           <Trash2 className="w-4 h-4" /> Delete
         </button>
       </div>
->>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
     </div>
   );
 }

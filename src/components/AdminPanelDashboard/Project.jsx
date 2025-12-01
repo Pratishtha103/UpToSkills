@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { FolderOpen, User, Users, Plus, Trash2, Award, Search, Loader2 } from "lucide-react";
 
 export default function Project({ isDarkMode }) {
+<<<<<<< HEAD
   const [projects, setProjects] = useState([]);          
   const [newProjects, setNewProjects] = useState([]);     
+=======
+  const [projects, setProjects] = useState([]);
+  const [newProjects, setNewProjects] = useState([]);
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
   const [loading, setLoading] = useState(true);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectMentor, setNewProjectMentor] = useState("");
@@ -20,7 +25,16 @@ export default function Project({ isDarkMode }) {
     const fetchProjects = async () => {
       try {
         setLoading(true);
+<<<<<<< HEAD
         const res = await fetch("http://localhost:5000/api/mentor_projects");
+=======
+        let url = "http://localhost:5000/api/student-projects";
+        if (searchTerm.trim()) {
+          url = `http://localhost:5000/api/student-projects?search=${encodeURIComponent(searchTerm.trim())}`;
+          setSearching(true);
+        }
+        const res = await fetch(url);
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -118,10 +132,14 @@ export default function Project({ isDarkMode }) {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
+<<<<<<< HEAD
       const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, {
         method: "DELETE",
       });
 
+=======
+      const res = await fetch(`http://localhost:5000/api/student-projects/${id}`, { method: "DELETE" });
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
       const data = await res.json();
 
       if (data.success) {
@@ -171,6 +189,22 @@ export default function Project({ isDarkMode }) {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleAddStudent = (id) => {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === id ? { ...project, total_students: (project.total_students || 0) + 1 } : project
+      )
+    );
+    setNewProjects((prev) =>
+      prev.map((project) =>
+        project.id === id ? { ...project, total_students: (project.total_students || 0) + 1 } : project
+      )
+    );
+  };
+
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
   return (
     <main
       className={`p-4 sm:p-6 flex flex-col gap-6 transition-colors duration-300 ${
@@ -192,7 +226,7 @@ export default function Project({ isDarkMode }) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search projects..."
+            placeholder="Search projects or students..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${
@@ -228,6 +262,7 @@ export default function Project({ isDarkMode }) {
         )}
       </div>
 
+<<<<<<< HEAD
       {/* ADD NEW PROJECT
       <div
         className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
@@ -280,6 +315,14 @@ export default function Project({ isDarkMode }) {
       {newProjects.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-bold mb-3">New Projects</h2>
+=======
+      {/* NEWLY ADDED PROJECTS SECTION */}
+      {newProjects.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold flex items-center gap-2 mb-3">
+            New Projects
+          </h2>
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newProjects.map((project) => (
@@ -308,24 +351,38 @@ function ProjectCard({ project, removeProject, isDarkMode }) {
         <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600">
           <FolderOpen className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-lg font-bold break-words">{project.project_title}</h3>
+        <h3 className="text-lg font-bold break-words">{project.project_title || project.title}</h3>
       </div>
 
       <div className="text-sm mb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <User className="w-4 h-4" /> Mentor: {project.mentor_name}
+          <User className="w-4 h-4" /> 
+          Student: {project.student_name}
         </div>
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4" /> {project.total_students} Students
-        </div>
+        {project.total_students && (
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4" /> {project.total_students} Students
+          </div>
+        )}
       </div>
 
+<<<<<<< HEAD
       <button
         onClick={() => removeProject(project.id)}
         className="w-full flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
       >
         <Trash2 className="w-4 h-4" /> Delete
       </button>
+=======
+      <div className="flex gap-2">
+        <button
+          onClick={() => removeProject(project.id)}
+          className="flex-1 flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
+        >
+          <Trash2 className="w-4 h-4" /> Delete
+        </button>
+      </div>
+>>>>>>> 5444f89 (feat: student projects + mentor/webdev/login updates)
     </div>
   );
 }

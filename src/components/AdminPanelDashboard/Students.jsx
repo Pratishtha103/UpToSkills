@@ -20,7 +20,9 @@ const Students = ({ isDarkMode }) => {
   const fetchAllStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_BASE_URL);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(API_BASE_URL, { headers });
       const data = await res.json();
       if (data.success) setStudents(data.data || []);
       else setStudents([]);
@@ -43,7 +45,9 @@ const Students = ({ isDarkMode }) => {
 
     try {
       setIsDeleting(id);
-      const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+      const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE", headers });
       const result = await res.json();
       if (result.success) {
         setStudents((current) => current.filter((s) => s.id !== id));
@@ -83,11 +87,11 @@ const Students = ({ isDarkMode }) => {
         return;
 
     try {
-        setIsDeactivating(id);
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setStudents(current => current.map(s => 
-            s.id === id ? { ...s, status: newStatus } : s
-        ));
+      setIsDeactivating(id);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setStudents(current => current.map(s => 
+          s.id === id ? { ...s, status: newStatus } : s
+      ));
         alert(`Successfully set ${studentName} status to ${newStatus}.`);
 
         // Notify admins about status change
@@ -119,7 +123,9 @@ const Students = ({ isDarkMode }) => {
     try {
       setLoadingDetails(true);
       setSelectedStudent(studentId);
-      const res = await fetch(`${API_BASE_URL}/${studentId}/details`);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(`${API_BASE_URL}/${studentId}/details`, { headers });
       const data = await res.json();
       if (data.success) {
         setStudentDetails(data.data);
@@ -155,7 +161,9 @@ const Students = ({ isDarkMode }) => {
       try {
         setSearching(true);
         // ✅ CHANGED: Use /search?q= instead of /search/:name
-        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`);
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`, { headers });
         const data = await res.json();
         
         if (data.success) {

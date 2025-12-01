@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import {
   LayoutDashboard,
   User,
@@ -25,7 +26,7 @@ const sidebarItems = [
   { id: "addProject", label: "Add Project", icon: FolderOpen, path: "/dashboard/add-project" },
   { id: "myProjects", label: "My Projects", icon: ViewIcon, path: "/dashboard/my-projects" },
   { id: "skillBadges", label: "Skill Badges", icon: FaTrophy, path: "/student/skill-badges" },
-  // { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/project-showcase" },
+  { id: "projectShowcase", label: "Project Showcase", icon: Book, path: "/dashboard/project-showcase" },
   { id: "myprograms", label: "My Programs", icon: GraduationCap, path: "/dashboard/my-programs" },
   { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
 ];

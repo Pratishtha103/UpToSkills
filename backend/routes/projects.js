@@ -77,7 +77,7 @@ router.post("/", async (req, res) => {
 router.get("/assigned/:studentId", async (req, res) => {
     const studentId = req.params.studentId; 
     
-    console.log('Fetching projects for student ID:', studentId);
+    // debug log removed to avoid noisy terminal output
 
     try {
         const query = `

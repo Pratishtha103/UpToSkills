@@ -315,7 +315,7 @@ export default function AboutUs() {
           <div className="max-w-6xl mx-auto">
             {/* About Section */}
             <div
-              className={`rounded-2xl p-8 shadow-md border transition-colors duration-300 ${
+              className={`mt-10 rounded-2xl p-8 shadow-md border transition-colors duration-300 ${
                 isDarkMode
                   ? "bg-gray-800/60 border-gray-700"
                   : "bg-white border-gray-200"

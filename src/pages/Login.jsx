@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import loginImage from "../assets/loginnew2.jpg";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +33,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Hardcoded admin login (fallback only — main flow still hits the API so notifications fire)
+    
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",

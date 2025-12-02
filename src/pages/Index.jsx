@@ -17,6 +17,7 @@ import buisness from "../assets/buisness.jpeg";
 import StudentProfileModal from "../components/Company_Dashboard/StudentProfileModal";
 import ContactModal from "../components/Company_Dashboard/ContactModal";
 import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
+import Footer from "../components/AboutPage/Footer";
 
 const VALID_VIEWS = new Set([
   "dashboard",
@@ -173,7 +174,7 @@ export default function Index() {
         setFilteredStudents(formatted);
         setTotalMentors(mentorRes.data.totalMentors || 0);
 
-        // ✅ Calculate total badges
+        // Calculate total badges
         const totalBadgesCount = formatted.reduce(
           (sum, s) => sum + (s.badges?.length || 0),
           0
@@ -625,7 +626,9 @@ useEffect(() => {
           studentId={contactStudentId}
           onClose={() => setIsContactModalOpen(false)}
         />
-      </div>
+     
+      <Footer/>
+       </div>
     </div>
   );
 }

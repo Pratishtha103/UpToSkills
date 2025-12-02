@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../Company_Dashboard/ui/dialog";
+import Footer from "../AboutPage/Footer";
 
 const statusColors = {
   scheduled: "bg-primary text-primary-foreground",
@@ -273,6 +274,8 @@ export default function InterviewGallery() {
           </DialogContent>
         </Dialog>
       </div>
+      <Footer/>
     </div>
   );
 }
+

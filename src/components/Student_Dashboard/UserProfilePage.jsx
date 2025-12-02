@@ -61,9 +61,11 @@ const UserProfilePage = () => {
         });
 
         const d = res.data.data;
+        console.log("PROFILE RESPONSE:", d);
+
         setUserData({
           full_name: d.profile_full_name || d.student_name,
-          username: d.username, 
+          username: d.username || d.student_name , 
           email: d.student_email,
           contact_number: d.contact_number || d.student_phone,
           linkedin_url: d.linkedin_url,
@@ -132,7 +134,7 @@ const UserProfilePage = () => {
 
               <div className="space-y-4">
                 {[
-                  // ✅ यहाँ क्रम बदला गया है: Username पहले, फिर Full Name
+                  // 
                   ["Username", userData.username || "-"], 
                   ["Full Name", userData.full_name],
                   

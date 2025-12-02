@@ -21,6 +21,36 @@ const validateRole = (role) => {
 const formatRoleLabel = (role = '') =>
   role.charAt(0).toUpperCase() + role.slice(1);
 
+// ---------------- GLOBAL USERNAME CHECK ----------------
+const isUsernameTaken = async (username) => {
+  const query = `
+    SELECT username FROM students WHERE username=$1
+    UNION
+    SELECT username FROM mentors WHERE username=$1
+    UNION
+    SELECT username FROM companies WHERE username=$1
+  `;
+  const result = await pool.query(query, [username]);
+  return result.rows.length > 0;
+};
+
+// API for Frontend Username Live Check
+router.post("/check-username", async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username)
+      return res.json({ available: false });
+
+    const taken = await isUsernameTaken(username);
+    return res.json({ available: !taken });
+
+  } catch (error) {
+    console.error("Username check error:", error);
+    res.json({ available: false });
+  }
+});
+
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
   try {
@@ -42,7 +72,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Admin registration is not allowed' });
     }
 
-    // Choose table
+    // Choose Table
     let tableName =
       normalizedRole === "company"
         ? "companies"
@@ -51,25 +81,22 @@ router.post('/register', async (req, res) => {
           : "students";
 
     // Check existing email
-    const existingEmail = await pool.query(
-      `SELECT * FROM ${tableName} WHERE email = $1`,
+    const emailCheck = await pool.query(
+      `SELECT * FROM ${tableName} WHERE email=$1`,
       [email]
     );
 
-    if (existingEmail.rows.length > 0)
+    if (emailCheck.rows.length > 0)
       return res.status(400).json({ success: false, message: 'Email already exists' });
 
-    // Check existing username
-    const existingUsername = await pool.query(
-      `SELECT * FROM ${tableName} WHERE username = $1`,
-      [username]
-    );
-
-    if (existingUsername.rows.length > 0)
+    // GLOBAL USERNAME CHECK
+    if (await isUsernameTaken(username)) {
       return res.status(400).json({ success: false, message: 'Username already taken' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // INSERT QUERY
     let insertQuery, values;
 
     if (normalizedRole === 'company') {
@@ -105,35 +132,23 @@ router.post('/register', async (req, res) => {
         recipientRole: normalizedRole,
         recipientId: newUser.id,
         type: 'welcome',
-        title: `Welcome to UpToSkills, ${newUser.name || name}!`,
-        message: 'You are all set. Explore the dashboard to get started.',
-        metadata: {
-          username: newUser.username,
-          email: newUser.email,
-          role: normalizedRole,
-        },
+        title: `Welcome to UpToSkills, ${newUser.name}!`,
+        message: 'You are all set. Explore the dashboard.',
+        metadata: newUser,
         io: ioInstance,
       });
-    } catch (welcomeError) {
-      console.error('Welcome notification error:', welcomeError);
-    }
+    } catch (error) { }
 
-    // Notify Admins
+    // Notify Admin
     try {
       await notifyAdmins({
         title: `New ${formatRoleLabel(normalizedRole)} registered`,
-        message: `${newUser.name || name || 'A user'} just joined as a ${normalizedRole}.`,
+        message: `${newUser.name} just joined.`,
         type: 'user_register',
-        metadata: {
-          role: normalizedRole,
-          userId: newUser.id,
-          email: newUser.email,
-        },
+        metadata: newUser,
         io: ioInstance,
       });
-    } catch (adminNotifyError) {
-      console.error('Admin notification error (registration):', adminNotifyError);
-    }
+    } catch (error) { }
 
     res.status(201).json({
       success: true,
@@ -142,12 +157,12 @@ router.post('/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("REG ERROR:", error);
 
-    if (error.code === '23505') {
+    if (error.code === "23505") {
       return res.status(400).json({
         success: false,
-        message: 'Email or username already exists'
+        message: "Email or username already exists",
       });
     }
 
@@ -161,10 +176,7 @@ router.post('/login', async (req, res) => {
     const { email, password, role } = req.body;
 
     if (!email || !password || !role)
-      return res.status(400).json({
-        success: false,
-        message: 'Email/Username, password and role are required'
-      });
+      return res.status(400).json({ success: false, message: 'Email/Username, password and role are required' });
 
     const normalizedRole = role.toLowerCase();
 
@@ -178,13 +190,13 @@ router.post('/login', async (req, res) => {
             ? "mentors"
             : "companies";
 
-    // Admin → ONLY email login
+    // Query
     let loginQuery =
       normalizedRole === "admin"
-        ? `SELECT * FROM admins WHERE LOWER(email) = LOWER($1)`
+        ? `SELECT * FROM admins WHERE LOWER(email)=LOWER($1)`
         : `SELECT * FROM ${tableName}
-           WHERE LOWER(email) = LOWER($1)
-           OR LOWER(username) = LOWER($1)`;
+           WHERE LOWER(email)=LOWER($1)
+           OR LOWER(username)=LOWER($1)`;
 
     const userResult = await pool.query(loginQuery, [email]);
 
@@ -193,15 +205,12 @@ router.post('/login', async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // CHECK PASSWORD
+    // Compare Password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({
-        success: false,
-        message: "Incorrect email/username or password"
-      });
+      return res.status(400).json({ success: false, message: "Incorrect email/username or password" });
 
-    // DETECT REAL ROLE
+    // Identify Real Role
     const realRole =
       tableName === "students"
         ? "student"
@@ -211,11 +220,10 @@ router.post('/login', async (req, res) => {
             ? "company"
             : "admin";
 
-    // BLOCK ROLE MISMATCH
     if (realRole !== normalizedRole) {
       return res.status(401).json({
         success: false,
-        message: "Incorrect role selected. You cannot log in as this role."
+        message: "Incorrect role selected."
       });
     }
 
@@ -223,97 +231,37 @@ router.post('/login', async (req, res) => {
       user.full_name ||
       user.company_name ||
       user.name ||
-      (normalizedRole === 'admin' ? 'Admin' : null) ||
       user.email;
 
-    // Build JWT
     const payload = {
       user: {
         id: user.id,
-        role: normalizedRole,
+        role: realRole,
         email: user.email,
-        name: displayName
+        name: displayName,
       }
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
-    const ioInstance = req.app.get('io');
-
-    // Send Welcome Notification
-    await ensureWelcomeNotification({
-      role: normalizedRole,
-      recipientId: user.id,
-      name: displayName,
-      io: ioInstance,
-    });
-
-    // Login Notification
-    try {
-      const timestamp = new Date();
-      const friendlyTime = timestamp.toLocaleString('en-US', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      });
-
-      await pushNotification({
-        role: normalizedRole,
-        recipientRole: normalizedRole,
-        recipientId: user.id,
-        type: 'login',
-        title: 'New login detected',
-        message: `You signed in on ${friendlyTime}. If this wasn't you, please reset your password.`,
-        metadata: {
-          timestamp: timestamp.toISOString(),
-          ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip,
-          userAgent: req.get('user-agent') || 'unknown',
-        },
-        io: ioInstance,
-      });
-    } catch (notificationError) {
-      console.error('Login notification error:', notificationError);
-    }
-
-    // Admin Notification
-    try {
-      await notifyAdmins({
-        title: `${formatRoleLabel(normalizedRole)} signed in`,
-        message: `${displayName} logged in at ${new Date().toLocaleTimeString('en-US')}.`,
-        type: 'user_login',
-        metadata: {
-          role: normalizedRole,
-          userId: user.id,
-          email: user.email,
-        },
-        io: ioInstance,
-      });
-    } catch (adminNotifyLoginError) {
-      console.error('Admin notification error (login):', adminNotifyLoginError);
-    }
-
     res.json({
       success: true,
       message: "Login successful",
       token,
-      user: {
-        id: user.id,
-        name: displayName,
-        email: user.email,
-        role: normalizedRole
-      }
+      user: payload.user,
     });
 
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("LOGIN ERROR:", error);
     res.status(500).json({ success: false, message: 'Server error during login' });
   }
 });
 
-// ---------------- GET STUDENT (token) ----------------
+// ---------------- GET STUDENT ----------------
 router.get('/getStudent', verifyToken, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM students WHERE id = $1",
+      "SELECT * FROM students WHERE id=$1",
       [req.user.id]
     );
 

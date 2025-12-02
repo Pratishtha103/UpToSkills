@@ -125,8 +125,12 @@ const SkillBadgeForm = () => {
     }
   };
 
-  const selectStudent = (studentName) => {
+  const selectStudent = (e, studentName) => {
+    // prevent blur and other events when selecting from dropdown
+    e.preventDefault();
+    e.stopPropagation();
     setFormData((prev) => ({ ...prev, student_name: studentName }));
+    setFilteredStudents([]);
     setShowSuggestions(false);
   };
 
@@ -188,6 +192,18 @@ const SkillBadgeForm = () => {
     (b) => b.name === formData.badge_name
   );
 
+  // helper to compute badge classes (strips any border-... from badge.color)
+  const getBadgeClass = (badge) => {
+    const bgOnly = badge.color.replace(/\bborder-[^\s]+\b/g, "").trim();
+    const borderClassMatch = badge.color.match(/\bborder-[^\s]+\b/);
+    const borderColorClass = borderClassMatch ? borderClassMatch[0] : "border-blue-400";
+    return `${bgOnly} ${
+      formData.badge_name === badge.name
+        ? borderColorClass + ' border-4 shadow-lg'
+        : 'border-2 border-transparent hover:border-blue-400'
+    }`;
+  };
+
   return (
     <div
       className={`flex min-h-screen transition-all duration-300 ${
@@ -228,15 +244,8 @@ const SkillBadgeForm = () => {
                   <div
                     key={badge.name}
                     onClick={() => selectBadge(badge.name)}
-                    className={`p-3 text-center rounded-lg border-2 cursor-pointer transition-all duration-200 
-                      ${badge.color}
-                      ${
-                        formData.badge_name === badge.name
-                          ? "border-4 ring-2 ring-offset-2 ring-blue-500"
-                          : "border-transparent hover:border-blue-400"
-                      }`}
+                    className={`p-3 text-center rounded-lg cursor-pointer transition-all duration-200 ${getBadgeClass(badge)}`}
                   >
-                    {/* ✅ FIXED: className1 → className */}
                     <div className="text-3xl mb-1">{badge.icon}</div>
                     <p className="text-sm font-semibold dark:text-gray-100">
                       {badge.name}
@@ -289,7 +298,7 @@ const SkillBadgeForm = () => {
                         {filteredStudents.map((student) => (
                           <div
                             key={student.id}
-                            onClick={() => selectStudent(student.full_name)}
+                            onMouseDown={(e) => selectStudent(e, student.full_name)}
                             className="p-2 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer border-b dark:border-gray-600 last:border-b-0"
                           >
                             <div className="font-medium text-gray-900 dark:text-white">
@@ -329,7 +338,7 @@ const SkillBadgeForm = () => {
 
                 {/* Badge Description */}
                 <label className="block dark:text-white">
-                  Badge Description (Optional context):
+                  Badge Description <span className="text-red-500">*</span>:
                   <textarea
                     name="badge_description"
                     placeholder="Brief reason for the award (e.g., Completed the MERN stack project with high code quality)"
@@ -340,32 +349,35 @@ const SkillBadgeForm = () => {
                   ></textarea>
                 </label>
 
-                {/* Verified Checkbox */}
-                <label className="inline-flex items-center space-x-2 dark:text-white">
-                  <input
-                    type="checkbox"
-                    name="verified"
-                    checked={formData.verified}
-                    onChange={handleChange}
-                    className="form-checkbox h-5 w-5 text-blue-600 rounded dark:bg-gray-600 dark:border-gray-500"
-                  />
-                  <span>Verified Badge</span>
-                </label>
+                {/* Verified Checkbox + Submit Button stacked vertically */}
+                <div className="flex flex-col items-start gap-3">
+                  <label className="inline-flex items-center space-x-2 dark:text-white">
+                    <input
+                      type="checkbox"
+                      name="verified"
+                      checked={formData.verified}
+                      onChange={handleChange}
+                      className="form-checkbox h-5 w-5 text-blue-600 rounded dark:bg-gray-600 dark:border-gray-500"
+                    />
+                    <span>Verified Badge</span>
+                  </label>
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={submissionStatus === "submitting"}
-                  className={`px-4 py-2 text-white rounded-md transition ${
-                    submissionStatus === "submitting"
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }`}
-                >
-                  {submissionStatus === "submitting"
-                    ? "Submitting..."
-                    : "Award Badge"}
-                </button>
+                  <div className="w-full flex justify-start">
+                    <button
+                      type="submit"
+                      disabled={submissionStatus === "submitting"}
+                      className={`px-4 py-2 text-white rounded-md transition ${
+                        submissionStatus === "submitting"
+                          ? "bg-gray-500 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                    >
+                      {submissionStatus === "submitting"
+                        ? "Submitting..."
+                        : "Award Badge"}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Status Messages */}
                 {submissionStatus === "success" && (

@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Calendar, Star, TrendingUp } from "lucide-react";
 import axios from "axios";
+import { io } from "socket.io-client";
 
 function StatsGrid({ studentId }) {
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
   const [badgeCount, setBadgeCount] = useState(0);
+  const [interviewCount, setInterviewCount] = useState(0);
 
   //  Single GLOBAL loading state
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ function StatsGrid({ studentId }) {
   const markLoaded = () => {
     setLoadedParts((prev) => {
       const next = prev + 1;
-      if (next === 3) setLoading(false); // All 3 API calls done
+      if (next === 4) setLoading(false); // All 4 API calls done
       return next;
     });
   };
@@ -50,6 +52,58 @@ function StatsGrid({ studentId }) {
     };
 
     fetchEnrollment();
+  }, [effectiveStudentId]);
+
+  // --------------------------------
+  // Fetch Upcoming Interviews Count + realtime updates
+  // --------------------------------
+  useEffect(() => {
+    if (!effectiveStudentId) return;
+
+    const fetchInterviewCount = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/interviews/count/${effectiveStudentId}`
+        );
+        setInterviewCount(res.data.count || 0);
+      } catch (error) {
+        console.error("Error fetching interview count:", error);
+        setInterviewCount(0);
+      } finally {
+        markLoaded();
+      }
+    };
+
+    fetchInterviewCount();
+
+    const socket = io("http://localhost:5000", {
+      auth: {
+        role: "student",
+        recipientId: effectiveStudentId,
+      },
+      transports: ["websocket"],
+    });
+
+    socket.on("connect", () => {
+      // console.log("Socket connected for interview updates");
+    });
+
+    // listen to notifications emitted by server
+    socket.on("notifications:new", (payload) => {
+      if (!payload) return;
+      const t = payload.type || payload.notification_type || '';
+      if (t === "interview" || t === "interview:reschedule") {
+        fetchInterviewCount();
+      }
+    });
+
+    socket.on("disconnect", () => {
+      // console.log("Socket disconnected");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [effectiveStudentId]);
 
   // --------------------------------
@@ -146,7 +200,7 @@ function StatsGrid({ studentId }) {
     },
     {
       title: "Upcoming interviews",
-      value: "...",
+      value: loading ? "..." : interviewCount,
       icon: Star,
       color: "accent",
       delay: 0.3,

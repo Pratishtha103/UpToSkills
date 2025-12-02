@@ -85,7 +85,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
             whileHover={{ scale: 1.05, x: -3 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5" />
+           
             {/* <span>Back To Company Dashboard</span> */}
           </motion.button>
 

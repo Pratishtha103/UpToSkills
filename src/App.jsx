@@ -56,7 +56,9 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(
+  () => localStorage.getItem("darkMode") === "true"
+);
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (

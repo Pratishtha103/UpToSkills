@@ -18,7 +18,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
-const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) => {
+const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -142,7 +142,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
+          setIsDarkMode={setIsDarkMode}
         />
 
         {/* Main Content */}

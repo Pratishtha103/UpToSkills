@@ -38,7 +38,11 @@ export default function AssignedPrograms({ isDarkMode }) {
     try {
       // Fetch mentors (protected)
       const mentorsRes = await axios.get('http://localhost:5000/api/mentors', { headers });
-      setMentors(mentorsRes.data || []);
+      const mentorsPayload = mentorsRes.data;
+      if (Array.isArray(mentorsPayload)) setMentors(mentorsPayload);
+      else if (mentorsPayload && Array.isArray(mentorsPayload.data)) setMentors(mentorsPayload.data);
+      else if (mentorsPayload && Array.isArray(mentorsPayload.mentors)) setMentors(mentorsPayload.mentors);
+      else setMentors([]);
     } catch (err) {
       console.error('Error fetching mentors:', err);
       setErrorMessage('Failed to load mentors (/api/mentors). You may need to be logged in (admin token).');
@@ -49,7 +53,11 @@ export default function AssignedPrograms({ isDarkMode }) {
     try {
       // Fetch assigned programs
       const assignmentsRes = await axios.get('http://localhost:5000/api/assigned-programs', { headers });
-      setAssignments(assignmentsRes.data?.data || []);
+      const aPayload = assignmentsRes.data;
+      if (Array.isArray(aPayload)) setAssignments(aPayload);
+      else if (aPayload && Array.isArray(aPayload.data)) setAssignments(aPayload.data);
+      else if (aPayload && Array.isArray(aPayload.assignments)) setAssignments(aPayload.assignments);
+      else setAssignments([]);
     } catch (err) {
       console.error('Error fetching assigned programs:', err);
       setErrorMessage('Failed to load assigned programs (/api/assigned-programs).');
@@ -81,6 +89,36 @@ export default function AssignedPrograms({ isDarkMode }) {
         setAssignments([response.data.data, ...assignments]);
         setSelectedProgram('');
         setSelectedMentor('');
+        // Best-effort notifications: admin + mentor
+        try {
+          const programObj = programs.find(p => String(p.id) === String(selectedProgram));
+          const mentorObj = mentors.find(m => String(m.id) === String(selectedMentor));
+          const programTitle = programObj?.title || programObj?.name || `ID ${selectedProgram}`;
+          const mentorName = mentorObj?.full_name || mentorObj?.name || `ID ${selectedMentor}`;
+          const tokenForNotif = localStorage.getItem('token');
+          const notifHeaders = tokenForNotif ? { Authorization: `Bearer ${tokenForNotif}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+
+          // Admin notification
+          await axios.post('http://localhost:5000/api/notifications', {
+            role: 'admin',
+            type: 'assignment',
+            title: 'Program assigned',
+            message: `${programTitle} was assigned to ${mentorName}.`,
+            metadata: { entity: 'assigned-program', programId: selectedProgram, mentorId: selectedMentor }
+          }, { headers: notifHeaders });
+
+          // Mentor notification
+          await axios.post('http://localhost:5000/api/notifications', {
+            role: 'mentor',
+            recipientId: selectedMentor,
+            type: 'assignment',
+            title: 'New program assigned to you',
+            message: `You have been assigned the program: ${programTitle}.`,
+            metadata: { entity: 'assigned-program', programId: selectedProgram }
+          }, { headers: notifHeaders });
+        } catch (notifErr) {
+          console.error('Failed to create assignment notifications', notifErr);
+        }
       }
     } catch (err) {
       console.error('Error assigning program:', err);
@@ -101,6 +139,37 @@ export default function AssignedPrograms({ isDarkMode }) {
       await axios.delete(`http://localhost:5000/api/assigned-programs/${id}`, { headers });
       setAssignments(assignments.filter(a => a.id !== id));
       alert('Assignment removed successfully!');
+      // Best-effort: notify admin and mentor about removal
+      try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+        const removed = assignments.find(a => a.id === id) || null;
+        const programName = removed?.program_name || removed?.program_title || `ID ${removed?.course_id || ''}`;
+        const mentorId = removed?.mentor_id || removed?.mentorId || null;
+
+        // Admin notification
+        await axios.post('http://localhost:5000/api/notifications', {
+          role: 'admin',
+          type: 'assignment-removal',
+          title: 'Program assignment removed',
+          message: `${programName} assignment was removed.`,
+          metadata: { entity: 'assigned-program', id }
+        }, { headers });
+
+        // Mentor notification if mentor id available
+        if (mentorId) {
+          await axios.post('http://localhost:5000/api/notifications', {
+            role: 'mentor',
+            recipientId: mentorId,
+            type: 'assignment-removal',
+            title: 'Program assignment removed',
+            message: `The program ${programName} assigned to you was removed.`,
+            metadata: { entity: 'assigned-program', id }
+          }, { headers });
+        }
+      } catch (notifErr) {
+        console.error('Failed to create assignment removal notifications', notifErr);
+      }
     } catch (err) {
       console.error('Error removing assignment:', err);
       alert('Failed to remove assignment');

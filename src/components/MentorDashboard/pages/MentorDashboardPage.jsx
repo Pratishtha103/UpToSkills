@@ -16,13 +16,16 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
 
   useEffect(() => {
     // Fetch students and mentors counts
+    const token = localStorage.getItem('token');
+    const headers = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
     axios
-      .get("http://localhost:5000/api/students/count")
+      .get("http://localhost:5000/api/students/count", headers)
       .then((res) => setTotalStudents(res.data.totalStudents))
       .catch((err) => console.error("Error fetching students:", err));
 
     axios
-      .get("http://localhost:5000/api/mentors/count")
+      .get("http://localhost:5000/api/mentors/count", headers)
       .then((res) => setTotalMentors(res.data.totalMentors))
       .catch((err) => console.error("Error fetching mentors:", err));
 

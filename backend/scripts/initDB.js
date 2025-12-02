@@ -17,6 +17,17 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    // ENROLLMENTS
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS enrollments (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+    status TEXT DEFAULT 'active'
+  );
+`);
+
 
     // COMPANY PROFILES
     await pool.query(`

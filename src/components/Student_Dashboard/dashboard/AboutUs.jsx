@@ -445,34 +445,23 @@ export default function AboutUs() {
                 </a>
 
                 {/* Email */}
-                <a
-                  href="mailto:info@uptoskills.com"
-                  className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
-                    isDarkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  <FaEnvelope
-                    className="text-orange-500 mx-auto mb-4"
-                    size={40}
-                  />
-                  <h3 className="text-lg font-semibold mb-2">Mail Us 24/7:</h3>
-                  <p
-                    className={`${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    info@uptoskills.com
-                  </p>
-                </a>
+                
+          <a
+        href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
+        target="_blank"
+        rel="noopener noreferrer"
+        
+        >
+          <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+            <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
+            <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
+            <p className="text-gray-600">info@uptoskills.com</p>
+          </div>
+          </a>
               </div>
             </section>
           </div>
         </main>
-
-        {/* Footer */}
-        <Footer />
       </div>
     </div>
   );

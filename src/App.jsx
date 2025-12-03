@@ -70,7 +70,9 @@ function App() {
         autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
+        newestOnTop
         theme="light"
+        style={{ zIndex: 99999 }}
       />
       <Router>
         <Routes>

@@ -56,7 +56,9 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(
+  () => localStorage.getItem("darkMode") === "true"
+);
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
@@ -68,7 +70,9 @@ function App() {
         autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
+        newestOnTop
         theme="light"
+        style={{ zIndex: 99999 }}
       />
       <Router>
         <Routes>

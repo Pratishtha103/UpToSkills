@@ -26,7 +26,7 @@ export default function EditProfile() {
         if (res.data.success) {
           const data = res.data.data;
           setFormData({
-            companyName: data.name || "",
+            companyName: data.name || data.company_name || "",
             website: data.website || "",
             industry: data.industry || "",
             contact: data.contact || "",

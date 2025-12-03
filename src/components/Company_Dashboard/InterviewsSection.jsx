@@ -22,8 +22,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../Company_Dashboard/ui/dialog";
+import StudentProfileModal from "./StudentProfileModal";
+import SearchStudents from "./SearchStudents";
 
 import { Calendar, Clock, Video, Phone, Trash } from "lucide-react";
+import { toast } from "sonner";
 
 const statusColors = {
   scheduled: "bg-primary text-primary-foreground",
@@ -41,7 +44,13 @@ function InterviewsSection() {
   const [interviews, setInterviews] = useState([]);
   const [interviewCount, setInterviewCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [isFindOpen, setIsFindOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileStudent, setProfileStudent] = useState(null);
+  const [viewInterview, setViewInterview] = useState(null);
   const [newInterview, setNewInterview] = useState({
     candidateName: "",
     position: "",
@@ -68,8 +77,21 @@ function InterviewsSection() {
     try {
       const res = await axios.get("http://localhost:5000/api/interviews");
       const data = res.data || [];
-      setInterviews(data);
-      setInterviewCount(data.length);
+      // sort by date + time (ascending)
+      const sorted = Array.isArray(data)
+        ? data.slice().sort((a, b) => {
+            try {
+              const ta = new Date(a.date).getTime() + (a.time ? new Date('1970-01-01T' + a.time).getTime() : 0);
+              const tb = new Date(b.date).getTime() + (b.time ? new Date('1970-01-01T' + b.time).getTime() : 0);
+              return ta - tb;
+            } catch (e) {
+              return 0;
+            }
+          })
+        : data;
+
+      setInterviews(sorted);
+      setInterviewCount(sorted.length);
     } catch (err) {
       console.error("Error fetching interviews:", err);
     }
@@ -87,7 +109,38 @@ function InterviewsSection() {
 
   useEffect(() => {
     fetchInterviews();
-    fetchCandidates();
+    const onCandidateSelected = (e) => {
+      try {
+        const s = e?.detail;
+        if (!s) return;
+        // set candidate name and id in the newInterview draft
+        setNewInterview((prev) => ({ ...prev, candidateName: s.full_name || s.profile_full_name || s.student_name || s.name || prev.candidateName, candidateId: s.id || s.student_id || s.studentId || null }));
+        setIsFindOpen(false);
+        // keep schedule modal open for convenience
+      } catch (err) {
+        console.error('candidate:selected handler error', err);
+      }
+    };
+
+    window.addEventListener('candidate:selected', onCandidateSelected);
+    const onInterviewCreatedGlobal = (e) => {
+      try {
+        // when another component schedules an interview, refresh list
+        fetchInterviews();
+        const d = e?.detail || {};
+        const name = d.candidate_name || d.candidateName || d.name || null;
+        // Avoid duplicating toasts here; originator should show success toast.
+        // Optionally, we could show a muted notification if desired.
+      } catch (err) {
+        console.error('interview:created handler error', err);
+      }
+    };
+
+    window.addEventListener('interview:created', onInterviewCreatedGlobal);
+    return () => {
+      try { window.removeEventListener('candidate:selected', onCandidateSelected); } catch (e) {}
+      try { window.removeEventListener('interview:created', onInterviewCreatedGlobal); } catch (e) {}
+    };
   }, []);
 
   // Filter candidates based on input
@@ -180,9 +233,25 @@ function InterviewsSection() {
     try {
       await axios.delete(`http://localhost:5000/api/interviews/${id}`);
       fetchInterviews();
+      // show a red/danger toast on successful deletion
+      try { toast.error("Interview deleted"); } catch (e) { /* ignore toast errors */ }
     } catch (err) {
       console.error("Error deleting interview:", err);
+      try { toast.error("Failed to delete interview"); } catch (e) { }
     }
+  };
+
+  const confirmDeleteInterview = (id) => {
+    setPendingDeleteId(id);
+    setIsConfirmOpen(true);
+  };
+
+  const performConfirmedDelete = async () => {
+    if (!pendingDeleteId) return;
+    setIsConfirmOpen(false);
+    const id = pendingDeleteId;
+    setPendingDeleteId(null);
+    await handleDeleteInterview(id);
   };
 
   const handleEditSave = async () => {
@@ -226,10 +295,11 @@ function InterviewsSection() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent>
+          <DialogContent aria-describedby="schedule-desc">
             <DialogHeader>
               <DialogTitle>Schedule New Interview</DialogTitle>
             </DialogHeader>
+            <p id="schedule-desc" className="sr-only">Schedule a new interview by providing candidate, position, date, time and type.</p>
 
             <div className="grid gap-4 py-4">
               {/* Candidate Name with Autocomplete */}
@@ -304,14 +374,26 @@ function InterviewsSection() {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Input
-                      type={field === "date" ? "date" : field === "time" ? "time" : "text"}
-                      value={newInterview[field]}
-                      onChange={(e) =>
-                        setNewInterview({ ...newInterview, [field]: e.target.value })
-                      }
-                      className="col-span-3"
-                    />
+                    field === "candidateName" ? (
+                      <div className="col-span-3 flex items-center gap-2">
+                        <Input
+                          type="text"
+                          value={newInterview.candidateName}
+                          onChange={(e) => setNewInterview({ ...newInterview, candidateName: e.target.value })}
+                          className="flex-1"
+                        />
+                        <Button size="sm" variant="outline" onClick={() => setIsFindOpen(true)}>Find</Button>
+                      </div>
+                    ) : (
+                      <Input
+                        type={field === "date" ? "date" : field === "time" ? "time" : "text"}
+                        value={newInterview[field]}
+                        onChange={(e) =>
+                          setNewInterview({ ...newInterview, [field]: e.target.value })
+                        }
+                        className="col-span-3"
+                      />
+                    )
                   )}
                 </div>
               ))}
@@ -321,6 +403,19 @@ function InterviewsSection() {
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
               <Button onClick={handleScheduleInterview}>Schedule</Button>
             </div>
+          </DialogContent>
+        </Dialog>
+        {/* Find candidate dialog (embedded search) */}
+        <Dialog open={isFindOpen} onOpenChange={setIsFindOpen}>
+          <DialogContent aria-describedby="find-desc">
+            <DialogHeader>
+              <DialogTitle>Find Candidate</DialogTitle>
+            </DialogHeader>
+            <p id="find-desc" className="sr-only">Search and select a candidate from existing students.</p>
+            <div style={{ minHeight: 400 }} className="py-2">
+              <SearchStudents />
+            </div>
+            <div className="flex justify-end mt-2"><Button variant="outline" onClick={() => setIsFindOpen(false)}>Close</Button></div>
           </DialogContent>
         </Dialog>
       </div>
@@ -376,6 +471,17 @@ function InterviewsSection() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewInterview(interview);
+                        }}
+                      >
+                        Details
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => {
                           setEditInterview({
                             id: interview.id,
@@ -389,7 +495,7 @@ function InterviewsSection() {
                       </Button>
 
                       <Button
-                        onClick={() => handleDeleteInterview(interview.id)}
+                        onClick={() => confirmDeleteInterview(interview.id)}
                         variant="ghost"
                         size="icon"
                         className="bg-red-600 text-white rounded-xl hover:bg-red-700"
@@ -405,11 +511,101 @@ function InterviewsSection() {
         })}
       </div>
 
+      <Dialog open={!!viewInterview} onOpenChange={(open) => { if (!open) setViewInterview(null); }}>
+        <DialogContent aria-describedby="details-desc">
+          <DialogHeader>
+            <DialogTitle>Interview Details</DialogTitle>
+          </DialogHeader>
+          <p id="details-desc" className="sr-only">View detailed information about the selected interview.</p>
+
+          <div className="grid gap-4 py-2">
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Candidate</Label>
+              <div className="col-span-3 font-semibold">{viewInterview?.candidate_name || viewInterview?.candidateName}</div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Position</Label>
+              <div className="col-span-3">{viewInterview?.role || viewInterview?.position}</div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Date</Label>
+              <div className="col-span-3">{viewInterview?.date ? new Date(viewInterview.date).toLocaleDateString() : ""}</div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Time</Label>
+              <div className="col-span-3">{viewInterview?.time}</div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Type</Label>
+              <div className="col-span-3">{viewInterview?.type}</div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-right">Status</Label>
+              <div className="col-span-3 capitalize">{viewInterview?.status}</div>
+            </div>
+
+            {viewInterview?.raw && (
+              <div className="col-span-4">
+                <Label>Raw</Label>
+                <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded mt-1 overflow-auto">{JSON.stringify(viewInterview.raw, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setViewInterview(null)}>Close</Button>
+            <Button onClick={async () => {
+              // try to open student profile modal for this candidate
+              try {
+                const iv = viewInterview || {};
+                const candidateId = iv.candidate_student_id || iv.student_id || iv.candidateId || iv.candidate_id || iv.raw?.student_id || null;
+                if (candidateId) {
+                  setProfileStudent({ id: candidateId });
+                  setIsProfileOpen(true);
+                  return;
+                }
+
+                // Fallback: search by name
+                const name = (iv.candidate_name || iv.candidateName || "").toString().trim();
+                if (!name) {
+                  alert('No candidate id or name available to view profile');
+                  return;
+                }
+                const res = await fetch(`http://localhost:5000/api/students/search?q=${encodeURIComponent(name)}`);
+                const json = await res.json();
+                const rows = json?.data ?? [];
+                if (Array.isArray(rows) && rows.length > 0) {
+                  const first = rows[0];
+                  const id = first.id || first.student_id || first.user_detail_id || null;
+                  if (id) {
+                    setProfileStudent({ id });
+                    setIsProfileOpen(true);
+                    return;
+                  }
+                }
+                alert('Could not locate candidate profile');
+              } catch (err) {
+                console.error('Error opening candidate profile', err);
+                alert('Error opening candidate profile');
+              }
+            }}>View Candidate Profile</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <StudentProfileModal open={isProfileOpen} onClose={() => setIsProfileOpen(false)} student={profileStudent} fetchFresh />
+
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby="edit-desc">
           <DialogHeader>
             <DialogTitle>Reschedule Interview</DialogTitle>
           </DialogHeader>
+          <p id="edit-desc" className="sr-only">Reschedule the selected interview by choosing a new date and time.</p>
 
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 gap-4">
@@ -436,6 +632,20 @@ function InterviewsSection() {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button onClick={handleEditSave}>Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Confirm Delete Dialog */}
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent aria-describedby="confirm-delete-desc">
+          <DialogHeader>
+            <DialogTitle>Delete Interview</DialogTitle>
+          </DialogHeader>
+          <p id="confirm-delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
+          <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
+            <Button className="bg-red-600 text-white" onClick={performConfirmedDelete}>Delete</Button>
           </div>
         </DialogContent>
       </Dialog>

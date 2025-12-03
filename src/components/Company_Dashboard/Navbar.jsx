@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Settings, User, Sun, Moon, Menu } from "lucide-react";
+import { User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
+import NotificationCenter from "../Notifications/NotificationCenter";
 
 export default function Navbar({ onMenuClick }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,11 +27,11 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 bg-black-60 dark:bg-gray-800 pb-2 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/30 bg-white/70 pb-2 text-gray-900 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 dark:border-slate-800/60 dark:bg-slate-900/70 dark:text-white"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      style={{ WebkitBackdropFilter: "blur(16px)" }}
+      style={{ WebkitBackdropFilter: "blur(18px)" }}
     >
       <div className="flex items-center justify-between px-4 sm:px-6 py-4 pb-1">
         {/* Left: Hamburger + Logo */}
@@ -48,7 +49,7 @@ export default function Navbar({ onMenuClick }) {
 
           {/* Logo - 🌟 FIX APPLIED HERE 🌟 */}
           <motion.div
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 rounded-2xl bg-white/70 px-3 py-1 shadow-sm ring-1 ring-white/60 backdrop-blur dark:bg-slate-900/70 dark:ring-slate-800/80"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
@@ -57,7 +58,7 @@ export default function Navbar({ onMenuClick }) {
                 // **Dynamically set the src based on the theme**
                 src={isDarkMode ? darkLogo : logo} 
                 alt="UptoSkill Logo"
-                className="object-contain w-25 h-25"
+                className="object-contain w-28 h-10"
               />
             </Link>
           </motion.div>
@@ -65,16 +66,7 @@ export default function Navbar({ onMenuClick }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          
-        {/* Notifications */}
-          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5 relative z-10" />
-              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
-                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
-              </span>
-            </Button>
-          </motion.div> */}
+            <NotificationCenter role="company" />
           {/* Theme Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -101,13 +93,3 @@ export default function Navbar({ onMenuClick }) {
     </motion.nav>
   );
 }
-
-{/* Notifications */}
-          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5 relative z-10" />
-              <span className="absolute -top-0 -right-0 w-3 h-3 bg-secondary rounded-full flex items-center justify-center z-20">
-                <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full"></span>
-              </span>
-            </Button>
-          </motion.div> */}

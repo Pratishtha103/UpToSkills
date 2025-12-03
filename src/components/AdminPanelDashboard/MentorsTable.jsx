@@ -23,7 +23,10 @@ export default function MentorsTable({ isDarkMode, onNavigateSection }) {
     let mounted = true;
     const fetchMentors = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/mentors');
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/api/mentors', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         if (!mounted) return;
         if (!res.ok) {
           console.warn('Mentors endpoint not available:', res.status);
@@ -31,7 +34,7 @@ export default function MentorsTable({ isDarkMode, onNavigateSection }) {
           return;
         }
         const data = await res.json();
-        setMentors(Array.isArray(data) ? data : []);
+        setMentors(Array.isArray(data.mentors) ? data.mentors : []);
       } catch (err) {
         console.error('Error fetching mentors:', err);
         if (mounted) setMentors([]);

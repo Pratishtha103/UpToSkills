@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import loginImage from "../assets/loginnew.jpg";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,19 +33,20 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ---------------- HARD-CODED ADMIN ----------------
+    
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
       role: "admin",
     };
 
-    if (
+    const isHardcodedAdmin =
       formData.email === hardcodedAdmin.email &&
       formData.password === hardcodedAdmin.password &&
-      formData.role === "admin"
-    ) {
-      alert("Admin login successful");
+      formData.role === "admin";
+
+    const fallbackAdminLogin = () => {
+      alert("Admin login successful (fallback mode)");
 
       const adminUser = {
         name: "Admin",
@@ -53,10 +56,11 @@ const LoginForm = () => {
 
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
+      localStorage.setItem("admin", JSON.stringify(adminUser));
 
       navigate("/adminPanel", { state: { updated: true } });
-      return;
-    }
+    };
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -64,7 +68,7 @@ const LoginForm = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      alert(response.data.message || "Login successful");
+      toast.success(response.data.message || "Login successful");
 
       if (response.data.token)
         localStorage.setItem("token", response.data.token);
@@ -75,47 +79,70 @@ const LoginForm = () => {
         localStorage.setItem("id", response.data.user.id);
       }
 
+      const role = response.data.user?.role || formData.role;
 
-      const roleToSave =
-        (response.data.user?.role || formData.role).toLowerCase();
-
-      if (roleToSave === "mentor" && response.data.user) {
+      if (role === "mentor")
         localStorage.setItem("mentor", JSON.stringify(response.data.user));
+
+      if (role === "admin")
+        localStorage.setItem("admin", JSON.stringify(response.data.user));
+
+      setTimeout(() => {
+        if (role === "admin") navigate("/adminPanel");
+        else if (role === "student" || role === "learner")
+          navigate("/dashboard");
+        else if (role === "mentor") navigate("/mentor-dashboard");
+        else if (role === "company") navigate("/company");
+        else navigate("/login");
+      }, 5000);
+    } catch (err) {
+      if (isHardcodedAdmin) {
+        fallbackAdminLogin();
+        return;
       }
 
-      if (roleToSave === "admin") navigate("/adminPanel");
-      else if (roleToSave === "student" || roleToSave === "learner")
-        navigate("/dashboard");
-      else if (roleToSave === "mentor") navigate("/mentor-dashboard");
-      else if (roleToSave === "company") navigate("/company");
-      else navigate("/login");
-    } catch (err) {
-      const message =
+      toast.error(
         err.response?.data?.message ||
         err.message ||
-        "Login failed. Please try again.";
-      alert(message);
+        "Login failed. Please try again."
+      );
     }
   };
 
   return (
-    <div className="h-[100vh] flex justify-center items-center px-5 lg:px-0 bg-gray-50">
-      <div className="max-w-screen-xl bg-white sm:rounded-lg shadow-md flex justify-center flex-1">
+    <div className="w-full min-h-screen flex justify-center items-center bg-gray-50">
+      <div
+        className="shadow-lg bg-white overflow-hidden flex"
+        style={{ width: "1237px", height: "651px", borderRadius: "12px" }}
+      >
 
-        {/* Image */}
-        <div className="w-full md:w-1/2 p-3 flex items-center">
-          <div
-            className="w-full h-[420px] md:h-[400px] lg:h-[600px] bg-cover bg-center rounded-2xl shadow-sm"
-            style={{ backgroundImage: `url(${loginImage})` }}
+        {/* LEFT IMAGE */}
+        <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
+          <img
+            src={loginImage}
+            className="w-full h-full object-cover object-center"
+            alt="Login Visual"
           />
         </div>
 
-        {/* Form */}
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+        {/* RIGHT FORM */}
+        <div className="w-1/2 h-full flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <div className="text-center">
-              <h1 className="text-4xl xl:text-4xl font-extrabold text-blue-900">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
+
+            <ToastContainer
+              position="top-right"
+              autoClose={2500}
+              hideProgressBar={false}
+              pauseOnHover
+              style={{ marginTop: "20px", right: "250px", zIndex: 9999 }}
+              closeOnClick
+            />
+
+            <div className="text-center w-full">
+              <h1 className="text-4xl font-extrabold text-blue-900">
+                <span className="text-[#00BDA6] capitalize">
+                  {formData.role}
+                </span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
               <p className="text-[16px] text-gray-500">Enter your details</p>
@@ -131,7 +158,7 @@ const LoginForm = () => {
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 text-gray-700 text-sm"
+                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 text-sm"
                 >
                   <option value="admin">Login as Admin</option>
                   <option value="student">Login as Student</option>
@@ -171,7 +198,6 @@ const LoginForm = () => {
                   </div>
                 </div>
 
-
                 <div className="text-right -mt-2 mb-3">
                   <Link
                     to="/login/forgot-password"
@@ -181,11 +207,11 @@ const LoginForm = () => {
                   </Link>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
-                  className=" bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
-                > Login
+                  className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
+                >
+                  Login
                 </button>
 
                 <p className="text-center text-gray-600">
@@ -196,11 +222,13 @@ const LoginForm = () => {
                     </span>
                   </Link>
                 </p>
+
               </form>
             </div>
 
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -125,7 +125,7 @@ const addOrUpdateCompanyProfile = async (req, res) => {
       // INSERT new profile
       result = await pool.query(
         `INSERT INTO company_profiles (company_id, name, website, industry, contact, logo_url, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW(),$7)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
          RETURNING *`,
         [companyId, name, website, industry, contact, logo_url]
       );

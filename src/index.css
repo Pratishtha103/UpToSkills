@@ -24,11 +24,7 @@
     --input: 220 13% 91%;
     --ring: 214 84% 56%;
 
-    /* Sidebar (Light) */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 25 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary-foreground: 240 5.3% 26.1%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
@@ -96,6 +92,60 @@
   border-image-slice: 1;
 }
   
+/* Ensure Sonner toasts appear below the fixed header (navbar) */
+/* Sonner's markup may vary across versions; target common attributes/classes */
+
+/* Broad selectors to catch Sonner-generated roots and containers */
+[data-sonner],
+[data-sonner-root],
+[data-sonner-id],
+[class*="sonner"],
+.sonner,
+.sonner-root,
+.sonner_toaster,
+.sonner-toaster,
+.sonner-toast,
+.sonner__toast,
+.sonner__container,
+.sonner__root,
+#sonner-root {
+  /* align toasts visually under the header and inset from the right edge */
+  top: 64px !important; /* matches navbar height */
+  right: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: auto !important;
+  z-index: 45 !important; /* below navbar (navbar is z-[9999]) */
+}
+
+/* Ensure any inner toast wrapper also respects the top offset */
+[data-sonner] *,
+[data-sonner-root] *,
+[class*="sonner"] * {
+  top: unset !important;
+}
+
+/* Final fallback: hide Sonner containers entirely so toasts are not visible */
+[data-sonner],
+[data-sonner-root],
+[class*="sonner"],
+.sonner,
+.sonner-root,
+.sonner_toaster,
+.sonner-toaster,
+.sonner-toast,
+.sonner__toast,
+.sonner__container,
+.sonner__root,
+#sonner-root {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+}
+
   .sidebar-item {
     @apply flex items-center gap-3 px-4 py-3 text-sidebar-foreground rounded-lg transition-all;
   }

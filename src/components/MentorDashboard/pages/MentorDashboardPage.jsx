@@ -12,25 +12,52 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
 
   const [totalStudents, setTotalStudents] = useState(0);
   const [totalMentors, setTotalMentors] = useState(0);
+  const [assignedProgramsCount, setAssignedProgramsCount] = useState(0);
 
   useEffect(() => {
+    // Fetch students and mentors counts
+    const token = localStorage.getItem('token');
+    const headers = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
     axios
-      .get("http://localhost:5000/api/students/count")
+      .get("http://localhost:5000/api/students/count", headers)
       .then((res) => setTotalStudents(res.data.totalStudents))
       .catch((err) => console.error("Error fetching students:", err));
 
     axios
-      .get("http://localhost:5000/api/mentors/count")
+      .get("http://localhost:5000/api/mentors/count", headers)
       .then((res) => setTotalMentors(res.data.totalMentors))
       .catch((err) => console.error("Error fetching mentors:", err));
+
+    // Fetch assigned programs for current mentor
+    const currentUser = localStorage.getItem("user");
+    if (currentUser) {
+      try {
+        const user = JSON.parse(currentUser);
+        const mentorId = user.id;
+        
+        axios
+          .get(`http://localhost:5000/api/assigned-programs/mentor/${mentorId}`)
+          .then((res) => {
+            if (res.data.success && Array.isArray(res.data.data)) {
+              setAssignedProgramsCount(res.data.data.length);
+            }
+          })
+          .catch((err) => console.error("Error fetching assigned programs:", err));
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+      }
+    }
   }, []);
 
   const dashboardFeatures = [
     {
-      icon: "🧑‍🏫",
-      title: "Projects",
-      description: "Projects at a glance",
-      onClick: () => navigate("open-source-contributions"),
+      icon: "📋",
+      title: "My Programs",
+      description: "Programs assigned to me",
+      count: assignedProgramsCount,
+      color: "primary",
+      onClick: () => navigate("assigned-programs"),
     },
     {
       icon: "👥",
@@ -67,9 +94,12 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
                 icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
+                count={feature.count}   // <-- ⭐ added
+                color={feature.color}     // ⭐ added
                 onClick={feature.onClick}
                 isDarkMode={isDarkMode}
               />
+
             ))}
           </div>
         </div>

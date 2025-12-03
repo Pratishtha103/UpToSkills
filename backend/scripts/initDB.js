@@ -1,6 +1,7 @@
 // scripts/initDB.js
-require("dotenv").config();
-const pool = require("../config/database");
+require('dotenv').config();
+const pool = require('../config/database');
+const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable');
 
 (async () => {
   try {
@@ -8,7 +9,7 @@ const pool = require("../config/database");
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         company_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -16,6 +17,17 @@ const pool = require("../config/database");
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    // ENROLLMENTS
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS enrollments (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+    status TEXT DEFAULT 'active'
+  );
+`);
+
 
     // COMPANY PROFILES
     await pool.query(`
@@ -36,12 +48,29 @@ const pool = require("../config/database");
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Mentor details table (profiles for mentors)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS mentor_details (
+        id SERIAL PRIMARY KEY,
+        mentor_id INTEGER UNIQUE REFERENCES mentors(id) ON DELETE CASCADE,
+        full_name TEXT,
+        contact_number VARCHAR(15),
+        linkedin_url TEXT,
+        github_url TEXT,
+        about_me TEXT,
+        expertise_domains TEXT[],
+        others_domain TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
@@ -82,7 +111,7 @@ const pool = require("../config/database");
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -174,7 +203,34 @@ const pool = require("../config/database");
       );
     `);
 
-    console.log("✅ All tables created successfully with foreign keys & extended relations.");
+    // PROGRAM ASSIGNMENTS (assign programs/courses to mentors)
+    // Use mentor_id referencing mentors.id (accounts). If legacy column exists, keep it unchanged here;
+    // startup migration is handled by ensureProgramAssignmentsTable utility which runs at server boot.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS program_assignments (
+        id SERIAL PRIMARY KEY,
+        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        mentor_id INTEGER REFERENCES mentors(id) ON DELETE CASCADE,
+        assigned_on TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Create indexes for better query performance
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_student_id ON enrollments(student_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
+    `);
+
+    await ensureNotificationsTable();
+
+    console.log('✅ All tables checked/created successfully');
   } catch (err) {
     console.error("❌ DB Initialization Failed:", err);
   } finally {

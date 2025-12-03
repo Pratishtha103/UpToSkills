@@ -15,9 +15,10 @@ const ProgramsPage = () => {
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
+       {/* Chatbot */}
       <Chatbot />
     </div>
   );
 };
 
-export default ProgramsPage;
+export default ProgramsPage;

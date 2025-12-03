@@ -21,7 +21,11 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const enrollment = await createEnrollment(student_id, course_id, status);
+    const enrollment = await createEnrollment(student_id, course_id, status, {
+      io: req.app?.get('io'),
+      actorRole: req.user?.role || 'enrollment_api',
+      actorId: req.user?.id || null,
+    });
     res.status(201).json({ 
       success: true, 
       message: 'Enrollment created successfully',
@@ -94,7 +98,11 @@ router.post('/enroll', async (req, res) => {
   }
 
   try {
-    const enrollment = await createEnrollment(student_id, course_id, 'active');
+    const enrollment = await createEnrollment(student_id, course_id, 'active', {
+      io: req.app?.get('io'),
+      actorRole: req.user?.role || 'student',
+      actorId: req.user?.id || student_id,
+    });
     res.status(201).json({ 
       success: true, 
       message: 'Successfully enrolled in course',

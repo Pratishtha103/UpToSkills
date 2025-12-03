@@ -1,6 +1,8 @@
 import React from 'react';
 import ProgramsSection from '../components/AboutPage/ProgramsSection';
 import Header from '../components/AboutPage/Header';
+import Chatbot from "../components/Contact_Page/Chatbot";
+
 
 const ProgramsPage = () => {
   return (
@@ -14,8 +16,10 @@ const ProgramsPage = () => {
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
+       {/* Chatbot */}
+      <Chatbot />
     </div>
   );
 };
 
-export default ProgramsPage;
+export default ProgramsPage;

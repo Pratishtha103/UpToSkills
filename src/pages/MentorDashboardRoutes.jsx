@@ -8,6 +8,7 @@ import MultiStudent from "../components/MentorDashboard/pages/MultiStudent";
 import MentorProfilePage from "../components/MentorDashboard/components/MentorProfilePage";
 import MentorEditProfilePage from "../components/MentorDashboard/components/MentorEditProfilePage";
 import AboutUs from "../components/MentorDashboard/pages/AboutUs";
+import AssignedPrograms from "../components/MentorDashboard/pages/AssignedPrograms";
 
 function MentorDashboardRoutes({ isDarkMode, setIsDarkMode }) {
   return (
@@ -73,6 +74,16 @@ function MentorDashboardRoutes({ isDarkMode, setIsDarkMode }) {
       />
 
       <Route path="AboutUs" element={<AboutUs />} />
+
+      <Route
+        path="assigned-programs"
+        element={
+          <AssignedPrograms
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+          />
+        }
+      />
     </Routes>
   );
 }

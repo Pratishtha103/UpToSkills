@@ -450,7 +450,7 @@ export default function SearchStudents() {
             )}
           </div>
         </div>
-        <Footer />
+        <Footer/>
       </div>
     );
   }

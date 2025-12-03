@@ -1,19 +1,56 @@
 // backend/routes/skillBadges.js
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { addSkillBadge, getStudentBadges, getAllStudents } = require('../controllers/skillBadges.controller');
-// IMPORT the authentication middleware (adjust path as necessary)
-const authMiddleware = require('../middleware/auth'); // <<< IMPORTANT: ENSURE THIS PATH IS CORRECT
+const pool = require("../config/database");
 
-// Mentor POST route
-router.post('/', addSkillBadge);
-router.post('/*', addSkillBadge); 
+const {
+  addSkillBadge,
+  getStudentBadges,
+  getAllStudents
+} = require("../controllers/skillBadges.controller");
 
-// MODIFIED GET route: Add the authMiddleware to ensure only the logged-in student's ID is used
-router.get('/', authMiddleware, getStudentBadges);
+const authMiddleware = require("../middleware/auth");
 
-// GET route to fetch all students for mentor dropdown
-router.get('/students', getAllStudents);
+/*==========================================================
+ 🟢 TOTAL VERIFIED BADGES COUNT  (NO TOKEN REQUIRED)
+==========================================================*/
+router.get("/count", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        COALESCE(SUM(
+          CASE 
+            WHEN jsonb_typeof(badges) = 'array' THEN jsonb_array_length(badges)
+            ELSE 0
+          END
+        ), 0) AS total_badges
+      FROM students
+    `);
+
+    res.json({
+      success: true,
+      totalBadges: Number(result.rows[0].total_badges) || 0,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching skill badges count:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+/*==========================================================
+ 🟦 ADD SKILL BADGE (MENTOR ACTION)
+==========================================================*/
+router.post("/", authMiddleware, addSkillBadge);
+
+/*==========================================================
+ 🟦 STUDENT BADGES (REQUIRES TOKEN)
+==========================================================*/
+router.get("/", authMiddleware, getStudentBadges);
+
+/*==========================================================
+ 🟦 ALL STUDENTS FOR MENTOR BADGE DROPDOWN
+==========================================================*/
+router.get("/students", authMiddleware, getAllStudents);
 
 module.exports = router;

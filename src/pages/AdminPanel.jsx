@@ -20,6 +20,7 @@ import ProgramsAdmin from "../components/AdminPanelDashboard/ProgramsAdmin";
 import Programs from "../components/AdminPanelDashboard/Programs";
 import Testimonials from "../components/AdminPanelDashboard/Testimonials";
 import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
+import AssignedPrograms from "../components/AdminPanelDashboard/AssignedPrograms";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -75,14 +76,23 @@ function AdminPanel() {
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
       case "programs":
+        // ✅ FIX: Pass onNavigateSection prop correctly
         return (
           <ProgramsAdmin
             isDarkMode={isDarkMode}
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+      case "assigned_programs":
+        return <AssignedPrograms isDarkMode={isDarkMode} />;
       case "courses_table":
-        return (<CoursesTable isDarkMode={isDarkMode} onNavigateSection={() => setActiveSection} />);
+        // ✅ FIX: Correct the navigation prop
+        return (
+          <CoursesTable 
+            isDarkMode={isDarkMode} 
+            onNavigateSection={(s) => setActiveSection(s)} 
+          />
+        );
       case "mentors_table":
         return (
           <MentorsTable
@@ -93,12 +103,23 @@ function AdminPanel() {
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
       case "courses":
-        return <Programs isDarkMode={isDarkMode} />;
+        // ✅ FIX: Add onNavigateSection prop to Programs component
+        return (
+          <Programs 
+            isDarkMode={isDarkMode} 
+            onNavigateSection={(s) => setActiveSection(s)}
+          />
+        );
       case "testimonials":
         return <Testimonials isDarkMode={isDarkMode} />;
 
       default:
-        return <DashboardMain isDarkMode={isDarkMode} />;
+        return (
+          <DashboardMain 
+            isDarkMode={isDarkMode}
+            onNavigateSection={(section) => setActiveSection(section)}
+          />
+        );
     }
   };
 
@@ -169,12 +190,15 @@ function AdminPanel() {
 
         {/* Footer */}
         <footer
-    className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 
-    dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 
-    text-center py-4 text-sm transition-colors duration-300 mt-auto"
-  >
-    <p>© 2025 Uptoskills. Built by learners.</p>
-  </footer></div>
+          className={`w-full text-center py-4 text-sm transition-colors duration-500 mt-auto ${
+            isDarkMode
+              ? "bg-gray-900 text-gray-300 border-t border-gray-700"
+              : "bg-white text-gray-700 border-t border-gray-300"
+          }`}
+        >
+          <p>© 2025 Uptoskills. Built by learners.</p>
+        </footer>
+      </div>
     </div>
   );
 }

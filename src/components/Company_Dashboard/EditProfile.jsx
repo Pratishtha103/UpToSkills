@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Footer from "../AboutPage/Footer";
+// import Footer from "../AboutPage/Footer";
 
 export default function EditProfile() {
   const [formData, setFormData] = useState({
@@ -26,7 +26,7 @@ export default function EditProfile() {
         if (res.data.success) {
           const data = res.data.data;
           setFormData({
-            companyName: data.name || "",
+            companyName: data.name || data.company_name || "",
             website: data.website || "",
             industry: data.industry || "",
             contact: data.contact || "",
@@ -97,6 +97,7 @@ export default function EditProfile() {
   if (loading) return <p className="text-center mt-6">Loading...</p>;
 
   return (
+    <>
     <div className="flex flex-col min-h-screen">
       {/* Main Content */}
       <main className="flex-grow flex justify-center items-start p-6">
@@ -194,7 +195,12 @@ export default function EditProfile() {
           </form>
         </div>
       </main>
-      <Footer />
     </div>
+    <footer
+    className="w-full mt-2 text-gray-700   dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+  >
+    <p>© 2025 Uptoskills. Built by learners.</p>
+  </footer>
+    </>
   );
 }

@@ -265,20 +265,7 @@ const roleThemes = {
                                   </a>
                                 )}
                               </div>
-                              <div className="flex flex-wrap items-center gap-3 text-xs">
-                                {notification.link && (
-                                  <a
-                                    className="inline-flex items-center gap-1 font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-                                    href={notification.link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    onClick={(event) => event.stopPropagation()}
-                                  >
-                                    Open
-                                    <ArrowUpRight className="h-4 w-4" />
-                                  </a>
-                                )}
-                              </div>
+                              {/* Single "Open" action shown above in per-item actions; duplicate removed */}
                             </div>
                           </button>
                         </li>

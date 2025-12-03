@@ -27,7 +27,7 @@ export default function AdminNavbar({
           {/* Hamburger Menu */}
           <motion.button
             aria-label="Toggle sidebar"
-            className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800"
+            className="p-2 rounded-md hover:bg-gray-200 dark:hover:text-black transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onMenuClick}

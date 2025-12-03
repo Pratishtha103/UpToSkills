@@ -1,5 +1,3 @@
-// src/components/AdminPanelDashboard/DashboardMain.jsx
-
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -61,7 +59,7 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
   }, []);
 
   const formatNumber = (num) => {
-    if (num === null || num === undefined) return "-";
+    if (num === null || num === undefined) return "...";
     const n = typeof num === "number" ? num : Number(num);
     return n.toLocaleString("en-IN");
   };
@@ -116,8 +114,6 @@ const DashboardMain = ({ isDarkMode = false, onNavigateSection }) => {
       >
         Platform Overview
       </motion.h2>
-
-      {/* === Stat Cards (FIXED: 4 cards in one row) === */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card, index) => (
           <motion.div

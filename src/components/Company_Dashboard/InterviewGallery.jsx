@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../Company_Dashboard/ui/dialog";
+import Footer from "../AboutPage/Footer";
 
 const statusColors = {
   scheduled: "bg-primary text-primary-foreground",
@@ -171,10 +172,12 @@ export default function InterviewGallery() {
   const saveEdit = async () => {
     if (!editInterview.date || !editInterview.time) return alert("Select date and time");
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       await axios.put(`${API_BASE}/api/interviews/${editInterview.id}`, {
         date: editInterview.date,
         time: editInterview.time,
-      });
+      }, { headers });
       setIsEditOpen(false);
       setEditInterview({ id: "", date: "", time: "" });
       fetchInterviews();
@@ -184,6 +187,7 @@ export default function InterviewGallery() {
   };
 
   return (
+    <>
     <div className="min-h-screen dark:bg-gray-900">
       <div className="pt-20 px-4 max-w-[1200px] mx-auto">
         <h1 className="text-2xl font-bold mb-4">Upcoming Interviews ({interviews.length})</h1>
@@ -235,10 +239,12 @@ export default function InterviewGallery() {
         </div>
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent>
+          <DialogContent aria-describedby="reschedule-desc">
             <DialogHeader>
               <DialogTitle>Reschedule Interview</DialogTitle>
             </DialogHeader>
+
+            <p id="reschedule-desc" className="sr-only">Reschedule interview dialog. Choose a new date and time.</p>
 
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 gap-4 items-center">
@@ -261,10 +267,11 @@ export default function InterviewGallery() {
 
         {/* Confirm Delete Dialog */}
         <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-          <DialogContent>
+          <DialogContent aria-describedby="delete-desc">
             <DialogHeader>
               <DialogTitle>Delete Interview</DialogTitle>
             </DialogHeader>
+            <p id="delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
             <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
             <div className="flex justify-end gap-2 mt-4">
               <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
@@ -273,6 +280,14 @@ export default function InterviewGallery() {
           </DialogContent>
         </Dialog>
       </div>
+      <Footer/>
     </div>
+     {/* <footer
+    className="w-full  bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+  >
+    <p>© 2025 Uptoskills. Built by learners.</p>
+  </footer> */}
+    </>
   );
 }
+

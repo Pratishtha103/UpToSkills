@@ -3,7 +3,7 @@ import axios from "axios";
 import Sidebar from "../../MentorDashboard/components/Sidebar";
 import Header from "../../MentorDashboard/components/Header";
 import Footer from "../../MentorDashboard/components/Footer";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const predefinedDomains = [
@@ -18,7 +18,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
-const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) => {
+const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -142,12 +142,14 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
+          setIsDarkMode={setIsDarkMode}
         />
 
         {/* Main Content */}
         <main className="flex-1 pt-16 p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            {/* Local ToastContainer to guarantee visibility on this page */}
+            <ToastContainer position="top-right" autoClose={3000} newestOnTop style={{ zIndex: 99999 }} />
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Mentor Profile

@@ -129,9 +129,7 @@ const ProjectShowcase = () => {
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 No Projects Found
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
-                You don't have any assigned projects yet.
-              </p>
+              
             </div>
           </div>
         ) : (

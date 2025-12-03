@@ -39,7 +39,6 @@ const FIXED_BADGES = [
   },
 ];
 
-// ⬇️ NO PROPS – apna khud ka dark mode state yahi banayenge
 const SkillBadgeForm = () => {
   // Local dark mode state ONLY for this page
   const [isDarkMode, setIsDarkMode] = useState(
@@ -68,11 +67,17 @@ const SkillBadgeForm = () => {
       setLoadingStudents(true);
       try {
         const response = await fetch(
-          "http://localhost:5000/api/skill-badges/students"
+          "http://localhost:5000/api/students/autocomplete"
         );
         const data = await response.json();
-        if (data.success) {
-          setStudents(data.data);
+        // Map the response to match expected format (name -> full_name)
+        if (Array.isArray(data)) {
+          const mappedStudents = data.map((student) => ({
+            id: student.id,
+            full_name: student.name,
+            email: student.email,
+          }));
+          setStudents(mappedStudents);
         }
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -125,10 +130,7 @@ const SkillBadgeForm = () => {
     }
   };
 
-  const selectStudent = (e, studentName) => {
-    // prevent blur and other events when selecting from dropdown
-    e.preventDefault();
-    e.stopPropagation();
+  const selectStudent = (studentName) => {
     setFormData((prev) => ({ ...prev, student_name: studentName }));
     setFilteredStudents([]);
     setShowSuggestions(false);
@@ -153,7 +155,7 @@ const SkillBadgeForm = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-auth-token": token,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -191,18 +193,6 @@ const SkillBadgeForm = () => {
   const selectedBadge = FIXED_BADGES.find(
     (b) => b.name === formData.badge_name
   );
-
-  // helper to compute badge classes (strips any border-... from badge.color)
-  const getBadgeClass = (badge) => {
-    const bgOnly = badge.color.replace(/\bborder-[^\s]+\b/g, "").trim();
-    const borderClassMatch = badge.color.match(/\bborder-[^\s]+\b/);
-    const borderColorClass = borderClassMatch ? borderClassMatch[0] : "border-blue-400";
-    return `${bgOnly} ${
-      formData.badge_name === badge.name
-        ? borderColorClass + ' border-4 shadow-lg'
-        : 'border-2 border-transparent hover:border-blue-400'
-    }`;
-  };
 
   return (
     <div
@@ -244,8 +234,15 @@ const SkillBadgeForm = () => {
                   <div
                     key={badge.name}
                     onClick={() => selectBadge(badge.name)}
-                    className={`p-3 text-center rounded-lg cursor-pointer transition-all duration-200 ${getBadgeClass(badge)}`}
+                    className={`p-3 text-center rounded-lg border-2 cursor-pointer transition-all duration-200 
+                      ${badge.color}
+                      ${
+                        formData.badge_name === badge.name
+                          ? "border-4 ring-2 ring-offset-2 ring-blue-500"
+                          : "border-transparent hover:border-blue-400"
+                      }`}
                   >
+                    {/* ✅ FIXED: className1 → className */}
                     <div className="text-3xl mb-1">{badge.icon}</div>
                     <p className="text-sm font-semibold dark:text-gray-100">
                       {badge.name}
@@ -281,12 +278,24 @@ const SkillBadgeForm = () => {
                       name="student_name"
                       value={formData.student_name}
                       onChange={handleStudentNameChange}
-                      onFocus={() =>
-                        formData.student_name && setShowSuggestions(true)
-                      }
-                      onClick={() =>
-                        formData.student_name && setShowSuggestions(true)
-                      }
+                      onFocus={() => {
+                        if (formData.student_name) {
+                          const filtered = students.filter((student) =>
+                            student.full_name.toLowerCase().includes(formData.student_name.toLowerCase())
+                          );
+                          setFilteredStudents(filtered);
+                          setShowSuggestions(true);
+                        }
+                      }}
+                      onClick={() => {
+                        if (formData.student_name) {
+                          const filtered = students.filter((student) =>
+                            student.full_name.toLowerCase().includes(formData.student_name.toLowerCase())
+                          );
+                          setFilteredStudents(filtered);
+                          setShowSuggestions(true);
+                        }
+                      }}
                       required
                       autoComplete="off"
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -298,7 +307,7 @@ const SkillBadgeForm = () => {
                         {filteredStudents.map((student) => (
                           <div
                             key={student.id}
-                            onMouseDown={(e) => selectStudent(e, student.full_name)}
+                            onMouseDown={() => selectStudent(student.full_name)}
                             className="p-2 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer border-b dark:border-gray-600 last:border-b-0"
                           >
                             <div className="font-medium text-gray-900 dark:text-white">
@@ -318,7 +327,7 @@ const SkillBadgeForm = () => {
                       filteredStudents.length === 0 && (
                         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
                           <p className="text-sm text-red-600 dark:text-red-400">
-                            ⚠️ No students found with that name
+                            ⚠ No students found with that name
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Make sure the student is registered in the system
@@ -349,34 +358,33 @@ const SkillBadgeForm = () => {
                   ></textarea>
                 </label>
 
-                {/* Verified Checkbox + Submit Button stacked vertically */}
-                <div className="flex flex-col items-start gap-3">
-                  <label className="inline-flex items-center space-x-2 dark:text-white">
-                    <input
-                      type="checkbox"
-                      name="verified"
-                      checked={formData.verified}
-                      onChange={handleChange}
-                      className="form-checkbox h-5 w-5 text-blue-600 rounded dark:bg-gray-600 dark:border-gray-500"
-                    />
-                    <span>Verified Badge</span>
-                  </label>
+                {/* Verified Checkbox */}
+                <label className="inline-flex items-center space-x-2 dark:text-white">
+                  <input
+                    type="checkbox"
+                    name="verified"
+                    checked={formData.verified}
+                    onChange={handleChange}
+                    className="form-checkbox h-5 w-5 text-blue-600 rounded dark:bg-gray-600 dark:border-gray-500"
+                  />
+                  <span>Verified Badge</span>
+                </label>
 
-                  <div className="w-full flex justify-start">
-                    <button
-                      type="submit"
-                      disabled={submissionStatus === "submitting"}
-                      className={`px-4 py-2 text-white rounded-md transition ${
-                        submissionStatus === "submitting"
-                          ? "bg-gray-500 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      }`}
-                    >
-                      {submissionStatus === "submitting"
-                        ? "Submitting..."
-                        : "Award Badge"}
-                    </button>
-                  </div>
+                {/* Submit Button */}
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={submissionStatus === "submitting"}
+                    className={`px-4 py-2 text-white rounded-md transition ${
+                      submissionStatus === "submitting"
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {submissionStatus === "submitting"
+                      ? "Submitting..."
+                      : "Award Badge"}
+                  </button>
                 </div>
 
                 {/* Status Messages */}

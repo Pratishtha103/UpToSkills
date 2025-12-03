@@ -1,4 +1,4 @@
-// src/components/AdminPanelDashboard/Students.jsx
+/// src/components/AdminPanelDashboard/Students.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -442,8 +442,8 @@ const Students = ({ isDarkMode }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Enrollments</p>
                       </div>
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}%</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Attendance</p>
+                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Interview</p>
                       </div>
                     </div>
 

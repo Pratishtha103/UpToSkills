@@ -56,7 +56,9 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(
+  () => localStorage.getItem("darkMode") === "true"
+);
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
@@ -68,7 +70,9 @@ function App() {
         autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
+        newestOnTop
         theme="light"
+        style={{ zIndex: 99999 }}
       />
       <Router>
         <Routes>
@@ -84,14 +88,13 @@ function App() {
                 className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
               >
                 <p>© 2025 Uptoskills. Built by learners.</p>
-
               </footer>
               <Chatbot />
             </>
           } />
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/login" element={<LoginForm />} />
-           <Route path="/login/forgot-password" element={<ForgotPassword />} /> 
+          <Route path="/login/forgot-password" element={<ForgotPassword />} />
 
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -103,11 +106,11 @@ function App() {
           <Route path="/dashboard/my-programs" element={<ProtectedRoute><MyPrograms /></ProtectedRoute>} />
           <Route path="/dashboard/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/dashboard/aboutus" element={<ProtectedRoute><AboutUs /></ProtectedRoute>} />
-{/* ===== Add Project (Project Submission Form) ===== */}
-<Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
+          {/* ===== Add Project (Project Submission Form) ===== */}
+          <Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
 
-{/* ===== My Projects (Student’s submitted projects) ===== */}
-<Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
+          {/* ===== My Projects (Student’s submitted projects) ===== */}
+          <Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
 
 
 
@@ -121,10 +124,18 @@ function App() {
           <Route path="/company/*" element={<ProtectedRoute><CompanyNotFound /></ProtectedRoute>} />
 
           {/* ===== Misc Routes ===== */}
-          
-           <Route path="/dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view = "student" /></ProtectedRoute>} />
-          <Route path="/mentor-dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view = "mentor" /></ProtectedRoute>} />
-          <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} />
+
+          <Route path="/dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="student" /></ProtectedRoute>} />
+          <Route path="/mentor-dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="mentor" /></ProtectedRoute>} />
+          {/* <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} /> */}
+          <Route path="/mentor-dashboard/*" element={
+            <ProtectedRoute allowedRoles={["mentor"]}>
+              <MentorDashboardRoutes
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+              />
+            </ProtectedRoute>
+          } />
           <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
@@ -135,7 +146,78 @@ function App() {
           <Route path="/cybersecurity" element={<Cybersecurity />} />
           <Route path="/thankyou" element={<Thankyou />} />
 
-          {/* ===== 404 ===== */}
+          {/* STUDENT PROTECTED ROUTES */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute allowedRoles={["student"]}><Student_Dashboard /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/profile" element={
+            <ProtectedRoute allowedRoles={["student"]}><UserProfilePage /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/edit-profile" element={
+            <ProtectedRoute allowedRoles={["student"]}><EditProfilePage /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/my-projects" element={
+            <ProtectedRoute allowedRoles={["student"]}><MyProjects /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/my-programs" element={
+            <ProtectedRoute allowedRoles={["student"]}><MyPrograms /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/notifications" element={
+            <ProtectedRoute allowedRoles={["student"]}><NotificationsPage /></ProtectedRoute>
+          } />
+
+          <Route path="/student/skill-badges" element={
+            <ProtectedRoute allowedRoles={["student"]}><StudentSkillBadgesPage /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/projects" element={
+            <ProtectedRoute allowedRoles={["student"]}><Dashboard_Project /></ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/aboutus" element={
+            <ProtectedRoute allowedRoles={["student"]}><AboutUs /></ProtectedRoute>
+          } />
+
+          {/* COMPANY PROTECTED ROUTES */}
+          <Route path="/company" element={
+            <ProtectedRoute allowedRoles={["company"]}><CompanyDashboardHome /></ProtectedRoute>
+          } />
+
+          <Route path="/company-profile" element={
+            <ProtectedRoute allowedRoles={["company"]}><CompanyProfilePage /></ProtectedRoute>
+          } />
+
+          <Route path="/company/*" element={
+            <ProtectedRoute allowedRoles={["company"]}><CompanyNotFound /></ProtectedRoute>
+          } />
+
+          {/* MENTOR PROTECTED ROUTES */}
+          <Route path="/mentor-dashboard/skill-badges" element={
+            <ProtectedRoute allowedRoles={["mentor"]}>
+              <SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/mentor-dashboard/*" element={
+            <ProtectedRoute allowedRoles={["mentor"]}><MentorDashboardRoutes /></ProtectedRoute>
+          } />
+
+          {/* ADMIN PROTECTED ROUTES */}
+          <Route path="/adminPanel" element={
+            <ProtectedRoute allowedRoles={["admin"]}><AdminPanel /></ProtectedRoute>
+          } />
+
+          {/* GENERAL */}
+          <Route path="/projectShowcase" element={
+            <ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>
+          } />
+
+          <Route path="/unauthorized" element={<h1>403 - Unauthorized</h1>} />
           <Route path="*" element={<h1>404 - Page Not Found</h1>} />
 
         </Routes>
@@ -144,4 +226,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

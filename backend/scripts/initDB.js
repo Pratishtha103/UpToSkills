@@ -9,7 +9,7 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         company_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -17,6 +17,17 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+    // ENROLLMENTS
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS enrollments (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+    status TEXT DEFAULT 'active'
+  );
+`);
+
 
     // COMPANY PROFILES
     await pool.query(`
@@ -37,7 +48,7 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -100,7 +111,7 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,

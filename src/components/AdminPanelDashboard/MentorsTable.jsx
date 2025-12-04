@@ -34,7 +34,7 @@ export default function MentorsTable({ isDarkMode, onNavigateSection }) {
           return;
         }
         const data = await res.json();
-        setMentors(Array.isArray(data) ? data : []);
+        setMentors(Array.isArray(data.mentors) ? data.mentors : []);
       } catch (err) {
         console.error('Error fetching mentors:', err);
         if (mounted) setMentors([]);

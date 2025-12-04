@@ -24,11 +24,7 @@
     --input: 220 13% 91%;
     --ring: 214 84% 56%;
 
-    /* Sidebar (Light) */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 25 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary-foreground: 240 5.3% 26.1%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;

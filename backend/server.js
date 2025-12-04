@@ -73,6 +73,29 @@ io.on('connection', (socket) => {
     });
 });
 
+// Scheduled cleanup: remove notifications that have been read and are older than 7 weeks.
+// Unread notifications are retained indefinitely.
+const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // run once per day
+async function cleanupOldReadNotifications() {
+    try {
+        const res = await pool.query(
+            `DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '7 weeks' RETURNING id`);
+        if (res && res.rowCount) {
+            console.log(`🧹 Cleaned up ${res.rowCount} read notification(s) older than 7 weeks`);
+        } else {
+            console.log('🧹 Notification cleanup ran: no old read notifications found');
+        }
+    } catch (err) {
+        console.error('❌ Error during notification cleanup:', err && err.message ? err.message : err);
+    }
+}
+
+// Start cleanup timer after server starts. Also run once immediately on startup.
+setTimeout(() => {
+    cleanupOldReadNotifications();
+    setInterval(cleanupOldReadNotifications, CLEANUP_INTERVAL_MS);
+}, 1000);
+
 // Import routers
 const userProfileRoutes = require('./routes/userProfile');
 const authRoutes = require('./routes/auth');
@@ -93,6 +116,7 @@ const skillBadgesRoutes = require('./routes/skillBadges');
 const coursesRoutes = require('./routes/courses.route');
 const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
+
 
 // ✅ MIDDLEWARE SETUP FIRST (CRITICAL for req.body to work)
 app.use(cors({
@@ -176,6 +200,9 @@ app.use("/api/enrollments", require("./routes/enrollments"));
 app.use('/api/companies', companiesRouter);
 app.use('/api/searchcompanies', searchCompaniesRouter);
 app.use('/api/searchproject', searchProjectRoutes);
+// Add this line with other routes (around line 20-30)
+app.use('/api/student-projects', require('./routes/studentProjects'));
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {

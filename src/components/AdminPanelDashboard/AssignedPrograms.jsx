@@ -38,7 +38,11 @@ export default function AssignedPrograms({ isDarkMode }) {
     try {
       // Fetch mentors (protected)
       const mentorsRes = await axios.get('http://localhost:5000/api/mentors', { headers });
-      setMentors(mentorsRes.data || []);
+      const mentorsPayload = mentorsRes.data;
+      if (Array.isArray(mentorsPayload)) setMentors(mentorsPayload);
+      else if (mentorsPayload && Array.isArray(mentorsPayload.data)) setMentors(mentorsPayload.data);
+      else if (mentorsPayload && Array.isArray(mentorsPayload.mentors)) setMentors(mentorsPayload.mentors);
+      else setMentors([]);
     } catch (err) {
       console.error('Error fetching mentors:', err);
       setErrorMessage('Failed to load mentors (/api/mentors). You may need to be logged in (admin token).');
@@ -49,7 +53,11 @@ export default function AssignedPrograms({ isDarkMode }) {
     try {
       // Fetch assigned programs
       const assignmentsRes = await axios.get('http://localhost:5000/api/assigned-programs', { headers });
-      setAssignments(assignmentsRes.data?.data || []);
+      const aPayload = assignmentsRes.data;
+      if (Array.isArray(aPayload)) setAssignments(aPayload);
+      else if (aPayload && Array.isArray(aPayload.data)) setAssignments(aPayload.data);
+      else if (aPayload && Array.isArray(aPayload.assignments)) setAssignments(aPayload.assignments);
+      else setAssignments([]);
     } catch (err) {
       console.error('Error fetching assigned programs:', err);
       setErrorMessage('Failed to load assigned programs (/api/assigned-programs).');

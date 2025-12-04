@@ -1,4 +1,4 @@
-// src/components/AdminPanelDashboard/Students.jsx
+/// src/components/AdminPanelDashboard/Students.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +20,9 @@ const Students = ({ isDarkMode }) => {
   const fetchAllStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_BASE_URL);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(API_BASE_URL, { headers });
       const data = await res.json();
       if (data.success) setStudents(data.data || []);
       else setStudents([]);
@@ -43,7 +45,9 @@ const Students = ({ isDarkMode }) => {
 
     try {
       setIsDeleting(id);
-      const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+      const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE", headers });
       const result = await res.json();
       if (result.success) {
         setStudents((current) => current.filter((s) => s.id !== id));
@@ -83,11 +87,11 @@ const Students = ({ isDarkMode }) => {
         return;
 
     try {
-        setIsDeactivating(id);
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setStudents(current => current.map(s => 
-            s.id === id ? { ...s, status: newStatus } : s
-        ));
+      setIsDeactivating(id);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setStudents(current => current.map(s => 
+          s.id === id ? { ...s, status: newStatus } : s
+      ));
         alert(`Successfully set ${studentName} status to ${newStatus}.`);
 
         // Notify admins about status change
@@ -119,7 +123,9 @@ const Students = ({ isDarkMode }) => {
     try {
       setLoadingDetails(true);
       setSelectedStudent(studentId);
-      const res = await fetch(`${API_BASE_URL}/${studentId}/details`);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(`${API_BASE_URL}/${studentId}/details`, { headers });
       const data = await res.json();
       if (data.success) {
         setStudentDetails(data.data);
@@ -155,7 +161,9 @@ const Students = ({ isDarkMode }) => {
       try {
         setSearching(true);
         // ✅ CHANGED: Use /search?q= instead of /search/:name
-        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`);
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`, { headers });
         const data = await res.json();
         
         if (data.success) {
@@ -251,18 +259,10 @@ const Students = ({ isDarkMode }) => {
                       <h3 className="text-xl font-bold break-words flex-shrink-1 min-w-0">
                         {student.full_name}
                       </h3>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full whitespace-nowrap ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {currentStatus}
-                        </span>
-                        <button
-                          onClick={() => fetchStudentDetails(student.id)}
-                          className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
-                          title="View Details"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
-                      </div>
+                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {currentStatus}
+                      </span>
+                      
                     </div>
                   </div>
                   <p className="text-sm line-clamp-2">
@@ -436,8 +436,8 @@ const Students = ({ isDarkMode }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Enrollments</p>
                       </div>
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}%</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Attendance</p>
+                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Interview</p>
                       </div>
                     </div>
 

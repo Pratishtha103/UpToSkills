@@ -3,7 +3,7 @@ import axios from "axios";
 import Sidebar from "../../MentorDashboard/components/Sidebar";
 import Header from "../../MentorDashboard/components/Header";
 import Footer from "../../MentorDashboard/components/Footer";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const predefinedDomains = [
@@ -18,7 +18,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
-const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) => {
+const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -120,20 +120,40 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
 
   const handleSaveButtonClick = (e) => {
     e.preventDefault();
+    // Prevent saving unless all required fields are filled
+    const isComplete = Boolean(
+      formData.full_name &&
+        formData.contact_number &&
+        formData.linkedin_url &&
+        formData.github_url &&
+        formData.about_me &&
+        formData.expertise_domains &&
+        formData.expertise_domains.length > 0
+    );
+    if (!isComplete) {
+      toast.warn("Please fill all required fields before saving.");
+      return;
+    }
+    // Client-side validation: ensure full name contains only alphabets/spaces
+    if (formData.full_name && !/^[A-Za-z\s]+$/.test(formData.full_name.trim())) {
+      toast.error("Full name must contain only alphabets and spaces.");
+      return;
+    }
     saveProfile();
   };
 
   // Check if profile is completed - ALL fields must be filled
-  const isProfileCompleted =
+  const isProfileCompletedBool = Boolean(
     formData.full_name &&
-    formData.contact_number &&
-    formData.linkedin_url &&
-    formData.github_url &&
-    formData.about_me &&
-    formData.expertise_domains &&
-    formData.expertise_domains.length > 0
-      ? "Yes"
-      : "No";
+      formData.contact_number &&
+      formData.linkedin_url &&
+      formData.github_url &&
+      formData.about_me &&
+      formData.expertise_domains &&
+      formData.expertise_domains.length > 0
+  );
+
+  const isProfileCompleted = isProfileCompletedBool ? "Yes" : "No";
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
@@ -142,12 +162,14 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
+          setIsDarkMode={setIsDarkMode}
         />
 
         {/* Main Content */}
         <main className="flex-1 pt-16 p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            {/* Local ToastContainer to guarantee visibility on this page */}
+            <ToastContainer position="top-right" autoClose={3000} newestOnTop style={{ zIndex: 99999 }} />
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Mentor Profile
@@ -274,9 +296,10 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode, toggleDarkMode }) =>
                   </span>
                   <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition"
+                    disabled={saving}
+                    className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
-                    Save Profile
+                    {saving ? 'Saving...' : 'Save Profile'}
                   </button>
                 </div>
               </form>

@@ -63,7 +63,19 @@ router.post("/", async (req, res) => {
             [student_id, cleanTitle, cleanDescription, cleanTechStack, cleanContributions, final_is_open_source, cleanGithubLink]
         );
         
-        console.log('Project submitted successfully!', result.rows[0]);
+                // Project submitted successfully (details commented to avoid terminal noise)
+                /*
+                    id: result.rows[0].id,
+                    student_id: result.rows[0].student_id,
+                    title: result.rows[0].title,
+                    description: result.rows[0].description,
+                    tech_stack: result.rows[0].tech_stack,
+                    contributions: result.rows[0].contributions,
+                    is_open_source: result.rows[0].is_open_source,
+                    github_pr_link: result.rows[0].github_pr_link,
+                    created_at: result.rows[0].created_at,
+                    updated_at: result.rows[0].updated_at
+                */
     
         res.status(201).json({ message: "Project submitted successfully!", project: result.rows[0] });
     } catch (err) {
@@ -77,7 +89,7 @@ router.post("/", async (req, res) => {
 router.get("/assigned/:studentId", async (req, res) => {
     const studentId = req.params.studentId; 
     
-    console.log('Fetching projects for student ID:', studentId);
+    // debug log removed to avoid noisy terminal output
 
     try {
         const query = `

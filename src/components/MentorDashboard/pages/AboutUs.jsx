@@ -133,13 +133,19 @@ export default function AboutUs() {
             </a>
 
             {/* Email */}
-            <a href="mailto:info@uptoskills.com">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition h-full">
-                <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-                <h3 className="text-xl font-semibold mb-2 dark:text-white">Mail Us 24/7:</h3>
-                <p className="text-gray-700 dark:text-gray-300">info@uptoskills.com</p>
-              </div>
-            </a>
+            
+          <a
+        href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
+        target="_blank"
+        rel="noopener noreferrer"
+        
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition h-full">
+            <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
+            <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
+            <p className="text-gray-600">info@uptoskills.com</p>
+          </div>
+          </a>
 
           </div>
         </section>

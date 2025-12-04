@@ -8,7 +8,9 @@ export default function AboutCompanyPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       {/* Content */}
-      <div className="flex-grow pt-20 px-2 sm:px-4 py-6 max-w-[1650px] mx-auto">
+      {/* <div className="flex-grow pt-20 px-2 sm:px-4 py-6 max-w-[1650px] mx-auto"> */}
+      <div className="flex-grow pt-20 px-2 sm:px-4 py-6 w-full">
+
         <motion.div
           className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
           initial={{ opacity: 0, y: 10 }}

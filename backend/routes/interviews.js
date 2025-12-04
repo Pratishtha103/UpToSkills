@@ -20,6 +20,40 @@ const formatInterviewSlot = (date, time) => {
   return `${date} ${time}`;
 };
 
+// ✅ GET upcoming interviews count for a specific student
+router.get('/count/:studentId', async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    if (!studentId) {
+      return res.status(400).json({ error: 'Student ID is required' });
+    }
+
+    // Get current date and time to filter only upcoming interviews
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().split(' ')[0].substring(0, 5);
+
+    // Count upcoming interviews where status is 'Scheduled' and date/time is in the future
+    const result = await pool.query(
+      `SELECT COUNT(*) as count 
+       FROM interviews 
+       WHERE candidate_id = $1 
+       AND status = 'Scheduled'
+       AND (
+         date > $2 
+         OR (date = $2 AND time >= $3)
+       )`,
+      [studentId, currentDate, currentTime]
+    );
+
+    res.json({ count: parseInt(result.rows[0].count, 10) });
+  } catch (error) {
+    console.error('Error fetching upcoming interviews count:', error);
+    res.status(500).json({ error: 'Server error while fetching upcoming interviews count' });
+  }
+});
+
 // ✅ GET all interviews (sorted by date & time)
 router.get("/", async (req, res) => {
   try {

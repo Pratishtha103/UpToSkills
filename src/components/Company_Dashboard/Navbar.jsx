@@ -7,22 +7,45 @@ import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../Notifications/NotificationCenter";
+import { persistThemePreference, readStoredTheme } from "../../lib/utils";
 
 export default function Navbar({ onMenuClick }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => readStoredTheme());
   const navigate = useNavigate();
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [isDarkMode]);
+    const handleThemeSignal = (event) => {
+      const nextValue =
+        typeof event?.detail?.isDarkMode === "boolean"
+          ? event.detail.isDarkMode
+          : readStoredTheme();
+      setIsDarkMode((prev) => (prev === nextValue ? prev : nextValue));
+    };
+
+    window.addEventListener("themeChange", handleThemeSignal);
+    window.addEventListener("storage", handleThemeSignal);
+
+    return () => {
+      window.removeEventListener("themeChange", handleThemeSignal);
+      window.removeEventListener("storage", handleThemeSignal);
+    };
+  }, []);
 
   const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode((prev) => {
+      const nextValue = !prev;
+      const root = document.documentElement;
+
+      if (nextValue) {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+
+      persistThemePreference(nextValue);
+
+      return nextValue;
+    });
   };
 
   return (

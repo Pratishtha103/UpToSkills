@@ -232,14 +232,28 @@
 
 // src/pages/Landing.jsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Sun, Moon } from 'lucide-react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Chatbot from "../components/Contact_Page/Chatbot";
 import logo from "../assets/logo.jpg";
+import darkLogo from "../assets/darkLogo.jpg";
 
-export default function Landing() {
+export default function Landing({ isDarkMode, setIsDarkMode }) {
   const navigate = useNavigate();
+
+  // Apply dark mode class on root so Tailwind's dark: utilities work
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("darkMode", "false");
+    }
+  }, [isDarkMode]);
 
   // Get user from localStorage
   const storedUser = localStorage.getItem("user");
@@ -311,17 +325,17 @@ export default function Landing() {
   ];
 
   return (
-    <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
+    <div className={`font-sans transition-all duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} overflow-x-hidden`}>
       {/* Header */}
-      <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
+      <header className={`fixed w-full z-50 backdrop-blur-lg shadow-sm transition ${isDarkMode ? 'bg-gray-900 text-white border-b border-gray-800' : 'bg-white/80 text-gray-900 border-b border-border'}`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <img
-            src={logo}
+            src={isDarkMode ? darkLogo : logo}
             alt="Upto To Skills logo"
             className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
-          <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
+          <nav className={`flex items-center space-x-6 font-medium text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
             {["Home", "About", "Programs", "Contact"].map((link, i) => {
               const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
               return (
@@ -335,12 +349,20 @@ export default function Landing() {
                 </span>
               );
             })}
+            {/* Dark/Light toggle placed after Contact */}
+            <button
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              onClick={() => setIsDarkMode && setIsDarkMode(prev => !prev)}
+              className={`ml-2 p-2 rounded-full transition flex items-center ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+            >
+              {isDarkMode ? <Sun className="h-4 w-4 text-yellow-300" /> : <Moon className="h-4 w-4 text-gray-800" />}
+            </button>
           </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 md:pt-44 pb-20 px-6 md:px-16 bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8] relative overflow-hidden">
+      <section className="pt-32 md:pt-44 pb-20 px-6 md:px-16 relative overflow-hidden transition-colors duration-300 bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8] dark:from-transparent dark:bg-gradient-to-br dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -350,7 +372,7 @@ export default function Landing() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-[#00BDA6] leading-tight mb-6">
               Learn. Connect. <br /> Grow with Peers.
             </h1>
-            <p className="text-gray-600 text-lg mb-6">
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
               Collaborate with passionate learners and build real-world tech skills through projects.
             </p>
 
@@ -407,8 +429,8 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 md:px-16 bg-white text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
+      <section className="py-20 px-6 md:px-16 bg-white dark:bg-gray-800 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-10">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div
@@ -432,8 +454,8 @@ export default function Landing() {
       </section>
 
       {/* Partners */}
-      <section className="py-16 bg-[#f9f9f9] text-center">
-        <h3 className="text-2xl font-bold text-gray-800 mb-8">
+      <section className="py-16 bg-[#f9f9f9] dark:bg-gray-800 text-center">
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-8">
           Trusted by Top Companies
         </h3>
         <div className="flex flex-wrap justify-center items-center gap-10">

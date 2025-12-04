@@ -8,42 +8,44 @@ import NotificationCenter from "../../Notifications/NotificationCenter";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
+import { persistThemePreference, readStoredTheme } from "../../../lib/utils";
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => readStoredTheme());
 
-  // Load saved theme from localStorage when component mounts
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const root = document.documentElement;
+    const handleThemeSignal = (event) => {
+      const nextValue =
+        typeof event?.detail?.isDarkMode === "boolean"
+          ? event.detail.isDarkMode
+          : readStoredTheme();
+      setIsDarkMode((prev) => (prev === nextValue ? prev : nextValue));
+    };
 
-    if (savedTheme === "dark") {
-      root.classList.add("dark");
-      setIsDarkMode(true);
-    } else {
-      root.classList.remove("dark");
-      setIsDarkMode(false);
-    }
+    window.addEventListener("themeChange", handleThemeSignal);
+    window.addEventListener("storage", handleThemeSignal);
+
+    return () => {
+      window.removeEventListener("themeChange", handleThemeSignal);
+      window.removeEventListener("storage", handleThemeSignal);
+    };
   }, []);
 
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => {
-      const newTheme = !prev ? "dark" : "light";
+      const nextValue = !prev;
       const html = document.documentElement;
 
-      if (newTheme === "dark") {
+      if (nextValue) {
         html.classList.add("dark");
       } else {
         html.classList.remove("dark");
       }
 
-      localStorage.setItem("theme", newTheme);
+      persistThemePreference(nextValue);
 
-      // Notify dashboard about theme change
-      window.dispatchEvent(new Event("themeChange"));
-
-      return !prev;
+      return nextValue;
     });
   };
 

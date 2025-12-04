@@ -199,7 +199,7 @@ const Students = ({ isDarkMode }) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by name"
+              placeholder="Search by name & domain"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none ${
@@ -242,32 +242,34 @@ const Students = ({ isDarkMode }) => {
                     : "bg-white text-gray-900"
                 }`}
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold truncate">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
+                      <User className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-wrap items-center gap-2">
+                      <h3 className="text-xl font-bold break-words flex-shrink-1 min-w-0">
                         {student.full_name}
                       </h3>
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {currentStatus}
-                      </span>
-                      <button
-                        onClick={() => fetchStudentDetails(student.id)}
-                        className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
-                        title="View Details"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </button>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full whitespace-nowrap ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {currentStatus}
+                        </span>
+                        <button
+                          onClick={() => fetchStudentDetails(student.id)}
+                          className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
+                          title="View Details"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-sm line-clamp-2">
-                      {Array.isArray(student.domains_of_interest)
-                        ? student.domains_of_interest.join(", ")
-                        : student.domains_of_interest}
-                    </p>
                   </div>
+                  <p className="text-sm line-clamp-2">
+                    {Array.isArray(student.domains_of_interest)
+                      ? student.domains_of_interest.join(", ")
+                      : student.domains_of_interest}
+                  </p>
                 </div>
 
                 <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">

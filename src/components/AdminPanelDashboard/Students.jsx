@@ -1,4 +1,4 @@
-// src/components/AdminPanelDashboard/Students.jsx
+/// src/components/AdminPanelDashboard/Students.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -262,13 +262,7 @@ const Students = ({ isDarkMode }) => {
                       <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {currentStatus}
                       </span>
-                      <button
-                        onClick={() => fetchStudentDetails(student.id)}
-                        className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
-                        title="View Details"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </button>
+                      
                     </div>
                     <p className="text-sm line-clamp-2">
                       {Array.isArray(student.domains_of_interest)
@@ -442,8 +436,8 @@ const Students = ({ isDarkMode }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Enrollments</p>
                       </div>
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}%</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Attendance</p>
+                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Interview</p>
                       </div>
                     </div>
 

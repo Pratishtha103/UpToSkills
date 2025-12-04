@@ -1,8 +1,7 @@
 import React from 'react';
 import ProgramsSection from '../components/AboutPage/ProgramsSection';
 import Header from '../components/AboutPage/Header';
-import Chatbot from "../components/Contact_Page/Chatbot";
-
+import Chatbot from '../components/Contact_Page/Chatbot'
 
 const ProgramsPage = () => {
   return (

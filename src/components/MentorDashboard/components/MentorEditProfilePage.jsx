@@ -120,20 +120,40 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   const handleSaveButtonClick = (e) => {
     e.preventDefault();
+    // Prevent saving unless all required fields are filled
+    const isComplete = Boolean(
+      formData.full_name &&
+        formData.contact_number &&
+        formData.linkedin_url &&
+        formData.github_url &&
+        formData.about_me &&
+        formData.expertise_domains &&
+        formData.expertise_domains.length > 0
+    );
+    if (!isComplete) {
+      toast.warn("Please fill all required fields before saving.");
+      return;
+    }
+    // Client-side validation: ensure full name contains only alphabets/spaces
+    if (formData.full_name && !/^[A-Za-z\s]+$/.test(formData.full_name.trim())) {
+      toast.error("Full name must contain only alphabets and spaces.");
+      return;
+    }
     saveProfile();
   };
 
   // Check if profile is completed - ALL fields must be filled
-  const isProfileCompleted =
+  const isProfileCompletedBool = Boolean(
     formData.full_name &&
-    formData.contact_number &&
-    formData.linkedin_url &&
-    formData.github_url &&
-    formData.about_me &&
-    formData.expertise_domains &&
-    formData.expertise_domains.length > 0
-      ? "Yes"
-      : "No";
+      formData.contact_number &&
+      formData.linkedin_url &&
+      formData.github_url &&
+      formData.about_me &&
+      formData.expertise_domains &&
+      formData.expertise_domains.length > 0
+  );
+
+  const isProfileCompleted = isProfileCompletedBool ? "Yes" : "No";
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
@@ -276,9 +296,10 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                   </span>
                   <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition"
+                    disabled={saving}
+                    className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
-                    Save Profile
+                    {saving ? 'Saving...' : 'Save Profile'}
                   </button>
                 </div>
               </form>

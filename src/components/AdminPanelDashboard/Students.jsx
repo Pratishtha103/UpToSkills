@@ -1,8 +1,22 @@
-/// src/components/AdminPanelDashboard/Students.jsx
+// src/components/AdminPanelDashboard/Students.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Search, Loader2, Users, Eye, X, Award, BookOpen, Calendar, Github, Linkedin, Mail, Phone } from "lucide-react"; 
+import {
+  User,
+  Search,
+  Loader2,
+  Users,
+  Eye,
+  X,
+  Award,
+  BookOpen,
+  Calendar,
+  Github,
+  Linkedin,
+  Mail,
+  Phone,
+} from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api/students";
 
@@ -12,7 +26,7 @@ const Students = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(null);
-  const [isDeactivating, setIsDeactivating] = useState(null); 
+  const [isDeactivating, setIsDeactivating] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -20,7 +34,8 @@ const Students = ({ isDarkMode }) => {
   const fetchAllStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await fetch(API_BASE_URL, { headers });
       const data = await res.json();
@@ -45,8 +60,11 @@ const Students = ({ isDarkMode }) => {
 
     try {
       setIsDeleting(id);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const headers = token
+        ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
       const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE", headers });
       const result = await res.json();
       if (result.success) {
@@ -80,42 +98,45 @@ const Students = ({ isDarkMode }) => {
 
   const handleDeactivate = async (id, currentStatus) => {
     const studentToUpdate = students.find((s) => s.id === id);
-    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
     const studentName = studentToUpdate?.full_name || `ID ${id}`;
 
-    if (!window.confirm(`Are you sure you want to change the status of ${studentName} to "${newStatus}"?`))
-        return;
+    if (
+      !window.confirm(
+        `Are you sure you want to change the status of ${studentName} to "${newStatus}"?`
+      )
+    )
+      return;
 
     try {
       setIsDeactivating(id);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setStudents(current => current.map(s => 
-          s.id === id ? { ...s, status: newStatus } : s
-      ));
-        alert(`Successfully set ${studentName} status to ${newStatus}.`);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setStudents((current) =>
+        current.map((s) => (s.id === id ? { ...s, status: newStatus } : s))
+      );
+      alert(`Successfully set ${studentName} status to ${newStatus}.`);
 
-        // Notify admins about status change
-        try {
-          await fetch("http://localhost:5000/api/notifications", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              role: "admin",
-              type: "status-change",
-              title: "Student status updated",
-              message: `${studentName} status changed to ${newStatus} (id: ${id}).`,
-              metadata: { entity: "student", id, status: newStatus },
-            }),
-          });
-        } catch (notifErr) {
-          console.error("Failed to create notification:", notifErr);
-        }
-
+      // Notify admins about status change
+      try {
+        await fetch("http://localhost:5000/api/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "admin",
+            type: "status-change",
+            title: "Student status updated",
+            message: `${studentName} status changed to ${newStatus} (id: ${id}).`,
+            metadata: { entity: "student", id, status: newStatus },
+          }),
+        });
+      } catch (notifErr) {
+        console.error("Failed to create notification:", notifErr);
+      }
     } catch (err) {
-        console.error("Error updating status:", err);
-        alert(`Failed to change student status to ${newStatus}.`);
+      console.error("Error updating status:", err);
+      alert(`Failed to change student status to ${newStatus}.`);
     } finally {
-        setIsDeactivating(null);
+      setIsDeactivating(null);
     }
   };
 
@@ -123,7 +144,8 @@ const Students = ({ isDarkMode }) => {
     try {
       setLoadingDetails(true);
       setSelectedStudent(studentId);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await fetch(`${API_BASE_URL}/${studentId}/details`, { headers });
       const data = await res.json();
@@ -151,21 +173,25 @@ const Students = ({ isDarkMode }) => {
   useEffect(() => {
     const timeout = setTimeout(async () => {
       const trimmedSearch = searchTerm.trim();
-      
+
       // If search is empty, fetch all students
       if (!trimmedSearch) {
         fetchAllStudents();
         return;
       }
-      
+
       try {
         setSearching(true);
         // ✅ CHANGED: Use /search?q= instead of /search/:name
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`, { headers });
+        const res = await fetch(
+          `${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`,
+          { headers }
+        );
         const data = await res.json();
-        
+
         if (data.success) {
           setStudents(data.data || []);
         } else {
@@ -178,7 +204,7 @@ const Students = ({ isDarkMode }) => {
         setSearching(false);
       }
     }, 500); // 500ms debounce
-    
+
     return () => clearTimeout(timeout);
   }, [searchTerm, fetchAllStudents]);
 
@@ -198,9 +224,7 @@ const Students = ({ isDarkMode }) => {
         {/* Search Bar */}
         <div
           className={`p-4 shadow-md rounded-lg border transition-colors duration-300 ${
-            isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-300"
+            isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
           }`}
         >
           <div className="relative">
@@ -237,68 +261,92 @@ const Students = ({ isDarkMode }) => {
             ))
           ) : students.length > 0 ? (
             students.map((student) => {
-              const currentStatus = student.status || 'Active';
-              const isCurrentlyActive = currentStatus === 'Active';
-              
+              const currentStatus = student.status || "Active";
+              const isCurrentlyActive = currentStatus === "Active";
+
               return (
-              <motion.div
-                key={student.id}
-                layout
-                className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
-                  isDarkMode
-                    ? "bg-gray-800 text-gray-100"
-                    : "bg-white text-gray-900"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold truncate">
-                        {student.full_name}
-                      </h3>
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {currentStatus}
-                      </span>
-                      
+                <motion.div
+                  key={student.id}
+                  layout
+                  className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
+                    isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
+                  }`}
+                >
+                  {/* TOP: avatar + name + status + eye */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
+                      <User className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-sm line-clamp-2">
-                      {Array.isArray(student.domains_of_interest)
-                        ? student.domains_of_interest.join(", ")
-                        : student.domains_of_interest}
-                    </p>
+
+                    {/* Make the name area a shrinkable container so eye icon doesn't overflow */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 justify-between w-full overflow-hidden">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-xl font-bold break-words whitespace-normal leading-snug">
+                            {student.full_name}
+                          </h3>
+                          {/* optional small subtitle could go here */}
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                          <span
+                            className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                              isCurrentlyActive ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {currentStatus}
+                          </span>
+
+                          <button
+                            onClick={() => fetchStudentDetails(student.id)}
+                            className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400 flex-shrink-0"
+                            title="View Details"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-400 break-words whitespace-normal mt-2">
+                        {Array.isArray(student.domains_of_interest)
+                          ? student.domains_of_interest.join(", ")
+                          : student.domains_of_interest}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
-                  <button
-                    onClick={() => handleDeactivate(student.id, currentStatus)}
-                    disabled={isDeactivating === student.id}
-                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                      isDeactivating === student.id
-                        ? "bg-blue-300 text-blue-800 cursor-not-allowed"
-                        : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
-                  >
-                    {isDeactivating === student.id ? "Updating..." : (isCurrentlyActive ? "Deactivate" : "Activate")}
-                  </button>
+                  <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
+                    <button
+                      onClick={() => handleDeactivate(student.id, currentStatus)}
+                      disabled={isDeactivating === student.id}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        isDeactivating === student.id
+                          ? "bg-blue-300 text-blue-800 cursor-not-allowed"
+                          : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                    >
+                      {isDeactivating === student.id
+                        ? "Updating..."
+                        : isCurrentlyActive
+                        ? "Deactivate"
+                        : "Activate"}
+                    </button>
 
-                  <button
-                    onClick={() => handleDelete(student.id)}
-                    disabled={isDeleting === student.id}
-                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                      isDeleting === student.id
-                        ? "bg-red-300 text-red-800 cursor-not-allowed"
-                        : "bg-red-500 text-white hover:bg-red-600"
-                    }`}
-                  >
-                    {isDeleting === student.id ? "Deleting..." : "Delete"}
-                  </button>
-                </div>
-              </motion.div>
-            )})
+                    <button
+                      onClick={() => handleDelete(student.id)}
+                      disabled={isDeleting === student.id}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        isDeleting === student.id
+                          ? "bg-red-300 text-red-800 cursor-not-allowed"
+                          : "bg-red-500 text-white hover:bg-red-600"
+                      }`}
+                    >
+                      {isDeleting === student.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12">
               <p className="text-gray-500">
@@ -324,14 +372,16 @@ const Students = ({ isDarkMode }) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl ${
+              className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl overflow-hidden break-words whitespace-normal ${
                 isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
               }`}
             >
               {/* Modal Header */}
-              <div className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${
-                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-              }`}>
+              <div
+                className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${
+                  isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+                }`}
+              >
                 <h2 className="text-2xl font-bold">Student Details</h2>
                 <button
                   onClick={closeModal}
@@ -358,32 +408,43 @@ const Students = ({ isDarkMode }) => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
-                          <p className="font-semibold">{studentDetails.profile.full_name || studentDetails.profile.profile_full_name}</p>
+                          <p className="font-semibold break-words whitespace-normal">
+                            {studentDetails.profile.full_name || studentDetails.profile.profile_full_name}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                          <p className="font-semibold flex items-center gap-2">
+                          <p className="font-semibold flex items-center gap-2 break-words whitespace-normal">
                             <Mail className="w-4 h-4" />
                             {studentDetails.profile.email}
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                          <p className="font-semibold flex items-center gap-2">
+                          <p className="font-semibold flex items-center gap-2 break-words whitespace-normal">
                             <Phone className="w-4 h-4" />
                             {studentDetails.profile.phone || studentDetails.profile.contact_number}
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Profile Status</p>
-                          <p className={`font-semibold ${studentDetails.profile.profile_completed ? "text-green-500" : "text-yellow-500"}`}>
+                          <p
+                            className={`font-semibold ${
+                              studentDetails.profile.profile_completed ? "text-green-500" : "text-yellow-500"
+                            }`}
+                          >
                             {studentDetails.profile.profile_completed ? "Completed" : "Incomplete"}
                           </p>
                         </div>
                         {studentDetails.profile.linkedin_url && (
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">LinkedIn</p>
-                            <a href={studentDetails.profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-500 hover:underline flex items-center gap-2">
+                            <a
+                              href={studentDetails.profile.linkedin_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold break-all text-blue-500 hover:underline flex items-center gap-2 max-w-full"
+                            >
                               <Linkedin className="w-4 h-4" />
                               View Profile
                             </a>
@@ -392,7 +453,12 @@ const Students = ({ isDarkMode }) => {
                         {studentDetails.profile.github_url && (
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">GitHub</p>
-                            <a href={studentDetails.profile.github_url} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-500 hover:underline flex items-center gap-2">
+                            <a
+                              href={studentDetails.profile.github_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold break-all text-blue-500 hover:underline flex items-center gap-2 max-w-full"
+                            >
                               <Github className="w-4 h-4" />
                               View Profile
                             </a>
@@ -402,17 +468,21 @@ const Students = ({ isDarkMode }) => {
                       {studentDetails.profile.why_hire_me && (
                         <div className="mt-4">
                           <p className="text-sm text-gray-500 dark:text-gray-400">Why Hire Me</p>
-                          <p className="mt-1">{studentDetails.profile.why_hire_me}</p>
+                          <p className="mt-1 break-words whitespace-normal">{studentDetails.profile.why_hire_me}</p>
                         </div>
                       )}
                       {studentDetails.profile.domains_of_interest && (
                         <div className="mt-4">
                           <p className="text-sm text-gray-500 dark:text-gray-400">Domains of Interest</p>
                           <div className="flex flex-wrap gap-2 mt-2">
-                            {(Array.isArray(studentDetails.profile.domains_of_interest) 
-                              ? studentDetails.profile.domains_of_interest 
-                              : [studentDetails.profile.domains_of_interest]).map((domain, idx) => (
-                              <span key={idx} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                            {(Array.isArray(studentDetails.profile.domains_of_interest)
+                              ? studentDetails.profile.domains_of_interest
+                              : [studentDetails.profile.domains_of_interest]
+                            ).map((domain, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm break-words max-w-full"
+                              >
                                 {domain}
                               </span>
                             ))}
@@ -450,14 +520,24 @@ const Students = ({ isDarkMode }) => {
                         </h3>
                         <div className="space-y-4">
                           {studentDetails.projects.map((project) => (
-                            <div key={project.id} className={`p-4 rounded-lg border ${isDarkMode ? "border-gray-600 bg-gray-800" : "border-gray-200 bg-white"}`}>
-                              <h4 className="font-bold text-lg">{project.title}</h4>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{project.description}</p>
+                            <div
+                              key={project.id}
+                              className={`p-4 rounded-lg border ${isDarkMode ? "border-gray-600 bg-gray-800" : "border-gray-200 bg-white"}`}
+                            >
+                              <h4 className="font-bold text-lg break-words">{project.title}</h4>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words">{project.description}</p>
                               {project.tech_stack && (
-                                <p className="text-sm mt-2"><span className="font-semibold">Tech Stack:</span> {project.tech_stack}</p>
+                                <p className="text-sm mt-2 break-words">
+                                  <span className="font-semibold">Tech Stack:</span> {project.tech_stack}
+                                </p>
                               )}
                               {project.github_pr_link && (
-                                <a href={project.github_pr_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm mt-2 inline-flex items-center gap-1">
+                                <a
+                                  href={project.github_pr_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline text-sm mt-2 inline-flex items-center gap-1 break-all max-w-full"
+                                >
                                   <Github className="w-4 h-4" />
                                   View on GitHub
                                 </a>
@@ -485,8 +565,8 @@ const Students = ({ isDarkMode }) => {
                             <div key={badge.id} className={`p-4 rounded-lg border ${isDarkMode ? "border-gray-600 bg-gray-800" : "border-gray-200 bg-white"}`}>
                               <div className="flex items-start justify-between">
                                 <div>
-                                  <h4 className="font-bold">{badge.name}</h4>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{badge.description}</p>
+                                  <h4 className="font-bold break-words">{badge.name}</h4>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words">{badge.description}</p>
                                   <p className="text-xs text-gray-400 mt-2">Awarded: {new Date(badge.awarded_at).toLocaleDateString()}</p>
                                 </div>
                                 {badge.is_verified && (
@@ -513,15 +593,17 @@ const Students = ({ isDarkMode }) => {
                             <div key={enrollment.id} className={`p-4 rounded-lg border ${isDarkMode ? "border-gray-600 bg-gray-800" : "border-gray-200 bg-white"}`}>
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <h4 className="font-bold">{enrollment.course_name}</h4>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{enrollment.course_description}</p>
+                                  <h4 className="font-bold break-words">{enrollment.course_name}</h4>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words">{enrollment.course_description}</p>
                                   <p className="text-xs text-gray-400 mt-2">Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
                                 </div>
-                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  enrollment.status === 'active' 
-                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                    : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200'
-                                }`}>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                    enrollment.status === "active"
+                                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                                      : "bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200"
+                                  }`}
+                                >
                                   {enrollment.status}
                                 </span>
                               </div>

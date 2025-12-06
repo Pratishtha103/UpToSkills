@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import axios from "axios";
 import signupImage from "../assets/bgc.jpeg";
 
@@ -63,6 +63,7 @@ const RegistrationForm = () => {
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [passwordWarning, setPasswordWarning] = useState("");
   const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     role: initialRole,
@@ -109,16 +110,20 @@ const RegistrationForm = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const response = await axios.post("http://localhost:5000/api/auth/register", formData);
 
       showToast("success", response.data.message || "You have successfully registered!");
 
       setTimeout(() => {
+        setIsLoading(false);
         closeToast();
         navigate("/login");
       }, 3500);
     } catch (err) {
+      setIsLoading(false);
       showToast("error", err.response?.data?.message || "Registration failed!");
     }
   };
@@ -151,25 +156,80 @@ const RegistrationForm = () => {
                 <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
 
                   {/* Role */}
-                  <select name="role" value={formData.role} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200">
+                  <select 
+                    name="role" 
+                    value={formData.role} 
+                    onChange={handleChange} 
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
                     <option value="Student">Register as Student</option>
                     <option value="Company">Register as Company</option>
                     <option value="Mentor">Register as Mentor</option>
                   </select>
 
-                  <input name="username" value={formData.username} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200" type="text" placeholder="Enter your username" required />
+                  <input 
+                    name="username" 
+                    value={formData.username} 
+                    onChange={handleChange} 
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed" 
+                    type="text" 
+                    placeholder="Enter your username" 
+                    required 
+                  />
 
-                  <input name="name" value={formData.name} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200" type="text" placeholder="Enter your name" required />
+                  <input 
+                    name="name" 
+                    value={formData.name} 
+                    onChange={handleChange} 
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed" 
+                    type="text" 
+                    placeholder="Enter your name" 
+                    required 
+                  />
 
-                  <input name="email" value={formData.email} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200" type="email" placeholder="Enter your email" required />
+                  <input 
+                    name="email" 
+                    value={formData.email} 
+                    onChange={handleChange} 
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed" 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    required 
+                  />
 
-                  <input name="phone" value={formData.phone} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200" type="tel" placeholder="Enter your mobile no" maxLength={10} required />
+                  <input 
+                    name="phone" 
+                    value={formData.phone} 
+                    onChange={handleChange} 
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed" 
+                    type="tel" 
+                    placeholder="Enter your mobile no" 
+                    maxLength={10} 
+                    required 
+                  />
 
                   <div className="relative w-full">
-                    <input name="password" value={formData.password} onChange={handleChange} className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 pr-10" type={showPassword ? "text" : "password"} placeholder="Create a Password" required />
+                    <input 
+                      name="password" 
+                      value={formData.password} 
+                      onChange={handleChange} 
+                      disabled={isLoading}
+                      className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 pr-10 disabled:opacity-60 disabled:cursor-not-allowed" 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Create a Password" 
+                      required 
+                    />
 
                     {passwordTouched && (
-                      <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                      <div 
+                        className={`absolute inset-y-0 right-3 flex items-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                        onClick={() => !isLoading && setShowPassword(!showPassword)}
+                      >
                         {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
                       </div>
                     )}
@@ -177,13 +237,24 @@ const RegistrationForm = () => {
 
                   {passwordWarning && <p className="text-xs text-red-500 mt-1">{passwordWarning}</p>}
 
-                  <button type="submit" className="mt-5 tracking-wide font-semibold bg-[#00BDA6] text-gray-100 w-full py-4 rounded-lg hover:bg-[#FF6D34] transition-all">
-                    Sign Up
+                  <button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="mt-5 tracking-wide font-semibold bg-[#00BDA6] text-gray-100 w-full py-4 rounded-lg hover:bg-[#FF6D34] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Signing up...</span>
+                      </>
+                    ) : (
+                      "Sign Up"
+                    )}
                   </button>
 
                   <p className="text-l text-gray-600 text-center">
                     Already have an account?{" "}
-                    <Link to="/login">
+                    <Link to="/login" className={isLoading ? 'pointer-events-none opacity-60' : ''}>
                       <span className="text-[#FF6D34] hover:text-[#00BDA6] font-semibold">Sign in</span>
                     </Link>
                   </p>

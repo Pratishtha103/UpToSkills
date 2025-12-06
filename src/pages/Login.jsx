@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import axios from "axios";
 import loginImage from "../assets/loginnew.jpg";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,8 +33,8 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
@@ -46,7 +47,7 @@ const LoginForm = () => {
       formData.role === "admin";
 
     const fallbackAdminLogin = () => {
-      alert("Admin login successful (fallback mode)");
+      toast.success("Admin login successful (fallback mode)");
 
       const adminUser = {
         name: "Admin",
@@ -58,7 +59,10 @@ const LoginForm = () => {
       localStorage.setItem("user", JSON.stringify(adminUser));
       localStorage.setItem("admin", JSON.stringify(adminUser));
 
-      navigate("/adminPanel", { state: { updated: true } });
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate("/adminPanel", { state: { updated: true } });
+      }, 2500);
     };
 
     try {
@@ -88,14 +92,17 @@ const LoginForm = () => {
         localStorage.setItem("admin", JSON.stringify(response.data.user));
 
       setTimeout(() => {
+        setIsLoading(false);
         if (role === "admin") navigate("/adminPanel");
         else if (role === "student" || role === "learner")
           navigate("/dashboard");
         else if (role === "mentor") navigate("/mentor-dashboard");
         else if (role === "company") navigate("/company");
         else navigate("/login");
-      }, 5000);
+      }, 2500);
     } catch (err) {
+      setIsLoading(false);
+      
       if (isHardcodedAdmin) {
         fallbackAdminLogin();
         return;
@@ -158,7 +165,8 @@ const LoginForm = () => {
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 text-sm"
+                  disabled={isLoading}
+                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <option value="admin">Login as Admin</option>
                   <option value="student">Login as Student</option>
@@ -170,7 +178,8 @@ const LoginForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+                  disabled={isLoading}
+                  className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   type="text"
                   placeholder="Enter email or username"
                   required
@@ -181,14 +190,15 @@ const LoginForm = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm"
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 rounded-lg bg-gray-100 border border-gray-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
                   />
                   <div
-                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                    onClick={() => setShowPassword((s) => !s)}
+                    className={`absolute inset-y-0 right-3 flex items-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                    onClick={() => !isLoading && setShowPassword((s) => !s)}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-500" />
@@ -201,7 +211,7 @@ const LoginForm = () => {
                 <div className="text-right -mt-2 mb-3">
                   <Link
                     to="/login/forgot-password"
-                    className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+                    className={`text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium ${isLoading ? 'pointer-events-none opacity-60' : ''}`}
                   >
                     Forgot password?
                   </Link>
@@ -209,14 +219,22 @@ const LoginForm = () => {
 
                 <button
                   type="submit"
-                  className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
+                  disabled={isLoading}
+                  className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Login
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Logging in...</span>
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </button>
 
                 <p className="text-center text-gray-600">
-                  Don’t have an account?{" "}
-                  <Link to="/register">
+                  Don't have an account?{" "}
+                  <Link to="/register" className={isLoading ? 'pointer-events-none opacity-60' : ''}>
                     <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
                       Sign up
                     </span>

@@ -1,25 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 
 export default function Testimonials({ isDarkMode = false }) {
-  const [testimonials, setTestimonials] = useState([
-    { id: 1, text: "Test Review", author: "Pratishtha", role: "student", date: "03/11/2025, 14:21:36" },
-    { id: 2, text: "TEST", author: "TEST", role: "TEST", date: "03/11/2025, 04:07:22" },
-    { id: 3, text: "Test", author: "Pratishtha", role: "TEST", date: "31/10/2025, 13:38:29" },
-    { id: 4, text: "Test", author: "Test", role: "", date: "27/10/2025, 12:50:50" },
-    { id: 5, text: "Glad to work with Uptoskills", author: "Boobesh K", role: "", date: "15/10/2025, 14:21:54" },
-    { id: 6, text: "test", author: "Pratishtha", role: "student", date: "15/10/2025, 14:21:15" },
-    { id: 7, text: "Glad to work", author: "Mohan", role: "", date: "15/10/2025, 13:59:06" },
-    { id: 8, text: "Good", author: "Test", role: "student", date: "15/10/2025, 13:52:10" },
-    { id: 9, text: "Glad to work with upToSkills", author: "Kanchan", role: "student", date: "15/10/2025, 13:37:47" },
-    { id: 10, text: "Supporting teachers", author: "Kartik", role: "web dev intern", date: "15/10/2025, 13:24:00" },
-    { id: 11, text: "Great place to learn", author: "Rachit", role: "", date: "15/10/2025, 13:22:26" },
-    { id: 12, text: "Hello", author: "Rachit Taneja", role: "web dev intern", date: "15/10/2025, 12:59:20" },
-  ]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (id) => {
-    setTestimonials(testimonials.filter((t) => t.id !== id));
+  // Fetch testimonials from database on component mount
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/testimonials");
+      const data = await response.json();
+      setTestimonials(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+      setLoading(false);
+    }
   };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this testimonial?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/testimonials/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Remove from UI after successful deletion
+        setTestimonials(testimonials.filter((t) => t.id !== id));
+        alert("Testimonial deleted successfully!");
+      } else {
+        alert("Failed to delete testimonial: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error deleting testimonial:", error);
+      alert("Error deleting testimonial");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+        <p className="text-xl">Loading testimonials...</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -72,7 +109,7 @@ export default function Testimonials({ isDarkMode = false }) {
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                {t.text}
+                {t.message}
               </p>
               
               <div className="flex items-center gap-3">
@@ -82,11 +119,11 @@ export default function Testimonials({ isDarkMode = false }) {
                     ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
                     : "bg-gradient-to-br from-blue-400 to-purple-500 text-white"
                 }`}>
-                  {t.author.charAt(0).toUpperCase()}
+                  {t.name.charAt(0).toUpperCase()}
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-lg truncate">{t.author}</h4>
+                  <h4 className="font-semibold text-lg truncate">{t.name}</h4>
                   {t.role && (
                     <p
                       className={`text-sm truncate ${
@@ -103,7 +140,7 @@ export default function Testimonials({ isDarkMode = false }) {
                     isDarkMode ? "text-gray-500" : "text-gray-400"
                   }`}
                 >
-                  {t.date}
+                  {new Date(t.created_at).toLocaleString()}
                 </p>
               </div>
             </div>

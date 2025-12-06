@@ -84,7 +84,7 @@ const MultiStudent = ({ isDarkMode, setIsDarkMode }) => {
         {/* Student Card */}
         <div className="w-full max-w-lg border p-6 rounded-lg shadow-xl bg-white dark:bg-gray-800 dark:border-gray-700 transition-shadow">
           <h3 className="text-xl font-bold mb-3 text-gray-700 dark:text-gray-300">
-            Personal Information 🧑‍💻
+            Student's Information 🧑‍💻
           </h3>
           <div className="grid grid-cols-2 gap-y-3 text-base">
             {/* Username */}

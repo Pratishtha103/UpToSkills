@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -5,6 +6,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { persistThemePreference, readStoredTheme } from "./lib/utils";
 import ProtectedRoute from './components/ProtectedRoute';
+=======
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ThemeProvider } from './context/ThemeContext';
+>>>>>>> d63b6a8e4494e28f75bcc4d8c6cf1a26097389df
 
 // Pages & Components
 import Landing from './pages/Landing';
@@ -48,42 +57,13 @@ import Thankyou from './components/Programs/Thankyou';
 const queryClient = new QueryClient();
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    return readStoredTheme();
-  });
+  const [isDarkMode, setIsDarkMode] = useState(
+  () => localStorage.getItem("darkMode") === "true"
+);
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
-  // Apply `dark` class to root so Tailwind's dark: utilities work app-wide
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    persistThemePreference(isDarkMode);
-  }, [isDarkMode]);
-
-  // Listen for theme changes triggered outside of App (e.g., dashboard headers)
-  useEffect(() => {
-    const handleThemeSignal = () => {
-      const storedTheme = readStoredTheme();
-      setIsDarkMode(prev => (prev === storedTheme ? prev : storedTheme));
-    };
-
-    window.addEventListener('themeChange', handleThemeSignal);
-    window.addEventListener('storage', handleThemeSignal);
-
-    return () => {
-      window.removeEventListener('themeChange', handleThemeSignal);
-      window.removeEventListener('storage', handleThemeSignal);
-    };
-  }, []);
-
   return (
+    <ThemeProvider>
     <QueryClientProvider client={queryClient}>
       <ToastContainer
         position="top-right"
@@ -91,15 +71,20 @@ function App() {
         hideProgressBar={false}
         pauseOnHover
         newestOnTop
-        theme={isDarkMode ? 'dark' : 'light'}
+        theme="light"
         style={{ zIndex: 99999 }}
       />
       <Router>
         <Routes>
 
+<<<<<<< HEAD
           {/* ========== PUBLIC ROUTES (No Login Required) ========== */}
           <Route path="/" element={<Landing isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} />
           
+=======
+          {/* ===== Public Routes ===== */}
+          <Route path="/" element={<Landing />} />
+>>>>>>> d63b6a8e4494e28f75bcc4d8c6cf1a26097389df
           <Route path="/about" element={
             <>
               <Header />
@@ -258,6 +243,7 @@ function App() {
         </Routes>
       </Router>
     </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

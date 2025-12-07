@@ -1,31 +1,17 @@
 // Header.jsx
-import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Search, Sun, Moon, Menu } from "lucide-react";
+import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
-import { Input } from "../../Company_Dashboard/ui/input";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../../Notifications/NotificationCenter";
+import { useTheme } from "../../../context/ThemeContext";
 
-export default function Header({ onMenuClick, isDarkMode, setIsDarkMode }) {
+export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
-
-  // Apply dark mode to root and save preference
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-      localStorage.setItem("darkMode", "true");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("darkMode", "false");
-    }
-  }, [isDarkMode]);
-
-  const toggleTheme = () => setIsDarkMode((prev) => !prev);
+  const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
 
   const handleProfileClick = () => navigate("/mentor-dashboard/profile");
 

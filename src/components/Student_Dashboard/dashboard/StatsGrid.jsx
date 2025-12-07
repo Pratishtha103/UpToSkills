@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import { CheckCircle, Calendar, Star, TrendingUp } from "lucide-react";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { useTheme } from "../../../context/ThemeContext";
 
 function StatsGrid({ studentId }) {
+  const { darkMode } = useTheme();
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
   const [badgeCount, setBadgeCount] = useState(0);
@@ -224,8 +226,8 @@ function StatsGrid({ studentId }) {
   if (!effectiveStudentId) {
     return (
       <section className="mb-8">
-        <div className="p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-          <p className="text-yellow-800 dark:text-yellow-300">
+        <div className={`p-6 rounded-lg border ${darkMode ? "bg-yellow-900/20 border-yellow-800" : "bg-yellow-50 border-yellow-200"}`}>
+          <p className={darkMode ? "text-yellow-300" : "text-yellow-800"}>
             ⚠️ Please log in to view your progress statistics.
           </p>
         </div>
@@ -236,7 +238,7 @@ function StatsGrid({ studentId }) {
   return (
     <section className="mb-8">
       <motion.h2
-        className="text-2xl font-bold text-foreground mb-6"
+        className={`text-2xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
       >
@@ -247,9 +249,7 @@ function StatsGrid({ studentId }) {
         {stats.map((stat) => (
           <motion.div
             key={stat.title}
-            className="stat-card p-6 flex items-center gap-4 bg-white dark:bg-gray-800 
-                       border border-gray-200 dark:border-gray-700 rounded-xl shadow-md 
-                       hover:shadow-lg transition-shadow duration-300"
+            className={`stat-card p-6 flex items-center gap-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: stat.delay, duration: 0.5 }}
@@ -260,8 +260,8 @@ function StatsGrid({ studentId }) {
             </div>
 
             <div>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.title}</div>
+              <div className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>{stat.value}</div>
+              <div className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{stat.title}</div>
             </div>
           </motion.div>
         ))}

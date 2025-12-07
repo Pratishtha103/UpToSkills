@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import {
   FaTwitter,
@@ -6,25 +7,28 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
-import logo from '../../assets/uptoskills-logo2.png';
 
+=======
+import { useTheme } from "../../context/ThemeContext";
+>>>>>>> 314eaea649719aa08be2617c658536a1bed5740f
 
-const Footer = () => {
+const Footer = ({ isDarkMode: propIsDarkMode }) => {
+  const { darkMode: contextDarkMode } = useTheme();
+  const isDarkMode = propIsDarkMode !== undefined ? propIsDarkMode : contextDarkMode;
   return (
-    <footer className="bg-[#2E4053] text-white py-2 px-3">
+    <footer className={`py-2 px-3 transition-colors duration-300 ${isDarkMode ? "bg-gray-800 text-white" : "bg-[#2E4053] text-white"}`}>
 
       {/* Scroll up button*/}
       <div className="flex justify-center mt-6">
-  <button
-    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-    className="bg-slate-700 text-white p-3 rounded-full shadow-lg hover:bg-transparent transition"
-    aria-label="Scroll to top">
- 
-    ↑
-  </button>
-</div>
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className={`p-3 rounded-full shadow-lg transition ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-slate-700 hover:bg-transparent text-white"}`}
+          aria-label="Scroll to top">
+          ↑
+        </button>
+      </div>
 
-      <p className="text-center text-sm text-gray-400">
+      <p className={`text-center text-sm ${isDarkMode ? "text-gray-400" : "text-gray-400"}`}>
         © 2025 Uptoskills. Built by learners.
       </p>
     </footer>

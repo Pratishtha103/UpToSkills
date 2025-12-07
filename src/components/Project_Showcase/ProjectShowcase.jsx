@@ -1,20 +1,15 @@
 // ProjectShowcase.jsx - IMPROVED VERSION
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard";
 import ProjectModal from "./ProjectModal";
 import { motion } from "framer-motion";
+import { useTheme } from "../../context/ThemeContext";
 
-const ProjectShowcase = () => {
+const ProjectShowcase = ({ isDarkMode: propDarkMode }) => {
+  const { darkMode: contextDarkMode } = useTheme();
+  const isDarkMode = propDarkMode !== undefined ? propDarkMode : contextDarkMode;
+  
   const [projects, setProjects] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      return document.documentElement.classList.contains('dark') || 
-             localStorage.getItem('theme') === 'dark' || 
-             localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) { 
-      return false; 
-    }
-  });
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,20 +69,6 @@ const ProjectShowcase = () => {
       });
 
   }, []); // Only run once on mount
-
-  // Dark mode effect
-  useEffect(() => {
-    const handleThemeChange = () => {
-      const isDark = document.documentElement.classList.contains('dark') || 
-                     localStorage.getItem('theme') === 'dark';
-      setIsDarkMode(isDark);
-    };
-
-    handleThemeChange();
-    window.addEventListener('storage', handleThemeChange);
-    
-    return () => window.removeEventListener('storage', handleThemeChange);
-  }, []);
 
   return (
     <>

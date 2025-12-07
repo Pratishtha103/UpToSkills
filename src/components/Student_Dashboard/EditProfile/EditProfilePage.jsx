@@ -6,58 +6,12 @@ import Header from "../dashboard/Header";
 import Footer from "../dashboard/Footer";
 import StudentProfileForm from "./StudentProfileForm";
 import DomainsOfInterest from "./DomainsOfInterest";
+import { useTheme } from "../../../context/ThemeContext";
 
-const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggleDarkMode }) => {
+const EditProfilePage = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
-
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      if (typeof propIsDarkMode !== "undefined") return propIsDarkMode;
-      if (typeof window !== "undefined") {
-        if (document.documentElement.classList.contains("dark")) return true;
-        const theme = localStorage.getItem("theme");
-        if (theme === "dark") return true;
-        if (localStorage.getItem("isDarkMode") === "true") return true;
-      }
-    } catch (e) {}
-    return false;
-  });
-
-  const toggleDarkMode = propToggleDarkMode
-    ? propToggleDarkMode
-    : () => {
-        setIsDarkMode((prev) => {
-          const next = !prev;
-          try {
-            document.documentElement.classList.toggle("dark", next);
-            localStorage.setItem("theme", next ? "dark" : "light");
-            localStorage.setItem("isDarkMode", String(next));
-          } catch (e) {}
-          return next;
-        });
-      };
-
-  useEffect(() => {
-    if (typeof propIsDarkMode !== "undefined") return;
-
-    const handleStorage = (e) => {
-      if (e.key === "theme") setIsDarkMode(e.newValue === "dark");
-      if (e.key === "isDarkMode") setIsDarkMode(e.newValue === "true");
-    };
-
-    const mo = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.classList.contains("dark"));
-    });
-
-    window.addEventListener("storage", handleStorage);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      mo.disconnect();
-    };
-  }, [propIsDarkMode]);
+  const { darkMode: isDarkMode } = useTheme();
 
   const [domainsOfInterest, setDomainsOfInterest] = useState([]);
   const [othersDomain, setOthersDomain] = useState("");
@@ -178,7 +132,7 @@ const EditProfilePage = ({ isDarkMode: propIsDarkMode, toggleDarkMode: propToggl
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? "lg:ml-64" : "ml-0"}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <Header onMenuClick={toggleSidebar} />
 
         <div className="flex-1 overflow-y-auto pt-24 p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <div className="max-w-6xl mx-auto">

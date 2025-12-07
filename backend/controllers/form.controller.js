@@ -44,7 +44,7 @@ const sendContactEmail = async (req, res) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        //console.log("Email sent successfully. Message ID: %s", info.messageId);
+        console.log("Email sent successfully. Message ID: %s", info.messageId);
 
         return res.status(200).json({ 
             message: "Message sent successfully! We will be in touch soon.", 

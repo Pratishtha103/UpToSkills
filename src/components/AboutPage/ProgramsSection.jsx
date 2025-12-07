@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useTheme } from "../../context/ThemeContext";
 
 const ProgramsSection = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -76,15 +78,15 @@ const ProgramsSection = () => {
   );
 
   return (
-    <section id="programs" className="py-8 px-4 relative">
+    <section id="programs" className={`py-8 px-4 relative transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
       {/* Inject shimmer styles */}
       <style>{shimmerStyle}</style>
 
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-[32px] font-bold mb-4 mt-12 dark:text-white">
+        <h2 className={`text-[32px] font-bold mb-4 mt-12 ${darkMode ? "text-white" : "text-gray-900"}`}>
          Programs we offer
         </h2>
-        <p className="text-[#64748b] dark:text-slate-300 text-[17px] mb-12">
+        <p className={`text-[17px] mb-12 ${darkMode ? "text-slate-300" : "text-[#64748b]"}`}>
           Discover our expertly designed programs to master in-demand tech skills
           through hands-on projects and mentorship from industry professionals.
         </p>

@@ -54,10 +54,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useTheme } from "../../../context/ThemeContext";
 
 function WelcomeSection() {
   const [name, setName] = useState("Learner");
   const location = useLocation();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -69,20 +71,20 @@ function WelcomeSection() {
   }, [location.state]);
 
   return (
-    <div className="welcome-section p-6 rounded-2xl mb-8 transition-all duration-300 bg-gray-100 dark:bg-[#1e293b] flex items-center justify-between gap-6">
+    <div className={`welcome-section p-6 rounded-2xl mb-8 transition-all duration-300 flex items-center justify-between gap-6 ${darkMode ? "bg-gray-800" : "bg-gray-100"}`}>
       
       {/* ---- Left side: Text content ---- */}
       <div className="welcome-content flex-1">
-        <h2 className="text-3xl font-bold mb-2 transition-colors text-gray-800 dark:text-white">
+        <h2 className={`text-3xl font-bold mb-2 transition-colors ${darkMode ? "text-white" : "text-gray-800"}`}>
           Hey {name}!
         </h2>
 
-        <p className="text-base leading-relaxed mb-2 transition-colors text-gray-700 dark:text-gray-300">
+        <p className={`text-base leading-relaxed mb-2 transition-colors ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
           Your learning journey continues — and so does your path to real-world opportunities.
           Earn badges, showcase projects, and get noticed by recruiters.
         </p>
 
-        <p className="font-medium transition-colors text-blue-600 dark:text-blue-400">
+        <p className={`font-medium transition-colors ${darkMode ? "text-blue-400" : "text-blue-600"}`}>
           Let's turn your effort into employment!
         </p>
       </div>

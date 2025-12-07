@@ -1,22 +1,24 @@
 import React from 'react';
 import heroSectionImg from "../../assets/her0Section.jpeg";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { darkMode } = useTheme();
   const goToRegister = () => navigate("/register");
   const goToCompanyRegister = () => navigate("/register?role=company");
   const goToMentorRegister = () => navigate("/register?role=mentor");
   return (
     <section
       id="home"
-      className="flex flex-col justify-start items-center p-8 h-auto min-h-screen md:h-screen md:flex-row md:justify-between md:p-16 md:px-20 animate-[fadeInUp_0.5s_ease-out]"
+      className={`flex flex-col justify-start items-center p-8 h-auto min-h-screen md:h-screen md:flex-row md:justify-between md:p-16 md:px-20 animate-[fadeInUp_0.5s_ease-out] transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-white"}`}
     >
       <div className="max-w-[40rem] mt-10 md:mt-0">
-        <h1 className="text-[34px] font-bold leading-[1.2]">
+        <h1 className={`text-[34px] font-bold leading-[1.2] ${darkMode ? "text-white" : "text-gray-900"}`}>
           Master Tech Skills with Peer-to-Peer Learning
         </h1>
-        <p className="text-[#64748b] mt-4">
+        <p className={`mt-4 ${darkMode ? "text-gray-400" : "text-[#64748b]"}`}>
           Join a global community to learn cutting-edge tech skills, collaborate
           on real-world projects, and accelerate your career with expert
           mentorship.

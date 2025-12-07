@@ -9,10 +9,11 @@ import {
   LogOut, 
   X,
   Bell,
-  UserCheck // 🆕 NEW ICON for Assigned Programs
+  UserCheck
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -31,8 +32,8 @@ export default function AdminSidebar({
   setIsOpen,
   activeSection,
   setActiveSection,
-  isDarkMode,
 }) {
+  const { darkMode: isDarkMode } = useTheme();
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
 
@@ -54,12 +55,13 @@ export default function AdminSidebar({
     if (!isDesktop) setIsOpen(false);
   };
 
-  const handleLogout = () => {
-    const lastRole = localStorage.getItem("role") || "admin";
-    localStorage.clear();
-    navigate("/login", { state: { role: lastRole } });
-  };
-
+      const handleLogout = () => {
+      const lastRole = localStorage.getItem("role") || "admin";
+      localStorage.clear();
+      // Explicitly remove 'dark' class from html element to ensure consistent theme on login page
+      document.documentElement.classList.remove("dark");
+      navigate("/login", { state: { role: lastRole } });
+    };
   return (
     <>
       {/* Overlay for mobile */}
@@ -132,13 +134,13 @@ export default function AdminSidebar({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.03, duration: 0.3 }}
-                    whileHover={{ x: 8, scale: 1.03 }}
+                    whileHover={{ x: 8, scale: 1.03 }} 
                     whileTap={{ scale: 0.97 }}
                   >
                     <Icon
                       className={`w-6 h-6 ${
                         isActive
-                          ? "text-white drop-shadow-md"
+                          ? "text-gray-800 drop-shadow-md"
                           : isDarkMode
                           ? "text-gray-400 group-hover:text-indigo-400"
                           : "text-gray-600 group-hover:text-primary"
@@ -147,7 +149,7 @@ export default function AdminSidebar({
                     <motion.span
                       className={`font-semibold transition-colors duration-200 ${
                         isActive
-                          ? "text-white"
+                          ? "text-gray-800"
                           : isDarkMode
                           ? "text-gray-300 group-hover:text-white"
                           : "text-gray-700 group-hover:text-gray-900"

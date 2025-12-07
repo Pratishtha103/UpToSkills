@@ -3,31 +3,15 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../dashboard/Sidebar";
 import Header from "../dashboard/Header";
 import Footer from "../dashboard/Footer";
-import AchievementCard from "./AchievementCard"; 
+import AchievementCard from "./AchievementCard";
+import { useTheme } from "../../../context/ThemeContext";
 
 const StudentSkillBadgesPage = () => {
     const [isSidebarVisible, setSidebarVisible] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(
-        localStorage.getItem("theme") === "dark"
-    );
+    const { darkMode } = useTheme();
     const [badges, setBadges] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // ------------------------------
-    // Theme handling
-    // ------------------------------
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-        }
-    }, [isDarkMode]);
-
-    const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
     // ------------------------------
     // Sidebar responsive behavior
@@ -88,7 +72,7 @@ const StudentSkillBadgesPage = () => {
     return (
         <div
             className={`flex min-h-screen transition-all duration-300 ${
-                isDarkMode ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+                darkMode ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
             }`}
         >
             <Sidebar isOpen={isSidebarVisible} setIsOpen={setSidebarVisible} />
@@ -100,7 +84,6 @@ const StudentSkillBadgesPage = () => {
             >
                 <Header
                     onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
-                    toggleDarkMode={toggleDarkMode}
                 />
 
                 <div className="pt-24 px-4 sm:px-6 py-6 flex-1">

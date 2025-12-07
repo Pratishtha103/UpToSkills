@@ -1,23 +1,25 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Folder, LogOut, Edit3, Award, Info, BookOpen } from "lucide-react";
+import { Home, Users, LogOut, Edit3, Award, Info, BookOpen } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
+import { useTheme } from "../../../context/ThemeContext";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
   { name: "My Programs", icon: <BookOpen size={18} />, path: "/mentor-dashboard/assigned-programs" },
   { name: "Students", icon: <Users size={18} />, path: "/mentor-dashboard/multi-student" },
-  { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
+  // { name: "Projects", icon: <Folder size={18} />, path: "/mentor-dashboard/open-source-contributions" },
   { name: "Edit Profile", icon: <Edit3 size={18} />, path: "/mentor-dashboard/edit-profile" },
   { name: "Skill Badges", icon: <Award size={18} />, path: "/mentor-dashboard/skill-badges" },
   // { name: "Project Showcase", icon: <Folder size={18} />, path: "/mentor-dashboard/project-showcase" },
   { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 
-const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode, setIsDarkMode }) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { darkMode: isDarkMode } = useTheme();
 
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [internalOpen, setInternalOpen] = useState(true);

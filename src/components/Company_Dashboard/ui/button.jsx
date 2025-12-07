@@ -16,7 +16,7 @@ const buttonVariants = cva(
           "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
-        ghost: "hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:-translate-y-1",
+        ghost: "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-accent dark:hover:text-accent-foreground transition-all duration-300 hover:-translate-y-1",
         link: "text-primary underline-offset-4 hover:underline transition-all duration-300",
         premium: "bg-gradient-to-r from-logo-primary to-logo-secondary text-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300",
         glow: "bg-primary text-primary-foreground shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/50 relative before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-primary-glow before:to-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300",

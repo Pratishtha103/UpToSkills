@@ -6,9 +6,11 @@ import Sidebar from "./Sidebar";
 import Header from "./Navbar";
 import Footer from "../AboutPage/Footer";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BriefcaseIcon } from "lucide-react";
+import { BriefcaseIcon } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
 
-const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const CompanyProfilePage = () => {
+  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
         const res = await axios.get(
           "http://localhost:5000/api/company-profiles/me",
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token} `} }
         );
 
         if (res.data.success) {
@@ -53,28 +55,15 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
   
   return (
-    <div
-      className={`flex h-screen dashboard-container${
-        isDarkMode ? " dark" : ""
-      }`}
-    >
+    <div className={`flex h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
       {isOpen && (
         <Sidebar
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          isDarkMode={isDarkMode}
         />
       )}
-      <div
-        className={`flex-1 flex flex-col overflow-hidden main-content${
-          isOpen ? "" : " full-width"
-        }`}
-      >
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
-        />
+      <div className={`flex-1 flex flex-col overflow-hidden ${isOpen ? "lg:ml-64" : "ml-0"}`}>
+        <Header onMenuClick={toggleSidebar} />
 
         {/* Main Scrollable Content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide pt-20 p-6 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -85,7 +74,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
             whileHover={{ scale: 1.05, x: -3 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5" />
+           
             {/* <span>Back To Company Dashboard</span> */}
           </motion.button>
 
@@ -112,18 +101,27 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                       {/* Logo Section */}
                       {companyData.logo_url && (
                         <section aria-labelledby="logo-heading">
-                          <div className="flex justify-center py-1 rounded-full">
-                            <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full dark:bg-gray-900 shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]">
-                              <img
-                                src={`http://localhost:5000${companyData.logo_url}`}
-                                alt={`${
-                                  companyData.company_name ||
-                                  companyData.name ||
-                                  "Company"
-                                } Logo`}
-                                className="h-28 w-28 object-cover rounded-full"
-                                loading="lazy"
-                              />
+                          <div className="flex flex-col items-center gap-3">
+                            {/* Username Display */}
+                            {companyData.username && (
+                              <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+                                {companyData.username}
+                              </h3>
+                            )}
+                            {/* Logo */}
+                            <div className="flex justify-center py-1 rounded-full">
+                              <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full dark:bg-gray-900 shadow-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]">
+                                <img
+                                  src={`http://localhost:5000${companyData.logo_url}`}
+                                  alt={`${
+                                    companyData.name ||
+                                    companyData.company_name ||
+                                    "Company"
+                                  } Logo`}
+                                  className="h-28 w-28 object-cover rounded-full"
+                                  loading="lazy"
+                                />
+                              </div>
                             </div>
                           </div>
                         </section>
@@ -142,7 +140,7 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
                           <Info
                             label="Company Name :- "
                             value={
-                              companyData.company_name || companyData.name
+                              companyData.name || companyData.company_name
                             }
                             defaultText="N/A"
                             isLink={false}

@@ -1,24 +1,10 @@
-import React from "react";
 import { FaCode, FaGithub } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
+import { useTheme } from "../../context/ThemeContext";
 
 const ProjectCard = ({ project, onClick, isDarkMode: propIsDarkMode }) => {
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    try {
-      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
-      if (typeof document !== 'undefined') return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark' || localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) {}
-    return false;
-  });
-
-  React.useEffect(() => {
-    if (typeof propIsDarkMode !== 'undefined') { setIsDarkMode(propIsDarkMode); return; }
-    const onStorage = (e) => { if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark'); if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true'); };
-    window.addEventListener('storage', onStorage);
-    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
-  }, [propIsDarkMode]);
+  const { darkMode: contextDarkMode } = useTheme();
+  const isDarkMode = propIsDarkMode !== undefined ? propIsDarkMode : contextDarkMode;
 
   return (
     <div className={`border rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 p-6 flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-b from-white to-gray-50 border-gray-200'}`}>
@@ -59,13 +45,7 @@ const ProjectCard = ({ project, onClick, isDarkMode: propIsDarkMode }) => {
       )}
 
       {/* View Details */}
-      <button
-        onClick={onClick}
-        className={`mt-auto inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md text-white text-sm font-medium ${isDarkMode ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700' : 'bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-orange-500 hover:to-red-400'}`}
-      >
-        <FiEye />
-        View Details
-      </button>
+      
     </div>
   );
 };

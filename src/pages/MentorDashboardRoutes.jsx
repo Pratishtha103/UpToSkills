@@ -9,8 +9,10 @@ import MentorProfilePage from "../components/MentorDashboard/components/MentorPr
 import MentorEditProfilePage from "../components/MentorDashboard/components/MentorEditProfilePage";
 import AboutUs from "../components/MentorDashboard/pages/AboutUs";
 import AssignedPrograms from "../components/MentorDashboard/pages/AssignedPrograms";
+import { useTheme } from "../context/ThemeContext";
 
-function MentorDashboardRoutes({ isDarkMode, setIsDarkMode }) {
+function MentorDashboardRoutes() {
+  const { darkMode: isDarkMode, toggleDarkMode: setIsDarkMode } = useTheme();
   return (
     <Routes>
       <Route

@@ -6,8 +6,10 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import WelcomeSection from "../components/Welcome";
+import { useTheme } from "../../../context/ThemeContext";
 
-const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
+const MentorDashboardPage = () => {
+  const { darkMode: isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   const [totalStudents, setTotalStudents] = useState(0);
@@ -74,12 +76,10 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
         isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
       }`}
     >
-      {/* ✅ Pass both isDarkMode and setIsDarkMode to Sidebar */}
-      <Sidebar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+      <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        {/* ✅ Header toggle controls global theme */}
-        <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <Header />
 
         <div
           className={`flex-1 p-8 transition-colors duration-300 ${
@@ -104,8 +104,7 @@ const MentorDashboardPage = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </div>
 
-        {/* ✅ Footer adapts automatically */}
-        <Footer isDarkMode={isDarkMode} />
+        <Footer />
       </div>
     </div>
   );

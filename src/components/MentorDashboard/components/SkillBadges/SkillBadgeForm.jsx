@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
-import Footer from "../Footer"; // Added Footer from incoming changes
+import Footer from "../Footer";
+import { useTheme } from "../../../../context/ThemeContext";
 
 // Define the 6 fixed badge names with unique colors/styles
 const FIXED_BADGES = [
@@ -39,12 +40,8 @@ const FIXED_BADGES = [
   },
 ];
 
-// ⬇️ NO PROPS – apna khud ka dark mode state yahi banayenge
 const SkillBadgeForm = () => {
-  // Local dark mode state ONLY for this page
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => localStorage.getItem("darkMode") === "true"
-  );
+  const { darkMode: isDarkMode } = useTheme();
 
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
@@ -68,11 +65,17 @@ const SkillBadgeForm = () => {
       setLoadingStudents(true);
       try {
         const response = await fetch(
-          "http://localhost:5000/api/skill-badges/students"
+          "http://localhost:5000/api/students/autocomplete"
         );
         const data = await response.json();
-        if (data.success) {
-          setStudents(data.data);
+        // Map the response to match expected format (name -> full_name)
+        if (Array.isArray(data)) {
+          const mappedStudents = data.map((student) => ({
+            id: student.id,
+            full_name: student.name,
+            email: student.email,
+          }));
+          setStudents(mappedStudents);
         }
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -127,6 +130,7 @@ const SkillBadgeForm = () => {
 
   const selectStudent = (studentName) => {
     setFormData((prev) => ({ ...prev, student_name: studentName }));
+    setFilteredStudents([]);
     setShowSuggestions(false);
   };
 
@@ -149,7 +153,7 @@ const SkillBadgeForm = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-auth-token": token,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -205,12 +209,7 @@ const SkillBadgeForm = () => {
           isOpen ? "lg:ml-64" : "ml-0"
         }`}
       >
-        {/* ✅ FIXED: Header ko ab sahi props mil rahe hain */}
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
-        />
+        <Header onMenuClick={toggleSidebar} />
 
         <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">
           <div className="p-6 bg-white rounded-lg w-full max-w-2xl shadow-md dark:bg-gray-800">
@@ -272,12 +271,24 @@ const SkillBadgeForm = () => {
                       name="student_name"
                       value={formData.student_name}
                       onChange={handleStudentNameChange}
-                      onFocus={() =>
-                        formData.student_name && setShowSuggestions(true)
-                      }
-                      onClick={() =>
-                        formData.student_name && setShowSuggestions(true)
-                      }
+                      onFocus={() => {
+                        if (formData.student_name) {
+                          const filtered = students.filter((student) =>
+                            student.full_name.toLowerCase().includes(formData.student_name.toLowerCase())
+                          );
+                          setFilteredStudents(filtered);
+                          setShowSuggestions(true);
+                        }
+                      }}
+                      onClick={() => {
+                        if (formData.student_name) {
+                          const filtered = students.filter((student) =>
+                            student.full_name.toLowerCase().includes(formData.student_name.toLowerCase())
+                          );
+                          setFilteredStudents(filtered);
+                          setShowSuggestions(true);
+                        }
+                      }}
                       required
                       autoComplete="off"
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -289,7 +300,7 @@ const SkillBadgeForm = () => {
                         {filteredStudents.map((student) => (
                           <div
                             key={student.id}
-                            onClick={() => selectStudent(student.full_name)}
+                            onMouseDown={() => selectStudent(student.full_name)}
                             className="p-2 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer border-b dark:border-gray-600 last:border-b-0"
                           >
                             <div className="font-medium text-gray-900 dark:text-white">
@@ -309,7 +320,7 @@ const SkillBadgeForm = () => {
                       filteredStudents.length === 0 && (
                         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
                           <p className="text-sm text-red-600 dark:text-red-400">
-                            ⚠️ No students found with that name
+                            ⚠ No students found with that name
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Make sure the student is registered in the system
@@ -329,7 +340,7 @@ const SkillBadgeForm = () => {
 
                 {/* Badge Description */}
                 <label className="block dark:text-white">
-                  Badge Description (Optional context):
+                  Badge Description <span className="text-red-500">*</span>:
                   <textarea
                     name="badge_description"
                     placeholder="Brief reason for the award (e.g., Completed the MERN stack project with high code quality)"
@@ -353,19 +364,21 @@ const SkillBadgeForm = () => {
                 </label>
 
                 {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={submissionStatus === "submitting"}
-                  className={`px-4 py-2 text-white rounded-md transition ${
-                    submissionStatus === "submitting"
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }`}
-                >
-                  {submissionStatus === "submitting"
-                    ? "Submitting..."
-                    : "Award Badge"}
-                </button>
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={submissionStatus === "submitting"}
+                    className={`px-4 py-2 text-white rounded-md transition ${
+                      submissionStatus === "submitting"
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {submissionStatus === "submitting"
+                      ? "Submitting..."
+                      : "Award Badge"}
+                  </button>
+                </div>
 
                 {/* Status Messages */}
                 {submissionStatus === "success" && (

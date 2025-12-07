@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ThemeProvider } from './context/ThemeContext';
 
 // Pages & Components
 import Landing from './pages/Landing';
@@ -56,10 +57,13 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(
+  () => localStorage.getItem("darkMode") === "true"
+);
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
+    <ThemeProvider>
     <QueryClientProvider client={queryClient}>
 
       {/* 🔥 Toast Container (you must add this!) */}
@@ -68,7 +72,9 @@ function App() {
         autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
+        newestOnTop
         theme="light"
+        style={{ zIndex: 99999 }}
       />
       <Router>
         <Routes>
@@ -219,6 +225,7 @@ function App() {
         </Routes>
       </Router>
     </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

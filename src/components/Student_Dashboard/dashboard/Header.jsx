@@ -1,51 +1,16 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { User, Search, Sun, Moon, Menu } from "lucide-react";
+import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
-import { Input } from "../../Company_Dashboard/ui/input";
 import NotificationCenter from "../../Notifications/NotificationCenter";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Load saved theme from localStorage when component mounts
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const root = document.documentElement;
-
-    if (savedTheme === "dark") {
-      root.classList.add("dark");
-      setIsDarkMode(true);
-    } else {
-      root.classList.remove("dark");
-      setIsDarkMode(false);
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const newTheme = !prev ? "dark" : "light";
-      const html = document.documentElement;
-
-      if (newTheme === "dark") {
-        html.classList.add("dark");
-      } else {
-        html.classList.remove("dark");
-      }
-
-      localStorage.setItem("theme", newTheme);
-
-      // Notify dashboard about theme change
-      window.dispatchEvent(new Event("themeChange"));
-
-      return !prev;
-    });
-  };
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const handleProfileClick = () => navigate("/dashboard/profile");
 
@@ -77,7 +42,7 @@ export default function Header({ onMenuClick }) {
           >
             <Link to="/" className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={isDarkMode ? darkLogo : logo}
+                src={darkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
                 className="object-contain w-36 h-25"
               />
@@ -102,7 +67,7 @@ export default function Header({ onMenuClick }) {
 
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
-              {isDarkMode ? (
+              {darkMode ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200" />

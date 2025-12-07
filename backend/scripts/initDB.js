@@ -9,7 +9,7 @@ const { ensureNotificationsTable } = require('../utils/ensureNotificationsTable'
     await pool.query(`
       CREATE TABLE IF NOT EXISTS companies (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         company_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -48,7 +48,7 @@ await pool.query(`
     await pool.query(`
       CREATE TABLE IF NOT EXISTS mentors (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
@@ -111,7 +111,7 @@ await pool.query(`
     await pool.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50),
+        username VARCHAR(50) UNIQUE,
         program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,

@@ -1,20 +1,15 @@
 // ProjectShowcase.jsx - IMPROVED VERSION
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard";
 import ProjectModal from "./ProjectModal";
 import { motion } from "framer-motion";
+import { useTheme } from "../../context/ThemeContext";
 
-const ProjectShowcase = () => {
+const ProjectShowcase = ({ isDarkMode: propDarkMode }) => {
+  const { darkMode: contextDarkMode } = useTheme();
+  const isDarkMode = propDarkMode !== undefined ? propDarkMode : contextDarkMode;
+  
   const [projects, setProjects] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      return document.documentElement.classList.contains('dark') || 
-             localStorage.getItem('theme') === 'dark' || 
-             localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) { 
-      return false; 
-    }
-  });
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -75,20 +70,6 @@ const ProjectShowcase = () => {
 
   }, []); // Only run once on mount
 
-  // Dark mode effect
-  useEffect(() => {
-    const handleThemeChange = () => {
-      const isDark = document.documentElement.classList.contains('dark') || 
-                     localStorage.getItem('theme') === 'dark';
-      setIsDarkMode(isDark);
-    };
-
-    handleThemeChange();
-    window.addEventListener('storage', handleThemeChange);
-    
-    return () => window.removeEventListener('storage', handleThemeChange);
-  }, []);
-
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10">
@@ -129,9 +110,7 @@ const ProjectShowcase = () => {
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 No Projects Found
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
-                You don't have any assigned projects yet.
-              </p>
+              
             </div>
           </div>
         ) : (

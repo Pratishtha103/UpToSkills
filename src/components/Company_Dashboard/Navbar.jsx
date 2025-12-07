@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
@@ -7,23 +6,11 @@ import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../Notifications/NotificationCenter";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar({ onMenuClick }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-  };
 
   return (
     <motion.nav

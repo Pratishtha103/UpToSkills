@@ -235,11 +235,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
 import Chatbot from "../components/Contact_Page/Chatbot";
 import logo from "../assets/logo.jpg";
+import darkLogo from "../assets/darkLogo.jpg";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   // Get user from localStorage
   const storedUser = localStorage.getItem("user");
@@ -311,36 +315,45 @@ export default function Landing() {
   ];
 
   return (
-    <div className="font-sans bg-white text-gray-900 overflow-x-hidden">
+    <div className={`font-sans overflow-x-hidden transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
       {/* Header */}
-      <header className="fixed w-full z-50 bg-white/80 backdrop-blur-lg shadow-sm transition">
+      <header className={`fixed w-full z-50 backdrop-blur-lg shadow-sm transition-colors duration-300 ${darkMode ? "bg-gray-800/90" : "bg-white/80"}`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <img
-            src={logo}
+            src={darkMode ? darkLogo : logo}
             alt="Upto To Skills logo"
             className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
-          <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
-            {["Home", "About", "Programs", "Contact"].map((link, i) => {
-              const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
-              return (
-                <span
-                  key={i}
-                  className="relative group hover:text-[#00BDA6] cursor-pointer"
-                  onClick={() => navigate(path)}
-                >
-                  {link}
-                  <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#00BDA6] group-hover:w-full transition-all duration-300" />
-                </span>
-              );
-            })}
-          </nav>
+          <div className="flex items-center space-x-4">
+            <nav className={`flex space-x-6 font-medium text-sm ${darkMode ? "text-gray-200" : "text-gray-800"}`}>
+              {["Home", "About", "Programs", "Contact"].map((link, i) => {
+                const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+                return (
+                  <span
+                    key={i}
+                    className="relative group hover:text-[#00BDA6] cursor-pointer"
+                    onClick={() => navigate(path)}
+                  >
+                    {link}
+                    <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#00BDA6] group-hover:w-full transition-all duration-300" />
+                  </span>
+                );
+              })}
+            </nav>
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-full transition-colors ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"}`}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-700" />}
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 md:pt-44 pb-20 px-6 md:px-16 bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8] relative overflow-hidden">
+      <section className={`pt-32 md:pt-44 pb-20 px-6 md:px-16 relative overflow-hidden transition-colors duration-300 ${darkMode ? "bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800" : "bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8]"}`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -350,7 +363,7 @@ export default function Landing() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-[#00BDA6] leading-tight mb-6">
               Learn. Connect. <br /> Grow with Peers.
             </h1>
-            <p className="text-gray-600 text-lg mb-6">
+            <p className={`text-lg mb-6 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
               Collaborate with passionate learners and build real-world tech skills through projects.
             </p>
 
@@ -407,8 +420,8 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 md:px-16 bg-white text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-10">What We Offer</h2>
+      <section className={`py-20 px-6 md:px-16 text-center transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+        <h2 className={`text-3xl font-bold mb-10 ${darkMode ? "text-white" : "text-gray-800"}`}>What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div
@@ -432,8 +445,8 @@ export default function Landing() {
       </section>
 
       {/* Partners */}
-      <section className="py-16 bg-[#f9f9f9] text-center">
-        <h3 className="text-2xl font-bold text-gray-800 mb-8">
+      <section className={`py-16 text-center transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-[#f9f9f9]"}`}>
+        <h3 className={`text-2xl font-bold mb-8 ${darkMode ? "text-white" : "text-gray-800"}`}>
           Trusted by Top Companies
         </h3>
         <div className="flex flex-wrap justify-center items-center gap-10">
@@ -455,7 +468,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer
-        className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+        className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${darkMode ? "bg-gray-950 text-gray-300 border-gray-700" : "bg-gray-700 text-gray-100 border-gray-300"}`}
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>

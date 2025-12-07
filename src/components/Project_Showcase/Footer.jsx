@@ -6,7 +6,7 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
-import logo from '../../assets/uptoskills-logo2.png';
+
 
 
 const Footer = () => {

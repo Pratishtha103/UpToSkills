@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import loginImage from "../assets/loginnew2.jpg";
+import loginImage from "../assets/loginnew.jpg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -110,14 +110,14 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex justify-center items-center bg-gray-50">
+    <div className="w-full min-h-screen flex flex-col md:flex-row justify-center items-center bg-gray-50">
       <div
         className="shadow-lg bg-white overflow-hidden flex"
         style={{ width: "1237px", height: "651px", borderRadius: "12px" }}
       >
 
         {/* LEFT IMAGE */}
-        <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
+        <div className="hidden lg:block w-1/2 h-full rounded-l-xl overflow-hidden">
           <img
             src={loginImage}
             className="w-full h-full object-cover object-center"
@@ -126,7 +126,7 @@ const LoginForm = () => {
         </div>
 
         {/* RIGHT FORM */}
-        <div className="w-1/2 h-full flex items-center justify-center">
+        <div className="w-full lg:w-1/2 h-full flex items-center justify-center">
           <div className="flex flex-col items-center">
 
             <ToastContainer

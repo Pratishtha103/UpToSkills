@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// import Footer from "../AboutPage/Footer";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfile() {
+  const { darkMode } = useTheme();
   const [formData, setFormData] = useState({
     companyName: "",
     website: "",
@@ -98,11 +99,11 @@ export default function EditProfile() {
 
   return (
     <>
-    <div className="flex flex-col min-h-screen">
+    <div className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
       {/* Main Content */}
       <main className="flex-grow flex justify-center items-start p-6">
-        <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
-          <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+        <div className={`w-full max-w-2xl shadow-lg rounded-xl p-8 mt-10 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
+          <h2 className={`text-3xl font-bold mb-8 text-center ${darkMode ? "text-white" : "text-gray-800"}`}>
             {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
           </h2>
 
@@ -196,11 +197,9 @@ export default function EditProfile() {
         </div>
       </main>
     </div>
-    <footer
-    className="w-full mt-2 text-gray-700   dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-  >
-    <p>© 2025 Uptoskills. Built by learners.</p>
-  </footer>
+    <footer className={`w-full mt-2 text-center py-4 text-sm transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
+      <p>© 2025 Uptoskills. Built by learners.</p>
+    </footer>
     </>
   );
 }

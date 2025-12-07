@@ -1,9 +1,12 @@
 import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 const Footer = () => {
+  const { darkMode } = useTheme();
+
   return (
     <footer
-      className="w-full text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
+      className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${darkMode ? "bg-gray-950 text-gray-300 border-gray-700" : "bg-gray-700 text-gray-100 border-gray-300"}`}
     >
       <p>© 2025 Uptoskills. Built by learners.</p>
     </footer>

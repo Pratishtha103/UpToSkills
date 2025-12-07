@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTheme } from '../../../context/ThemeContext';
 
 const DOMAIN_OPTIONS = [
   'Web Development',
@@ -12,33 +13,8 @@ const DOMAIN_OPTIONS = [
   'App Development',
 ];
 
-const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '', isDarkMode: propIsDarkMode }) => {
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    try {
-      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
-      if (typeof window !== 'undefined') {
-        if (document.documentElement.classList.contains('dark')) return true;
-        if (localStorage.getItem('theme') === 'dark') return true;
-        if (localStorage.getItem('isDarkMode') === 'true') return true;
-      }
-    } catch (e) {}
-    return false;
-  });
-
-  React.useEffect(() => {
-    if (typeof propIsDarkMode !== 'undefined') {
-      setIsDarkMode(propIsDarkMode);
-      return;
-    }
-    const onStorage = (e) => {
-      if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark');
-      if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true');
-    };
-    window.addEventListener('storage', onStorage);
-    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
-  }, [propIsDarkMode]);
+const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' }) => {
+  const { darkMode: isDarkMode } = useTheme();
   // Handle checkbox selection
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;

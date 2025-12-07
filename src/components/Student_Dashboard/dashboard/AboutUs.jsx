@@ -264,23 +264,11 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Footer from "./Footer";
 import { FaLinkedin, FaPhone, FaEnvelope, FaUsers } from "react-icons/fa";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function AboutUs() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    // detect dark mode from body or system preference
-    const checkDark = () =>
-      setIsDarkMode(document.documentElement.classList.contains("dark"));
-    checkDark();
-    const observer = new MutationObserver(checkDark);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
+  const { darkMode: isDarkMode } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -445,19 +433,20 @@ export default function AboutUs() {
                 </a>
 
                 {/* Email */}
-                
-          <a
-        href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
-        target="_blank"
-        rel="noopener noreferrer"
-        
-        >
-          <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
-            <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
-            <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-            <p className="text-gray-600">info@uptoskills.com</p>
-          </div>
-          </a>
+                <a
+                  href="mailto:info@uptoskills.com"
+                  className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
+                  <h3 className="text-lg font-semibold mb-2">Mail Us 24/7:</h3>
+                  <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    info@uptoskills.com
+                  </p>
+                </a>
               </div>
             </section>
           </div>

@@ -5,12 +5,10 @@ import logo from "../../assets/logo.jpg";
 import darkLogo from "../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../Notifications/NotificationCenter";
+import { useTheme } from "../../context/ThemeContext";
 
-export default function AdminNavbar({
-  onMenuClick,
-  isDarkMode,
-  toggleTheme,
-}) {
+export default function AdminNavbar({ onMenuClick }) {
+  const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300 ${

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "../Company_Dashboard/ui/dialog";
 import Footer from "../AboutPage/Footer";
+import { useTheme } from "../../context/ThemeContext";
 
 const statusColors = {
   scheduled: "bg-primary text-primary-foreground",
@@ -22,6 +23,7 @@ const statusColors = {
 };
 
 export default function InterviewGallery() {
+  const { darkMode } = useTheme();
   const [interviews, setInterviews] = useState([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editInterview, setEditInterview] = useState({ id: "", date: "", time: "" });
@@ -188,15 +190,15 @@ export default function InterviewGallery() {
 
   return (
     <>
-    <div className="min-h-screen dark:bg-gray-900">
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
       <div className="pt-20 px-4 max-w-[1200px] mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Upcoming Interviews ({interviews.length})</h1>
+        <h1 className={`text-2xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>Upcoming Interviews ({interviews.length})</h1>
 
         <div className="grid gap-4">
-          {interviews.length === 0 && <div className="text-gray-500">No interviews scheduled.</div>}
+          {interviews.length === 0 && <div className={darkMode ? "text-gray-400" : "text-gray-500"}>No interviews scheduled.</div>}
 
           {interviews.map((interview) => (
-            <Card key={interview.id} className="p-4 flex flex-col bg-gray-50 dark:bg-gray-800 rounded-2xl">
+            <Card key={interview.id} className={`p-4 flex flex-col rounded-2xl ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">

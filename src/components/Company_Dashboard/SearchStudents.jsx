@@ -3,6 +3,7 @@ import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft, Filter, Rotat
 import Footer from "../AboutPage/Footer";
 import { Button } from "./ui/button";
 import StudentCard from "./StudentCard";
+import { useTheme } from "../../context/ThemeContext";
 
 const DOMAINS = [
   "All Domains",
@@ -20,6 +21,7 @@ const DOMAINS = [
 ];
 
 export default function SearchStudents() {
+  const { darkMode } = useTheme();
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -333,10 +335,10 @@ export default function SearchStudents() {
   // Details view
   if (selectedStudent && studentDetails) {
     return (
-      <div className="p-6 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+      <div className={`p-6 min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
         <div className="max-w-7xl mx-auto">
-          <button onClick={handleBackToList} className="flex items-center gap-2 mb-6 text-lg text-gray-900 dark:text-gray-100 hover:text-gray-700 transition-colors"><ArrowLeft className="w-5 h-5"/><b>Back to Students List</b></button>
-          <div className="dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
+          <button onClick={handleBackToList} className={`flex items-center gap-2 mb-6 text-lg hover:text-gray-700 transition-colors ${darkMode ? "text-gray-100" : "text-gray-900"}`}><ArrowLeft className="w-5 h-5"/><b>Back to Students List</b></button>
+          <div className={`rounded-2xl shadow-lg overflow-hidden transition-colors ${darkMode ? "bg-gray-800" : "bg-white"}`}>
             {detailsLoading ? (
               <div className="flex justify-center items-center py-12"><Loader className="w-8 h-8 animate-spin text-primary"/></div>
             ) : (
@@ -350,13 +352,13 @@ export default function SearchStudents() {
                     </div>
                   </div>
                 </div>
-                <div className="p-6 space-y-6 text-gray-900 dark:text-gray-100">
+                <div className={`p-6 space-y-6 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
                   <div>
                     <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
                     <div className="grid md:grid-cols-2 gap-4">
-                      {studentDetails.contact_number && (<div className="flex items-center gap-3"><Phone className="w-5 h-5 text-gray-400 dark:text-gray-300"/><span>{studentDetails.contact_number}</span></div>)}
+                      {studentDetails.contact_number && (<div className="flex items-center gap-3"><Phone className={`w-5 h-5 ${darkMode ? "text-gray-300" : "text-gray-400"}`}/><span>{studentDetails.contact_number}</span></div>)}
                       {studentDetails.linkedin_url && (<div className="flex items-center gap-3"><Linkedin className="w-5 h-5 text-blue-600"/><a href={studentDetails.linkedin_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">LinkedIn Profile</a></div>)}
-                      {studentDetails.github_url && (<div className="flex items-center gap-3"><Github className="w-5 h-5 text-gray-800 dark:text-white"/><a href={studentDetails.github_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">GitHub Profile</a></div>)}
+                      {studentDetails.github_url && (<div className="flex items-center gap-3"><Github className={`w-5 h-5 ${darkMode ? "text-white" : "text-gray-800"}`}/><a href={studentDetails.github_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">GitHub Profile</a></div>)}
                     </div>
                   </div>
                   {(studentDetails.domainsOfInterest || studentDetails.othersDomain) && (
@@ -457,11 +459,11 @@ export default function SearchStudents() {
 
   // List view
   return (
-    <div className="p-6 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <div className={`p-6 min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 transition-colors">
+        <div className={`rounded-2xl shadow-lg p-6 mb-8 transition-colors ${darkMode ? "bg-gray-800" : "bg-white"}`}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${darkMode ? "text-gray-300" : "text-gray-400"}`} />
             <input
               type="text"
               value={searchQuery}
@@ -482,15 +484,15 @@ export default function SearchStudents() {
                 }
               }}
               placeholder="Search by name or skill/domain (try: react, ai, frontend)..."
-              className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${darkMode ? "border-gray-700 bg-gray-700 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-900"}`}
             />
 
-            <button ref={filterToggleRef} type="button" aria-label="Toggle filters" onClick={() => setShowFiltersPanel((s)=>!s)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-200 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button ref={filterToggleRef} type="button" aria-label="Toggle filters" onClick={() => setShowFiltersPanel((s)=>!s)} className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-600 hover:bg-gray-100"}`}>
               <Filter className="w-5 h-5" />
             </button>
 
             {showSearchSuggestions && (searchQuery && searchQuery.trim().length >= 1) && (
-              <div className="absolute z-50 mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-72 overflow-auto text-left">
+              <div className={`absolute z-50 mt-2 w-full rounded-xl border shadow-xl max-h-72 overflow-auto text-left ${darkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"}`}>
                 {/* header removed as requested; Clear button moved into Recent section */}
 
                 {/* Recent history matches */}
@@ -503,7 +505,7 @@ export default function SearchStudents() {
                       )}
                     </div>
                     {(searchHistory || []).filter(h => h.toLowerCase().includes((searchQuery||"").toLowerCase())).map((h) => (
-                      <button key={`hist-${h}`} type="button" onMouseDown={(e)=>{e.preventDefault(); handleSearchSuggestionSelect(h);}} className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3">
+                      <button key={`hist-${h}`} type="button" onMouseDown={(e)=>{e.preventDefault(); handleSearchSuggestionSelect(h);}} className={`w-full px-4 py-2 text-sm flex items-center gap-3 ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-50"}`}>
                         <Clock className="w-4 h-4 text-gray-400"/>
                         <div className="truncate">{renderHighlighted(h, searchQuery)}</div>
                       </button>
@@ -514,7 +516,7 @@ export default function SearchStudents() {
                 {/* Computed suggestions (exclude ones present in history to avoid duplicates) */}
                 <div className="py-2">
                   {(searchSuggestions || []).filter(s => !(searchHistory || []).some(h => h.toLowerCase() === s.toLowerCase())).map((sug) => (
-                    <button key={sug} type="button" onMouseDown={(e)=>{e.preventDefault(); handleSearchSuggestionSelect(sug);}} className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3">
+                    <button key={sug} type="button" onMouseDown={(e)=>{e.preventDefault(); handleSearchSuggestionSelect(sug);}} className={`w-full px-4 py-2 text-sm flex items-center gap-3 ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-50"}`}>
                       <Search className="w-4 h-4 text-gray-400"/>
                       <div className="truncate">{renderHighlighted(sug, searchQuery)}</div>
                     </button>
@@ -525,23 +527,23 @@ export default function SearchStudents() {
 
             {showFiltersPanel && (
               <div ref={filtersPanelRef} className="absolute right-0 mt-3 w-full sm:w-80 z-30">
-                <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
-                  <div className="flex items-center gap-2 mb-2"><Filter className="w-4 h-4 text-primary"/><h4 className="font-semibold text-sm">Filters</h4></div>
+                <div className={`rounded-lg p-4 shadow-lg border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                  <div className="flex items-center gap-2 mb-2"><Filter className={`w-4 h-4 ${darkMode ? "text-blue-400" : "text-primary"}`}/><h4 className={`font-semibold text-sm ${darkMode ? "text-gray-100" : "text-gray-900"}`}>Filters</h4></div>
                   <div className="mb-3">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Domain:</label>
-                    <select value={filters.domain} onChange={(e)=>onFilterChange('domain', e.target.value)} className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                    <label className={`text-sm font-medium mb-1 block ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Domain:</label>
+                    <select value={filters.domain} onChange={(e)=>onFilterChange('domain', e.target.value)} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}>
                       {DOMAINS.map((d)=>(<option key={d} value={d}>{d}</option>))}
                     </select>
                   </div>
-                  <div className="flex justify-end"><button type="button" onClick={()=>{onClearFilters(); setShowFiltersPanel(false);}} className="inline-flex items-center gap-2 px-3 py-2 border border-border rounded-md text-sm bg-white hover:bg-gray-50"><RotateCcw className="w-4 h-4"/>Clear Filters</button></div>
+                  <div className="flex justify-end"><button type="button" onClick={()=>{onClearFilters(); setShowFiltersPanel(false);}} className={`inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600" : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"}`}><RotateCcw className="w-4 h-4"/>Clear Filters</button></div>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-colors">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700"><h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Candidates ({filteredStudents.length})</h2></div>
+        <div className={`rounded-2xl shadow-lg overflow-hidden transition-colors ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+          <div className={`px-6 py-4 border-b ${darkMode ? "border-gray-700" : "border-gray-200"}`}><h2 className={`text-lg font-semibold ${darkMode ? "text-gray-100" : "text-gray-900"}`}>Candidates ({filteredStudents.length})</h2></div>
 
           {loading ? (
             <div className="flex justify-center items-center py-12"><Loader className="w-8 h-8 animate-spin text-primary"/></div>

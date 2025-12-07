@@ -3,8 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { LayoutDashboard, Search, Calendar, LogOut, Building2, Info, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Search,
+  Calendar,
+  LogOut,
+  Building2,
+  X,
+  Info,
+} from "lucide-react";
 import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,6 +27,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
   const [activeItem, setActiveItem] = useState("dashboard");
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
+  const { darkMode } = useTheme();
 
   // Detect screen size
   useEffect(() => {
@@ -76,7 +86,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
 
       {/* Sidebar */}
       <motion.aside
-        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden border-r ${bgColor} ${borderColor}`}
+        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden border-r transition-colors duration-300 ${darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"}`}
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.25 }}
@@ -95,36 +105,40 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
           {/* Menu */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-2">
-           {sidebarItems.map((item) => {
+ {sidebarItems.map((item) => {
   const active = activeItem === item.id;
 
   return (
     <button
       key={item.id}
       onClick={() => handleClick(item)}
-      className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-colors duration-200
+      className={`w-full flex items-center gap-4 p-3 rounded-xl transition-all duration-200
         ${
           active
-            ? isDarkMode
+            ? darkMode
               ? "bg-gray-700 text-white"
-              : "bg-blue-600 text-white" // ✅ active item in light = direct blue
-            : isDarkMode
-            ? "text-gray-300 hover:bg-gray-800"
-            : "text-gray-700" // ❌ inactive in light = no hover
+              : "bg-blue-600 text-white shadow-sm" 
+            : darkMode
+            ? "text-white hover:bg-gray-800"
+            : "text-gray-800 hover:bg-gray-100"
         }`}
     >
       <item.icon
         className={`w-5 h-5 ${
-          active ? "text-white" : isDarkMode ? "text-gray-300" : "text-gray-600"
+          active ? "text-white" : darkMode ? "text-white" : "text-gray-600"
         }`}
       />
-      <span className={`font-semibold ${active ? "text-white" : ""}`}>
+
+      <span
+        className={`font-medium ${
+          active ? "text-white" : darkMode ? "text-white" : "text-gray-800"
+        }`}
+      >
         {item.label}
       </span>
     </button>
   );
 })}
-
 
             </div>
           </nav>

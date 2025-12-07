@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
-import Footer from "../Footer"; // Added Footer from incoming changes
+import Footer from "../Footer";
+import { useTheme } from "../../../../context/ThemeContext";
 
 // Define the 6 fixed badge names with unique colors/styles
 const FIXED_BADGES = [
@@ -40,10 +41,7 @@ const FIXED_BADGES = [
 ];
 
 const SkillBadgeForm = () => {
-  // Local dark mode state ONLY for this page
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => localStorage.getItem("darkMode") === "true"
-  );
+  const { darkMode: isDarkMode } = useTheme();
 
   const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
@@ -211,12 +209,7 @@ const SkillBadgeForm = () => {
           isOpen ? "lg:ml-64" : "ml-0"
         }`}
       >
-        {/* ✅ FIXED: Header ko ab sahi props mil rahe hain */}
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
-        />
+        <Header onMenuClick={toggleSidebar} />
 
         <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">
           <div className="p-6 bg-white rounded-lg w-full max-w-2xl shadow-md dark:bg-gray-800">

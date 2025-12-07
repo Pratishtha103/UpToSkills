@@ -1,4 +1,3 @@
-import React from 'react'
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Footer from "../../Project_Showcase/Footer";
@@ -6,40 +5,26 @@ import ProjectModal from "../../Project_Showcase/ProjectModal";
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import ProjectCard from '../../Project_Showcase/ProjectCard';
+import { useTheme } from "../../../context/ThemeContext";
+
 const Dashboard_Project = () => {
+    const { darkMode } = useTheme();
     const [loading, setLoading] = useState(true);
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
-      const [isSidebarVisible, setSidebarVisible] = useState(true);
-      const [isMobile, setIsMobile] = useState(false);
-      const [isDarkMode, setIsDarkMode] = useState(() => {
-        // load from localStorage initially
-        return localStorage.getItem("theme") === "dark";
-      });
-    
-      // 🔥 Whenever isDarkMode changes, update <html> class instantly
-      useEffect(() => {
-        if (isDarkMode) {
-          document.documentElement.classList.add("dark");
-          localStorage.setItem("theme", "dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-          localStorage.setItem("theme", "light");
-        }
-      }, [isDarkMode]);
-    
-      const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
-    
-      useEffect(() => {
+    const [isSidebarVisible, setSidebarVisible] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
         const checkScreenSize = () => {
-          const mobile = window.innerWidth <= 1024;
-          setIsMobile(mobile);
-          setSidebarVisible(!mobile);
+            const mobile = window.innerWidth <= 1024;
+            setIsMobile(mobile);
+            setSidebarVisible(!mobile);
         };
         checkScreenSize();
         window.addEventListener("resize", checkScreenSize);
         return () => window.removeEventListener("resize", checkScreenSize);
-      }, []);
+    }, []);
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -64,64 +49,61 @@ const Dashboard_Project = () => {
     }, [])
     return (
         <div
-            className={`min-h-screen transition-all duration-300 dark:bg-gray-800  ${isDarkMode ? "-[#0f172a] text-white" : "-[#f8fafc] text-gray-900"
-                }`}
+            className={`min-h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
         >
             <Sidebar isOpen={isSidebarVisible} setIsOpen={setSidebarVisible} />
             <div
-                className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarVisible ? "lg:ml-64" : "ml-0"
-                    }`}
+                className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarVisible ? "lg:ml-64" : "ml-0"}`}
             >
-                <Header
-                    onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
-                    toggleDarkMode={toggleDarkMode}
-                />
+                <Header onMenuClick={() => setSidebarVisible(!isSidebarVisible)} />
                 <div className='flex flex-col justify-center pt-24 px-4 sm:px-6 py-2 space-y-6 flex-grow'>
-                    <header className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center py-6 sm:py-8 tracking-wide border-b-4 border-[#00b2a9] flex items-center justify-center">
+                    <header className={`text-3xl sm:text-4xl md:text-5xl font-extrabold text-center py-6 sm:py-8 tracking-wide border-b-4 flex items-center justify-center ${darkMode ? "border-gray-700" : "border-[#00b2a9]"}`}>
                         <span className="text-[#f26c3d]">All</span>
-                            &nbsp;
+                        &nbsp;
                         <span className="text-[#00b2a9]">Projects</span>
                     </header>
                     
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-10'>
-                        {loading
-                            ?
+                        {loading ? (
                             Array.from({ length: 6 }).map((_, idx) => (
                                 <motion.div
                                     key={idx}
-                                    className="stat-card p-6 animate-pulse bg-gray-200 rounded-lg"
+                                    className={`stat-card p-6 animate-pulse rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-200"}`}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.1 }}
                                 >
-                                    <div className="h-6 w-3/4 bg-gray-300 mb-4 rounded"></div>
-                                    <div className="h-4 w-1/2 bg-gray-300 mb-2 rounded"></div>
-                                    <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
+                                    <div className={`h-6 w-3/4 mb-4 rounded ${darkMode ? "bg-gray-600" : "bg-gray-300"}`}></div>
+                                    <div className={`h-4 w-1/2 mb-2 rounded ${darkMode ? "bg-gray-600" : "bg-gray-300"}`}></div>
+                                    <div className={`h-4 w-1/3 rounded ${darkMode ? "bg-gray-600" : "bg-gray-300"}`}></div>
                                 </motion.div>
                             ))
-                            : projects.length === 0
-                                ?
-                                <div className="col-span-full flex items-center justify-center min-h-[300px]">
-                                    <div className="text-center">
-                                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Projects</h3>
-                                    </div>
+                        ) : projects.length === 0 ? (
+                            <div className="col-span-full flex items-center justify-center min-h-[300px]">
+                                <div className="text-center">
+                                    <h3 className={`text-lg font-medium mb-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>No Projects</h3>
                                 </div>
-                                : projects.map((proj, idx) => (
-                                    <ProjectCard
-                                        key={idx}
-                                        project={proj}
-                                        onClick={() => setSelectedProject(proj)}
-                                    />
-                                ))}
+                            </div>
+                        ) : (
+                            projects.map((proj, idx) => (
+                                <ProjectCard
+                                    key={idx}
+                                    project={proj}
+                                    onClick={() => setSelectedProject(proj)}
+                                    isDarkMode={darkMode}
+                                />
+                            ))
+                        )}
                     </div>
                     {selectedProject && (
                         <ProjectModal
                             project={selectedProject}
                             onClose={() => setSelectedProject(null)}
+                            isDarkMode={darkMode}
                         />
                     )}
                 </div>
-                <Footer />
+                <Footer isDarkMode={darkMode} />
             </div>
         </div>
     )

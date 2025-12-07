@@ -1,53 +1,16 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { User, Search, Sun, Moon, Menu } from "lucide-react";
+import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
-import { Input } from "../../Company_Dashboard/ui/input";
 import NotificationCenter from "../../Notifications/NotificationCenter";
 import logo from "../../../assets/logo.jpg";
 import darkLogo from "../../../assets/darkLogo.jpg";
 import { Link } from "react-router-dom";
-import { persistThemePreference, readStoredTheme } from "../../../lib/utils";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(() => readStoredTheme());
-
-  useEffect(() => {
-    const handleThemeSignal = (event) => {
-      const nextValue =
-        typeof event?.detail?.isDarkMode === "boolean"
-          ? event.detail.isDarkMode
-          : readStoredTheme();
-      setIsDarkMode((prev) => (prev === nextValue ? prev : nextValue));
-    };
-
-    window.addEventListener("themeChange", handleThemeSignal);
-    window.addEventListener("storage", handleThemeSignal);
-
-    return () => {
-      window.removeEventListener("themeChange", handleThemeSignal);
-      window.removeEventListener("storage", handleThemeSignal);
-    };
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const nextValue = !prev;
-      const html = document.documentElement;
-
-      if (nextValue) {
-        html.classList.add("dark");
-      } else {
-        html.classList.remove("dark");
-      }
-
-      persistThemePreference(nextValue);
-
-      return nextValue;
-    });
-  };
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const handleProfileClick = () => navigate("/dashboard/profile");
 
@@ -79,7 +42,7 @@ export default function Header({ onMenuClick }) {
           >
             <Link to="/" className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
-                src={isDarkMode ? darkLogo : logo}
+                src={darkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
                 className="object-contain w-36 h-25"
               />
@@ -104,7 +67,7 @@ export default function Header({ onMenuClick }) {
 
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
-              {isDarkMode ? (
+              {darkMode ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200" />

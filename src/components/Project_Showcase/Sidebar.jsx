@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import logo from "../../assets/uptoskills-logo.jpg";
+import logo from "../../assets/logo.jpg";
+import darkLogo from "../../assets/darkLogo.jpg";
+import { useTheme } from "../../context/ThemeContext";
 
 function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {
+  const { darkMode } = useTheme();
   const navItems = [
     {
       name: "dashboard",
@@ -73,7 +76,7 @@ function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {
       {/* Logo only (hamburger hata diya) */}
       <div className="flex items-center justify-center mb-6">
         <img
-          src={logo}
+          src={darkMode ? darkLogo : logo}
           alt="Uptoskills Logo"
           className="w-32 sm:w-36 md:w-40 mx-auto mb-6"
         />

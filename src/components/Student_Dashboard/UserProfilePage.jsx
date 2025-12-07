@@ -5,44 +5,21 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // useNavigate को इम्पोर्ट करें
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "./dashboard/Sidebar";
 import Header from "./dashboard/Header";
 import Footer from "./dashboard/Footer.jsx";
+import { useTheme } from "../../context/ThemeContext";
 
 const UserProfilePage = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // useNavigate Hook का उपयोग करें
+  const navigate = useNavigate();
 
-  // Load dark mode preference (unchanged)
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  // Update dark mode preference (unchanged)
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   // Fetch user profile data 
@@ -97,15 +74,11 @@ const UserProfilePage = () => {
   }, [navigate]); 
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-all duration-500">
-      {/* Sidebar and Header (unchanged) */}
+    <div className={`flex min-h-screen transition-all duration-500 ${darkMode ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"}`}>
+      {/* Sidebar and Header */}
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       <div className="flex-1 flex flex-col min-h-screen">
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
-        />
+        <Header onMenuClick={toggleSidebar} />
 
         {/* Profile Section */}
         <motion.div

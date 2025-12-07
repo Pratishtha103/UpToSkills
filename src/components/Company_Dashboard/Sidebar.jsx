@@ -23,11 +23,7 @@ const sidebarItems = [
   { id: "about-us", label: "About Us", icon: Info },
 ];
 
-<<<<<<< Updated upstream
 export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemClick, isDarkMode }) {
-=======
-export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemClick ,isDarkMode}) {
->>>>>>> Stashed changes
   const [activeItem, setActiveItem] = useState("dashboard");
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
@@ -108,7 +104,6 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
         <div className="flex flex-col h-full pt-16">
           {/* Menu */}
           <nav className="flex-1 pt-6 px-4">
-<<<<<<< Updated upstream
             <div className="space-y-2">
  {sidebarItems.map((item) => {
   const active = activeItem === item.id;
@@ -145,49 +140,6 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
   );
 })}
 
-=======
-            <div className="space-y-1">
-              {sidebarItems.map((item, idx) => (
-                <motion.button
-                  key={item.id}
-                  onClick={() => handleClick(item)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none ${
-                    activeItem === item.id
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.03, duration: 0.25 }}
-                  whileHover={{ x: 6, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="relative z-10 flex items-center justify-center">
-                    <item.icon
-                      className={`w-6 h-6 ${
-                        activeItem === item.id ? "text-white" : "dark:text-black hover:bg-gray-100 dark:hover:bg-gray-800" // 👈 FIXED ICON COLOR
-                      }`}
-                    />
-                  </div>
-
-                  {/* {activeItem === item.id && (
-                    <motion.div
-                      className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full"
-                      layoutId="activeIndicator"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )} */}
-
-                  <span
-                    className={`font-bold relative z-10 ${
-                      activeItem === item.id ? "text-white" : "text-black " // 👈 FIXED TEXT COLOR
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </motion.button>
-              ))}
->>>>>>> Stashed changes
             </div>
           </nav>
 

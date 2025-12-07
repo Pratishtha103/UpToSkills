@@ -210,6 +210,33 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
                     <FaTrash className="w-4 h-4" /> Delete
                   </button>
                 </div>
+<<<<<<< Updated upstream
+=======
+              )}
+
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold">{course.title}</h3>
+                <p className="text-sm opacity-80 mt-1">{course.description}</p>
+
+                {/* TAGS */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {course.skills?.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1 text-xs rounded-full border"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => removeCourse(course.id)}
+                  className="mt-4 px-3 py-1 bg-red-600 text-white text-sm rounded-full"
+                >
+                  <FaTrash className="inline-block mr-1" /> Delete
+                </button>
+>>>>>>> Stashed changes
               </div>
             </div>
           ))}

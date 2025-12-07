@@ -99,15 +99,6 @@ export default function EditProfile() {
 
   return (
     <>
-<<<<<<< Updated upstream
-    <div className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
-      {/* Main Content */}
-      <main className="flex-grow flex justify-center items-start p-6">
-        <div className={`w-full max-w-2xl shadow-lg rounded-xl p-8 mt-10 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
-          <h2 className={`text-3xl font-bold mb-8 text-center ${darkMode ? "text-white" : "text-gray-800"}`}>
-            {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
-          </h2>
-=======
       <div className="flex flex-col min-h-screen">
         {/* Main Content */}
         <main className="flex-grow flex justify-center items-start p-6">
@@ -115,24 +106,12 @@ export default function EditProfile() {
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
               {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
             </h2>
->>>>>>> Stashed changes
 
             <form
               onSubmit={handleSubmit}
               className="space-y-6"
               encType="multipart/form-data"
             >
-<<<<<<< Updated upstream
-              Save Details
-            </button>
-          </form>
-        </div>
-      </main>
-    </div>
-    <footer className={`w-full mt-2 text-center py-4 text-sm transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
-      <p>© 2025 Uptoskills. Built by learners.</p>
-    </footer>
-=======
               {/* Company Name */}
               <div>
                 <label className="block font-semibold mb-2">Company Name</label>
@@ -234,7 +213,6 @@ export default function EditProfile() {
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
->>>>>>> Stashed changes
     </>
   );
 }

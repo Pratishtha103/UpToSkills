@@ -7,35 +7,30 @@ const pool = require('../config/database');
  */
 const getStudents = async (req, res) => {
   try {
-   const query = `
-  SELECT
-    s.id,
-    s.username,
-    COALESCE(u.full_name, s.full_name) AS full_name,
-    s.email,
-    s.phone AS contact_number,
-    u.linkedin_url,
-    u.github_url,
-    u.why_hire_me,
-    u.ai_skill_summary,
-    u.domains_of_interest,
-    u.others_domain,
-    u.profile_completed,
-    s.created_at
-  FROM students s
-  LEFT JOIN user_details u ON s.id = u.student_id
-  ORDER BY s.created_at DESC;
-`;
-
-
+    const query = `
+      SELECT
+        s.id,
+        s.username,
+        COALESCE(u.full_name, s.full_name) AS full_name,
+        s.email,
+        s.phone,
+        u.ai_skill_summary,
+        u.domains_of_interest,
+        u.others_domain,
+        u.profile_completed,
+        s.created_at
+      FROM students s
+      LEFT JOIN user_details u ON s.id = u.student_id
+      ORDER BY s.created_at DESC;
+    `;
 
     const result = await pool.query(query);
     return res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
-    console.error("getStudents error:", err);
+    console.error('getStudents error:', err);
     return res
       .status(500)
-      .json({ success: false, message: "Server error", error: err.message });
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 };
 

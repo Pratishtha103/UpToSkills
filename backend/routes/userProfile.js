@@ -256,8 +256,8 @@ router.post('/mentor/profile', verifyToken, async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid token: mentor ID missing' });
     }
 
-    // Incoming mentor profile data (kept as comments to avoid terminal noise)
-    /*
+    // Log incoming data for debugging
+    console.log('Incoming mentor profile data:', {
       full_name,
       contact_number,
       linkedin_url,
@@ -265,7 +265,7 @@ router.post('/mentor/profile', verifyToken, async (req, res) => {
       about_me,
       expertise_domains,
       others_domain
-    */
+    });
 
     // ✅ Optional validation: only validate if value exists and is not empty
     if (full_name && full_name.trim() && !/^[A-Za-z ]+$/.test(full_name)) {

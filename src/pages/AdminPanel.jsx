@@ -1,6 +1,6 @@
 // src/pages/AdminPanel.jsx
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 import AdminNavbar from "../components/AdminPanelDashboard/AdminNavbar";
@@ -21,24 +21,12 @@ import Programs from "../components/AdminPanelDashboard/Programs";
 import Testimonials from "../components/AdminPanelDashboard/Testimonials";
 import CoursesTable from "../components/AdminPanelDashboard/CoursesTable";
 import AssignedPrograms from "../components/AdminPanelDashboard/AssignedPrograms";
+import { useTheme } from "../context/ThemeContext";
 
 function AdminPanel() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  // Load dark mode from localStorage on mount
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem("uptoskills-theme");
-    return savedTheme ? JSON.parse(savedTheme) : false;
-  });
-
-  // Save dark mode setting whenever it changes
-  useEffect(() => {
-    localStorage.setItem("uptoskills-theme", JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
-
-  // Toggle dark/light theme
-  const toggleTheme = () => setIsDarkMode((prev) => !prev);
+  const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
 
   const renderActiveModule = () => {
     switch (activeSection) {

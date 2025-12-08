@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Folder, LogOut, Edit3, Award, Info, BookOpen } from "lucide-react";
+import { Home, Users, LogOut, Edit3, Award, Info, BookOpen } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
+import { useTheme } from "../../../context/ThemeContext";
 
 const sidebarItems = [
   { name: "Dashboard", icon: <Home size={18} />, path: "/mentor-dashboard" },
@@ -15,9 +16,10 @@ const sidebarItems = [
   { name: "About Us", icon: <Info size={18} />, path: "/mentor-dashboard/AboutUs" },
 ];
 
-const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen, isDarkMode, setIsDarkMode }) => {
+const Sidebar = ({ children, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { darkMode: isDarkMode } = useTheme();
 
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [internalOpen, setInternalOpen] = useState(true);

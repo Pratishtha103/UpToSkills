@@ -1,40 +1,19 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { FaLaptopCode, FaSearch, FaTags, FaTrash } from 'react-icons/fa';
+import { FaCloud, FaShieldAlt, FaLaptopCode, FaChartLine, FaSearch, FaTags, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
-
-// ⭐ TAG GROUPS YOU PROVIDED
-const tagGroups = [
-  ["Unity 3D", "C#", "ARCore", "ARKit", "3D Modeling", "VR Interaction Design", "Spatial Mapping", "Animation"],
-  ["Hadoop", "Spark", "Hive", "Kafka", "NoSQL Databases", "Data Pipelines", "Distributed Computing", "ETL Processing"],
-  ["Unity", "C# Programming", "Unreal Engine", "3D Game Design", "Animation Basics", "Game Physics", "Level Design", "AI for Games"],
-  ["Excel", "SQL", "Tableau", "Power BI", "Python", "Data Cleaning", "Data Visualization", "Business Analytics"],
-  ["SEO", "Google Ads", "Social Media Marketing", "Content Strategy", "Email Marketing", "Analytics", "Branding", "Campaign Optimization"],
-  ["Sensors & Actuators", "Arduino", "Raspberry Pi", "IoT Cloud", "MQTT Protocol", "Python", "Embedded Systems", "Networking Basics"],
-  ["Supervised Learning", "Unsupervised Learning", "Python", "NumPy & Pandas", "Scikit-Learn", "Feature Engineering", "Model Evaluation", "Data Visualization"],
-  ["AWS Services", "Azure Cloud", "GCP Basics", "Virtual Machines", "Serverless Computing", "Cloud Security", "Networking", "Storage Solutions"],
-  ["Network Security", "Ethical Hacking", "Linux Basics", "Firewalls & IDS", "Penetration Testing", "Cryptography", "Risk Assessment", "Digital Forensics"],
-  ["HTML & CSS", "JavaScript", "React.js", "Node.js", "Express.js", "MongoDB", "REST APIs", "Git & GitHub", "Deployment"],
-  ["Linux & Shell Scripting", "Git & GitHub", "CI/CD Pipelines", "Docker", "Kubernetes", "Jenkins", "Cloud Platforms (AWS/Azure/GCP)", "Infrastructure as Code (Terraform)", "Monitoring Tools (Prometheus, Grafana)"],
-  ["Flutter", "Dart", "React Native", "JavaScript", "UI/UX Principles", "API Integration", "Firebase", "State Management (Provider, Redux, Bloc)", "App Deployment"],
-  ["Figma", "Wireframing", "Prototyping", "Design Thinking", "User Research", "Color Theory", "Typography", "Usability Testing", "Visual Design"],
-  ["Cryptography Basics", "Smart Contracts", "Solidity", "Ethereum Blockchain", "Distributed Ledger Technology", "Web3.js", "Decentralized Apps (DApps)", "Consensus Algorithms"],
-  ["Python Programming", "Machine Learning", "Deep Learning", "Neural Networks", "Statistics & Probability", "Data Visualization", "Data Preprocessing", "SQL & NoSQL Databases", "Model Deployment"]
-];
 
 export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
   const [query, setQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState(null);
-  const [showAllTags, setShowAllTags] = useState(false);
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // CLEAR FILTERS
   const clearAllFilters = () => {
     setQuery('');
     setSelectedTag(null);
   };
 
-  // FETCH COURSES
+  const [showAllTags, setShowAllTags] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -49,41 +28,21 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
     fetchCourses();
   }, []);
 
-  // ⭐ UNIQUE TAG LIST
   const allTags = useMemo(() => {
-    const setTags = new Set();
-    tagGroups.flat().forEach((t) => setTags.add(t));
-    return Array.from(setTags);
-  }, []);
+    const s = new Set();
 
-  // ⭐ FIXED FILTER — NOW WORKS 100% CORRECTLY
-  const filteredCourses = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const selectedLower = selectedTag?.toLowerCase();
-
-    return courses.filter((course) => {
-      const title = course.title?.toLowerCase() || "";
-      const desc = course.description?.toLowerCase() || "";
-      const skills = (course.skills || []).map((s) => s.toLowerCase());
-
-      const matchesQuery =
-        !q ||
-        title.includes(q) ||
-        desc.includes(q) ||
-        skills.some((s) => s.includes(q));
-
-     const matchesTag =
-  !selectedTag ||
-  skills.some((s) => s.includes(selectedLower));
-
-
-      return matchesQuery && matchesTag;
+    courses.forEach((c) => {
+      if (Array.isArray(c.skills)) c.skills.forEach((sk) => s.add(sk));
     });
-  }, [courses, query, selectedTag]);
 
-  // DELETE COURSE
+    const extraTags = ['HTML', 'CSS', 'JS', 'React js', 'AI', 'DevOps', 'Blockchain', 'UI/UX'];
+    extraTags.forEach((tag) => s.add(tag));
+
+    return Array.from(s);
+  }, [courses]);
+
   const removeCourse = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/courses/${id}`);
       setCourses((prev) => prev.filter((c) => c.id !== id));
@@ -92,137 +51,168 @@ export default function ProgramsAdmin({ isDarkMode, onNavigateSection }) {
     }
   };
 
+  const filteredCourses = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return courses.filter((course) => {
+      const matchesQuery =
+        !q ||
+        course.title?.toLowerCase().includes(q) ||
+        course.description?.toLowerCase().includes(q) ||
+        (Array.isArray(course.skills) && course.skills.join(' ').toLowerCase().includes(q));
+
+      const matchesTag =
+        !selectedTag ||
+        (Array.isArray(course.skills) && course.skills.includes(selectedTag));
+
+      return matchesQuery && matchesTag;
+    });
+  }, [courses, query, selectedTag]);
+
+  const handleBackClick = () => {
+    if (onNavigateSection) {
+      onNavigateSection('dashboard');
+    }
+  };
+
   return (
-    <main className={`${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} min-h-screen p-6`}>
-      
+    <main className={`${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} min-h-screen p-6`}>
       <header className="mb-6">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold">Programs</h1>
-            <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
-              Manage all Programs.
+            <h1 className="text-3xl font-extrabold">Programs</h1>
+            <p className={`mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Overview of all Programs and quick actions.
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => onNavigateSection?.("dashboard")}
-              className={`px-4 py-2 rounded-lg ${isDarkMode ? "bg-gray-800" : "bg-white"} border`}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleBackClick}
+              className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-gray-100 hover:bg-gray-700' : 'bg-white text-gray-800 hover:bg-gray-50'} shadow-sm border`}
             >
               ← Back
             </button>
 
-            <button
-              onClick={() => onNavigateSection?.("courses")}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+            <button 
+              onClick={() => onNavigateSection && onNavigateSection('courses')} 
+              className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
             >
-              Add Program
+              Add New Program
             </button>
           </div>
         </div>
 
-        {/* SEARCH + TAGS */}
-        <div className="mt-6">
-          
-          {/* SEARCH BAR */}
-          <div className={`flex items-center gap-2 p-3 rounded-lg border shadow-sm ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white"}`}>
-            <FaSearch />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search programs..."
-              className={`w-full bg-transparent outline-none`}
-            />
-            {(query || selectedTag) && (
-              <button onClick={clearAllFilters} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md">
-                Clear ✕
-              </button>
-            )}
+        {/* Search & Tags */}
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2 w-full sm:w-2/3">
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg w-full ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm border`}>
+              <FaSearch className={`${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name or skill..."
+                className={`w-full px-4 py-2 rounded-md border ${isDarkMode
+                  ? 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
+                  } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+              />
+              {(query || selectedTag) && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-sm px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600 transition"
+                >
+                  Clear All ✕
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* TAG SECTION */}
-          <div className="flex items-center flex-wrap gap-2 mt-4">
-            <span className="flex items-center text-sm opacity-80">
-              <FaTags className="mr-2" /> Tags:
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`inline-flex items-center text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <FaTags className="mr-2" />Tags:
             </span>
 
-            {(showAllTags ? allTags : allTags.slice(0, 12)).map((tag) => (
+            {(showAllTags ? allTags : allTags.slice(0, 8)).map((tag) => (
               <button
                 key={tag}
                 onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-                className={`px-3 py-1.5 rounded-full text-sm border ${
-                  selectedTag === tag
-                    ? "bg-indigo-600 text-white"
-                    : isDarkMode
-                    ? "bg-gray-800 text-gray-300"
-                    : "bg-white text-gray-700"
-                }`}
+                className={`text-sm px-3 py-1 rounded-full border ${selectedTag === tag
+                  ? 'bg-indigo-600 text-white'
+                  : isDarkMode
+                    ? 'bg-gray-800 text-gray-300'
+                    : 'bg-white text-gray-700'
+                  }`}
               >
                 {tag}
               </button>
             ))}
 
-            {allTags.length > 12 && (
+            {allTags.length > 8 && (
               <button
                 onClick={() => setShowAllTags(!showAllTags)}
-                className="text-indigo-600 text-sm px-2"
+                className={`text-sm px-3 py-1 rounded-full border-dashed ${isDarkMode ? 'text-indigo-400 border-indigo-400' : 'text-indigo-600 border-indigo-600'}`}
               >
-                {showAllTags ? "Show Less" : "Show More"}
+                {showAllTags ? 'Show Less' : 'Show More'}
               </button>
             )}
           </div>
         </div>
       </header>
 
-      {/* COURSES LIST */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="grid gap-6">
         {filteredCourses.map((course) => (
-          <div key={course.id}
-            className={`${isDarkMode ? "bg-gray-800" : "bg-white"} p-6 rounded-2xl shadow border`}>
-            
-            <div className="flex gap-4">
-              {/* IMAGE */}
+          <div
+            key={course.id}
+            className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl p-8 shadow hover:shadow-lg transition`}
+          >
+            <div className="flex items-start gap-6">
               {course.image_path ? (
-                <img
-                  src={`http://localhost:5000${course.image_path}`}
-                  className="w-16 h-16 rounded-xl object-cover"
-                />
+                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                  <img
+                    src={`http://localhost:5000${course.image_path}`}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ) : (
-                <div className="w-16 h-16 bg-indigo-100 flex items-center justify-center rounded-xl">
-                  <FaLaptopCode className="text-indigo-600" size={28} />
+                <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-indigo-50'} p-4 rounded-xl text-indigo-600`}>
+                  <FaLaptopCode className="w-8 h-8" />
                 </div>
               )}
 
               <div className="flex-1">
-                <h3 className="text-lg font-semibold">{course.title}</h3>
-                <p className="text-sm opacity-80 mt-1">{course.description}</p>
+                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
 
-                {/* TAGS */}
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {course.skills?.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded-full border"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {course.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {Array.isArray(course.skills) && course.skills.length > 0 ? (
+                    course.skills.map((skill) => (
+                      <span key={skill} className="text-sm px-3 py-1 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
+                        {skill}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm italic text-gray-500 dark:text-gray-400">No skills listed</span>
+                  )}
                 </div>
 
                 <button
                   onClick={() => removeCourse(course.id)}
-                  className="mt-4 px-3 py-1 bg-red-600 text-white text-sm rounded-full"
+                  className="flex items-center gap-1 border border-gray-100 px-3 py-1 bg-red-600 text-white rounded-full text-sm hover:bg-red-700 transition-colors"
                 >
-                  <FaTrash className="inline-block mr-1" /> Delete
+                  <FaTrash className="w-4 h-4" /> Delete
                 </button>
               </div>
             </div>
           </div>
         ))}
 
-        {!loading && filteredCourses.length === 0 && (
-          <p className="col-span-full text-center text-gray-500">No programs found.</p>
+        {filteredCourses.length === 0 && !loading && (
+          <p className="text-gray-600 dark:text-gray-300 text-center">No results found for this tag.</p>
         )}
       </section>
     </main>

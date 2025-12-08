@@ -180,8 +180,9 @@ export default function Company({ isDarkMode }) {
                 </div>
 
                 <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-                  <Users className="w-4 h-4" />
-                  <span>{company.hires || 0} Hires</span>
+                  
+                  <Mail className="w-4 h-4" />
+      <span>{company.email || "No email available"}</span>
                 </div>
 
                 <motion.button
@@ -305,7 +306,7 @@ export default function Company({ isDarkMode }) {
                     </div>
 
                     {/* Stats Section */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <p className="text-2xl font-bold text-blue-500">{companyDetails.stats.totalInterviews}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Total Interviews</p>
@@ -322,10 +323,10 @@ export default function Company({ isDarkMode }) {
                         <p className="text-2xl font-bold text-purple-500">{companyDetails.stats.hiredCount}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Hired</p>
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Interviews Section */}
-                    {companyDetails.interviews.length > 0 && (
+                    {/* {companyDetails.interviews.length > 0 && (
                       <div className={`p-6 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                           <Calendar className="w-5 h-5" />
@@ -359,13 +360,13 @@ export default function Company({ isDarkMode }) {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
 
-                    {companyDetails.interviews.length === 0 && (
+                    {/* {companyDetails.interviews.length === 0 && (
                       <div className={`p-6 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <p className="text-gray-500 dark:text-gray-400">No interview history available</p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 ) : (
                   <p className="text-center py-8">No details available</p>

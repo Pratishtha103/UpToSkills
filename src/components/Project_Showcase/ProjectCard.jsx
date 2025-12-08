@@ -1,24 +1,10 @@
-import React from "react";
 import { FaCode, FaGithub } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
+import { useTheme } from "../../context/ThemeContext";
 
 const ProjectCard = ({ project, onClick, isDarkMode: propIsDarkMode }) => {
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    try {
-      if (typeof propIsDarkMode !== 'undefined') return propIsDarkMode;
-      if (typeof document !== 'undefined') return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark' || localStorage.getItem('isDarkMode') === 'true';
-    } catch (e) {}
-    return false;
-  });
-
-  React.useEffect(() => {
-    if (typeof propIsDarkMode !== 'undefined') { setIsDarkMode(propIsDarkMode); return; }
-    const onStorage = (e) => { if (e.key === 'theme') setIsDarkMode(e.newValue === 'dark'); if (e.key === 'isDarkMode') setIsDarkMode(e.newValue === 'true'); };
-    window.addEventListener('storage', onStorage);
-    const mo = new MutationObserver(() => setIsDarkMode(document.documentElement.classList.contains('dark')));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => { window.removeEventListener('storage', onStorage); mo.disconnect(); };
-  }, [propIsDarkMode]);
+  const { darkMode: contextDarkMode } = useTheme();
+  const isDarkMode = propIsDarkMode !== undefined ? propIsDarkMode : contextDarkMode;
 
   return (
     <div className={`border rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 p-6 flex flex-col ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-b from-white to-gray-50 border-gray-200'}`}>

@@ -69,20 +69,8 @@ export default function Index() {
     currentUserName = "Account";
   }
 
-  // Dark mode
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => localStorage.getItem("theme") === "dark"
-  );
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDarkMode]);
-  const toggleDarkMode = () => setIsDarkMode((p) => !p);
+  // Dark mode - using shared ThemeContext
+  // Note: isDarkMode and toggleDarkMode are available from useTheme() if needed
 
   
   const suggestionPool = useMemo(() => {

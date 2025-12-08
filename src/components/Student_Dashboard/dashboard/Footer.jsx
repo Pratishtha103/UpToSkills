@@ -1,12 +1,17 @@
 // src/components/Footer.jsx
 import React from 'react';
+import { useTheme } from '../../../context/ThemeContext';
 
-const Footer = () => (
-  <footer
-    className="w-full bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-  >
-    <p>© 2025 Uptoskills. Built by learners.</p>
-  </footer>
-);
+const Footer = () => {
+  const { darkMode } = useTheme();
+
+  return (
+    <footer
+      className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${darkMode ? "bg-gray-900 text-gray-300 border-gray-700" : "bg-gray-100 text-gray-700 border-gray-300"}`}
+    >
+      <p>© 2025 Uptoskills. Built by learners.</p>
+    </footer>
+  );
+};
 
 export default Footer;

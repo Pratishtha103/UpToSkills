@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { Badge } from "../Company_Dashboard/ui/badge";
 import { Button } from "../Company_Dashboard/ui/button";
 import { Card } from "../Company_Dashboard/ui/card";
-// no icons needed in StudentCard after removing location/last-active
 import { Input } from "../Company_Dashboard/ui/input";
 import { Label } from "../Company_Dashboard/ui/label";
 import { toast } from "sonner";
 import StudentProfileModal from "./StudentProfileModal";
+import { useTheme } from "../../context/ThemeContext";
 
 /* --------- Utility for badge colours by skill level -------- */
 const skillLevelColors = {
@@ -26,6 +26,7 @@ export default function StudentCard({
   delay = 0,
   interviews: parentInterviews = null,
 }) {
+  const { darkMode } = useTheme();
   const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
   const divRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -336,7 +337,7 @@ export default function StudentCard({
     >
       <Card
         ref={divRef}
-        className="relative p-5 h-full flex flex-col hover:shadow-md transition-all duration-200 overflow-hidden bg-white border rounded-lg"
+        className={`relative p-5 h-full flex flex-col hover:shadow-md transition-all duration-200 overflow-hidden border rounded-lg ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setOpacity(0.6)}
         onMouseLeave={() => setOpacity(0)}
@@ -353,17 +354,17 @@ export default function StudentCard({
         {/* Compact header: avatar, name, domain */}
         <div className="relative z-10 flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-semibold ring-1 ring-slate-100">{initials}</div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold ring-1 ${darkMode ? "bg-gray-700 text-gray-200 ring-gray-600" : "bg-slate-100 text-slate-700 ring-slate-100"}`}>{initials}</div>
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              <h3 className="text-lg font-semibold text-slate-900 truncate">{displayName}</h3>
+              <h3 className={`text-lg font-semibold truncate ${darkMode ? "text-white" : "text-slate-900"}`}>{displayName}</h3>
               {(interviewScheduled || student.interviewScheduled) && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">Scheduled</span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${darkMode ? "bg-green-900 text-green-300" : "bg-green-50 text-green-700"}`}>Scheduled</span>
               )}
             </div>
-            <p className="text-sm text-slate-500 mt-1 truncate">{displayDomain || 'Not specified'}</p>
+            <p className={`text-sm mt-1 truncate ${darkMode ? "text-gray-400" : "text-slate-500"}`}>{displayDomain || 'Not specified'}</p>
 
             {/* skill level and experience removed from compact card per request */}
           </div>
@@ -372,7 +373,7 @@ export default function StudentCard({
         {/* meta row removed (AI summary / last active) — compact card simplified */}
 
         {/* actions */}
-        <div className="relative z-10 mt-4 border-t pt-4">
+        <div className={`relative z-10 mt-4 border-t pt-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -416,32 +417,32 @@ export default function StudentCard({
           {isScheduleOpen && createPortal(
             <div className="fixed inset-0 z-50 flex items-center justify-center">
               <div className="absolute inset-0 bg-black/50" onClick={() => setIsScheduleOpen(false)} />
-                <div className="relative z-10 w-full max-w-sm bg-white rounded-xl p-6 shadow-2xl">
+                <div className={`relative z-10 w-full max-w-sm rounded-xl p-6 shadow-2xl ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
                   <h3 className="text-xl font-semibold mb-4">Schedule Interview</h3>
                   <div className="grid gap-3 py-2">
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right text-sm text-slate-500">Candidate</Label>
+                      <Label className={`text-right text-sm ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Candidate</Label>
                       <div className="col-span-3 font-medium text-sm">{displayName}</div>
                     </div>
 
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right text-sm text-slate-500">Position</Label>
-                      <Input className="col-span-3 rounded-lg border border-slate-200 px-3 py-2" value={schedule.position} onChange={(e) => setSchedule({ ...schedule, position: e.target.value })} placeholder={displayDomain || 'Position / Domain'} />
+                      <Label className={`text-right text-sm ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Position</Label>
+                      <Input className={`col-span-3 rounded-lg border px-3 py-2 ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "border-slate-200"}`} value={schedule.position} onChange={(e) => setSchedule({ ...schedule, position: e.target.value })} placeholder={displayDomain || 'Position / Domain'} />
                     </div>
 
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right text-sm text-slate-500">Date</Label>
-                      <Input type="date" className="col-span-3 rounded-lg border border-slate-200 px-3 py-2" value={schedule.date} onChange={(e) => setSchedule({ ...schedule, date: e.target.value })} placeholder="dd-mm-yyyy" />
+                      <Label className={`text-right text-sm ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Date</Label>
+                      <Input type="date" className={`col-span-3 rounded-lg border px-3 py-2 ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "border-slate-200"}`} value={schedule.date} onChange={(e) => setSchedule({ ...schedule, date: e.target.value })} placeholder="dd-mm-yyyy" />
                     </div>
 
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right text-sm text-slate-500">Time</Label>
-                      <Input type="time" className="col-span-3 rounded-lg border border-slate-200 px-3 py-2" value={schedule.time} onChange={(e) => setSchedule({ ...schedule, time: e.target.value })} placeholder="--:--" />
+                      <Label className={`text-right text-sm ${darkMode ? "text-gray-400" : "text-slate-500"}`}>Time</Label>
+                      <Input type="time" className={`col-span-3 rounded-lg border px-3 py-2 ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "border-slate-200"}`} value={schedule.time} onChange={(e) => setSchedule({ ...schedule, time: e.target.value })} placeholder="--:--" />
                     </div>
                   </div>
 
                   <div className="flex justify-end gap-3 mt-5">
-                    <Button variant="outline" className="rounded-full px-4 py-2 border-blue-300 text-blue-600" onClick={() => setIsScheduleOpen(false)}>Cancel</Button>
+                    <Button variant="outline" className={`rounded-full px-4 py-2 ${darkMode ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-blue-300 text-blue-600"}`} onClick={() => setIsScheduleOpen(false)}>Cancel</Button>
                     <Button disabled={isSaving} className="rounded-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white shadow" onClick={async () => {
                         if (!schedule.position || !schedule.date || !schedule.time) { toast.error('Please fill all fields'); return; }
                         try {

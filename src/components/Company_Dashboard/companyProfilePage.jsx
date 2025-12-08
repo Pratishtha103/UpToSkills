@@ -6,9 +6,11 @@ import Sidebar from "./Sidebar";
 import Header from "./Navbar";
 import Footer from "../AboutPage/Footer";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BriefcaseIcon } from "lucide-react";
+import { BriefcaseIcon } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
 
-const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
+const CompanyProfilePage = () => {
+  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,28 +55,15 @@ const CompanyProfilePage = ({ isDarkMode, toggleDarkMode }) => {
 
   
   return (
-    <div
-      className={`flex h-screen dashboard-container${
-        isDarkMode ? " dark" : ""
-      }`}
-    >
+    <div className={`flex h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
       {isOpen && (
         <Sidebar
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          isDarkMode={isDarkMode}
         />
       )}
-      <div
-        className={`flex-1 flex flex-col overflow-hidden main-content${
-          isOpen ? "" : " full-width"
-        }`}
-      >
-        <Header
-          onMenuClick={toggleSidebar}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
-        />
+      <div className={`flex-1 flex flex-col overflow-hidden ${isOpen ? "lg:ml-64" : "ml-0"}`}>
+        <Header onMenuClick={toggleSidebar} />
 
         {/* Main Scrollable Content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide pt-20 p-6 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">

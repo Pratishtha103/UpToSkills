@@ -3,8 +3,8 @@ import './NotificationPage.css';
 
 // Imports file      
 import Header from '../dashboard/Header';
-// import RightSidebar from '../dashboard/RightSidebar';
 import Sidebar from '../dashboard/Sidebar';
+import { useTheme } from '../../../context/ThemeContext';
 
 // Sample data for the notifications
 const notificationsData = [
@@ -18,7 +18,7 @@ const notificationsData = [
     id: 2, 
     title: 'New Message from Jane Cooper', 
     message: "Hey, how's your project going? Let me know if you need help.", 
-    time: '极 day ago' 
+    time: '1 day ago' 
   },
   { 
     id: 3, 
@@ -34,8 +34,8 @@ const notificationsData = [
   },
 ];
 
-const NotificationsPage = ({ isDarkMode, toggleDarkMode }) => {
- 
+const NotificationsPage = () => {
+  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -43,32 +43,29 @@ const NotificationsPage = ({ isDarkMode, toggleDarkMode }) => {
   };
 
   return (
-   
-    <div className={`dashboard-container${isDarkMode ? ' dark' : ''}`}>
-      {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />}
-      <div className={`main-content${isOpen ? '' : ' full-width'}`}>
-        <Header onMenuClick={toggleSidebar} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+    <div className={`flex min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? "lg:ml-64" : "ml-0"}`}>
+        <Header onMenuClick={toggleSidebar} />
         
         {/* content in notification page */}
-        <div className="pt-24 page-card dark:bg-gray-700 dark:text-white">
-          <h2 className="notifications-main-title">🔔 Notifications</h2>
-          <div className="notifications-list">
-
+        <div className={`pt-24 px-6 py-6 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+          <h2 className={`text-2xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>🔔 Notifications</h2>
+          <div className="space-y-4">
             {notificationsData.map((notification) => (
-              <div className="notification-item" key={notification.id}>
-                
-                <div className="notification-content">
-                  <h3 className="notification-title">{notification.title}</h3>
-                  <p className="notification-message">{notification.message}</p>
+              <div className={`p-4 rounded-lg shadow-md ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border`} key={notification.id}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{notification.title}</h3>
+                    <p className={`text-sm mt-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{notification.message}</p>
+                  </div>
+                  <span className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{notification.time}</span>
                 </div>
-                <span className="notification-time">{notification.time}</span>
               </div>
             ))}
           </div>
         </div>
-
       </div>
-      {/* <RightSidebar isDarkMode={isDarkMode} className="padded-top" /> */}
     </div>
   );
 };

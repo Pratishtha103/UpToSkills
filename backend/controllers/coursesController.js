@@ -4,18 +4,17 @@ const path = require('path');
 
 // --- Ensure table exists ---
 const ensureCoursesTable = async () => {
-const createQuery = `
-  CREATE TABLE IF NOT EXISTS courses (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    image_path VARCHAR(255),
-    enrolled integer[],
-    skills JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-`;
-
+  const createQuery = `
+    CREATE TABLE IF NOT EXISTS courses (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      image_path VARCHAR(255),
+      enrolled integer[],
+      skills TEXT[],
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
   await pool.query(createQuery);
 
   const alterQuery = `

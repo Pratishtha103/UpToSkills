@@ -9,10 +9,11 @@ import {
   LogOut, 
   X,
   Bell,
-  UserCheck // 🆕 NEW ICON for Assigned Programs
+  UserCheck
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -31,8 +32,8 @@ export default function AdminSidebar({
   setIsOpen,
   activeSection,
   setActiveSection,
-  isDarkMode,
 }) {
+  const { darkMode: isDarkMode } = useTheme();
   const [isDesktop, setIsDesktop] = useState(false);
   const navigate = useNavigate();
 

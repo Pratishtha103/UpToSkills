@@ -1,32 +1,48 @@
-
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Sun, Moon } from "lucide-react";
 import axios from "axios";
+
 import loginImage from "../assets/loginnew.jpg";
+
+// Toast Notifications
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Global Theme Context for Dark/Light Mode
 import { useTheme } from "../context/ThemeContext";
 
 const LoginForm = () => {
+  // Controls password visibility toggle
   const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Theme context values
   const { darkMode, toggleDarkMode } = useTheme();
 
+  // Login form initial state
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "student",
+    role: "student", // Default role
   });
 
+  // ---------------------------------------------------------
+  // If user is redirected with role pre-selected from Landing Page,
+  // update the login role automatically.
+  // Example → navigate("/login", { state: { role: "mentor" } })
+  // ---------------------------------------------------------
   useEffect(() => {
     if (location.state?.role) {
       setFormData((prev) => ({ ...prev, role: location.state.role }));
     }
   }, [location.state]);
 
+  // ---------------------------------------------------------
+  // Update form fields dynamically
+  // ---------------------------------------------------------
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -34,9 +50,20 @@ const LoginForm = () => {
     }));
   };
 
+  // ---------------------------------------------------------
+  // MAIN LOGIN HANDLER
+  // Handles:
+  // 1. Hardcoded Admin fallback login
+  // 2. API login request
+  // 3. Token + user storage in localStorage
+  // 4. Role-based redirect
+  // ---------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ---------------------------------------
+    // Hardcoded Admin fallback (Emergency login for testing)
+    // ---------------------------------------
     const hardcodedAdmin = {
       email: "admin@example.com",
       password: "Admin123",
@@ -48,30 +75,53 @@ const LoginForm = () => {
       formData.password === hardcodedAdmin.password &&
       formData.role === "admin";
 
+    // If hardcoded admin login is triggered, bypass API
     const fallbackAdminLogin = () => {
       alert("Admin login successful (fallback mode)");
-      const adminUser = { name: "Admin", email: hardcodedAdmin.email, role: "admin" };
+
+      const adminUser = {
+        name: "Admin",
+        email: hardcodedAdmin.email,
+        role: "admin",
+      };
+
+      // Storing dummy credentials
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
       localStorage.setItem("admin", JSON.stringify(adminUser));
+
       navigate("/adminPanel", { state: { updated: true } });
     };
 
+    // ---------------------------------------
+    // API Login Flow
+    // ---------------------------------------
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData, { headers: { "Content-Type": "application/json" } });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
       toast.success(response.data.message || "Login successful");
 
+      // Store token and user data
       if (response.data.token) localStorage.setItem("token", response.data.token);
+
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("studentId", response.data.user.id);
         localStorage.setItem("id", response.data.user.id);
       }
 
+      // Role-specific storage (Used for dashboards)
       const role = response.data.user?.role || formData.role;
       if (role === "mentor") localStorage.setItem("mentor", JSON.stringify(response.data.user));
       if (role === "admin") localStorage.setItem("admin", JSON.stringify(response.data.user));
 
+      // ---------------------------------------------------
+      // Role-Based Redirects
+      // ---------------------------------------------------
       setTimeout(() => {
         if (role === "admin") navigate("/adminPanel");
         else if (role === "student" || role === "learner") navigate("/dashboard");
@@ -80,48 +130,108 @@ const LoginForm = () => {
         else navigate("/login");
       }, 5000);
     } catch (err) {
-      if (isHardcodedAdmin) { fallbackAdminLogin(); return; }
-      toast.error(err.response?.data?.message || err.message || "Login failed. Please try again.");
+      // If API fails but user matches hardcoded admin → fallback login
+      if (isHardcodedAdmin) {
+        fallbackAdminLogin();
+        return;
+      }
+
+      // Display actual API error
+      toast.error(
+        err.response?.data?.message || err.message || "Login failed. Please try again."
+      );
     }
   };
 
+  // ---------------------------------------------------------
+  // UI + Theming + Login UI Layout
+  // ---------------------------------------------------------
   return (
-    <div className={`w-full min-h-screen flex justify-center items-center transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-      {/* Theme Toggle Button */}
+    <div
+      className={`w-full min-h-screen flex justify-center items-center transition-colors duration-300 ${
+        darkMode ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
+      {/* Floating Theme Toggle Button */}
       <button
         onClick={toggleDarkMode}
-        className={`fixed top-4 right-6 z-50 p-2 rounded-full transition-colors ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}`}
+        className={`fixed top-4 right-6 z-50 p-2 rounded-full transition-colors ${
+          darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+        }`}
         aria-label="Toggle dark mode"
       >
-        {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-700" />}
+        {darkMode ? (
+          <Sun size={20} className="text-yellow-500" />
+        ) : (
+          <Moon size={20} className="text-gray-700" />
+        )}
       </button>
 
-      <div className={`shadow-lg overflow-hidden flex transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`} style={{ width: "1237px", height: "651px", borderRadius: "12px" }}>
-        {/* LEFT IMAGE */}
+      {/* ----------------------------------------------------- */}
+      {/* MAIN LOGIN CARD — Split into Left( Image ) + Right( Form ) */}
+      {/* ----------------------------------------------------- */}
+      <div
+        className={`shadow-lg overflow-hidden flex transition-colors duration-300 ${
+          darkMode ? "bg-gray-800" : "bg-white"
+        }`}
+        style={{ width: "1237px", height: "651px", borderRadius: "12px" }}
+      >
+        {/* LEFT SIDE — Login Illustration */}
         <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
-          <img src={loginImage} className="w-full h-full object-cover object-center" alt="Login Visual" />
+          <img
+            src={loginImage}
+            className="w-full h-full object-cover object-center"
+            alt="Login Visual"
+          />
         </div>
 
-        {/* RIGHT FORM */}
+        {/* RIGHT SIDE — Login Form */}
         <div className="w-1/2 h-full flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <ToastContainer position="top-right" autoClose={2500} hideProgressBar={false} pauseOnHover style={{ marginTop: "20px", right: "250px", zIndex: 9999 }} closeOnClick />
 
+            {/* Toast Notification Container */}
+            <ToastContainer
+              position="top-right"
+              autoClose={2500}
+              hideProgressBar={false}
+              pauseOnHover
+              style={{ marginTop: "20px", right: "250px", zIndex: 9999 }}
+              closeOnClick
+            />
+
+            {/* Title */}
             <div className="text-center w-full">
               <h1 className="text-4xl font-extrabold">
                 <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
                 <span className="text-[#FF6D34]">Login</span>
               </h1>
-              <p className={`text-[16px] ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Enter your details</p>
+              <p
+                className={`text-[16px] ${
+                  darkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
+                Enter your details
+              </p>
             </div>
 
+            {/* ----------------------------------------------------- */}
+            {/* ACTUAL LOGIN FORM */}
+            {/* ----------------------------------------------------- */}
             <div className="w-full flex-1 mt-8">
-              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
+              <form
+                className="mx-auto max-w-xs flex flex-col gap-4"
+                onSubmit={handleSubmit}
+              >
+                {/* ROLE SELECTOR */}
                 <select
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-100 border-gray-200 text-gray-700"} border`}
+                  className={`w-full px-5 py-3 rounded-lg text-sm ${
+                    darkMode
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-200 text-gray-700"
+                  } border`}
                 >
                   <option value="admin">Login as Admin</option>
                   <option value="student">Login as Student</option>
@@ -129,40 +239,87 @@ const LoginForm = () => {
                   <option value="mentor">Login as Mentor</option>
                 </select>
 
+                {/* EMAIL / USERNAME INPUT */}
                 <input
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"} border`}
+                  className={`w-full px-5 py-3 rounded-lg text-sm ${
+                    darkMode
+                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                      : "bg-gray-100 border-gray-200"
+                  } border`}
                   type="text"
                   placeholder="Enter email or username"
                   required
                 />
 
+                {/* PASSWORD FIELD + TOGGLE VISIBILITY */}
                 <div className="relative">
                   <input
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"} border`}
+                    className={`w-full px-5 py-3 rounded-lg text-sm ${
+                      darkMode
+                        ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                        : "bg-gray-100 border-gray-200"
+                    } border`}
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
                   />
-                  <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer" onClick={() => setShowPassword((s) => !s)}>
-                    {showPassword ? <EyeOff className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} /> : <Eye className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}
+                  {/* Eye Icon Toggle */}
+                  <div
+                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword((s) => !s)}
+                  >
+                    {showPassword ? (
+                      <EyeOff
+                        className={`h-5 w-5 ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      />
+                    ) : (
+                      <Eye
+                        className={`h-5 w-5 ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      />
+                    )}
                   </div>
                 </div>
 
+                {/* FORGOT PASSWORD LINK */}
                 <div className="text-right -mt-2 mb-3">
-                  <Link to="/login/forgot-password" className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium">Forgot password?</Link>
+                  <Link
+                    to="/login/forgot-password"
+                    className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
 
-                <button type="submit" className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition">Login</button>
+                {/* SUBMIT BUTTON */}
+                <button
+                  type="submit"
+                  className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition"
+                >
+                  Login
+                </button>
 
-                <p className={`text-center ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                {/* SIGN-UP LINK */}
+                <p
+                  className={`text-center ${
+                    darkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
                   Don't have an account?{" "}
-                  <Link to="/register"><span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">Sign up</span></Link>
+                  <Link to="/register">
+                    <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
+                      Sign up
+                    </span>
+                  </Link>
                 </p>
               </form>
             </div>

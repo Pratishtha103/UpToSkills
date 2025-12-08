@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Sun, Moon } from "lucide-react";
 import axios from "axios";
 import signupImage from "../assets/bgc.jpeg";
 import { useTheme } from "../context/ThemeContext";
 
+/* --------------------------------------------------------------------
+   Utility: Capitalizes first letter of a given role string
+   Ensures UI shows: Student / Company / Mentor instead of lowercase.
+-------------------------------------------------------------------- */
 const capitalizeFirstLetter = (string) => {
   if (!string) return "";
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
+/* --------------------------------------------------------------------
+   Custom Toast Icons (SVG icons to show toast messages cleanly)
+-------------------------------------------------------------------- */
 const ToastIcons = {
   success: (
     <svg className="w-3 h-3 mr-3 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -33,6 +40,9 @@ const ToastIcons = {
   ),
 };
 
+/* --------------------------------------------------------------------
+   Toast Component → Reusable, Dark-mode aware
+-------------------------------------------------------------------- */
 const Toast = ({ type, message, onClose, darkMode }) => {
   const bgColors = {
     success: darkMode ? "bg-green-900 text-green-300" : "bg-green-100 text-green-700",
@@ -42,10 +52,19 @@ const Toast = ({ type, message, onClose, darkMode }) => {
   };
 
   return (
-    <div className={`fixed top-2 right-44 max-w-xs w-full flex items-center px-3 py-2 rounded-md shadow-md ${bgColors[type]}`} role="alert" style={{ minWidth: "280px" }}>
+    <div
+      className={`fixed top-2 right-44 max-w-xs w-full flex items-center px-3 py-2 rounded-md shadow-md ${bgColors[type]}`}
+      style={{ minWidth: "280px" }}
+      role="alert"
+    >
       {ToastIcons[type]}
       <div className="flex-1 text-sm font-medium">{message}</div>
-      <button onClick={onClose} className={`ml-2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-600"}`}>
+
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className={`ml-2 ${darkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-600"}`}
+      >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
@@ -55,18 +74,33 @@ const Toast = ({ type, message, onClose, darkMode }) => {
   );
 };
 
-
+/* --------------------------------------------------------------------
+   MAIN REGISTRATION COMPONENT
+   Handles: 
+     • Role-based registration (Student / Mentor / Company)
+     • Custom toast alerts
+     • Form validation
+     • Dark mode UI
+-------------------------------------------------------------------- */
 const RegistrationForm = () => {
   const location = useLocation();
+
+  // Determine role from URL (?role=mentor etc.)
   const params = new URLSearchParams(location.search);
   const initialRole = capitalizeFirstLetter(params.get("role") || "student");
+
+  // Theme context
   const { darkMode, toggleDarkMode } = useTheme();
 
+  // Input states
   const [showPassword, setShowPassword] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [passwordWarning, setPasswordWarning] = useState("");
+
+  // Toast state
   const [toast, setToast] = useState(null);
 
+  // Form fields
   const [formData, setFormData] = useState({
     role: initialRole,
     username: "",
@@ -78,12 +112,17 @@ const RegistrationForm = () => {
 
   const navigate = useNavigate();
 
+  /* ------------------- Toast Helpers ------------------- */
   const showToast = (type, message) => setToast({ type, message });
   const closeToast = () => setToast(null);
 
+  /* --------------------------------------------------------------------
+     Form input handler (Role, Email Validation, Password Strength)
+  -------------------------------------------------------------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Email: Always convert to lowercase + warn user
     if (name === "email") {
       if (/[A-Z]/.test(value)) {
         showToast("warning", "Enter a valid email (use lowercase only)");
@@ -94,16 +133,22 @@ const RegistrationForm = () => {
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
+    // Password strength validation
     if (name === "password") {
       if (!passwordTouched && value.length > 0) setPasswordTouched(true);
+
       if (value.length < 8 || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) {
         setPasswordWarning("Password too weak. Use at least 8 characters, a number, and an uppercase letter.");
       } else setPasswordWarning("");
     }
   };
 
+  /* --------------------------------------------------------------------
+     FORM SUBMIT → Registers user via API
+  -------------------------------------------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (passwordWarning) {
       showToast("warning", "Fix password issues before submitting!");
       return;
@@ -111,84 +156,202 @@ const RegistrationForm = () => {
 
     try {
       const response = await axios.post("http://localhost:5000/api/auth/register", formData);
+
       showToast("success", response.data.message || "You have successfully registered!");
-      setTimeout(() => { closeToast(); navigate("/login"); }, 3500);
+
+      // Redirect after success
+      setTimeout(() => {
+        closeToast();
+        navigate("/login");
+      }, 3500);
     } catch (err) {
       showToast("error", err.response?.data?.message || "Registration failed!");
     }
   };
 
+  /* --------------------------------------------------------------------
+     UI MARKUP + Dark Mode + Form Layout
+  -------------------------------------------------------------------- */
   return (
     <>
-      {toast && <Toast type={toast.type} message={toast.message} onClose={closeToast} darkMode={darkMode} />}
+      {/* Toast message */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={closeToast}
+          darkMode={darkMode}
+        />
+      )}
 
-      {/* Theme Toggle Button */}
+      {/* Theme toggle button */}
       <button
         onClick={toggleDarkMode}
-        className={`fixed top-4 right-6 z-50 p-2 rounded-full transition-colors ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}`}
+        className={`fixed top-4 right-6 z-50 p-2 rounded-full transition-colors ${
+          darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+        }`}
         aria-label="Toggle dark mode"
       >
         {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-700" />}
       </button>
 
-      <div className={`h-[100vh] flex items-center justify-center px-5 lg:px-0 transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-        <div className={`max-w-screen-xl shadow-md sm:rounded-lg flex justify-center flex-1 transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+      {/* Main layout container */}
+      <div
+        className={`h-[100vh] flex items-center justify-center px-5 lg:px-0 transition-colors duration-300 ${
+          darkMode ? "bg-gray-900" : "bg-gray-50"
+        }`}
+      >
+        <div
+          className={`max-w-screen-xl shadow-md sm:rounded-lg flex justify-center flex-1 transition-colors duration-300 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
+        >
 
-          {/* LEFT IMAGE */}
+          {/* LEFT IMAGE → Decorative */}
           <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
-            <div className="h-full w-full bg-cover rounded-2xl" style={{ backgroundImage: `url(${signupImage})` }} />
+            <div
+              className="h-full w-full bg-cover rounded-2xl"
+              style={{ backgroundImage: `url(${signupImage})` }}
+            />
           </div>
 
-          {/* RIGHT FORM */}
+          {/* RIGHT FORM → Main Registration Form */}
           <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
             <div className="flex flex-col items-center">
 
+              {/* Heading Section */}
               <div className="text-center">
                 <h1 className="text-4xl font-extrabold">
                   <span className="text-[#00BDA6]">{capitalizeFirstLetter(formData.role)}</span>
                   <span className="text-[#FF6D34]"> Sign Up</span>
                 </h1>
-                <p className={`text-[16px] ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Enter your details to create your account</p>
+
+                <p className={`text-[16px] ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                  Enter your details to create your account
+                </p>
               </div>
 
+              {/* Form starts here */}
               <div className="w-full flex-1 mt-8">
                 <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
 
-                  <select name="role" value={formData.role} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-100 border-gray-200 text-gray-700"}`}>
+                  {/* Role Selector */}
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className={`w-full px-5 py-3 rounded-lg border ${
+                      darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-100 border-gray-200 text-gray-700"
+                    }`}
+                  >
                     <option value="Student">Register as Student</option>
                     <option value="Company">Register as Company</option>
                     <option value="Mentor">Register as Mentor</option>
                   </select>
 
-                  <input name="username" value={formData.username} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`} type="text" placeholder="Enter your username" required />
+                  {/* Username */}
+                  <input
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className={`w-full px-5 py-3 rounded-lg border ${
+                      darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"
+                    }`}
+                    type="text"
+                    placeholder="Enter your username"
+                    required
+                  />
 
-                  <input name="name" value={formData.name} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`} type="text" placeholder="Enter your name" required />
+                  {/* Full Name */}
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={`w-full px-5 py-3 rounded-lg border ${
+                      darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"
+                    }`}
+                    type="text"
+                    placeholder="Enter your name"
+                    required
+                  />
 
-                  <input name="email" value={formData.email} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`} type="email" placeholder="Enter your email" required />
+                  {/* Email */}
+                  <input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full px-5 py-3 rounded-lg border ${
+                      darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"
+                    }`}
+                    type="email"
+                    placeholder="Enter your email"
+                    required
+                  />
 
-                  <input name="phone" value={formData.phone} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`} type="tel" placeholder="Enter your mobile no" maxLength={10} required />
+                  {/* Phone Number */}
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={`w-full px-5 py-3 rounded-lg border ${
+                      darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"
+                    }`}
+                    type="tel"
+                    placeholder="Enter your mobile no"
+                    maxLength={10}
+                    required
+                  />
 
+                  {/* Password + Toggle Eye Icon */}
                   <div className="relative w-full">
-                    <input name="password" value={formData.password} onChange={handleChange} className={`w-full px-5 py-3 rounded-lg border pr-10 ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`} type={showPassword ? "text" : "password"} placeholder="Create a Password" required />
+                    <input
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full px-5 py-3 rounded-lg border pr-10 ${
+                        darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"
+                      }`}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a Password"
+                      required
+                    />
+
+                    {/* Eye icon shown only after user starts typing */}
                     {passwordTouched && (
-                      <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <EyeOff className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} /> : <Eye className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}
+                      <div
+                        className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />
+                        ) : (
+                          <Eye className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />
+                        )}
                       </div>
                     )}
                   </div>
 
+                  {/* Password Warning Message */}
                   {passwordWarning && <p className="text-xs text-red-500 mt-1">{passwordWarning}</p>}
 
-                  <button type="submit" className="mt-5 tracking-wide font-semibold bg-[#00BDA6] text-gray-100 w-full py-4 rounded-lg hover:bg-[#FF6D34] transition-all">Sign Up</button>
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="mt-5 tracking-wide font-semibold bg-[#00BDA6] text-gray-100 w-full py-4 rounded-lg hover:bg-[#FF6D34] transition-all"
+                  >
+                    Sign Up
+                  </button>
 
+                  {/* Redirect to Login */}
                   <p className={`text-l text-center ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                     Already have an account?{" "}
-                    <Link to="/login"><span className="text-[#FF6D34] hover:text-[#00BDA6] font-semibold">Sign in</span></Link>
+                    <Link to="/login">
+                      <span className="text-[#FF6D34] hover:text-[#00BDA6] font-semibold">Sign in</span>
+                    </Link>
                   </p>
 
                 </form>
               </div>
-
             </div>
           </div>
 

@@ -1,9 +1,12 @@
+// src/components/.../EditProfile.jsx
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfile() {
   const { darkMode } = useTheme();
+
   const [formData, setFormData] = useState({
     companyName: "",
     website: "",
@@ -14,8 +17,17 @@ export default function EditProfile() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Popup State
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+
   const token = localStorage.getItem("token");
 
+  /* --------------------------------------------------
+    FETCH PROFILE
+  -------------------------------------------------- */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -39,6 +51,8 @@ export default function EditProfile() {
         }
       } catch (err) {
         console.error("Failed to fetch profile:", err.response?.data || err.message);
+        setPopupMessage("Failed to load profile");
+        setShowPopup(true);
       } finally {
         setLoading(false);
       }
@@ -47,13 +61,16 @@ export default function EditProfile() {
     fetchProfile();
   }, [token]);
 
+  /* --------------------------------------------------
+    FORM HANDLERS
+  -------------------------------------------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setFormData((prev) => ({
         ...prev,
@@ -65,7 +82,16 @@ export default function EditProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.companyName || !formData.industry) {
+      setPopupMessage("Please fill in all required fields");
+      setShowPopup(true);
+      return;
+    }
+
     try {
+      setSaving(true);
+
       const fd = new FormData();
       fd.append("name", formData.companyName);
       fd.append("website", formData.website);
@@ -85,65 +111,83 @@ export default function EditProfile() {
       );
 
       if (res.data.success) {
-        alert("Profile saved successfully!");
+        setPopupMessage("Profile saved successfully!");
       } else {
-        alert("Failed to save profile.");
+        setPopupMessage(res.data.message || "Failed to save profile");
       }
+      setShowPopup(true);
     } catch (err) {
-      console.error("Submission failed:", err.response?.data || err.message);
-      alert("Failed to save profile.");
+      console.error("Save error:", err.response?.data || err.message);
+      setPopupMessage(err.response?.data?.message || "Failed to save profile");
+      setShowPopup(true);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) return <p className="text-center mt-6">Loading...</p>;
+  /* --------------------------------------------------
+    LOADING SCREEN
+  -------------------------------------------------- */
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
+  /* --------------------------------------------------
+    COMPONENT RENDER
+  -------------------------------------------------- */
   return (
     <>
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-[380px] text-center">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Message</h2>
+
+            <p className="text-gray-700 dark:text-gray-300 mb-6">{popupMessage}</p>
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col min-h-screen">
-        {/* Main Content */}
         <main className="flex-grow flex justify-center items-start p-6">
           <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
               {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
             </h2>
 
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-6"
-              encType="multipart/form-data"
-            >
+            <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
+
               {/* Company Name */}
               <div>
-                <label className="block font-semibold mb-2">Company Name</label>
+                <label className="block font-semibold mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
                   required
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
                 />
               </div>
 
-              {/* Company Logo */}
-              <div class="flex items-center justify-center w-full">
-                <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-50 bg-neutral-secondary-medium border border-dashed border-default-strong rounded cursor-pointer hover:bg-neutral-tertiary-medium">
-                  <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
-                    <svg class="w-8 h-8 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" /></svg>
-                    <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag & drop</p>
-                    <p class="text-xs">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                  </div>
-                  <input id="dropzone-file" accept="image/*" type="file" class="hidden" onChange={handleLogoChange} />
-                </label>
-              </div>
-              {formData.logoPreview && (
-                  <img
-                    src={formData.logoPreview}
-                    alt="Logo Preview"
-                    className="mt-4 h-50 object-contain rounded-lg border"
-                  />
-                )}
-              {/* <div>
+              {/* Logo */}
+              <div>
                 <label className="block font-semibold mb-2">Company Logo</label>
                 <input
                   type="file"
@@ -151,8 +195,15 @@ export default function EditProfile() {
                   onChange={handleLogoChange}
                   className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
                 />
-                
-              </div> */}
+
+                {formData.logoPreview && (
+                  <img
+                    src={formData.logoPreview}
+                    alt="Logo Preview"
+                    className="mt-4 h-28 object-contain rounded-lg border"
+                  />
+                )}
+              </div>
 
               {/* Website */}
               <div>
@@ -162,19 +213,21 @@ export default function EditProfile() {
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 />
               </div>
 
               {/* Industry */}
               <div>
-                <label className="block font-semibold mb-2">Industry Type</label>
+                <label className="block font-semibold mb-2">
+                  Industry Type <span className="text-red-500">*</span>
+                </label>
                 <select
                   name="industry"
                   value={formData.industry}
                   onChange={handleChange}
                   required
-                  className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 >
                   <option value="">Select industry</option>
                   <option value="IT">IT / Technology</option>
@@ -187,32 +240,40 @@ export default function EditProfile() {
 
               {/* Contact */}
               <div>
-                <label className="block font-semibold mb-2">Company Contact</label>
+                <label className="block font-semibold mb-2">Contact Info</label>
                 <input
                   type="text"
                   name="contact"
                   value={formData.contact}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                disabled={saving}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                Save Details
+                {saving ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Details"
+                )}
               </button>
+
             </form>
           </div>
         </main>
+
+        <footer className="w-full mt-2 text-center text-gray-700 dark:text-gray-300 py-4 text-sm">
+          © 2025 Uptoskills. Built by learners.
+        </footer>
       </div>
-      <footer
-        className="w-full mt-2 text-gray-700   dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-      >
-        <p>© 2025 Uptoskills. Built by learners.</p>
-      </footer>
     </>
   );
 }

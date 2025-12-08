@@ -56,6 +56,7 @@ const SkillBadgeForm = () => {
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
@@ -134,17 +135,21 @@ const SkillBadgeForm = () => {
     setShowSuggestions(false);
   };
 
-  const handleSubmit = async (e) => {
+  // Show confirmation popup instead of direct submit
+  const handleSubmitClick = (e) => {
     e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  // Confirm and proceed with actual submission
+  const handleConfirmSubmit = async () => {
+    setShowConfirmation(false);
     setSubmissionStatus("submitting");
 
     const token = localStorage.getItem("token");
 
     if (!token) {
       setSubmissionStatus("error");
-      alert(
-        "Authentication Error: Mentor token not found. Please log in again."
-      );
       return;
     }
 
@@ -162,7 +167,6 @@ const SkillBadgeForm = () => {
 
       if (response.ok && data.success) {
         setSubmissionStatus("success");
-        alert("✅ Badge added successfully!");
         setFormData({
           student_name: "",
           badge_name: "",
@@ -175,17 +179,16 @@ const SkillBadgeForm = () => {
           "Backend Error:",
           data.message || "Unknown error during badge creation."
         );
-        alert(
-          `❌ Failed to add badge\n\n${
-            data.message || "Unknown error. Check browser console for details."
-          }`
-        );
       }
     } catch (error) {
       console.error("Network Error:", error);
       setSubmissionStatus("error");
-      alert("A network error occurred. Check browser console.");
     }
+  };
+
+  // Cancel confirmation
+  const handleCancelConfirm = () => {
+    setShowConfirmation(false);
   };
 
   const selectedBadge = FIXED_BADGES.find(
@@ -253,7 +256,7 @@ const SkillBadgeForm = () => {
 
             {/* 2. AWARD FORM */}
             {formData.badge_name && (
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-4" onSubmit={handleSubmitClick}>
                 <h3 className="text-lg font-medium pt-4 mb-3 border-t dark:border-gray-600 dark:text-white">
                   2. Award Details:
                 </h3>
@@ -398,6 +401,75 @@ const SkillBadgeForm = () => {
 
         <Footer isDarkMode={isDarkMode} />
       </div>
+
+      {/* ✅ CONFIRMATION POPUP - CENTERED */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className={`rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}>
+            {/* Header */}
+            <div className="flex items-center justify-center mb-4">
+              <div className="text-4xl">⚠️</div>
+            </div>
+
+            {/* Title */}
+            <h3 className={`text-xl font-semibold text-center mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}>
+              Confirm Badge Award
+            </h3>
+
+            {/* Details */}
+            <div className={`mb-6 p-4 rounded-lg ${
+              isDarkMode ? "bg-gray-700" : "bg-gray-50"
+            }`}>
+              <p className={`text-sm mb-3 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Student:</strong> {formData.student_name}
+              </p>
+              <p className={`text-sm mb-3 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Badge:</strong> {selectedBadge?.icon} {formData.badge_name}
+              </p>
+              <p className={`text-sm ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Description:</strong> {formData.badge_description}
+              </p>
+            </div>
+
+            {/* Message */}
+            <p className={`text-center text-sm mb-6 ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
+              Are you sure you want to award this badge?
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleCancelConfirm}
+                className={`px-6 py-2 rounded-md font-medium transition ${
+                  isDarkMode
+                    ? "bg-gray-700 text-white hover:bg-gray-600"
+                    : "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSubmit}
+                className="px-6 py-2 rounded-md font-medium bg-green-600 text-white hover:bg-green-700 transition"
+              >
+                Yes, Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

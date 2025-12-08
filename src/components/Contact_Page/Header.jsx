@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
-import logo from "../../assets/logo.jpg";
-import darkLogo from "../../assets/darkLogo.jpg";
+import logo from "../../assets/UptoSkills.png";
+import darkLogo from "../../assets/UptoSkills.png";
 import { useTheme } from "../../context/ThemeContext";
 
 const Header = () => {

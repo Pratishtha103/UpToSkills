@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import logo from "../../assets/logo.jpg";
-import darkLogo from "../../assets/darkLogo.jpg";
+import logo from "../../assets/UptoSkills.png";
+import darkLogo from "../../assets/UptoSkills.png";
 import { useTheme } from "../../context/ThemeContext";
 
 function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {

@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import Footer from "../../Student_Dashboard/dashboard/Footer";
 
-function ProjectSubmissionForm() {
+function ProjectSubmissionForm({ isDarkMode }) {
   const user = JSON.parse(localStorage.getItem("user"));  
-  const studentId = user?.id;  // ✅ get studentId
-  const studentEmail = user?.email; // (optional, auto-fill email)
+  const studentId = user?.id;
+  const studentEmail = user?.email;
 
   const [formData, setFormData] = useState({
     student_email: studentEmail || "",
@@ -50,10 +50,8 @@ function ProjectSubmissionForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
-
-        // 🔥 ADD student_id automatically
         body: JSON.stringify({
           ...formData,
           student_id: studentId,
@@ -73,7 +71,7 @@ function ProjectSubmissionForm() {
         });
       } else {
         const err = await response.json();
-        alert(`Failed to submit project: ${err.message || "Server error"}`);
+        alert(`Failed to submit project: ${err.message || "Server error"}`); // ✅ Fixed: Added backticks
       }
     } catch (error) {
       console.error(error);
@@ -86,9 +84,15 @@ function ProjectSubmissionForm() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700">
+        <div className={`bg-white p-8 rounded-2xl shadow-2xl w-full max-w-3xl border ${
+          isDarkMode 
+            ? "dark:bg-gray-900 dark:border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
           
-          <h2 className="text-3xl font-extrabold text-center mb-4 text-indigo-700 dark:text-indigo-400">
+          <h2 className={`text-3xl font-extrabold text-center mb-4 ${
+            isDarkMode ? "text-indigo-400" : "text-indigo-700"
+          }`}>
             Student Project Submission
           </h2>
 
@@ -96,7 +100,9 @@ function ProjectSubmissionForm() {
 
             {/* Student Email */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Student Email
               </label>
               <input
@@ -105,13 +111,19 @@ function ProjectSubmissionForm() {
                 value={formData.student_email}
                 onChange={handleChange}
                 placeholder="Your Student Email"
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               />
             </div>
 
             {/* Title */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Project Title
               </label>
               <input
@@ -120,13 +132,19 @@ function ProjectSubmissionForm() {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Project Title"
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               />
             </div>
 
             {/* Tech Stack */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Technology Stack
               </label>
               <input
@@ -135,13 +153,19 @@ function ProjectSubmissionForm() {
                 value={formData.tech_stack}
                 onChange={handleChange}
                 placeholder="React, Node.js..."
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               />
             </div>
 
             {/* GitHub PR */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 GitHub PR Link
               </label>
               <input
@@ -150,13 +174,19 @@ function ProjectSubmissionForm() {
                 value={formData.github_pr_link}
                 onChange={handleChange}
                 placeholder="https://github.com/..."
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Project Description
               </label>
               <textarea
@@ -164,13 +194,19 @@ function ProjectSubmissionForm() {
                 value={formData.description}
                 onChange={handleChange}
                 rows="4"
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               ></textarea>
             </div>
 
             {/* Contributions */}
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+              <label className={`block font-semibold mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Your Contributions
               </label>
               <textarea
@@ -178,7 +214,11 @@ function ProjectSubmissionForm() {
                 value={formData.contributions}
                 onChange={handleChange}
                 rows="3"
-                className="w-full border rounded-xl px-4 py-3 bg-white dark:bg-gray-800"
+                className={`w-full border rounded-xl px-4 py-3 ${
+                  isDarkMode 
+                    ? "bg-gray-800 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
               ></textarea>
             </div>
 
@@ -189,15 +229,18 @@ function ProjectSubmissionForm() {
                 name="is_open_source"
                 checked={formData.is_open_source}
                 onChange={handleChange}
+                className="w-4 h-4"
               />
-              <label className="text-gray-700 dark:text-gray-300 font-medium">
+              <label className={`font-medium ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
                 Is this project open-source?
               </label>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition-colors"
             >
               🚀 Submit Project
             </button>
@@ -206,13 +249,17 @@ function ProjectSubmissionForm() {
           {/* Success Modal */}
           {showModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-center text-green-600 dark:text-green-400 mb-4">
+              <div className={`rounded-2xl p-8 ${
+                isDarkMode ? "bg-gray-900" : "bg-white"
+              }`}>
+                <h3 className={`text-2xl font-bold text-center mb-4 ${
+                  isDarkMode ? "text-green-400" : "text-green-600"
+                }`}>
                   ✅ Project Submitted!
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="block mx-auto bg-green-600 text-white px-5 py-2 rounded-lg"
+                  className="block mx-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition-colors"
                 >
                   Close
                 </button>

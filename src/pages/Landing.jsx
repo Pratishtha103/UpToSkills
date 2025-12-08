@@ -4,7 +4,7 @@
 // import { motion } from "framer-motion";
 // import { useNavigate } from "react-router-dom";
 // import Chatbot from "../components/Contact_Page/Chatbot";
-// import logo from "../assets/logo.jpg";
+// import logo from "../assets/UptoSkills.png";
 
 // export default function Landing() {
 //   const navigate = useNavigate();
@@ -86,7 +86,7 @@
 //           <img
 //             src={logo}
 //             alt="Upto To Skills logo"          
-//             className="h-10 transition-transform hover:scale-110 cursor-pointer"
+//             className="h-12 transition-transform hover:scale-110 cursor-pointer"
 //             onClick={() => navigate("/")}
 //           />
 //           <nav className="flex space-x-6 font-medium text-gray-800 text-sm">
@@ -237,8 +237,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import Chatbot from "../components/Contact_Page/Chatbot";
-import logo from "../assets/logo.jpg";
-import darkLogo from "../assets/darkLogo.jpg";
+import logo from "../assets/UptoSkills.png";
+import darkLogo from "../assets/UptoSkills.png";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Landing() {
@@ -322,7 +322,7 @@ export default function Landing() {
           <img
             src={darkMode ? darkLogo : logo}
             alt="Upto To Skills logo"
-            className="h-10 transition-transform hover:scale-110 cursor-pointer"
+            className="h-12 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
           <div className="flex items-center space-x-4">

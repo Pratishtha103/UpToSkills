@@ -1,19 +1,14 @@
-<<<<<<< HEAD
+
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route ,useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { persistThemePreference, readStoredTheme } from "./lib/utils";
 import ProtectedRoute from './components/ProtectedRoute';
-=======
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from './context/ThemeContext';
->>>>>>> d63b6a8e4494e28f75bcc4d8c6cf1a26097389df
+
+
 
 // Pages & Components
 import Landing from './pages/Landing';
@@ -77,14 +72,13 @@ function App() {
       <Router>
         <Routes>
 
-<<<<<<< HEAD
+
           {/* ========== PUBLIC ROUTES (No Login Required) ========== */}
           <Route path="/" element={<Landing isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} />
           
-=======
           {/* ===== Public Routes ===== */}
           <Route path="/" element={<Landing />} />
->>>>>>> d63b6a8e4494e28f75bcc4d8c6cf1a26097389df
+
           <Route path="/about" element={
             <>
               <Header />

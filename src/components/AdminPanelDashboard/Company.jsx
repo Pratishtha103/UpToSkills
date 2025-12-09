@@ -1,8 +1,89 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Users, Trash2, Eye, X, Mail, Phone, Globe, Briefcase, Calendar, Loader2, Search } from "lucide-react";
+import { Building2, Users, Trash2, Eye, X, Mail, Phone, Globe, Briefcase, Calendar, Loader2, Search, AlertCircle } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api/companies";
+
+// Confirmation Modal Component
+const ConfirmationModal = ({ isOpen, onConfirm, onCancel, message, isDarkMode = false, confirmText = "Confirm", confirmColor = "red" }) => {
+  if (!isOpen) return null;
+
+  const getColorClasses = () => {
+    switch(confirmColor) {
+      case 'red':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'blue':
+        return 'bg-blue-500 hover:bg-blue-600';
+      case 'yellow':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      default:
+        return 'bg-red-500 hover:bg-red-600';
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+        onClick={onCancel}
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, y: -20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.8, opacity: 0, y: -20 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          onClick={(e) => e.stopPropagation()}
+          className={`relative max-w-sm w-full rounded-2xl shadow-2xl p-8 ${
+            isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+          }`}
+        >
+          {/* Icon */}
+          <div className={`flex justify-center mb-6 p-4 rounded-full w-fit mx-auto ${
+            isDarkMode ? 'bg-yellow-500/10' : 'bg-yellow-50'
+          }`}>
+            <AlertCircle className="w-10 h-10 text-yellow-500" />
+          </div>
+
+          {/* Message */}
+          <div className="text-center mb-8">
+            <h2 className="text-lg font-bold mb-2">Are you sure?</h2>
+            <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              {message}
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3">
+            <motion.button
+              onClick={onCancel}
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all ${
+                isDarkMode 
+                  ? 'bg-gray-700 text-gray-100 hover:bg-gray-600' 
+                  : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Cancel
+            </motion.button>
+
+            <motion.button
+              onClick={onConfirm}
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm text-white transition-all ${getColorClasses()}`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {confirmText}
+            </motion.button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 export default function Company({ isDarkMode }) {
   const [companies, setCompanies] = useState([]);
@@ -11,6 +92,35 @@ export default function Company({ isDarkMode }) {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(null);
+
+  // Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: '',
+    companyId: null
+  });
+
+  const showConfirmation = (message, companyId) => {
+    setConfirmModal({ 
+      isOpen: true, 
+      message, 
+      companyId
+    });
+  };
+
+  const closeConfirmation = () => {
+    setConfirmModal({
+      isOpen: false,
+      message: '',
+      companyId: null
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    await performDelete(confirmModal.companyId);
+    closeConfirmation();
+  };
 
   // Apply/remove dark mode class on root
   useEffect(() => {
@@ -52,11 +162,16 @@ export default function Company({ isDarkMode }) {
     return nameMatch || emailMatch || phoneMatch;
   });
 
-  // Handler for removing a company
-  const handleRemoveCompany = async (id) => {
+  // Handler for showing confirmation before removing a company
+  const handleRemoveCompany = (id) => {
     const companyName = companies.find(c => c.id === id)?.company_name || `ID ${id}`;
-    if (!window.confirm(`Are you sure you want to remove ${companyName}?`)) return;
+    showConfirmation(`Are you sure you want to remove ${companyName}?`, id);
+  };
+
+  // Perform the actual delete
+  const performDelete = async (id) => {
     try {
+      setIsDeleting(id);
       const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete company");
       setCompanies(current => current.filter(c => c.id !== id));
@@ -79,7 +194,8 @@ export default function Company({ isDarkMode }) {
       }
     } catch (error) {
       console.error("Error deleting company:", error);
-      alert("Failed to delete company");
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -93,12 +209,10 @@ export default function Company({ isDarkMode }) {
       if (data.success) {
         setCompanyDetails(data.data);
       } else {
-        alert("Failed to load company details");
         setSelectedCompany(null);
       }
     } catch (err) {
       console.error("Error fetching company details:", err);
-      alert("Error loading company details");
       setSelectedCompany(null);
     } finally {
       setLoadingDetails(false);
@@ -115,6 +229,17 @@ export default function Company({ isDarkMode }) {
       className={`min-h-screen p-4 sm:p-8 font-inter transition-colors duration-500 ${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
         }`}
     >
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={closeConfirmation}
+        message={confirmModal.message}
+        isDarkMode={isDarkMode}
+        confirmText="Remove"
+        confirmColor="red"
+      />
+
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
         {/* Header */}
         <div className="text-4xl font-extrabold flex items-center gap-3">
@@ -187,12 +312,17 @@ export default function Company({ isDarkMode }) {
 
                 <motion.button
                   onClick={() => handleRemoveCompany(company.id)}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                  disabled={isDeleting === company.id}
+                  className={`w-full py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors ${
+                    isDeleting === company.id
+                      ? "bg-red-300 text-red-800 cursor-not-allowed"
+                      : "bg-red-600 hover:bg-red-700 text-white"
+                  }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Remove
+                  {isDeleting === company.id ? "Removing..." : "Remove"}
                 </motion.button>
               </motion.div>
             ))

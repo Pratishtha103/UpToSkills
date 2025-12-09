@@ -6,7 +6,7 @@ import NotificationDrawer from "./NotificationDrawer";
 import useRealtimeNotifications from "../../hooks/useRealtimeNotifications";
 import { cn } from "../../lib/utils";
 
-const deriveRecipientFromStorage = () => {
+export const deriveRecipientFromStorage = () => {
   if (typeof window === "undefined") return null;
   const potentialKeys = ["user", "admin", "mentor", "company", "student"];
   for (const key of potentialKeys) {
@@ -39,15 +39,25 @@ const NotificationCenter = ({
   const normalizedRole = (role || "").toLowerCase();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [derivedRecipient, setDerivedRecipient] = useState(() => recipientId || null);
+  const [derivedRecipient, setDerivedRecipient] = useState(() => {
+    if (recipientId) return recipientId;
+    return deriveRecipientFromStorage();
+  });
 
   useEffect(() => {
     if (recipientId) {
-      setDerivedRecipient(recipientId);
+      setDerivedRecipient((prev) => (prev === recipientId ? prev : recipientId));
       return;
     }
-    setDerivedRecipient(deriveRecipientFromStorage());
+
+    const stored = deriveRecipientFromStorage();
+    if (stored) {
+      setDerivedRecipient((prev) => (prev === stored ? prev : stored));
+    }
   }, [recipientId]);
+
+  const effectiveRecipientId = recipientId || derivedRecipient || null;
+  const shouldEnableRealtime = Boolean(normalizedRole) && (normalizedRole === "admin" || Boolean(effectiveRecipientId));
 
   const {
     notifications,
@@ -59,8 +69,8 @@ const NotificationCenter = ({
     refetch,
   } = useRealtimeNotifications({
     role: normalizedRole,
-    recipientId: derivedRecipient,
-    enabled: Boolean(normalizedRole),
+    recipientId: normalizedRole === "admin" ? null : effectiveRecipientId,
+    enabled: shouldEnableRealtime,
   });
 
   useEffect(() => {
@@ -78,7 +88,7 @@ const NotificationCenter = ({
   const badgeValue = useMemo(() => {
     const count = typeof unreadCount === "number" ? unreadCount : totalNotifications;
     if (!count) return null;
-    return count > 9 ? "9+" : count;
+    return count;
   }, [unreadCount, totalNotifications]);
 
   if (!normalizedRole) {

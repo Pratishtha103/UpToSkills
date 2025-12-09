@@ -1,8 +1,16 @@
 // src/pages/AdminPanel.jsx
 
+// ===============================
+//  ADMIN PANEL MAIN PAGE
+//  - Handles layout, routing between internal components, theme, sidebar
+//  - This is the central controller for all admin modules
+// ===============================
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+// Importing all admin-related UI components.
+// Each module is responsible for rendering its own section inside admin panel.
 import AdminNavbar from "../components/AdminPanelDashboard/AdminNavbar";
 import AdminSidebar from "../components/AdminPanelDashboard/AdminSidebar";
 import DashboardMain from "../components/AdminPanelDashboard/DashboardMain";
@@ -24,25 +32,29 @@ import AssignedPrograms from "../components/AdminPanelDashboard/AssignedPrograms
 import { useTheme } from "../context/ThemeContext";
 
 function AdminPanel() {
-  // -----------------------------------------
+  // ===============================
   // STATE MANAGEMENT
-  // -----------------------------------------
+  // ===============================
 
-  // Tracks which module/section is being viewed
+  // Tracks which section (Dashboard / Students / Programs etc.) is active.
+  // Sidebar buttons update this value.
   const [activeSection, setActiveSection] = useState("dashboard");
 
-  // Controls sidebar open/close
+  // Controls sidebar visibility on smaller screens. (Responsive behavior)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Theme context (Dark/Light mode)
+  // Theme context: controls Dark Mode / Light Mode
   const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
 
-  // -----------------------------------------
-  // RENDERING EACH ADMIN SECTION
-  // -----------------------------------------
+  // ===============================
+  // COMPONENT RENDERING LOGIC
+  // Dynamically returns the correct module based on activeSection
+  // Acts like a mini router inside the Admin Panel
+  // ===============================
   const renderActiveModule = () => {
     switch (activeSection) {
       case "dashboard":
+        // Dashboard page also receives navigation callback
         return (
           <DashboardMain
             isDarkMode={isDarkMode}
@@ -54,6 +66,7 @@ function AdminPanel() {
         return <Students isDarkMode={isDarkMode} />;
 
       case "students_table":
+        // Students table includes navigation back to student page or edit page
         return (
           <StudentsTable
             isDarkMode={isDarkMode}
@@ -85,7 +98,7 @@ function AdminPanel() {
         return <MentorReview isDarkMode={isDarkMode} />;
 
       case "programs":
-        // Program Management section
+        // Admin version of programs (CRUD for creating programs)
         return (
           <ProgramsAdmin
             isDarkMode={isDarkMode}
@@ -94,10 +107,11 @@ function AdminPanel() {
         );
 
       case "assigned_programs":
+        // Shows programs assigned to students
         return <AssignedPrograms isDarkMode={isDarkMode} />;
 
       case "courses_table":
-        // Course Table (Admin)
+        // Displays all available courses in table form
         return (
           <CoursesTable
             isDarkMode={isDarkMode}
@@ -117,7 +131,7 @@ function AdminPanel() {
         return <AdminNotifications isDarkMode={isDarkMode} />;
 
       case "courses":
-        // Student Programs Section
+        // Programs List (User-facing view)
         return (
           <Programs
             isDarkMode={isDarkMode}
@@ -128,6 +142,7 @@ function AdminPanel() {
       case "testimonials":
         return <Testimonials isDarkMode={isDarkMode} />;
 
+      // Fallback: When activeSection is invalid or not set
       default:
         // Default to Dashboard if section is unknown
         return (
@@ -139,48 +154,54 @@ function AdminPanel() {
     }
   };
 
-  // Toggles Sidebar Collapse/Expand
+  // Toggle sidebar open/close (especially useful for mobile/tablet)
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // -----------------------------------------
-  // MAIN LAYOUT STRUCTURE
-  // -----------------------------------------
+  // ===============================
+  // MAIN PAGE UI
+  // Contains: Sidebar + Navbar + Header + Dynamic Module Renderer + Footer
+  // ===============================
   return (
     <div
       className={`flex min-h-screen transition-colors duration-500 ${
         isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
-      {/* ---------------------------------------
-         SIDEBAR COMPONENT
-      ---------------------------------------- */}
+      {/* =============================== */}
+      {/* SIDEBAR SECTION */}
+      {/* =============================== */}
       <AdminSidebar
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        isDarkMode={isDarkMode}
+        isOpen={isSidebarOpen} // Controls drawer state
+        setIsOpen={setIsSidebarOpen} // Update sidebar state
+        activeSection={activeSection} // Highlight active menu item
+        setActiveSection={setActiveSection} // Change page on click
+        isDarkMode={isDarkMode} // Theme support
       />
 
-      {/* ---------------------------------------
-         MAIN CONTENT AREA
-      ---------------------------------------- */}
+      {/* =============================== */}
+      {/* MAIN CONTENT WRAPPER */}
+      {/* =============================== */}
       <div
         className={`flex-1 flex flex-col transition-all duration-300 ${
           isSidebarOpen ? "lg:ml-64" : "ml-0"
         }`}
       >
-        {/* NAVBAR (Top bar with theme toggle & menu icon) */}
+        {/* =============================== */}
+        {/* TOP NAVIGATION BAR */}
+        {/* Contains menu button + theme toggle */}
+        {/* =============================== */}
         <AdminNavbar
           onMenuClick={toggleSidebar}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
         />
 
-        {/* ---------------------------------------
-           PAGE HEADER SECTION WITH TITLE
-        ---------------------------------------- */}
+        {/* =============================== */}
+        {/* MAIN PAGE BODY */}
+        {/* Contains animated header + active module */}
+        {/* =============================== */}
         <main className="pt-20 px-4 sm:px-6 py-6">
+          {/* Admin Dashboard Header Section */}
           <motion.section
             className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${
               isDarkMode
@@ -201,7 +222,7 @@ function AdminPanel() {
               UptoSkills Admin Dashboard
             </motion.h1>
 
-            {/* SUBTITLE */}
+            {/* Subtitle under heading */}
             <motion.p
               className={`text-xl ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -210,20 +231,21 @@ function AdminPanel() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Manage students, companies, projects, and analytics from one
-              place.
+              Manage students, companies, projects, and analytics from one place.
             </motion.p>
           </motion.section>
 
-          {/* ---------------------------------------
-             RENDER CURRENT ACTIVE MODULE
-          ---------------------------------------- */}
+          {/* =============================== */}
+          {/* DYNAMIC MODULE RENDERING HERE */}
+          {/* Based on sidebar selection */}
+          {/* =============================== */}
           {renderActiveModule()}
         </main>
 
-        {/* ---------------------------------------
-           FOOTER
-        ---------------------------------------- */}
+        {/* =============================== */}
+        {/* FOOTER SECTION */}
+        {/* Always at bottom of page */}
+        {/* =============================== */}
         <footer
           className={`w-full text-center py-4 text-sm transition-colors duration-500 mt-auto ${
             isDarkMode

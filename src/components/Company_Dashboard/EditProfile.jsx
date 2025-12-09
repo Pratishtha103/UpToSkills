@@ -1,7 +1,8 @@
 // src/components/.../EditProfile.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { UploadCloud } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfile() {
@@ -18,6 +19,9 @@ export default function EditProfile() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   // Popup State
   const [showPopup, setShowPopup] = useState(false);
@@ -69,8 +73,7 @@ export default function EditProfile() {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files?.[0];
+  const applyLogoFile = (file) => {
     if (file) {
       setFormData((prev) => ({
         ...prev,
@@ -78,6 +81,26 @@ export default function EditProfile() {
         logoPreview: URL.createObjectURL(file),
       }));
     }
+  };
+
+  const handleLogoInputChange = (e) => {
+    applyLogoFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    applyLogoFile(event.dataTransfer.files?.[0]);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
   };
 
   const handleSubmit = async (e) => {
@@ -189,20 +212,47 @@ export default function EditProfile() {
               {/* Logo */}
               <div>
                 <label className="block font-semibold mb-2">Company Logo</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
-                />
-
-                {formData.logoPreview && (
-                  <img
-                    src={formData.logoPreview}
-                    alt="Logo Preview"
-                    className="mt-4 h-28 object-contain rounded-lg border"
+                <div
+                  className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-all cursor-pointer ${
+                    isDragging
+                      ? "border-blue-500 bg-blue-50 dark:bg-slate-800/70"
+                      : "border-gray-300 dark:border-gray-700 hover:border-blue-500"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {formData.logoPreview ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <img
+                        src={formData.logoPreview}
+                        alt="Logo preview"
+                        className="h-28 w-auto rounded-lg border bg-white object-contain"
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-300">
+                        Click or drag a new file to replace the logo
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <UploadCloud className="h-9 w-9 text-blue-500" />
+                      <p className="mt-3 text-sm text-gray-800 dark:text-gray-100">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        SVG, PNG, JPG or GIF (max 800x400px)
+                      </p>
+                    </>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoInputChange}
+                    className="hidden"
                   />
-                )}
+                </div>
               </div>
 
               {/* Website */}

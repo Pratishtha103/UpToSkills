@@ -34,6 +34,45 @@ const LoginForm = () => {
     }));
   };
 
+  const persistUserSession = (user, roleValue) => {
+    if (!user) return;
+
+    const normalizedRole = (roleValue || user.role || "").toLowerCase();
+    const serializedUser = JSON.stringify(user);
+
+    localStorage.setItem("user", serializedUser);
+    if (user.id != null) {
+      localStorage.setItem("id", user.id);
+    }
+
+    switch (normalizedRole) {
+      case "student":
+      case "learner":
+        localStorage.setItem("student", serializedUser);
+        if (user.id != null) {
+          localStorage.setItem("studentId", user.id);
+        }
+        break;
+      case "mentor":
+        localStorage.setItem("mentor", serializedUser);
+        if (user.id != null) {
+          localStorage.setItem("mentorId", user.id);
+        }
+        break;
+      case "company":
+        localStorage.setItem("company", serializedUser);
+        if (user.id != null) {
+          localStorage.setItem("companyId", user.id);
+        }
+        break;
+      case "admin":
+        localStorage.setItem("admin", serializedUser);
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -52,8 +91,7 @@ const LoginForm = () => {
       alert("Admin login successful (fallback mode)");
       const adminUser = { name: "Admin", email: hardcodedAdmin.email, role: "admin" };
       localStorage.setItem("token", "dummy_admin_token");
-      localStorage.setItem("user", JSON.stringify(adminUser));
-      localStorage.setItem("admin", JSON.stringify(adminUser));
+      persistUserSession(adminUser, "admin");
       navigate("/adminPanel", { state: { updated: true } });
     };
 
@@ -62,15 +100,10 @@ const LoginForm = () => {
       toast.success(response.data.message || "Login successful");
 
       if (response.data.token) localStorage.setItem("token", response.data.token);
+      const role = (response.data.user?.role || formData.role).toLowerCase();
       if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        localStorage.setItem("studentId", response.data.user.id);
-        localStorage.setItem("id", response.data.user.id);
+        persistUserSession(response.data.user, role);
       }
-
-      const role = response.data.user?.role || formData.role;
-      if (role === "mentor") localStorage.setItem("mentor", JSON.stringify(response.data.user));
-      if (role === "admin") localStorage.setItem("admin", JSON.stringify(response.data.user));
 
       setTimeout(() => {
         if (role === "admin") navigate("/adminPanel");

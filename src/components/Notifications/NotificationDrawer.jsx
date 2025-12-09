@@ -142,7 +142,7 @@ const roleThemes = {
                     {unreadCount > 0 && (
                       <>
                         <span className="inline-flex min-w-[2.25rem] justify-center rounded-full bg-white/70 px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur dark:bg-slate-900/60 dark:text-gray-100">
-                          {unreadCount > 9 ? "9+" : unreadCount}
+                          {unreadCount}
                         </span>
                         {onMarkAllRead && (
                           <Button size="sm" variant="ghost" onClick={onMarkAllRead} className="mr-2 text-xs">Mark all read</Button>
@@ -184,30 +184,40 @@ const roleThemes = {
                   <ul className="space-y-4">
                     {notifications.map((notification) => {
                       const isActive = activeNotification?.id === notification.id;
+                      const handleActivate = async () => {
+                        try {
+                          onSelectNotification(notification);
+                          if (!notification.isRead && onMarkAsRead) {
+                            if (markingIds.has(String(notification.id))) return;
+                            setMarkingIds((s) => new Set([...Array.from(s), String(notification.id)]));
+                            try {
+                              await onMarkAsRead(notification.id);
+                              if (onRefetch) onRefetch();
+                            } finally {
+                              setMarkingIds((s) => {
+                                const next = new Set(Array.from(s).filter((x) => x !== String(notification.id)));
+                                return next;
+                              });
+                            }
+                          }
+                        } catch (e) {}
+                      };
+
+                      const handleKeyDown = (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleActivate();
+                        }
+                      };
+
                       return (
                         <li key={notification.id}>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              try {
-                                onSelectNotification(notification);
-                                if (!notification.isRead && onMarkAsRead) {
-                                  // avoid duplicate requests
-                                  if (markingIds.has(String(notification.id))) return;
-                                  setMarkingIds((s) => new Set([...Array.from(s), String(notification.id)]));
-                                  try {
-                                    await onMarkAsRead(notification.id);
-                                    if (onRefetch) onRefetch();
-                                  } finally {
-                                    setMarkingIds((s) => {
-                                      const next = new Set(Array.from(s).filter((x) => x !== String(notification.id)));
-                                      return next;
-                                    });
-                                  }
-                                }
-                              } catch (e) {}
-                            }}
-                            className={`group flex w-full items-start gap-4 rounded-3xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-100 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:bg-slate-900 dark:ring-slate-800 ${
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={handleActivate}
+                            onKeyDown={handleKeyDown}
+                            className={`group flex w-full items-start gap-4 rounded-3xl bg-white p-4 text-left shadow-sm ring-1 ring-slate-100 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary dark:bg-slate-900 dark:ring-slate-800 ${
                               isActive ? "ring-2 ring-secondary shadow-lg" : ""
                             } ${notification.isRead ? "opacity-80" : ""}`}
                           >
@@ -216,9 +226,16 @@ const roleThemes = {
                             </span>
                             <div className="flex-1 space-y-2">
                               <div className="flex flex-wrap items-center justify-between gap-2">
-                                <p className="text-base font-semibold text-gray-900 dark:text-gray-50">
-                                  {notification.title}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-base font-semibold text-gray-900 dark:text-gray-50">
+                                    {notification.title}
+                                  </p>
+                                  {!notification.isRead && (
+                                    <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+                                      New
+                                    </span>
+                                  )}
+                                </div>
                                 <span className="text-xs text-muted-foreground">
                                   {formatTimestamp(notification.createdAt)}
                                 </span>
@@ -267,7 +284,7 @@ const roleThemes = {
                               </div>
                               {/* Single "Open" action shown above in per-item actions; duplicate removed */}
                             </div>
-                          </button>
+                          </div>
                         </li>
                       );
                     })}

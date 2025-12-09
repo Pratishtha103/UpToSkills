@@ -421,236 +421,262 @@ function InterviewsSection() {
       </div>
 
       <div className="grid gap-4">
-        {interviews.map((interview, index) => {
-          const TypeIcon = typeIcons[interview.type] || Calendar;
+  {/* Map through all interviews and render a card for each */}
+  {interviews.map((interview, index) => {
+    // Select an icon based on interview type or fallback to Calendar
+    const TypeIcon = typeIcons[interview.type] || Calendar;
 
-          return (
-            <motion.div
-              key={interview.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="p-4 flex flex-col bg-gray-50 dark:bg-gray-800 rounded-2xl">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      {(interview.candidate_name || interview.candidateName).split(" ").map(n => n[0]).join("")}
-                    </div>
+    return (
+      <motion.div
+        key={interview.id}
+        initial={{ opacity: 0, x: -20 }} // animation initial state
+        animate={{ opacity: 1, x: 0 }}  // animation final state
+        transition={{ delay: index * 0.1 }} // staggered animation
+      >
+        {/* Individual interview card */}
+        <Card className="p-4 flex flex-col bg-gray-50 dark:bg-gray-800 rounded-2xl">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+            {/* Candidate info: avatar, name, role */}
+            <div className="flex items-center gap-2">
+              {/* Avatar with initials */}
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                {(interview.candidate_name || interview.candidateName).split(" ").map(n => n[0]).join("")}
+              </div>
 
-                    <div>
-                      <h3 className="font-semibold text-lg">
-                        {interview.candidate_name || interview.candidateName}
-                      </h3>
-                      <p className="text-sm text-gray-400">
-                        {interview.role || interview.position}
-                      </p>
-                    </div>
-                  </div>
+              {/* Candidate name and role */}
+              <div>
+                <h3 className="font-semibold text-lg">
+                  {interview.candidate_name || interview.candidateName}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  {interview.role || interview.position}
+                </p>
+              </div>
+            </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(interview.date).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{interview.time}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <TypeIcon className="w-5 h-5 text-primary" />
-                      <Badge className={`${statusColors[interview.status?.toLowerCase()] || ""} capitalize`}>
-                        {interview.status}
-                      </Badge>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setViewInterview(interview);
-                        }}
-                      >
-                        Details
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setEditInterview({
-                            id: interview.id,
-                            date: interview.date.split("T")[0],
-                            time: interview.time,
-                          });
-                          setIsEditModalOpen(true);
-                        }}
-                      >
-                        Reschedule
-                      </Button>
-
-                      <Button
-                        onClick={() => confirmDeleteInterview(interview.id)}
-                        variant="ghost"
-                        size="icon"
-                        className="bg-red-600 text-white rounded-xl hover:bg-red-700"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
+            {/* Right side: date, time, type, status, action buttons */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {/* Date and time */}
+              <div className="text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>{new Date(interview.date).toLocaleDateString()}</span>
                 </div>
-              </Card>
-            </motion.div>
-          );
-        })}
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>{interview.time}</span>
+                </div>
+              </div>
+
+              {/* Interview type and status */}
+              <div className="flex items-center gap-2">
+                <TypeIcon className="w-5 h-5 text-primary" />
+                <Badge className={`${statusColors[interview.status?.toLowerCase()] || ""} capitalize`}>
+                  {interview.status}
+                </Badge>
+              </div>
+
+              {/* Action buttons: Details, Reschedule, Delete */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setViewInterview(interview); // Open details modal
+                  }}
+                >
+                  Details
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // Open edit modal and prefill data
+                    setEditInterview({
+                      id: interview.id,
+                      date: interview.date.split("T")[0],
+                      time: interview.time,
+                    });
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  Reschedule
+                </Button>
+
+                <Button
+                  onClick={() => confirmDeleteInterview(interview.id)} // Confirm deletion
+                  variant="ghost"
+                  size="icon"
+                  className="bg-red-600 text-white rounded-xl hover:bg-red-700"
+                >
+                  <Trash className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  })}
+</div>
+
+{/* Dialog for viewing interview details */}
+<Dialog open={!!viewInterview} onOpenChange={(open) => { if (!open) setViewInterview(null); }}>
+  <DialogContent aria-describedby="details-desc">
+    <DialogHeader>
+      <DialogTitle>Interview Details</DialogTitle>
+    </DialogHeader>
+    <p id="details-desc" className="sr-only">View detailed information about the selected interview.</p>
+
+    {/* Grid displaying interview info */}
+    <div className="grid gap-4 py-2">
+      {/* Candidate Name */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Candidate</Label>
+        <div className="col-span-3 font-semibold">{viewInterview?.candidate_name || viewInterview?.candidateName}</div>
       </div>
 
-      <Dialog open={!!viewInterview} onOpenChange={(open) => { if (!open) setViewInterview(null); }}>
-        <DialogContent aria-describedby="details-desc">
-          <DialogHeader>
-            <DialogTitle>Interview Details</DialogTitle>
-          </DialogHeader>
-          <p id="details-desc" className="sr-only">View detailed information about the selected interview.</p>
+      {/* Position/Role */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Position</Label>
+        <div className="col-span-3">{viewInterview?.role || viewInterview?.position}</div>
+      </div>
 
-          <div className="grid gap-4 py-2">
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Candidate</Label>
-              <div className="col-span-3 font-semibold">{viewInterview?.candidate_name || viewInterview?.candidateName}</div>
-            </div>
+      {/* Date */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Date</Label>
+        <div className="col-span-3">{viewInterview?.date ? new Date(viewInterview.date).toLocaleDateString() : ""}</div>
+      </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Position</Label>
-              <div className="col-span-3">{viewInterview?.role || viewInterview?.position}</div>
-            </div>
+      {/* Time */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Time</Label>
+        <div className="col-span-3">{viewInterview?.time}</div>
+      </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Date</Label>
-              <div className="col-span-3">{viewInterview?.date ? new Date(viewInterview.date).toLocaleDateString() : ""}</div>
-            </div>
+      {/* Type */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Type</Label>
+        <div className="col-span-3">{viewInterview?.type}</div>
+      </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Time</Label>
-              <div className="col-span-3">{viewInterview?.time}</div>
-            </div>
+      {/* Status */}
+      <div className="grid grid-cols-4 gap-4 items-center">
+        <Label className="text-right">Status</Label>
+        <div className="col-span-3 capitalize">{viewInterview?.status}</div>
+      </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Type</Label>
-              <div className="col-span-3">{viewInterview?.type}</div>
-            </div>
+      {/* Raw JSON data (if available) */}
+      {viewInterview?.raw && (
+        <div className="col-span-4">
+          <Label>Raw</Label>
+          <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded mt-1 overflow-auto">{JSON.stringify(viewInterview.raw, null, 2)}</pre>
+        </div>
+      )}
+    </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <Label className="text-right">Status</Label>
-              <div className="col-span-3 capitalize">{viewInterview?.status}</div>
-            </div>
+    {/* Footer actions: Close & View Candidate Profile */}
+    <div className="flex justify-end gap-2">
+      <Button variant="outline" onClick={() => setViewInterview(null)}>Close</Button>
+      <Button onClick={async () => {
+        // Logic to open candidate profile modal
+        try {
+          const iv = viewInterview || {};
+          const candidateId = iv.candidate_student_id || iv.student_id || iv.candidateId || iv.candidate_id || iv.raw?.student_id || null;
+          if (candidateId) {
+            setProfileStudent({ id: candidateId });
+            setIsProfileOpen(true);
+            return;
+          }
 
-            {viewInterview?.raw && (
-              <div className="col-span-4">
-                <Label>Raw</Label>
-                <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded mt-1 overflow-auto">{JSON.stringify(viewInterview.raw, null, 2)}</pre>
-              </div>
-            )}
-          </div>
+          // Fallback: search by name if no ID
+          const name = (iv.candidate_name || iv.candidateName || "").toString().trim();
+          if (!name) {
+            alert('No candidate id or name available to view profile');
+            return;
+          }
+          const res = await fetch(`http://localhost:5000/api/students/search?q=${encodeURIComponent(name)}`);
+          const json = await res.json();
+          const rows = json?.data ?? [];
+          if (Array.isArray(rows) && rows.length > 0) {
+            const first = rows[0];
+            const id = first.id || first.student_id || first.user_detail_id || null;
+            if (id) {
+              setProfileStudent({ id });
+              setIsProfileOpen(true);
+              return;
+            }
+          }
+          alert('Could not locate candidate profile');
+        } catch (err) {
+          console.error('Error opening candidate profile', err);
+          alert('Error opening candidate profile');
+        }
+      }}>View Candidate Profile</Button>
+    </div>
+  </DialogContent>
+</Dialog>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setViewInterview(null)}>Close</Button>
-            <Button onClick={async () => {
-              // try to open student profile modal for this candidate
-              try {
-                const iv = viewInterview || {};
-                const candidateId = iv.candidate_student_id || iv.student_id || iv.candidateId || iv.candidate_id || iv.raw?.student_id || null;
-                if (candidateId) {
-                  setProfileStudent({ id: candidateId });
-                  setIsProfileOpen(true);
-                  return;
-                }
+{/* Student Profile Modal */}
+<StudentProfileModal open={isProfileOpen} onClose={() => setIsProfileOpen(false)} student={profileStudent} fetchFresh />
 
-                // Fallback: search by name
-                const name = (iv.candidate_name || iv.candidateName || "").toString().trim();
-                if (!name) {
-                  alert('No candidate id or name available to view profile');
-                  return;
-                }
-                const res = await fetch(`http://localhost:5000/api/students/search?q=${encodeURIComponent(name)}`);
-                const json = await res.json();
-                const rows = json?.data ?? [];
-                if (Array.isArray(rows) && rows.length > 0) {
-                  const first = rows[0];
-                  const id = first.id || first.student_id || first.user_detail_id || null;
-                  if (id) {
-                    setProfileStudent({ id });
-                    setIsProfileOpen(true);
-                    return;
-                  }
-                }
-                alert('Could not locate candidate profile');
-              } catch (err) {
-                console.error('Error opening candidate profile', err);
-                alert('Error opening candidate profile');
-              }
-            }}>View Candidate Profile</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+{/* Reschedule Interview Modal */}
+<Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+  <DialogContent aria-describedby="edit-desc">
+    <DialogHeader>
+      <DialogTitle>Reschedule Interview</DialogTitle>
+    </DialogHeader>
+    <p id="edit-desc" className="sr-only">Reschedule the selected interview by choosing a new date and time.</p>
 
-      <StudentProfileModal open={isProfileOpen} onClose={() => setIsProfileOpen(false)} student={profileStudent} fetchFresh />
+    {/* Inputs for date and time */}
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 gap-4">
+        <Label className="text-right">Date</Label>
+        <Input
+          type="date"
+          value={editInterview.date}
+          onChange={(e) => setEditInterview({ ...editInterview, date: e.target.value })}
+          className="col-span-3"
+        />
+      </div>
 
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent aria-describedby="edit-desc">
-          <DialogHeader>
-            <DialogTitle>Reschedule Interview</DialogTitle>
-          </DialogHeader>
-          <p id="edit-desc" className="sr-only">Reschedule the selected interview by choosing a new date and time.</p>
+      <div className="grid grid-cols-4 gap-4">
+        <Label className="text-right">Time</Label>
+        <Input
+          type="time"
+          value={editInterview.time}
+          onChange={(e) => setEditInterview({ ...editInterview, time: e.target.value })}
+          className="col-span-3"
+        />
+      </div>
+    </div>
 
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 gap-4">
-              <Label className="text-right">Date</Label>
-              <Input
-                type="date"
-                value={editInterview.date}
-                onChange={(e) => setEditInterview({ ...editInterview, date: e.target.value })}
-                className="col-span-3"
-              />
-            </div>
+    {/* Modal actions */}
+    <div className="flex justify-end gap-2">
+      <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+      <Button onClick={handleEditSave}>Save</Button>
+    </div>
+  </DialogContent>
+</Dialog>
 
-            <div className="grid grid-cols-4 gap-4">
-              <Label className="text-right">Time</Label>
-              <Input
-                type="time"
-                value={editInterview.time}
-                onChange={(e) => setEditInterview({ ...editInterview, time: e.target.value })}
-                className="col-span-3"
-              />
-            </div>
-          </div>
+{/* Confirm Delete Dialog */}
+<Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+  <DialogContent aria-describedby="confirm-delete-desc">
+    <DialogHeader>
+      <DialogTitle>Delete Interview</DialogTitle>
+    </DialogHeader>
+    <p id="confirm-delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
+    <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleEditSave}>Save</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* Confirm Delete Dialog */}
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent aria-describedby="confirm-delete-desc">
-          <DialogHeader>
-            <DialogTitle>Delete Interview</DialogTitle>
-          </DialogHeader>
-          <p id="confirm-delete-desc" className="sr-only">Confirm deletion of the scheduled interview.</p>
-          <p>Are you sure you want to delete this scheduled interview? This action cannot be undone.</p>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
-            <Button className="bg-red-600 text-white" onClick={performConfirmedDelete}>Delete</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </motion.div>
+    <div className="flex justify-end gap-2 mt-4">
+      <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
+      <Button className="bg-red-600 text-white" onClick={performConfirmedDelete}>Delete</Button>
+    </div>
+  </DialogContent>
+</Dialog>
+</motion.div>
   );
 }
-
 export default InterviewsSection;

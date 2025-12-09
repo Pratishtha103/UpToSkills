@@ -14,9 +14,10 @@ export default function EditProfile() {
   });
 
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token"); // get user token
 
   useEffect(() => {
+    // fetch company profile data on load
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
@@ -47,11 +48,13 @@ export default function EditProfile() {
     fetchProfile();
   }, [token]);
 
+  // handle text input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // handle logo upload and preview
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -63,6 +66,7 @@ export default function EditProfile() {
     }
   };
 
+  // submit updated profile data
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -95,111 +99,108 @@ export default function EditProfile() {
     }
   };
 
-  if (loading) return <p className="text-center mt-6">Loading...</p>;
+  if (loading) return <p className="text-center mt-6">Loading...</p>; // show while fetching
 
   return (
     <>
-    <div className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
-      {/* Main Content */}
-      <main className="flex-grow flex justify-center items-start p-6">
-        <div className={`w-full max-w-2xl shadow-lg rounded-xl p-8 mt-10 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
-          <h2 className={`text-3xl font-bold mb-8 text-center ${darkMode ? "text-white" : "text-gray-800"}`}>
-            {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
-          </h2>
+      <div className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+        <main className="flex-grow flex justify-center items-start p-6">
+          <div className={`w-full max-w-2xl shadow-lg rounded-xl p-8 mt-10 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
+            <h2 className={`text-3xl font-bold mb-8 text-center ${darkMode ? "text-white" : "text-gray-800"}`}>
+              {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
+            </h2>
 
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-            encType="multipart/form-data"
-          >
-            {/* Company Name */}
-            <div>
-              <label className="block font-semibold mb-2">Company Name</label>
-              <input
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Company Logo */}
-            <div>
-              <label className="block font-semibold mb-2">Company Logo</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoChange}
-                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
-              />
-              {formData.logoPreview && (
-                <img
-                  src={formData.logoPreview}
-                  alt="Logo Preview"
-                  className="mt-4 h-28 object-contain rounded-lg border"
+            <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
+              {/* Company Name */}
+              <div>
+                <label className="block font-semibold mb-2">Company Name</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
                 />
-              )}
-            </div>
+              </div>
 
-            {/* Website */}
-            <div>
-              <label className="block font-semibold mb-2">Website URL</label>
-              <input
-                type="url"
-                name="website"
-                value={formData.website}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
-              />
-            </div>
+              {/* Company Logo */}
+              <div>
+                <label className="block font-semibold mb-2">Company Logo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
+                />
+                {formData.logoPreview && (
+                  <img
+                    src={formData.logoPreview}
+                    alt="Logo Preview"
+                    className="mt-4 h-28 object-contain rounded-lg border"
+                  />
+                )}
+              </div>
 
-            {/* Industry */}
-            <div>
-              <label className="block font-semibold mb-2">Industry Type</label>
-              <select
-                name="industry"
-                value={formData.industry}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {/* Website */}
+              <div>
+                <label className="block font-semibold mb-2">Website URL</label>
+                <input
+                  type="url"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                />
+              </div>
+
+              {/* Industry */}
+              <div>
+                <label className="block font-semibold mb-2">Industry Type</label>
+                <select
+                  name="industry"
+                  value={formData.industry}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select industry</option>
+                  <option value="IT">IT / Technology</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block font-semibold mb-2">Company Contact</label>
+                <input
+                  type="text"
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
               >
-                <option value="">Select industry</option>
-                <option value="IT">IT / Technology</option>
-                <option value="Finance">Finance</option>
-                <option value="Healthcare">Healthcare</option>
-                <option value="Education">Education</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+                Save Details
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
 
-            {/* Contact */}
-            <div>
-              <label className="block font-semibold mb-2">Company Contact</label>
-              <input
-                type="text"
-                name="contact"
-                value={formData.contact}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
-            >
-              Save Details
-            </button>
-          </form>
-        </div>
-      </main>
-    </div>
-    <footer className={`w-full mt-2 text-center py-4 text-sm transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
-      <p>© 2025 Uptoskills. Built by learners.</p>
-    </footer>
+      {/* Footer Section */}
+      <footer className={`w-full mt-2 text-center py-4 text-sm transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
+        <p>© 2025 Uptoskills. Built by learners.</p>
+      </footer>
     </>
   );
 }

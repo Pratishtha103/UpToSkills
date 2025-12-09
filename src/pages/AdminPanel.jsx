@@ -24,10 +24,22 @@ import AssignedPrograms from "../components/AdminPanelDashboard/AssignedPrograms
 import { useTheme } from "../context/ThemeContext";
 
 function AdminPanel() {
+  // -----------------------------------------
+  // STATE MANAGEMENT
+  // -----------------------------------------
+
+  // Tracks which module/section is being viewed
   const [activeSection, setActiveSection] = useState("dashboard");
+
+  // Controls sidebar open/close
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Theme context (Dark/Light mode)
   const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
 
+  // -----------------------------------------
+  // RENDERING EACH ADMIN SECTION
+  // -----------------------------------------
   const renderActiveModule = () => {
     switch (activeSection) {
       case "dashboard":
@@ -37,8 +49,10 @@ function AdminPanel() {
             onNavigateSection={(section) => setActiveSection(section)}
           />
         );
+
       case "students":
         return <Students isDarkMode={isDarkMode} />;
+
       case "students_table":
         return (
           <StudentsTable
@@ -46,10 +60,13 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "mentors":
         return <Mentors isDarkMode={isDarkMode} />;
+
       case "companies":
         return <Company isDarkMode={isDarkMode} />;
+
       case "companies_table":
         return (
           <CompaniesTable
@@ -57,30 +74,37 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "projects":
         return <Project isDarkMode={isDarkMode} />;
+
       case "analytics":
         return <Analytics isDarkMode={isDarkMode} />;
+
       case "mentor":
         return <MentorReview isDarkMode={isDarkMode} />;
+
       case "programs":
-        // ✅ FIX: Pass onNavigateSection prop correctly
+        // Program Management section
         return (
           <ProgramsAdmin
             isDarkMode={isDarkMode}
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "assigned_programs":
         return <AssignedPrograms isDarkMode={isDarkMode} />;
+
       case "courses_table":
-        // ✅ FIX: Correct the navigation prop
+        // Course Table (Admin)
         return (
-          <CoursesTable 
-            isDarkMode={isDarkMode} 
-            onNavigateSection={(s) => setActiveSection(s)} 
+          <CoursesTable
+            isDarkMode={isDarkMode}
+            onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "mentors_table":
         return (
           <MentorsTable
@@ -88,22 +112,26 @@ function AdminPanel() {
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "notifications":
         return <AdminNotifications isDarkMode={isDarkMode} />;
+
       case "courses":
-        // ✅ FIX: Add onNavigateSection prop to Programs component
+        // Student Programs Section
         return (
-          <Programs 
-            isDarkMode={isDarkMode} 
+          <Programs
+            isDarkMode={isDarkMode}
             onNavigateSection={(s) => setActiveSection(s)}
           />
         );
+
       case "testimonials":
         return <Testimonials isDarkMode={isDarkMode} />;
 
       default:
+        // Default to Dashboard if section is unknown
         return (
-          <DashboardMain 
+          <DashboardMain
             isDarkMode={isDarkMode}
             onNavigateSection={(section) => setActiveSection(section)}
           />
@@ -111,16 +139,21 @@ function AdminPanel() {
     }
   };
 
+  // Toggles Sidebar Collapse/Expand
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+  // -----------------------------------------
+  // MAIN LAYOUT STRUCTURE
+  // -----------------------------------------
   return (
     <div
-      className={`flex min-h-screen transition-colors duration-500 ${isDarkMode
-        ? "bg-gray-900 text-gray-100"
-        : "bg-gray-50 text-gray-900"
-        }`}
+      className={`flex min-h-screen transition-colors duration-500 ${
+        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
     >
-      {/* Sidebar */}
+      {/* ---------------------------------------
+         SIDEBAR COMPONENT
+      ---------------------------------------- */}
       <AdminSidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
@@ -129,29 +162,36 @@ function AdminPanel() {
         isDarkMode={isDarkMode}
       />
 
-      {/* Main Content */}
+      {/* ---------------------------------------
+         MAIN CONTENT AREA
+      ---------------------------------------- */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"
-          }`}
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          isSidebarOpen ? "lg:ml-64" : "ml-0"
+        }`}
       >
-        {/* Navbar */}
+        {/* NAVBAR (Top bar with theme toggle & menu icon) */}
         <AdminNavbar
           onMenuClick={toggleSidebar}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
         />
 
-        {/* Main Admin Content */}
+        {/* ---------------------------------------
+           PAGE HEADER SECTION WITH TITLE
+        ---------------------------------------- */}
         <main className="pt-20 px-4 sm:px-6 py-6">
           <motion.section
-            className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${isDarkMode
-              ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white"
-              : "bg-gradient-to-br from-white to-gray-100 text-gray-900"
-              }`}
+            className={`rounded-2xl p-8 mb-8 transition-all duration-500 ${
+              isDarkMode
+                ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white"
+                : "bg-gradient-to-br from-white to-gray-100 text-gray-900"
+            }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
+            {/* MAIN TITLE */}
             <motion.h1
               className="text-4xl font-bold mb-4"
               initial={{ opacity: 0, y: 30 }}
@@ -160,9 +200,12 @@ function AdminPanel() {
             >
               UptoSkills Admin Dashboard
             </motion.h1>
+
+            {/* SUBTITLE */}
             <motion.p
-              className={`text-xl ${isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+              className={`text-xl ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -172,11 +215,15 @@ function AdminPanel() {
             </motion.p>
           </motion.section>
 
-          {/* Dynamic section render */}
+          {/* ---------------------------------------
+             RENDER CURRENT ACTIVE MODULE
+          ---------------------------------------- */}
           {renderActiveModule()}
         </main>
 
-        {/* Footer */}
+        {/* ---------------------------------------
+           FOOTER
+        ---------------------------------------- */}
         <footer
           className={`w-full text-center py-4 text-sm transition-colors duration-500 mt-auto ${
             isDarkMode

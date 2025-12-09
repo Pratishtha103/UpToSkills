@@ -140,7 +140,7 @@ function MyProjects() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`rounded-lg shadow-lg overflow-hidden transition-all hover:shadow-xl ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"}`}
+                      className={`rounded-lg shadow-lg overflow-hidden transition-all hover:shadow-xl flex flex-col ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"}`}
                     >
                       {/* Card Header */}
                       <div className={`p-6 ${darkMode ? "bg-gray-700" : "bg-gradient-to-r from-blue-50 to-indigo-50"}`}>
@@ -162,8 +162,8 @@ function MyProjects() {
                         </div>
                       </div>
 
-                      {/* Card Body */}
-                      <div className="p-6">
+                      {/* Card Body - Grows to fill space */}
+                      <div className="p-6 flex-grow">
                         {/* Contributions */}
                         {project.contributions && (
                           <div className="mb-4">
@@ -200,8 +200,15 @@ function MyProjects() {
                         </div>
                       </div>
 
-                      {/* Card Footer */}
-                      
+                      {/* Card Footer - Always at bottom */}
+                      <div className={`px-6 py-4 border-t ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
+                        <button
+                          onClick={() => handleDeleteProject(project.id)}
+                          className="w-full px-3 py-2 rounded text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     </motion.div>
                   ))}
                 </div>

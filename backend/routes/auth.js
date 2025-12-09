@@ -244,6 +244,48 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
+    const ioInstance = req.app.get("io");
+    const loginTimestamp = new Date();
+
+    try {
+      await pushNotification({
+        role: realRole,
+        recipientRole: realRole,
+        recipientId: user.id,
+        type: "security_login",
+        title: "New login detected",
+        message: `You signed in on ${loginTimestamp.toLocaleString("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })}. If this wasn't you, please reset your password.`,
+        metadata: {
+          event: "login",
+          userId: user.id,
+          loggedInAt: loginTimestamp.toISOString(),
+        },
+        io: ioInstance,
+      });
+
+      await pushNotification({
+        role: "admin",
+        recipientRole: "admin",
+        recipientId: null,
+        type: "user_login",
+        title: `${formatRoleLabel(realRole)} signed in`,
+        message: `${displayName} logged in at ${loginTimestamp.toLocaleTimeString("en-US")}.`,
+        metadata: {
+          event: "user_login",
+          userId: user.id,
+          role: realRole,
+          email: user.email,
+          loggedInAt: loginTimestamp.toISOString(),
+        },
+        io: ioInstance,
+      });
+    } catch (err) {
+      console.error("Failed to push login notification", err);
+    }
+
     res.json({
       success: true,
       message: "Login successful",

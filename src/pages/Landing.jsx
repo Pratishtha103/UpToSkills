@@ -231,52 +231,58 @@
 // }
 
 // src/pages/Landing.jsx
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
+
 import Chatbot from "../components/Contact_Page/Chatbot";
-import logo from "../assets/UptoSkills.png";
-import darkLogo from "../assets/UptoSkills.png";
+import logo from "../assets/logo.jpg";
+import darkLogo from "../assets/darkLogo.jpg";
+
+// Global theme provider for Dark/Light mode
 import { useTheme } from "../context/ThemeContext";
 
 export default function Landing() {
   const navigate = useNavigate();
+
+  // Theme context → provides global darkMode + toggleDarkMode
   const { darkMode, toggleDarkMode } = useTheme();
 
-  // Get user from localStorage
+  // Fetch logged-in user from localStorage to enable role-based redirects
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  // Track selected role (default student)
+  // Tracks the selected role during navigation (student/company/mentor)
   const [selectedRole, setSelectedRole] = useState("student");
 
-  // Handle role-based navigation
+  // ----------------------------------------------
+  // ROLE-BASED NAVIGATION LOGIC
+  // Helps redirect users to the correct dashboard 
+  // depending on their login status + role.
+  // ----------------------------------------------
   const handleNavigation = (role) => {
     if (user) {
       const userRole = user.role?.toLowerCase();
 
-      // Student/Learner → Dashboard
+      // If logged-in user selects the role they belong to → redirect to dashboard
       if (role === "learner" && (userRole === "student" || userRole === "learner")) {
         navigate("/dashboard");
         return;
       }
 
-      // Company → Company Dashboard
       if (role === "company" && userRole === "company") {
         navigate("/company");
         return;
       }
 
-      // Mentor → Mentor Dashboard
       if (role === "mentor" && userRole === "mentor") {
         navigate("/mentor-dashboard");
         return;
       }
     }
 
-    // If user not logged in, redirect to login with role pre-selected
+    // If user is NOT logged in → redirect to login with pre-selected role
     let loginRole = "student";
     if (role === "company") loginRole = "company";
     else if (role === "mentor") loginRole = "mentor";
@@ -286,13 +292,14 @@ export default function Landing() {
     navigate("/login", { state: { role: loginRole } });
   };
 
-  // Dropdown handler
+  // Simple dropdown role selector → moves user to login page
   const handleRoleChange = (e) => {
     const role = e.target.value;
     setSelectedRole(role);
     navigate("/login", { state: { role } });
   };
 
+  // Landing page feature boxes
   const features = [
     {
       title: "For Learners",
@@ -315,20 +322,40 @@ export default function Landing() {
   ];
 
   return (
-    <div className={`font-sans overflow-x-hidden transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
-      {/* Header */}
-      <header className={`fixed w-full z-50 backdrop-blur-lg shadow-sm transition-colors duration-300 ${darkMode ? "bg-gray-800/90" : "bg-white/80"}`}>
+    <div
+      className={`font-sans overflow-x-hidden transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      {/* ------------------------------------------------- */}
+      {/* HEADER — sticky top bar with logo + navigation + theme toggle */}
+      {/* ------------------------------------------------- */}
+      <header
+        className={`fixed w-full z-50 backdrop-blur-lg shadow-sm transition-colors duration-300 ${
+          darkMode ? "bg-gray-800/90" : "bg-white/80"
+        }`}
+      >
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+
+          {/* Logo switches automatically based on theme */}
           <img
             src={darkMode ? darkLogo : logo}
-            alt="Upto To Skills logo"
-            className="h-12 transition-transform hover:scale-110 cursor-pointer"
+            alt="UptoSkills logo"
+            className="h-10 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
+
+          {/* Navigation Links + Theme Toggle */}
           <div className="flex items-center space-x-4">
-            <nav className={`flex space-x-6 font-medium text-sm ${darkMode ? "text-gray-200" : "text-gray-800"}`}>
+            <nav
+              className={`flex space-x-6 font-medium text-sm ${
+                darkMode ? "text-gray-200" : "text-gray-800"
+              }`}
+            >
+              {/* Dynamic nav links */}
               {["Home", "About", "Programs", "Contact"].map((link, i) => {
                 const path = link.toLowerCase() === "home" ? "/" : `/${link.toLowerCase()}`;
+
                 return (
                   <span
                     key={i}
@@ -336,25 +363,44 @@ export default function Landing() {
                     onClick={() => navigate(path)}
                   >
                     {link}
+                    {/* Underline animation */}
                     <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#00BDA6] group-hover:w-full transition-all duration-300" />
                   </span>
                 );
               })}
             </nav>
+
+            {/* Dark mode switch button */}
             <button
               onClick={toggleDarkMode}
-              className={`p-2 rounded-full transition-colors ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"}`}
+              className={`p-2 rounded-full transition-colors ${
+                darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
+              }`}
               aria-label="Toggle dark mode"
             >
-              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-700" />}
+              {darkMode ? (
+                <Sun size={20} className="text-yellow-500" />
+              ) : (
+                <Moon size={20} className="text-gray-700" />
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className={`pt-32 md:pt-44 pb-20 px-6 md:px-16 relative overflow-hidden transition-colors duration-300 ${darkMode ? "bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800" : "bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8]"}`}>
+      {/* ------------------------------------------------- */}
+      {/* HERO SECTION — main landing hero with animated images */}
+      {/* ------------------------------------------------- */}
+      <section
+        className={`pt-32 md:pt-44 pb-20 px-6 md:px-16 relative overflow-hidden transition-colors duration-300 ${
+          darkMode
+            ? "bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800"
+            : "bg-gradient-to-br from-[#e0fdf4] via-[#f7fffe] to-[#c1f6e8]"
+        }`}
+      >
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+          {/* LEFT: Title + Text + Buttons */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -363,11 +409,16 @@ export default function Landing() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-[#00BDA6] leading-tight mb-6">
               Learn. Connect. <br /> Grow with Peers.
             </h1>
-            <p className={`text-lg mb-6 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+
+            <p
+              className={`text-lg mb-6 ${
+                darkMode ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
               Collaborate with passionate learners and build real-world tech skills through projects.
             </p>
 
-            {/* Buttons */}
+            {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 className="bg-gradient-to-r from-[#00BDA6] to-[#1BBC9B] hover:from-[#f97316] hover:to-[#fb923c] text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-500 w-full sm:w-auto"
@@ -384,9 +435,10 @@ export default function Landing() {
             </div>
           </motion.div>
 
-          {/* Animated Illustrations */}
+          {/* RIGHT: Animated hero illustration cluster */}
           <div className="relative flex justify-center items-center">
-            {/* 1. Main Hero (Kept as is - The reference animation) */}
+
+            {/* Main hero illustration */}
             <motion.img
               src="https://i.postimg.cc/X7ypPmVZ/hero.jpg"
               alt="Main Hero"
@@ -396,32 +448,45 @@ export default function Landing() {
               transition={{ delay: 0.3, duration: 0.9 }}
             />
 
-            {/* 2. Secondary Hero (Animation changed to match Main Hero) */}
+            {/* Secondary floating illustrations */}
             <motion.img
               src="https://img.freepik.com/free-vector/programming-concept-illustration_114360-1351.jpg"
               alt="Secondary Hero"
-              className="absolute top-[-40px] right-[-30px] w-40 md:w-48 shadow-xl rounded-lg z-0 opacity-80"
-              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
-              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid
-              transition={{ delay: 0.6, duration: 0.9 }} // Kept delay, matched duration
+              className="absolute top-[-40px] right-[-30px] w-40 md:w-48 shadow-xl rounded-lg opacity-80"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.9 }}
             />
 
-            {/* 3. Floating Hero (Animation changed to match Main Hero) */}
             <motion.img
               src="https://i.postimg.cc/50qrTPRm/s1.jpg"
               alt="Floating Hero"
               className="absolute bottom-[-30px] left-[-30px] w-36 md:w-44 rounded-lg shadow-md opacity-90"
-              initial={{ y: 20, opacity: 0 }} // Changed: Starts 20px down, faded
-              animate={{ y: 0, opacity: 1 }} // Changed: Moves to final spot, solid (REMOVES REPEAT)
-              transition={{ delay: 0.9, duration: 0.9 }} // Added delay, matched duration (REMOVES REPEAT: INFINITY)
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.9 }}
             />
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className={`py-20 px-6 md:px-16 text-center transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
-        <h2 className={`text-3xl font-bold mb-10 ${darkMode ? "text-white" : "text-gray-800"}`}>What We Offer</h2>
+      {/* ------------------------------------------------- */}
+      {/* FEATURES SECTION — clickable tiles directing by role */}
+      {/* ------------------------------------------------- */}
+      <section
+        className={`py-20 px-6 md:px-16 text-center transition-colors duration-300 ${
+          darkMode ? "bg-gray-800" : "bg-white"
+        }`}
+      >
+        <h2
+          className={`text-3xl font-bold mb-10 ${
+            darkMode ? "text-white" : "text-gray-800"
+          }`}
+        >
+          What We Offer
+        </h2>
+
+        {/* Role cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {features.map((box, i) => (
             <motion.div
@@ -429,8 +494,8 @@ export default function Landing() {
               whileHover={{ scale: 1.06 }}
               onClick={() => handleNavigation(box.role)}
               className="cursor-pointer text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform transition
-                bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B]
-                hover:from-[#f97316] hover:to-[#fb923c]"
+              bg-gradient-to-br from-[#00BDA6] to-[#1BBC9B]
+              hover:from-[#f97316] hover:to-[#fb923c]"
             >
               <img
                 src={box.icon}
@@ -444,11 +509,22 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Partners */}
-      <section className={`py-16 text-center transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-[#f9f9f9]"}`}>
-        <h3 className={`text-2xl font-bold mb-8 ${darkMode ? "text-white" : "text-gray-800"}`}>
+      {/* ------------------------------------------------- */}
+      {/* PARTNERS SECTION — showing trusted company logos */}
+      {/* ------------------------------------------------- */}
+      <section
+        className={`py-16 text-center transition-colors duration-300 ${
+          darkMode ? "bg-gray-900" : "bg-[#f9f9f9]"
+        }`}
+      >
+        <h3
+          className={`text-2xl font-bold mb-8 ${
+            darkMode ? "text-white" : "text-gray-800"
+          }`}
+        >
           Trusted by Top Companies
         </h3>
+
         <div className="flex flex-wrap justify-center items-center gap-10">
           {[
             "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg",
@@ -466,14 +542,20 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ------------------------------------------------- */}
+      {/* FOOTER SECTION */}
+      {/* ------------------------------------------------- */}
       <footer
-        className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${darkMode ? "bg-gray-950 text-gray-300 border-gray-700" : "bg-gray-700 text-gray-100 border-gray-300"}`}
+        className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${
+          darkMode
+            ? "bg-gray-950 text-gray-300 border-gray-700"
+            : "bg-gray-700 text-gray-100 border-gray-300"
+        }`}
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
 
-      {/* Chatbot */}
+      {/* Global chatbot available on landing page */}
       <Chatbot />
     </div>
   );

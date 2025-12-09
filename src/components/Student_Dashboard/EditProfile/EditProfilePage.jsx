@@ -19,6 +19,27 @@ const EditProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 🔔 Popup state (replaces alert)
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info", // "success" | "error" | "info"
+  });
+
+  const openPopup = ({ title, message, type = "info" }) => {
+    setPopup({
+      isOpen: true,
+      title,
+      message,
+      type,
+    });
+  };
+
+  const closePopup = () => {
+    setPopup((prev) => ({ ...prev, isOpen: false }));
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -94,7 +115,11 @@ const EditProfilePage = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Session expired. Please login again.");
+        openPopup({
+          title: "Session Expired",
+          message: "Session expired. Please login again.",
+          type: "error",
+        });
         navigate("/login");
         return;
       }
@@ -111,19 +136,47 @@ const EditProfilePage = () => {
       const result = await response.json();
 
       if (response.status === 401) {
-        alert("Session expired. Please login again.");
+        openPopup({
+          title: "Session Expired",
+          message: "Session expired. Please login again.",
+          type: "error",
+        });
         localStorage.removeItem("token");
         navigate("/login");
         return;
       }
 
       if (result.success) {
-        alert("Profile saved successfully!");
+        openPopup({
+          title: "Success",
+          message: "Profile saved successfully!",
+          type: "success",
+        });
       } else {
-        alert(`Error saving profile: ${result.message}\nDetails: ${result.error}`);
+        openPopup({
+          title: "Error",
+          message: `Error saving profile: ${result.message}\nDetails: ${result.error}`,
+          type: "error",
+        });
       }
     } catch (error) {
-      alert("Network error: Could not connect to server");
+      openPopup({
+        title: "Network Error",
+        message: "Network error: Could not connect to server",
+        type: "error",
+      });
+    }
+  };
+
+  // Helper to style popup header based on type
+  const getPopupAccentClasses = () => {
+    switch (popup.type) {
+      case "success":
+        return "border-green-500";
+      case "error":
+        return "border-red-500";
+      default:
+        return "border-blue-500";
     }
   };
 
@@ -184,6 +237,28 @@ const EditProfilePage = () => {
 
         <Footer />
       </div>
+
+      {/* 🔔 Centered Popup Modal (replaces alert) */}
+      {popup.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className={`bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full mx-4 p-6 border-t-4 ${getPopupAccentClasses()}`}>
+            <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+              {popup.title || "Message"}
+            </h2>
+            <p className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-line">
+              {popup.message}
+            </p>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closePopup}
+                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

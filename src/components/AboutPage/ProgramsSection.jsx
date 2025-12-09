@@ -51,7 +51,7 @@ const ProgramsSection = () => {
         rgba(230, 240, 255, 0.4) 100%
       );
       background-size: 2000px 100%;
-      animation: shimmerMove 1.6s infinite linear, pulseGlow 2.8s ease-in-out infinite;
+      animation: shimmerMove 2.8s infinite linear, pulseGlow 4.2s ease-in-out infinite;
       border-radius: 0.5rem;
     }
 
@@ -62,7 +62,7 @@ const ProgramsSection = () => {
         rgba(71, 85, 105, 0.8) 50%,
         rgba(51, 65, 85, 0.3) 100%
       );
-      animation: shimmerMove 1.6s infinite linear, pulseGlow 2.8s ease-in-out infinite;
+      animation: shimmerMove 2.8s infinite linear, pulseGlow 4.2s ease-in-out infinite;
     }
   `;
 

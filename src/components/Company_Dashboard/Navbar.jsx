@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
-import logo from "../../assets/logo.jpg";
+import logo from "../../assets/UptoSkills.png";
 import { useNavigate } from "react-router-dom";
-import darkLogo from "../../assets/darkLogo.jpg";
+import darkLogo from "../../assets/UptoSkills.png";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../Notifications/NotificationCenter";
 import { useTheme } from "../../context/ThemeContext";

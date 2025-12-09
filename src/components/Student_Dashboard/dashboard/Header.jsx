@@ -3,8 +3,8 @@ import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
 import NotificationCenter from "../../Notifications/NotificationCenter";
-import logo from "../../../assets/logo.jpg";
-import darkLogo from "../../../assets/darkLogo.jpg";
+import logo from "../../../assets/UptoSkills.png";
+import darkLogo from "../../../assets/UptoSkills.png";
 import { Link } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
 

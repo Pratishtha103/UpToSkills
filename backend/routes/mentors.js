@@ -37,21 +37,23 @@ router.get("/", verifyToken, async (req, res) => {
     // Return mentors with legacy field names to keep frontend compatibility.
     // Prefer profile fields when present (mentor_details) but always include `id` and `full_name`.
     const result = await pool.query(`
-      SELECT
-        m.id AS id,
-        COALESCE(md.full_name, m.full_name) AS full_name,
-        m.email,
-        COALESCE(md.contact_number, m.phone) AS phone,
-        COALESCE(md.linkedin_url, '') AS linkedin_url,
-        COALESCE(md.github_url, '') AS github_url,
-        COALESCE(md.about_me, '') AS about_me,
-        COALESCE(md.expertise_domains, ARRAY[]::text[]) AS expertise_domains,
-        COALESCE(md.others_domain, '') AS others_domain,
-        md.id AS profile_id
-      FROM mentors m
-      LEFT JOIN mentor_details md ON md.mentor_id = m.id
-      ORDER BY m.id DESC
-    `);
+  SELECT
+    m.id AS id,
+    m.username AS username,                 
+    COALESCE(md.full_name, m.full_name) AS full_name,
+    m.email,
+    COALESCE(md.contact_number, m.phone) AS phone,
+    COALESCE(md.linkedin_url, '') AS linkedin_url,
+    COALESCE(md.github_url, '') AS github_url,
+    COALESCE(md.about_me, '') AS about_me,
+    COALESCE(md.expertise_domains, ARRAY[]::text[]) AS expertise_domains,
+    COALESCE(md.others_domain, '') AS others_domain,
+    md.id AS profile_id
+  FROM mentors m
+  LEFT JOIN mentor_details md ON md.mentor_id = m.id
+  ORDER BY m.id DESC
+`);
+
 
     res.json({
       success: true,

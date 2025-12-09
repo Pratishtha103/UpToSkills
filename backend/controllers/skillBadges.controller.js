@@ -11,18 +11,31 @@ const addSkillBadge = async (req, res) => {
     }
 
     try {
-        // Trim whitespace and search with flexible matching
-        const trimmedName = student_name.trim();
-        
+        // Trim whitespace and normalize spacing for consistent comparisons
+        const trimmedName = student_name.trim().replace(/\s+/g, ' ');
+
         const studentResult = await pool.query(
-            'SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1',
+            `SELECT s.id,
+                    COALESCE(u.full_name, s.full_name, s.username) AS full_name
+             FROM students s
+             LEFT JOIN user_details u ON s.id = u.student_id
+             WHERE LOWER(TRIM(COALESCE(u.full_name, s.full_name, s.username))) = LOWER($1)
+                OR LOWER(TRIM(COALESCE(s.full_name, ''))) = LOWER($1)
+                OR LOWER(TRIM(COALESCE(u.full_name, ''))) = LOWER($1)`,
             [trimmedName]
         );
 
         if (studentResult.rows.length === 0) {
-            // Try partial match as fallback
-            const partialResult = await pool.query(
-                'SELECT id, full_name FROM students WHERE TRIM(full_name) ILIKE $1 LIMIT 5',
+            // Try partial match as fallback to suggest possible students
+                const partialResult = await pool.query(
+                     `SELECT s.id,
+                                COALESCE(u.full_name, s.full_name, s.username) AS full_name
+                      FROM students s
+                      LEFT JOIN user_details u ON s.id = u.student_id
+                      WHERE LOWER(COALESCE(u.full_name, s.full_name, s.username)) LIKE LOWER($1)
+                          OR LOWER(COALESCE(s.full_name, '')) LIKE LOWER($1)
+                          OR LOWER(COALESCE(u.full_name, '')) LIKE LOWER($1)
+                      LIMIT 5`,
                 [`%${trimmedName}%`]
             );
             

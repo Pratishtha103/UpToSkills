@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+// src/components/.../EditProfile.jsx
+
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { UploadCloud } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function EditProfile() {
   const { darkMode } = useTheme();
+
   const [formData, setFormData] = useState({
     companyName: "",
     website: "",
@@ -14,8 +18,20 @@ export default function EditProfile() {
   });
 
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem("token"); // get user token
+  const [saving, setSaving] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
+  const fileInputRef = useRef(null);
+
+  // Popup State
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  /* --------------------------------------------------
+    FETCH PROFILE
+  -------------------------------------------------- */
   useEffect(() => {
     // fetch company profile data on load
     const fetchProfile = async () => {
@@ -40,6 +56,8 @@ export default function EditProfile() {
         }
       } catch (err) {
         console.error("Failed to fetch profile:", err.response?.data || err.message);
+        setPopupMessage("Failed to load profile");
+        setShowPopup(true);
       } finally {
         setLoading(false);
       }
@@ -48,15 +66,15 @@ export default function EditProfile() {
     fetchProfile();
   }, [token]);
 
-  // handle text input changes
+  /* --------------------------------------------------
+    FORM HANDLERS
+  -------------------------------------------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  // handle logo upload and preview
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+  const applyLogoFile = (file) => {
     if (file) {
       setFormData((prev) => ({
         ...prev,
@@ -66,10 +84,38 @@ export default function EditProfile() {
     }
   };
 
-  // submit updated profile data
+  const handleLogoInputChange = (e) => {
+    applyLogoFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    applyLogoFile(event.dataTransfer.files?.[0]);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.companyName || !formData.industry) {
+      setPopupMessage("Please fill in all required fields");
+      setShowPopup(true);
+      return;
+    }
+
     try {
+      setSaving(true);
+
       const fd = new FormData();
       fd.append("name", formData.companyName);
       fd.append("website", formData.website);
@@ -89,57 +135,125 @@ export default function EditProfile() {
       );
 
       if (res.data.success) {
-        alert("Profile saved successfully!");
+        setPopupMessage("Profile saved successfully!");
       } else {
-        alert("Failed to save profile.");
+        setPopupMessage(res.data.message || "Failed to save profile");
       }
+      setShowPopup(true);
     } catch (err) {
-      console.error("Submission failed:", err.response?.data || err.message);
-      alert("Failed to save profile.");
+      console.error("Save error:", err.response?.data || err.message);
+      setPopupMessage(err.response?.data?.message || "Failed to save profile");
+      setShowPopup(true);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) return <p className="text-center mt-6">Loading...</p>; // show while fetching
+  /* --------------------------------------------------
+    LOADING SCREEN
+  -------------------------------------------------- */
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
+  /* --------------------------------------------------
+    COMPONENT RENDER
+  -------------------------------------------------- */
   return (
     <>
-      <div className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-[380px] text-center">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Message</h2>
+
+            <p className="text-gray-700 dark:text-gray-300 mb-6">{popupMessage}</p>
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col min-h-screen">
         <main className="flex-grow flex justify-center items-start p-6">
-          <div className={`w-full max-w-2xl shadow-lg rounded-xl p-8 mt-10 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
-            <h2 className={`text-3xl font-bold mb-8 text-center ${darkMode ? "text-white" : "text-gray-800"}`}>
+          <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
+            <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">
               {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
+
               {/* Company Name */}
               <div>
-                <label className="block font-semibold mb-2">Company Name</label>
+                <label className="block font-semibold mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
                   required
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
                 />
               </div>
 
-              {/* Company Logo */}
+              {/* Logo */}
               <div>
                 <label className="block font-semibold mb-2">Company Logo</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800"
-                />
-                {formData.logoPreview && (
-                  <img
-                    src={formData.logoPreview}
-                    alt="Logo Preview"
-                    className="mt-4 h-28 object-contain rounded-lg border"
+                <div
+                  className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-all cursor-pointer ${
+                    isDragging
+                      ? "border-blue-500 bg-blue-50 dark:bg-slate-800/70"
+                      : "border-gray-300 dark:border-gray-700 hover:border-blue-500"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {formData.logoPreview ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <img
+                        src={formData.logoPreview}
+                        alt="Logo preview"
+                        className="h-28 w-auto rounded-lg border bg-white object-contain"
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-300">
+                        Click or drag a new file to replace the logo
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <UploadCloud className="h-9 w-9 text-blue-500" />
+                      <p className="mt-3 text-sm text-gray-800 dark:text-gray-100">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        SVG, PNG, JPG or GIF (max 800x400px)
+                      </p>
+                    </>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoInputChange}
+                    className="hidden"
                   />
-                )}
+                </div>
               </div>
 
               {/* Website */}
@@ -150,19 +264,21 @@ export default function EditProfile() {
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 />
               </div>
 
               {/* Industry */}
               <div>
-                <label className="block font-semibold mb-2">Industry Type</label>
+                <label className="block font-semibold mb-2">
+                  Industry Type <span className="text-red-500">*</span>
+                </label>
                 <select
                   name="industry"
                   value={formData.industry}
                   onChange={handleChange}
                   required
-                  className="w-full border rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 >
                   <option value="">Select industry</option>
                   <option value="IT">IT / Technology</option>
@@ -175,32 +291,40 @@ export default function EditProfile() {
 
               {/* Contact */}
               <div>
-                <label className="block font-semibold mb-2">Company Contact</label>
+                <label className="block font-semibold mb-2">Contact Info</label>
                 <input
                   type="text"
                   name="contact"
                   value={formData.contact}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                disabled={saving}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                Save Details
+                {saving ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Details"
+                )}
               </button>
+
             </form>
           </div>
         </main>
-      </div>
 
-      {/* Footer Section */}
-      <footer className={`w-full mt-2 text-center py-4 text-sm transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
-        <p>© 2025 Uptoskills. Built by learners.</p>
-      </footer>
+        <footer className="w-full mt-2 text-center text-gray-700 dark:text-gray-300 py-4 text-sm">
+          © 2025 Uptoskills. Built by learners.
+        </footer>
+      </div>
     </>
   );
 }

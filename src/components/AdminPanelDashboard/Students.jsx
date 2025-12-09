@@ -2,7 +2,21 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Search, Loader2, Users, Eye, X, Award, BookOpen, Calendar, Github, Linkedin, Mail, Phone } from "lucide-react"; 
+import {
+  User,
+  Search,
+  Loader2,
+  Users,
+  Eye,
+  X,
+  Award,
+  BookOpen,
+  Calendar,
+  Github,
+  Linkedin,
+  Mail,
+  Phone,
+} from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api/students";
 
@@ -12,7 +26,7 @@ const Students = ({ isDarkMode }) => {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(null);
-  const [isDeactivating, setIsDeactivating] = useState(null); 
+  const [isDeactivating, setIsDeactivating] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -20,7 +34,8 @@ const Students = ({ isDarkMode }) => {
   const fetchAllStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await fetch(API_BASE_URL, { headers });
       const data = await res.json();
@@ -40,13 +55,15 @@ const Students = ({ isDarkMode }) => {
   const handleDelete = async (id) => {
     const studentToDelete = students.find((s) => s.id === id);
     const studentName = studentToDelete?.full_name || `ID ${id}`;
-    if (!window.confirm(`Are you sure you want to delete ${studentName}?`))
-      return;
+    if (!window.confirm(`Are you sure you want to delete ${studentName}?`)) return;
 
     try {
       setIsDeleting(id);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const headers = token
+        ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
       const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE", headers });
       const result = await res.json();
       if (result.success) {
@@ -80,59 +97,102 @@ const Students = ({ isDarkMode }) => {
 
   const handleDeactivate = async (id, currentStatus) => {
     const studentToUpdate = students.find((s) => s.id === id);
-    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
     const studentName = studentToUpdate?.full_name || `ID ${id}`;
 
     if (!window.confirm(`Are you sure you want to change the status of ${studentName} to "${newStatus}"?`))
-        return;
+      return;
 
     try {
       setIsDeactivating(id);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setStudents(current => current.map(s => 
-          s.id === id ? { ...s, status: newStatus } : s
-      ));
-        alert(`Successfully set ${studentName} status to ${newStatus}.`);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setStudents((current) =>
+        current.map((s) => (s.id === id ? { ...s, status: newStatus } : s))
+      );
+      alert(`Successfully set ${studentName} status to ${newStatus}.`);
 
-        // Notify admins about status change
-        try {
-          await fetch("http://localhost:5000/api/notifications", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              role: "admin",
-              type: "status-change",
-              title: "Student status updated",
-              message: `${studentName} status changed to ${newStatus} (id: ${id}).`,
-              metadata: { entity: "student", id, status: newStatus },
-            }),
-          });
-        } catch (notifErr) {
-          console.error("Failed to create notification:", notifErr);
-        }
-
+      // Notify admins about status change
+      try {
+        await fetch("http://localhost:5000/api/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "admin",
+            type: "status-change",
+            title: "Student status updated",
+            message: `${studentName} status changed to ${newStatus} (id: ${id}).`,
+            metadata: { entity: "student", id, status: newStatus },
+          }),
+        });
+      } catch (notifErr) {
+        console.error("Failed to create notification:", notifErr);
+      }
     } catch (err) {
-        console.error("Error updating status:", err);
-        alert(`Failed to change student status to ${newStatus}.`);
+      console.error("Error updating status:", err);
+      alert(`Failed to change student status to ${newStatus}.`);
     } finally {
-        setIsDeactivating(null);
+      setIsDeactivating(null);
     }
   };
 
+  // Fetch student details + interview count (robust)
   const fetchStudentDetails = async (studentId) => {
     try {
       setLoadingDetails(true);
       setSelectedStudent(studentId);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      setStudentDetails(null);
+
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      // 1) Fetch details
       const res = await fetch(`${API_BASE_URL}/${studentId}/details`, { headers });
       const data = await res.json();
-      if (data.success) {
-        setStudentDetails(data.data);
-      } else {
+      if (!data.success) {
         alert("Failed to load student details");
         setSelectedStudent(null);
+        setLoadingDetails(false);
+        return;
       }
+
+      const details = data.data;
+
+      // 2) Attempt to fetch interviews for this student to compute interview count
+      // Try multiple likely endpoints; fallback to 0
+      let interviewsCount = 0;
+      try {
+        // Common query param style
+        let ivRes = await fetch(`http://localhost:5000/api/interviews?studentId=${studentId}`, { headers });
+        if (!ivRes.ok) {
+          // try another pattern
+          ivRes = await fetch(`http://localhost:5000/api/interviews/student/${studentId}`, { headers });
+        }
+        if (ivRes.ok) {
+          const ivData = await ivRes.json();
+          // ivData might be an object { success, data } or array
+          if (Array.isArray(ivData)) interviewsCount = ivData.length;
+          else if (ivData?.success && Array.isArray(ivData.data)) interviewsCount = ivData.data.length;
+          else if (Array.isArray(ivData?.data)) interviewsCount = ivData.data.length;
+        } else {
+          // no interviews endpoint or none scheduled -> interviewsCount stays 0
+          interviewsCount = 0;
+        }
+      } catch (ivErr) {
+        console.warn("Interview fetch failed or endpoint not available:", ivErr);
+        interviewsCount = 0;
+      }
+
+      // Attach interviewsCount into details.stats (safe merge)
+      const mergedDetails = {
+        ...details,
+        stats: {
+          ...details.stats,
+          interviewsCount: typeof interviewsCount === "number" ? interviewsCount : 0,
+        },
+      };
+
+      setStudentDetails(mergedDetails);
     } catch (err) {
       console.error("Error fetching student details:", err);
       alert("Error loading student details");
@@ -151,21 +211,25 @@ const Students = ({ isDarkMode }) => {
   useEffect(() => {
     const timeout = setTimeout(async () => {
       const trimmedSearch = searchTerm.trim();
-      
+
       // If search is empty, fetch all students
       if (!trimmedSearch) {
         fetchAllStudents();
         return;
       }
-      
+
       try {
         setSearching(true);
         // ✅ CHANGED: Use /search?q= instead of /search/:name
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`, { headers });
+        const res = await fetch(
+          `${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`,
+          { headers }
+        );
         const data = await res.json();
-        
+
         if (data.success) {
           setStudents(data.data || []);
         } else {
@@ -178,7 +242,7 @@ const Students = ({ isDarkMode }) => {
         setSearching(false);
       }
     }, 500); // 500ms debounce
-    
+
     return () => clearTimeout(timeout);
   }, [searchTerm, fetchAllStudents]);
 
@@ -198,9 +262,7 @@ const Students = ({ isDarkMode }) => {
         {/* Search Bar */}
         <div
           className={`p-4 shadow-md rounded-lg border transition-colors duration-300 ${
-            isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-300"
+            isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
           }`}
         >
           <div className="relative">
@@ -237,73 +299,81 @@ const Students = ({ isDarkMode }) => {
             ))
           ) : students.length > 0 ? (
             students.map((student) => {
-              const currentStatus = student.status || 'Active';
-              const isCurrentlyActive = currentStatus === 'Active';
-              
+              const currentStatus = student.status || "Active";
+              const isCurrentlyActive = currentStatus === "Active";
+
               return (
-              <motion.div
-                key={student.id}
-                layout
-                className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
-                  isDarkMode
-                    ? "bg-gray-800 text-gray-100"
-                    : "bg-white text-gray-900"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold truncate">
-                        {student.full_name}
-                      </h3>
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isCurrentlyActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {currentStatus}
-                      </span>
-                      
+                <motion.div
+                  key={student.id}
+                  layout
+                  className={`rounded-lg shadow-md hover:shadow-lg p-6 transition-all ${
+                    isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
+                      <User className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-sm line-clamp-2">
-                      {Array.isArray(student.domains_of_interest)
-                        ? student.domains_of_interest.join(", ")
-                        : student.domains_of_interest}
-                    </p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold truncate">{student.full_name}</h3>
+
+                        <span
+                          className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                            isCurrentlyActive ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {currentStatus}
+                        </span>
+
+                        {/* Eye icon button next to name (opens modal) */}
+                        <button
+                          onClick={() => fetchStudentDetails(student.id)}
+                          className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400 ml-1"
+                          title="View Details"
+                          aria-label={`View details for ${student.full_name}`}
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <p className="text-sm line-clamp-2">
+                        {Array.isArray(student.domains_of_interest)
+                          ? student.domains_of_interest.join(", ")
+                          : student.domains_of_interest}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
-                  <button
-                    onClick={() => handleDeactivate(student.id, currentStatus)}
-                    disabled={isDeactivating === student.id}
-                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                      isDeactivating === student.id
-                        ? "bg-blue-300 text-blue-800 cursor-not-allowed"
-                        : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
-                  >
-                    {isDeactivating === student.id ? "Updating..." : (isCurrentlyActive ? "Deactivate" : "Activate")}
-                  </button>
+                  <div className="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
+                    <button
+                      onClick={() => handleDeactivate(student.id, currentStatus)}
+                      disabled={isDeactivating === student.id}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        isDeactivating === student.id
+                          ? "bg-blue-300 text-blue-800 cursor-not-allowed"
+                          : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                    >
+                      {isDeactivating === student.id ? "Updating..." : isCurrentlyActive ? "Deactivate" : "Activate"}
+                    </button>
 
-                  <button
-                    onClick={() => handleDelete(student.id)}
-                    disabled={isDeleting === student.id}
-                    className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
-                      isDeleting === student.id
-                        ? "bg-red-300 text-red-800 cursor-not-allowed"
-                        : "bg-red-500 text-white hover:bg-red-600"
-                    }`}
-                  >
-                    {isDeleting === student.id ? "Deleting..." : "Delete"}
-                  </button>
-                </div>
-              </motion.div>
-            )})
+                    <button
+                      onClick={() => handleDelete(student.id)}
+                      disabled={isDeleting === student.id}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                        isDeleting === student.id ? "bg-red-300 text-red-800 cursor-not-allowed" : "bg-red-500 text-white hover:bg-red-600"
+                      }`}
+                    >
+                      {isDeleting === student.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12">
-              <p className="text-gray-500">
-                {searchTerm ? "No students found matching your search." : "No students found."}
-              </p>
+              <p className="text-gray-500">{searchTerm ? "No students found matching your search." : "No students found."}</p>
             </div>
           )}
         </div>
@@ -329,14 +399,13 @@ const Students = ({ isDarkMode }) => {
               }`}
             >
               {/* Modal Header */}
-              <div className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${
-                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-              }`}>
+              <div
+                className={`sticky top-0 z-10 p-6 border-b flex justify-between items-center ${
+                  isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+                }`}
+              >
                 <h2 className="text-2xl font-bold">Student Details</h2>
-                <button
-                  onClick={closeModal}
-                  className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
+                <button onClick={closeModal} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -384,8 +453,7 @@ const Students = ({ isDarkMode }) => {
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">LinkedIn</p>
                             <a href={studentDetails.profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-500 hover:underline flex items-center gap-2">
-                              <Linkedin className="w-4 h-4" />
-                              View Profile
+                              <Linkedin className="w-4 h-4" /> View Profile
                             </a>
                           </div>
                         )}
@@ -393,25 +461,27 @@ const Students = ({ isDarkMode }) => {
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">GitHub</p>
                             <a href={studentDetails.profile.github_url} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-500 hover:underline flex items-center gap-2">
-                              <Github className="w-4 h-4" />
-                              View Profile
+                              <Github className="w-4 h-4" /> View Profile
                             </a>
                           </div>
                         )}
                       </div>
+
                       {studentDetails.profile.why_hire_me && (
                         <div className="mt-4">
                           <p className="text-sm text-gray-500 dark:text-gray-400">Why Hire Me</p>
                           <p className="mt-1">{studentDetails.profile.why_hire_me}</p>
                         </div>
                       )}
+
                       {studentDetails.profile.domains_of_interest && (
                         <div className="mt-4">
                           <p className="text-sm text-gray-500 dark:text-gray-400">Domains of Interest</p>
                           <div className="flex flex-wrap gap-2 mt-2">
-                            {(Array.isArray(studentDetails.profile.domains_of_interest) 
-                              ? studentDetails.profile.domains_of_interest 
-                              : [studentDetails.profile.domains_of_interest]).map((domain, idx) => (
+                            {(Array.isArray(studentDetails.profile.domains_of_interest)
+                              ? studentDetails.profile.domains_of_interest
+                              : [studentDetails.profile.domains_of_interest]
+                            ).map((domain, idx) => (
                               <span key={idx} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
                                 {domain}
                               </span>
@@ -436,8 +506,9 @@ const Students = ({ isDarkMode }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Enrollments</p>
                       </div>
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.attendanceRate}%</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Attendance</p>
+                        {/* show interview count (1 or 0) */}
+                        <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.interviewsCount ?? 0}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Interview</p>
                       </div>
                     </div>
 
@@ -445,8 +516,7 @@ const Students = ({ isDarkMode }) => {
                     {studentDetails.projects.length > 0 && (
                       <div className={`p-6 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <BookOpen className="w-5 h-5" />
-                          Projects ({studentDetails.projects.length})
+                          <BookOpen className="w-5 h-5" /> Projects ({studentDetails.projects.length})
                         </h3>
                         <div className="space-y-4">
                           {studentDetails.projects.map((project) => (
@@ -458,14 +528,11 @@ const Students = ({ isDarkMode }) => {
                               )}
                               {project.github_pr_link && (
                                 <a href={project.github_pr_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm mt-2 inline-flex items-center gap-1">
-                                  <Github className="w-4 h-4" />
-                                  View on GitHub
+                                  <Github className="w-4 h-4" /> View on GitHub
                                 </a>
                               )}
                               {project.is_open_source && (
-                                <span className="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs">
-                                  Open Source
-                                </span>
+                                <span className="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs">Open Source</span>
                               )}
                             </div>
                           ))}
@@ -477,8 +544,7 @@ const Students = ({ isDarkMode }) => {
                     {studentDetails.badges.length > 0 && (
                       <div className={`p-6 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <Award className="w-5 h-5" />
-                          Skill Badges ({studentDetails.badges.length})
+                          <Award className="w-5 h-5" /> Skill Badges ({studentDetails.badges.length})
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {studentDetails.badges.map((badge) => (
@@ -490,9 +556,7 @@ const Students = ({ isDarkMode }) => {
                                   <p className="text-xs text-gray-400 mt-2">Awarded: {new Date(badge.awarded_at).toLocaleDateString()}</p>
                                 </div>
                                 {badge.is_verified && (
-                                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
-                                    Verified
-                                  </span>
+                                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">Verified</span>
                                 )}
                               </div>
                             </div>
@@ -505,8 +569,7 @@ const Students = ({ isDarkMode }) => {
                     {studentDetails.enrollments.length > 0 && (
                       <div className={`p-6 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <Calendar className="w-5 h-5" />
-                          Course Enrollments ({studentDetails.enrollments.length})
+                          <Calendar className="w-5 h-5" /> Course Enrollments ({studentDetails.enrollments.length})
                         </h3>
                         <div className="space-y-3">
                           {studentDetails.enrollments.map((enrollment) => (
@@ -518,12 +581,8 @@ const Students = ({ isDarkMode }) => {
                                   <p className="text-xs text-gray-400 mt-2">Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  enrollment.status === 'active' 
-                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                    : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200'
-                                }`}>
-                                  {enrollment.status}
-                                </span>
+                                  enrollment.status === 'active' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200'
+                                }`}>{enrollment.status}</span>
                               </div>
                             </div>
                           ))}

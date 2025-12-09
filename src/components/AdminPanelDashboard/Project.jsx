@@ -10,21 +10,26 @@ export default function Project({ isDarkMode }) {
   const [newProjectStudents, setNewProjectStudents] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Popup State
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
   useEffect(() => {
     const root = document.documentElement;
     isDarkMode ? root.classList.add("dark") : root.classList.remove("dark");
   }, [isDarkMode]);
 
-  // Load projects from backend
+  // Load projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        let url = "http://localhost:5000/api/student-projects";
+
+        let url = "http://localhost:5000/api/mentor_projects";
         if (searchTerm.trim()) {
-          url = `http://localhost:5000/api/student-projects?search=${encodeURIComponent(searchTerm.trim())}`;
-          setSearching(true);
+          url = `http://localhost:5000/api/mentor_projects?search=${encodeURIComponent(searchTerm.trim())}`;
         }
+
         const res = await fetch(url);
         const data = await res.json();
 
@@ -45,16 +50,13 @@ export default function Project({ isDarkMode }) {
     fetchProjects();
   }, []);
 
-  // ⭐ LOCAL SEARCH FILTER
+  // ⭐ Local search
   const filteredProjects = projects.filter((proj) =>
-    proj.project_title.toLowerCase().includes(searchTerm.toLowerCase())
+    proj.project_title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addProject = async () => {
-    if (!newProjectTitle || !newProjectMentor || !newProjectStudents) {
-      alert("Please fill out all fields before adding a project.");
-      return;
-    }
+    if (!newProjectTitle || !newProjectMentor || !newProjectStudents) return;
 
     try {
       const res = await fetch("http://localhost:5000/api/mentor_projects", {
@@ -71,119 +73,35 @@ export default function Project({ isDarkMode }) {
 
       if (data.success) {
         const newProj = data.project;
+
         setProjects((prev) => [...prev, newProj]);
         setNewProjects((prev) => [...prev, newProj]);
 
+        // Clear fields
         setNewProjectTitle("");
         setNewProjectMentor("");
         setNewProjectStudents("");
-        // Notify admins and the mentor about the new project (best-effort)
-        try {
-          // Admin notification
-          await fetch("http://localhost:5000/api/notifications", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              role: "admin",
-              type: "creation",
-              title: "Project added",
-              message: `${newProj.project_title} was added by admin (mentor: ${newProj.mentor_name}).`,
-              metadata: { entity: "project", id: newProj.id },
-            }),
-          });
-
-          // Mentor notification (if mentor_id available)
-          if (newProj.mentor_id) {
-            await fetch("http://localhost:5000/api/notifications", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                role: "mentor",
-                recipientId: newProj.mentor_id,
-                type: "creation",
-                title: "New project assigned",
-                message: `A new project \"${newProj.project_title}\" was assigned to you.`,
-                metadata: { entity: "project", id: newProj.id },
-              }),
-            });
-          }
-        } catch (notifErr) {
-          console.error("Failed to create project notifications:", notifErr);
-        }
-      } else {
-        alert(data.message || "Failed to add project");
       }
     } catch (err) {
       console.error(err);
-      alert("Error adding project");
     }
   };
 
   const removeProject = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
-
     try {
-      const res = await fetch(`http://localhost:5000/api/student-projects/${id}`, { method: "DELETE" });
+      const res = await fetch(`http://localhost:5000/api/mentor_projects/${id}`, {
+        method: "DELETE",
+      });
+
       const data = await res.json();
 
       if (data.success) {
         setProjects((prev) => prev.filter((p) => p.id !== id));
         setNewProjects((prev) => prev.filter((p) => p.id !== id));
-        // Notify admins (and mentor) about deletion
-        try {
-          // Admin notification
-          await fetch("http://localhost:5000/api/notifications", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              role: "admin",
-              type: "deletion",
-              title: "Project deleted",
-              message: `Project with id ${id} was deleted.`,
-              metadata: { entity: "project", id },
-            }),
-          });
-
-          // If API returned deleted project with mentor_id, notify mentor
-          const deleted = data.deleted || data.deleted_project || null;
-          const mentorId = deleted?.mentor_id || deleted?.mentorId || null;
-          if (mentorId) {
-            await fetch("http://localhost:5000/api/notifications", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                role: "mentor",
-                recipientId: mentorId,
-                type: "deletion",
-                title: "Project removed",
-                message: `A project assigned to you was removed (id: ${id}).`,
-                metadata: { entity: "project", id },
-              }),
-            });
-          }
-        } catch (notifErr) {
-          console.error("Failed to create project deletion notifications:", notifErr);
-        }
-      } else {
-        alert(data.message || "Failed to delete project");
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting project");
     }
-  };
-
-  const handleAddStudent = (id) => {
-    setProjects((prev) =>
-      prev.map((project) =>
-        project.id === id ? { ...project, total_students: (project.total_students || 0) + 1 } : project
-      )
-    );
-    setNewProjects((prev) =>
-      prev.map((project) =>
-        project.id === id ? { ...project, total_students: (project.total_students || 0) + 1 } : project
-      )
-    );
   };
 
   return (
@@ -218,12 +136,11 @@ export default function Project({ isDarkMode }) {
         </div>
       </div>
 
-      {/* ALL PROJECTS SECTION */}
+      {/* All Projects */}
       <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
         <FolderOpen className="w-6 h-6 text-indigo-500" /> All Projects
       </h2>
 
-      {/* Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           Array.from({ length: 6 }).map((_, idx) => (
@@ -235,7 +152,10 @@ export default function Project({ isDarkMode }) {
               key={project.id}
               project={project}
               isDarkMode={isDarkMode}
-              removeProject={removeProject}
+              openDeletePopup={() => {
+                setDeleteId(project.id);
+                setShowDeletePopup(true);
+              }}
             />
           ))
         ) : (
@@ -243,12 +163,10 @@ export default function Project({ isDarkMode }) {
         )}
       </div>
 
-      {/* NEWLY ADDED PROJECTS SECTION */}
+      {/* New Projects */}
       {newProjects.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2 mb-3">
-            New Projects
-          </h2>
+          <h2 className="text-2xl font-bold mb-3">New Projects</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newProjects.map((project) => (
@@ -256,9 +174,85 @@ export default function Project({ isDarkMode }) {
                 key={project.id}
                 project={project}
                 isDarkMode={isDarkMode}
-                removeProject={removeProject}
+                openDeletePopup={() => {
+                  setDeleteId(project.id);
+                  setShowDeletePopup(true);
+                }}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add Project Form */}
+      <div
+        className={`p-6 rounded-2xl shadow-md transition-colors duration-300 ${
+          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        }`}
+      >
+        <h3 className="text-xl font-bold mb-4">Add New Project</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <input
+            type="text"
+            placeholder="Project Title"
+            value={newProjectTitle}
+            onChange={(e) => setNewProjectTitle(e.target.value)}
+            className="rounded-md p-2 border w-full"
+          />
+
+          <input
+            type="text"
+            placeholder="Mentor Name"
+            value={newProjectMentor}
+            onChange={(e) => setNewProjectMentor(e.target.value)}
+            className="rounded-md p-2 border w-full"
+          />
+
+          <input
+            type="number"
+            placeholder="Students"
+            value={newProjectStudents}
+            min="1"
+            max="20"
+            onChange={(e) => setNewProjectStudents(e.target.value)}
+            className="rounded-md p-2 border w-full"
+          />
+        </div>
+
+        <button
+          onClick={addProject}
+          className="flex items-center gap-2 rounded-md px-4 py-2 font-medium bg-indigo-600 hover:bg-indigo-500 text-white"
+        >
+          <Plus className="w-4 h-4" /> Add Project
+        </button>
+      </div>
+
+      {/* DELETE POPUP */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl w-80 text-center">
+            <h2 className="text-lg font-bold mb-4">Delete Project?</h2>
+            <p className="text-sm mb-6">Are you sure you want to delete this project?</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  removeProject(deleteId);
+                  setShowDeletePopup(false);
+                }}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-md"
+              >
+                Yes, Delete
+              </button>
+
+              <button
+                onClick={() => setShowDeletePopup(false)}
+                className="flex-1 bg-gray-300 dark:bg-gray-700 hover:bg-gray-600 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -266,7 +260,10 @@ export default function Project({ isDarkMode }) {
   );
 }
 
-function ProjectCard({ project, removeProject, isDarkMode }) {
+/* ========================
+   PROJECT CARD COMPONENT
+======================== */
+function ProjectCard({ project, openDeletePopup, isDarkMode }) {
   return (
     <div
       className={`p-6 rounded-lg shadow-md transition-colors duration-300 ${
@@ -277,14 +274,16 @@ function ProjectCard({ project, removeProject, isDarkMode }) {
         <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600">
           <FolderOpen className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-lg font-bold break-words">{project.project_title || project.title}</h3>
+
+        <h3 className="text-lg font-bold">{project.project_title}</h3>
       </div>
 
       <div className="text-sm mb-4 space-y-1">
         <div className="flex items-center gap-2">
-          <User className="w-4 h-4" /> 
+          <User className="w-4 h-4" />
           Student: {project.student_name}
         </div>
+
         {project.total_students && (
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4" /> {project.total_students} Students
@@ -292,14 +291,12 @@ function ProjectCard({ project, removeProject, isDarkMode }) {
         )}
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => removeProject(project.id)}
-          className="flex-1 flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
-        >
-          <Trash2 className="w-4 h-4" /> Delete
-        </button>
-      </div>
+      <button
+        onClick={openDeletePopup}
+        className="w-full flex items-center gap-2 justify-center rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white"
+      >
+        <Trash2 className="w-4 h-4" /> Delete
+      </button>
     </div>
   );
 }

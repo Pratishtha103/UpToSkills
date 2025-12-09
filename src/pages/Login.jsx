@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff, Sun, Moon } from "lucide-react";
+import { Eye, EyeOff, Sun, Moon, Loader2 } from "lucide-react";
 import axios from "axios";
 import loginImage from "../assets/loginnew.jpg";
 import { ToastContainer, toast } from "react-toastify";
@@ -9,6 +9,7 @@ import { useTheme } from "../context/ThemeContext";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -34,6 +35,7 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const hardcodedAdmin = {
       email: "admin@example.com",
@@ -47,19 +49,36 @@ const LoginForm = () => {
       formData.role === "admin";
 
     const fallbackAdminLogin = () => {
-      alert("Admin login successful (fallback mode)");
-      const adminUser = { name: "Admin", email: hardcodedAdmin.email, role: "admin" };
+      toast.success("Admin login successful (fallback mode)");
+
+      const adminUser = {
+        name: "Admin",
+        email: hardcodedAdmin.email,
+        role: "admin",
+      };
+
       localStorage.setItem("token", "dummy_admin_token");
       localStorage.setItem("user", JSON.stringify(adminUser));
       localStorage.setItem("admin", JSON.stringify(adminUser));
-      navigate("/adminPanel", { state: { updated: true } });
+
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate("/adminPanel", { state: { updated: true } });
+      }, 2500);
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData, { headers: { "Content-Type": "application/json" } });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
       toast.success(response.data.message || "Login successful");
 
-      if (response.data.token) localStorage.setItem("token", response.data.token);
+      if (response.data.token)
+        localStorage.setItem("token", response.data.token);
+
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("studentId", response.data.user.id);
@@ -67,24 +86,45 @@ const LoginForm = () => {
       }
 
       const role = response.data.user?.role || formData.role;
-      if (role === "mentor") localStorage.setItem("mentor", JSON.stringify(response.data.user));
-      if (role === "admin") localStorage.setItem("admin", JSON.stringify(response.data.user));
+
+      if (role === "mentor")
+        localStorage.setItem("mentor", JSON.stringify(response.data.user));
+
+      if (role === "admin")
+        localStorage.setItem("admin", JSON.stringify(response.data.user));
 
       setTimeout(() => {
+        setIsLoading(false);
         if (role === "admin") navigate("/adminPanel");
-        else if (role === "student" || role === "learner") navigate("/dashboard");
+        else if (role === "student" || role === "learner")
+          navigate("/dashboard");
         else if (role === "mentor") navigate("/mentor-dashboard");
         else if (role === "company") navigate("/company");
         else navigate("/login");
-      }, 5000);
+      }, 2500);
     } catch (err) {
-      if (isHardcodedAdmin) { fallbackAdminLogin(); return; }
-      toast.error(err.response?.data?.message || err.message || "Login failed. Please try again.");
+      setIsLoading(false);
+      
+      if (isHardcodedAdmin) {
+        fallbackAdminLogin();
+        return;
+      }
+
+      toast.error(
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please try again."
+      );
     }
   };
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return "";
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
   return (
-    <div className={`w-full min-h-screen flex justify-center items-center transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+    <>
       {/* Theme Toggle Button */}
       <button
         onClick={toggleDarkMode}
@@ -94,80 +134,124 @@ const LoginForm = () => {
         {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-700" />}
       </button>
 
-      <div className={`shadow-lg overflow-hidden flex transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`} style={{ width: "1237px", height: "651px", borderRadius: "12px" }}>
-        {/* LEFT IMAGE */}
-        <div className="w-1/2 h-full rounded-l-xl overflow-hidden">
-          <img src={loginImage} className="w-full h-full object-cover object-center" alt="Login Visual" />
-        </div>
+      <div className={`h-[100vh] flex items-center justify-center px-5 lg:px-0 transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+        <div className={`max-w-screen-xl shadow-md sm:rounded-lg flex justify-center flex-1 transition-colors duration-300 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
 
-        {/* RIGHT FORM */}
-        <div className="w-1/2 h-full flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <ToastContainer position="top-right" autoClose={2500} hideProgressBar={false} pauseOnHover style={{ marginTop: "20px", right: "250px", zIndex: 9999 }} closeOnClick />
+          <ToastContainer
+            position="top-right"
+            autoClose={2500}
+            hideProgressBar={false}
+            pauseOnHover
+            style={{ marginTop: "20px", right: "250px", zIndex: 9999 }}
+            closeOnClick
+            theme={darkMode ? "dark" : "light"}
+          />
 
-            <div className="text-center w-full">
-              <h1 className="text-4xl font-extrabold">
-                <span className="text-[#00BDA6] capitalize">{formData.role}</span>{" "}
-                <span className="text-[#FF6D34]">Login</span>
-              </h1>
-              <p className={`text-[16px] ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Enter your details</p>
-            </div>
+          {/* LEFT IMAGE */}
+          <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-7/12">
+            <div className="h-full w-full bg-cover rounded-2xl" style={{ backgroundImage: `url(${loginImage})` }} />
+          </div>
 
-            <div className="w-full flex-1 mt-8">
-              <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-100 border-gray-200 text-gray-700"} border`}
-                >
-                  <option value="admin">Login as Admin</option>
-                  <option value="student">Login as Student</option>
-                  <option value="company">Login as Company</option>
-                  <option value="mentor">Login as Mentor</option>
-                </select>
+          {/* RIGHT FORM */}
+          <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+            <div className="flex flex-col items-center">
 
-                <input
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"} border`}
-                  type="text"
-                  placeholder="Enter email or username"
-                  required
-                />
+              <div className="text-center">
+                <h1 className="text-4xl font-extrabold">
+                  <span className="text-[#00BDA6]">{capitalizeFirstLetter(formData.role)}</span>
+                  <span className="text-[#FF6D34]"> Login</span>
+                </h1>
+                <p className={`text-[16px] ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Enter your details</p>
+              </div>
 
-                <div className="relative">
-                  <input
-                    name="password"
-                    value={formData.password}
+              <div className="w-full flex-1 mt-8">
+                <form className="mx-auto max-w-xs flex flex-col gap-4" onSubmit={handleSubmit}>
+
+                  <select
+                    name="role"
+                    value={formData.role}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3 rounded-lg text-sm ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"} border`}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    disabled={isLoading}
+                    className={`w-full px-5 py-3 rounded-lg border disabled:opacity-60 disabled:cursor-not-allowed ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-100 border-gray-200 text-gray-700"}`}
+                  >
+                    <option value="admin">Login as Admin</option>
+                    <option value="student">Login as Student</option>
+                    <option value="company">Login as Company</option>
+                    <option value="mentor">Login as Mentor</option>
+                  </select>
+
+                  <input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    className={`w-full px-5 py-3 rounded-lg border disabled:opacity-60 disabled:cursor-not-allowed ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`}
+                    type="text"
+                    placeholder="Enter email or username"
                     required
                   />
-                  <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer" onClick={() => setShowPassword((s) => !s)}>
-                    {showPassword ? <EyeOff className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} /> : <Eye className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}
+
+                  <div className="relative w-full">
+                    <input
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                      className={`w-full px-5 py-3 rounded-lg border pr-10 disabled:opacity-60 disabled:cursor-not-allowed ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-100 border-gray-200"}`}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <div
+                      className={`absolute inset-y-0 right-3 flex items-center ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                      onClick={() => !isLoading && setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} /> : <Eye className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`} />}
+                    </div>
                   </div>
-                </div>
 
-                <div className="text-right -mt-2 mb-3">
-                  <Link to="/login/forgot-password" className="text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium">Forgot password?</Link>
-                </div>
+                  <div className="text-right -mt-2 mb-3">
+                    <Link
+                      to="/login/forgot-password"
+                      className={`text-sm text-[#00BDA6] hover:text-[#FF6D34] font-medium ${isLoading ? 'pointer-events-none opacity-60' : ''}`}
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
 
-                <button type="submit" className="bg-[#FF6D34] text-white w-full py-4 rounded-lg hover:bg-[#00BDA6] transition">Login</button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="mt-5 tracking-wide font-semibold bg-[#FF6D34] text-gray-100 w-full py-4 rounded-lg hover:bg-[#00BDA6] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Logging in...</span>
+                      </>
+                    ) : (
+                      "Login"
+                    )}
+                  </button>
 
-                <p className={`text-center ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  Don't have an account?{" "}
-                  <Link to="/register"><span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">Sign up</span></Link>
-                </p>
-              </form>
+                  <p className={`text-l text-center ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    Don't have an account?{" "}
+                    <Link to="/register" className={isLoading ? 'pointer-events-none opacity-60' : ''}>
+                      <span className="text-[#00BDA6] hover:text-[#FF6D34] font-semibold">
+                        Sign up
+                      </span>
+                    </Link>
+                  </p>
+
+                </form>
+              </div>
+
             </div>
           </div>
+
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

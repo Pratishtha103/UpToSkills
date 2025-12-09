@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { persistThemePreference, readStoredTheme } from "./lib/utils";
+import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 
 // Pages & Components
@@ -10,7 +12,7 @@ import Landing from './pages/Landing';
 import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
-import MyProjects from './components/Student_Dashboard/myProjects/MyProjects';
+import ProjectSubmission from './components/Student_Dashboard/myProjects/MyProjects'; // ✅ RENAMED for clarity
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';
@@ -27,14 +29,15 @@ import CompanyProfilePage from './components/Company_Dashboard/companyProfilePag
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
-import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
+import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms"; // ✅ Keep this one
 import ForgotPassword from "./pages/ForgotPassword";
+import Unauthorized from './pages/Unauthorized';
+import NotFound from './pages/NotFound';
 
 // About Page Components
 import Header from './components/AboutPage/Header';
 import HeroSection from './components/AboutPage/HeroSection';
 import AboutSection from './components/AboutPage/AboutSection';
-
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -45,186 +48,189 @@ import Thankyou from './components/Programs/Thankyou';
 
 const queryClient = new QueryClient();
 
-// Protected Route Wrapper
-function ProtectedRoute({ children }) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const location = useLocation();
-
-  if (!token) {
-    return <LoginForm />;
-  }
-  return children;
-}
-
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(
-  () => localStorage.getItem("darkMode") === "true"
-);
+    () => localStorage.getItem("darkMode") === "true"
+  );
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   return (
     <ThemeProvider>
-    <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          pauseOnHover
+          newestOnTop
+          theme="light"
+          style={{ zIndex: 99999 }}
+        />
+        <Router>
+          <Routes>
+            {/* ========== PUBLIC ROUTES (No Login Required) ========== */}
+            <Route path="/" element={<Landing isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} />
 
-      {/* 🔥 Toast Container (you must add this!) */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        pauseOnHover
-        newestOnTop
-        theme="light"
-        style={{ zIndex: 99999 }}
-      />
-      <Router>
-        <Routes>
+            <Route path="/about" element={
+              <>
+                <Header />
+                <HeroSection />
+                <AboutSection />
+                <footer className="w-full text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300">
+                  <p>© 2025 Uptoskills. Built by learners.</p>
+                </footer>
+                <Chatbot />
+              </>
+            } />
 
-          {/* ===== Public Routes ===== */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/about" element={
-            <>
-              <Header />
-              <HeroSection />
-              <AboutSection />
-              <footer
-                className="w-full  text-gray-100 bg-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-              >
-                <p>© 2025 Uptoskills. Built by learners.</p>
-              </footer>
-              <Chatbot />
-            </>
-          } />
-          <Route path="/programs" element={<ProgramsPage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/login/forgot-password" element={<ForgotPassword />} />
+            <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/login/forgot-password" element={<ForgotPassword />} />
+            <Route path="/register" element={<RegistrationForm />} />
 
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/contact" element={<ContactPage />} />
+            {/* Program Forms */}
+            <Route path="/programForm/:id" element={<Webdev />} />
+            <Route path="/data-science" element={<Datascience />} />
+            <Route path="/cloud-computing" element={<Cloudcompute />} />
+            <Route path="/cybersecurity" element={<Cybersecurity />} />
+            <Route path="/thankyou" element={<Thankyou />} />
 
-          {/* ===== Dashboard Routes ===== */}
-          <Route path="/dashboard" element={<ProtectedRoute><Student_Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-          <Route path="/dashboard/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
-          <Route path="/dashboard/my-programs" element={<ProtectedRoute><MyPrograms /></ProtectedRoute>} />
-          <Route path="/dashboard/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-          <Route path="/dashboard/aboutus" element={<ProtectedRoute><AboutUs /></ProtectedRoute>} />
-          {/* ===== Add Project (Project Submission Form) ===== */}
-          <Route path="/dashboard/add-project" element={<ProtectedRoute><MyProjects /></ProtectedRoute>} />
+            {/* ========== STUDENT PROTECTED ROUTES ========== */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <Student_Dashboard />
+              </ProtectedRoute>
+            } />
 
-          {/* ===== My Projects (Student’s submitted projects) ===== */}
-          <Route path="/dashboard/my-projects" element={<ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>} />
+            <Route path="/dashboard/profile" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <UserProfilePage />
+              </ProtectedRoute>
+            } />
 
+            <Route path="/dashboard/edit-profile" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <EditProfilePage />
+              </ProtectedRoute>
+            } />
 
+            {/* ✅ FIXED: Add Project route uses ProjectSubmission (with form) */}
+            <Route path="/dashboard/add-project" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <ProjectSubmission />
+              </ProtectedRoute>
+            } />
 
-          {/* ===== Skill Badges ===== */}
-          <Route path="/mentor-dashboard/skill-badges" element={<ProtectedRoute><SkillBadgeForm /></ProtectedRoute>} />
-          <Route path="/student/skill-badges" element={<ProtectedRoute><StudentSkillBadgesPage /></ProtectedRoute>} />
+            {/* ✅ FIXED: My Projects also uses ProjectSubmission */}
+            <Route path="/dashboard/my-projects" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <ProjectSubmission />
+              </ProtectedRoute>
+            } />
 
-          {/* ===== Company Routes ===== */}
-          <Route path="/company" element={<ProtectedRoute><CompanyDashboardHome /></ProtectedRoute>} />
-          <Route path="/company-profile" element={<ProtectedRoute><CompanyProfilePage /></ProtectedRoute>} />
-          <Route path="/company/*" element={<ProtectedRoute><CompanyNotFound /></ProtectedRoute>} />
+            {/* ✅ FIXED: My Programs uses the correct component from dashboard folder */}
+            <Route path="/dashboard/my-programs" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <MyPrograms />
+              </ProtectedRoute>
+            } />
 
-          {/* ===== Misc Routes ===== */}
+            <Route path="/dashboard/notifications" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <NotificationsPage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="student" /></ProtectedRoute>} />
-          <Route path="/mentor-dashboard/project-showcase" element={<ProtectedRoute><Dashboard_Project view="mentor" /></ProtectedRoute>} />
-          {/* <Route path="/mentor-dashboard/*" element={<ProtectedRoute><MentorDashboardRoutes /></ProtectedRoute>} /> */}
-          <Route path="/mentor-dashboard/*" element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <MentorDashboardRoutes
-                isDarkMode={isDarkMode}
-                setIsDarkMode={setIsDarkMode}
-              />
-            </ProtectedRoute>
-          } />
-          <Route path="/adminPanel" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
-          <Route path="/adminPanel/testimonials" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/dashboard/projects" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <Dashboard_Project />
+              </ProtectedRoute>
+            } />
 
-          {/* ===== Program Forms ===== */}
-          <Route path="/programForm/:id" element={<Webdev />} />
-          {/* <Route path="/data-science" element={<Datascience />} /> */}
-          <Route path="/cloud-computing" element={<Cloudcompute />} />
-          <Route path="/cybersecurity" element={<Cybersecurity />} />
-          <Route path="/thankyou" element={<Thankyou />} />
+            <Route path="/dashboard/project-showcase" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <Dashboard_Project view="student" />
+              </ProtectedRoute>
+            } />
 
-          {/* STUDENT PROTECTED ROUTES */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={["student"]}><Student_Dashboard /></ProtectedRoute>
-          } />
+            <Route path="/dashboard/aboutus" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <AboutUs />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><UserProfilePage /></ProtectedRoute>
-          } />
+            <Route path="/student/skill-badges" element={
+              <ProtectedRoute allowedRoles={["student"]}>
+                <StudentSkillBadgesPage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/edit-profile" element={
-            <ProtectedRoute allowedRoles={["student"]}><EditProfilePage /></ProtectedRoute>
-          } />
+            {/* ========== MENTOR PROTECTED ROUTES ========== */}
+            <Route path="/mentor-dashboard/*" element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <MentorDashboardRoutes isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/my-projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyProjects /></ProtectedRoute>
-          } />
+            <Route path="/mentor-dashboard/skill-badges" element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/my-programs" element={
-            <ProtectedRoute allowedRoles={["student"]}><MyPrograms /></ProtectedRoute>
-          } />
+            <Route path="/mentor-dashboard/project-showcase" element={
+              <ProtectedRoute allowedRoles={["mentor"]}>
+                <Dashboard_Project view="mentor" />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/notifications" element={
-            <ProtectedRoute allowedRoles={["student"]}><NotificationsPage /></ProtectedRoute>
-          } />
+            {/* ========== COMPANY PROTECTED ROUTES ========== */}
+            <Route path="/company" element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyDashboardHome />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/student/skill-badges" element={
-            <ProtectedRoute allowedRoles={["student"]}><StudentSkillBadgesPage /></ProtectedRoute>
-          } />
+            <Route path="/company-profile" element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyProfilePage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/projects" element={
-            <ProtectedRoute allowedRoles={["student"]}><Dashboard_Project /></ProtectedRoute>
-          } />
+            <Route path="/company/*" element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyNotFound />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/dashboard/aboutus" element={
-            <ProtectedRoute allowedRoles={["student"]}><AboutUs /></ProtectedRoute>
-          } />
+            {/* ========== ADMIN PROTECTED ROUTES ========== */}
+            <Route path="/adminPanel" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminPanel />
+              </ProtectedRoute>
+            } />
 
-          {/* COMPANY PROTECTED ROUTES */}
-          <Route path="/company" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyDashboardHome /></ProtectedRoute>
-          } />
+            <Route path="/adminPanel/testimonials" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminPanel />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/company-profile" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyProfilePage /></ProtectedRoute>
-          } />
+            {/* ========== GENERAL PROTECTED ROUTES (Any logged-in user) ========== */}
+            <Route path="/projectShowcase" element={
+              <ProtectedRoute>
+                <ProjectShowcasePage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/company/*" element={
-            <ProtectedRoute allowedRoles={["company"]}><CompanyNotFound /></ProtectedRoute>
-          } />
+            {/* ========== ERROR PAGES ========== */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<NotFound />} />
 
-          {/* MENTOR PROTECTED ROUTES */}
-          <Route path="/mentor-dashboard/skill-badges" element={
-            <ProtectedRoute allowedRoles={["mentor"]}>
-              <SkillBadgeForm isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/mentor-dashboard/*" element={
-            <ProtectedRoute allowedRoles={["mentor"]}><MentorDashboardRoutes /></ProtectedRoute>
-          } />
-
-          {/* ADMIN PROTECTED ROUTES */}
-          <Route path="/adminPanel" element={
-            <ProtectedRoute allowedRoles={["admin"]}><AdminPanel /></ProtectedRoute>
-          } />
-
-          {/* GENERAL */}
-          <Route path="/projectShowcase" element={
-            <ProtectedRoute><ProjectShowcasePage /></ProtectedRoute>
-          } />
-
-          <Route path="/unauthorized" element={<h1>403 - Unauthorized</h1>} />
-          <Route path="*" element={<h1>404 - Page Not Found</h1>} />
-
-        </Routes>
-      </Router>
-    </QueryClientProvider>
+          </Routes>
+        </Router>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

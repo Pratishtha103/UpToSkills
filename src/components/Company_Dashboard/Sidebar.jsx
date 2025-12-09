@@ -45,7 +45,11 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
 
   const handleLogout = () => {
     const lastRole = localStorage.getItem("role") || "company";
+    const preservedDarkMode = localStorage.getItem("darkMode");
     localStorage.clear();
+    if (preservedDarkMode !== null) {
+      localStorage.setItem("darkMode", preservedDarkMode);
+    }
     navigate("/login", { state: { role: lastRole } });
   };
 

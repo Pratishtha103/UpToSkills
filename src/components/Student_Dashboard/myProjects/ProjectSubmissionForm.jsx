@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import Footer from "../../Student_Dashboard/dashboard/Footer";
 
 function ProjectSubmissionForm() {
-  const user = JSON.parse(localStorage.getItem("user"));  
-  const studentId = user?.id;  // ✅ get studentId
+  const user = JSON.parse(localStorage.getItem("user"));
+  const studentId = user?.id; // ✅ get studentId
   const studentEmail = user?.email; // (optional, auto-fill email)
 
   const [formData, setFormData] = useState({
@@ -18,7 +18,26 @@ function ProjectSubmissionForm() {
     github_pr_link: "",
   });
 
-  const [showModal, setShowModal] = useState(false);
+  // 🔔 Modal state (used for success + errors)
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info", // "success" | "error" | "info"
+  });
+
+  const openModal = ({ title, message, type = "info" }) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+    });
+  };
+
+  const closeModal = () => {
+    setModal((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -31,17 +50,50 @@ function ProjectSubmissionForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (!formData.student_email) return alert("Student Email is required.");
-    if (!formData.title) return alert("Project Title is required.");
-    if (!formData.tech_stack) return alert("Technology Stack is required.");
-    if (!formData.description) return alert("Description is required.");
-    if (!formData.contributions) return alert("Contributions is required.");
+    // Basic validation (now using popup instead of alert)
+    if (!formData.student_email)
+      return openModal({
+        title: "Missing Information",
+        message: "Student Email is required.",
+        type: "error",
+      });
+
+    if (!formData.title)
+      return openModal({
+        title: "Missing Information",
+        message: "Project Title is required.",
+        type: "error",
+      });
+
+    if (!formData.tech_stack)
+      return openModal({
+        title: "Missing Information",
+        message: "Technology Stack is required.",
+        type: "error",
+      });
+
+    if (!formData.description)
+      return openModal({
+        title: "Missing Information",
+        message: "Project Description is required.",
+        type: "error",
+      });
+
+    if (!formData.contributions)
+      return openModal({
+        title: "Missing Information",
+        message: "Contributions field is required.",
+        type: "error",
+      });
 
     // Token Auth
     const authToken = localStorage.getItem("token");
     if (!authToken) {
-      alert("You are not logged in. Please log in again.");
+      openModal({
+        title: "Not Logged In",
+        message: "You are not logged in. Please log in again to submit your project.",
+        type: "error",
+      });
       return;
     }
 
@@ -50,9 +102,8 @@ function ProjectSubmissionForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
-
         // 🔥 ADD student_id automatically
         body: JSON.stringify({
           ...formData,
@@ -61,7 +112,14 @@ function ProjectSubmissionForm() {
       });
 
       if (response.ok) {
-        setShowModal(true);
+        // ✅ Success confirmation message in popup
+        openModal({
+          title: "Project Submitted",
+          message: "Your project has been submitted successfully!",
+          type: "success",
+        });
+
+        // Reset form
         setFormData({
           student_email: studentEmail || "",
           title: "",
@@ -73,27 +131,45 @@ function ProjectSubmissionForm() {
         });
       } else {
         const err = await response.json();
-        alert(`Failed to submit project: ${err.message || "Server error"}`);
+        openModal({
+          title: "Submission Failed",
+          message: `Failed to submit project: ${
+            err.message || "Server error. Please try again later."
+          }`,
+          type: "error",
+        });
       }
     } catch (error) {
       console.error(error);
-      alert("Network error. Try again later.");
+      openModal({
+        title: "Network Error",
+        message: "Network error. Please check your connection and try again.",
+        type: "error",
+      });
     }
   };
 
-  const closeModal = () => setShowModal(false);
+  // Decide border color based on modal type
+  const getModalAccentClasses = () => {
+    switch (modal.type) {
+      case "success":
+        return "border-green-500";
+      case "error":
+        return "border-red-500";
+      default:
+        return "border-indigo-500";
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700">
-          
           <h2 className="text-3xl font-extrabold text-center mb-4 text-indigo-700 dark:text-indigo-400">
             Student Project Submission
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             {/* Student Email */}
             <div>
               <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
@@ -202,26 +278,30 @@ function ProjectSubmissionForm() {
               🚀 Submit Project
             </button>
           </form>
-
-          {/* Success Modal */}
-          {showModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-center text-green-600 dark:text-green-400 mb-4">
-                  ✅ Project Submitted!
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="block mx-auto bg-green-600 text-white px-5 py-2 rounded-lg"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
-
         </div>
       </div>
+
+      {/* Centered Popup Modal (for confirmation + errors) */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div
+            className={`bg-white dark:bg-gray-900 rounded-2xl p-6 sm:p-8 max-w-md w-full border-t-4 ${getModalAccentClasses()}`}
+          >
+            <h3 className="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100">
+              {modal.title || "Message"}
+            </h3>
+            <p className="text-center text-gray-700 dark:text-gray-300 whitespace-pre-line">
+              {modal.message}
+            </p>
+            <button
+              onClick={closeModal}
+              className="block mx-auto mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

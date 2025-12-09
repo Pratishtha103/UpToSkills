@@ -22,6 +22,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
     contact_number: "",
@@ -67,6 +68,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   const saveProfile = async () => {
     try {
       setSaving(true);
+      setShowConfirmation(false);
 
       // Trim string fields and prepare payload
       const payload = {
@@ -120,7 +122,15 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   const handleSaveButtonClick = (e) => {
     e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmSave = () => {
     saveProfile();
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmation(false);
   };
 
   // Check if profile is completed - ALL fields must be filled
@@ -287,6 +297,75 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         </main>
         <Footer />
       </div>
+
+      {/* ✅ CONFIRMATION POPUP - CENTERED */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className={`rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}>
+            {/* Header */}
+            <div className="flex items-center justify-center mb-4">
+              <div className="text-4xl">⚠️</div>
+            </div>
+
+            {/* Title */}
+            <h3 className={`text-xl font-semibold text-center mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}>
+              Confirm Profile Update
+            </h3>
+
+            {/* Details */}
+            <div className={`mb-6 p-4 rounded-lg ${
+              isDarkMode ? "bg-gray-700" : "bg-gray-50"
+            }`}>
+              <p className={`text-sm mb-3 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Name:</strong> {formData.full_name || "Not provided"}
+              </p>
+              <p className={`text-sm mb-3 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Contact:</strong> {formData.contact_number || "Not provided"}
+              </p>
+              <p className={`text-sm ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
+                <strong>Domains:</strong> {formData.expertise_domains.length > 0 ? formData.expertise_domains.join(", ") : "Not provided"}
+              </p>
+            </div>
+
+            {/* Message */}
+            <p className={`text-center text-sm mb-6 ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
+              Are you sure you want to save these changes?
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleCancelConfirm}
+                className={`px-6 py-2 rounded-md font-medium transition ${
+                  isDarkMode
+                    ? "bg-gray-700 text-white hover:bg-gray-600"
+                    : "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSave}
+                className="px-6 py-2 rounded-md font-medium bg-green-600 text-white hover:bg-green-700 transition"
+              >
+                Yes, Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

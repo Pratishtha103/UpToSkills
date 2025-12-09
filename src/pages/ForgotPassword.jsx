@@ -6,40 +6,75 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTheme } from "../context/ThemeContext";
 
+// ===========================================
+// ForgotPassword Component
+// Handles password reset with validation,
+// toast notifications, password strength checking,
+// and redirect after success.
+// ===========================================
 const ForgotPassword = () => {
+
+  // ===============================
+  // STATE MANAGEMENT
+  // ===============================
+
+  // Password visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [email, setEmail] = useState("");
+
+  // Input fields state
+  const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Navigation hook to redirect after success
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useTheme();
 
-  // Strong password validation
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  const isMinLength = password.length >= 8;
+  // ===============================
+  // PASSWORD VALIDATION RULES
+  // Strong password = must pass all checks
+  // ===============================
 
-  const isStrongPassword = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isMinLength;
+  const hasUpperCase = /[A-Z]/.test(password);              // At least 1 uppercase letter
+  const hasLowerCase = /[a-z]/.test(password);              // At least 1 lowercase letter
+  const hasNumber = /\d/.test(password);                    // At least 1 number
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password); // At least 1 special character
+  const isMinLength = password.length >= 8;                 // Minimum 8 characters
+
+  // Combined strong password check
+  const isStrongPassword =
+    hasUpperCase &&
+    hasLowerCase &&
+    hasNumber &&
+    hasSpecialChar &&
+    isMinLength;
+
+  // Password match logic
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   const passwordsMismatch = password !== confirmPassword && confirmPassword.length > 0;
 
+  // ===============================
+  // SUBMIT HANDLER
+  // Called when user resets password
+  // ===============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation: Passwords must match
     if (!passwordsMatch) {
       toast.error("Passwords do not match!");
       return;
     }
 
+    // Validation: Password must be strong
     if (!isStrongPassword) {
       toast.error("Password must be 8+ chars with uppercase, lowercase, number & special char!");
       return;
     }
 
     try {
+      // Making POST request to backend
       const response = await axios.post("http://localhost:5000/api/forgot-password", {
         email,
         password,
@@ -47,6 +82,8 @@ const ForgotPassword = () => {
 
       if (response.status === 200) {
         toast.success("Password reset successfully!");
+
+        // Redirect user after success
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
@@ -91,8 +128,12 @@ const ForgotPassword = () => {
           />
         </div>
 
-        {/* Right Form */}
+        {/* ===================================== */}
+        {/* RIGHT SIDE FORM SECTION */}
+        {/* ===================================== */}
         <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+
+          {/* Title */}
           <h2 className="text-3xl font-bold text-[#09C3A1]">
             Forgot <span className="text-[#FF6600]">Password</span>
           </h2>
@@ -101,8 +142,12 @@ const ForgotPassword = () => {
             Enter your registered email or username and new password
           </p>
 
+          {/* =========================== */}
+          {/* RESET PASSWORD FORM */}
+          {/* =========================== */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+
+            {/* Email Field */}
             <input
               type="email"
               placeholder="Enter registered email-id or username"
@@ -116,7 +161,9 @@ const ForgotPassword = () => {
               }`}
             />
 
-            {/* New Password */}
+            {/* =========================== */}
+            {/* NEW PASSWORD FIELD */}
+            {/* =========================== */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -130,6 +177,8 @@ const ForgotPassword = () => {
                   ${!password ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
                   ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
               />
+
+              {/* Toggle password visibility */}
               <div
                 className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
                   darkMode ? "text-slate-400" : "text-gray-500"
@@ -140,7 +189,9 @@ const ForgotPassword = () => {
               </div>
             </div>
 
-            {/* Confirm Password */}
+            {/* =========================== */}
+            {/* CONFIRM PASSWORD FIELD */}
+            {/* =========================== */}
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -154,6 +205,8 @@ const ForgotPassword = () => {
                   ${!passwordsMatch && !passwordsMismatch ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
                   ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
               />
+
+              {/* Toggle confirm-password visibility */}
               <div
                 className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
                   darkMode ? "text-slate-400" : "text-gray-500"
@@ -164,7 +217,9 @@ const ForgotPassword = () => {
               </div>
             </div>
 
-            {/* Password Strength Indicator */}
+            {/* =========================== */}
+            {/* PASSWORD STRENGTH MESSAGE */}
+            {/* =========================== */}
             {password && (
               <div className="space-y-1">
                 <p className={`text-sm ${isStrongPassword ? "text-green-500" : "text-red-500"}`}>
@@ -180,7 +235,7 @@ const ForgotPassword = () => {
               </div>
             )}
 
-            {/* Match / Mismatch Message */}
+            {/* Match/Mismatch messages */}
             {passwordsMatch && (
               <p className="text-green-500 text-sm">✔ Passwords match</p>
             )}
@@ -188,7 +243,9 @@ const ForgotPassword = () => {
               <p className="text-red-500 text-sm">✖ Passwords do not match</p>
             )}
 
-            {/* Button */}
+            {/* =========================== */}
+            {/* RESET PASSWORD BUTTON */}
+            {/* =========================== */}
             <button
               type="submit"
               disabled={!passwordsMatch || !isStrongPassword}

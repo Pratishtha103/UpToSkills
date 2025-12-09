@@ -237,8 +237,8 @@ import { useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 
 import Chatbot from "../components/Contact_Page/Chatbot";
-import logo from "../assets/logo.jpg";
-import darkLogo from "../assets/darkLogo.jpg";
+import logo from "../assets/UptoSkills.png";
+import darkLogo from "../assets/UptoSkills.png";
 
 // Global theme provider for Dark/Light mode
 import { useTheme } from "../context/ThemeContext";

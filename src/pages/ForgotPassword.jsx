@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Sun, Moon } from "lucide-react";
 import axios from "axios";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useTheme } from "../context/ThemeContext";
 
 const ForgotPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +13,7 @@ const ForgotPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   // Strong password validation
   const hasUpperCase = /[A-Z]/.test(password);
@@ -54,14 +56,38 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#F9FAFB]">
-      <div className="flex bg-white rounded-2xl shadow-lg overflow-hidden max-w-5xl w-full">
+    <div
+      className={`relative flex justify-center items-center min-h-screen px-4 py-10 transition-colors duration-300 ${
+        darkMode ? "bg-[#020817] text-gray-100" : "bg-[#F9FAFB] text-gray-900"
+      }`}
+    >
+      <button
+        onClick={toggleDarkMode}
+        className={`absolute top-6 right-6 z-10 flex h-10 w-10 items-center justify-center rounded-full shadow-md transition-colors ${
+          darkMode
+            ? "bg-slate-800 text-yellow-300 hover:bg-slate-700"
+            : "bg-white text-slate-600 hover:bg-slate-100"
+        }`}
+        aria-label="Toggle theme"
+      >
+        {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+
+      <div
+        className={`flex rounded-2xl shadow-2xl overflow-hidden max-w-5xl w-full border transition-colors duration-300 ${
+          darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100"
+        }`}
+      >
         {/* Left Image */}
-        <div className="w-1/2 hidden md:flex items-center justify-center bg-[#F5F9FF] p-10">
+        <div
+          className={`w-1/2 hidden md:flex items-center justify-center p-10 transition-colors duration-300 ${
+            darkMode ? "bg-slate-950" : "bg-[#F5F9FF]"
+          }`}
+        >
           <img
             src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png"
             alt="Forgot Password"
-            className="w-3/4"
+            className="w-3/4 drop-shadow-lg"
           />
         </div>
 
@@ -71,7 +97,7 @@ const ForgotPassword = () => {
             Forgot <span className="text-[#FF6600]">Password</span>
           </h2>
 
-          <p className="text-gray-500 mt-1 mb-6">
+          <p className={`mt-1 mb-6 text-base ${darkMode ? "text-slate-300" : "text-gray-500"}`}>
             Enter your registered email or username and new password
           </p>
 
@@ -83,7 +109,11 @@ const ForgotPassword = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1]"
+              className={`w-full rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1] transition-colors ${
+                darkMode
+                  ? "bg-slate-800 border border-slate-700 text-white placeholder:text-slate-400"
+                  : "border border-gray-300 bg-white text-gray-900"
+              }`}
             />
 
             {/* New Password */}
@@ -97,10 +127,13 @@ const ForgotPassword = () => {
                 className={`w-full rounded-md px-4 py-3 focus:outline-none
                   ${isStrongPassword ? "border border-green-500" : ""}
                   ${!isStrongPassword && password ? "border border-red-500" : ""}
-                  ${!password ? "border border-gray-300" : ""}`}
+                  ${!password ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
+                  ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
               />
               <div
-                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
+                  darkMode ? "text-slate-400" : "text-gray-500"
+                }`}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -118,10 +151,13 @@ const ForgotPassword = () => {
                 className={`w-full rounded-md px-4 py-3 focus:outline-none
                   ${passwordsMatch ? "border border-green-500" : ""}
                   ${passwordsMismatch ? "border border-red-500" : ""}
-                  ${!passwordsMatch && !passwordsMismatch ? "border border-gray-300" : ""}`}
+                  ${!passwordsMatch && !passwordsMismatch ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
+                  ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
               />
               <div
-                className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
+                  darkMode ? "text-slate-400" : "text-gray-500"
+                }`}
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -131,10 +167,10 @@ const ForgotPassword = () => {
             {/* Password Strength Indicator */}
             {password && (
               <div className="space-y-1">
-                <p className={`text-sm ${isStrongPassword ? "text-green-600" : "text-red-600"}`}>
+                <p className={`text-sm ${isStrongPassword ? "text-green-500" : "text-red-500"}`}>
                   {isStrongPassword ? "✔ Strong password" : "✖ Password too weak"}
                 </p>
-                <div className="flex gap-1 text-xs text-gray-500">
+                <div className={`flex gap-1 text-xs ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
                   <span>8+ chars</span>
                   <span>ABC</span>
                   <span>abc</span>
@@ -146,10 +182,10 @@ const ForgotPassword = () => {
 
             {/* Match / Mismatch Message */}
             {passwordsMatch && (
-              <p className="text-green-600 text-sm">✔ Passwords match</p>
+              <p className="text-green-500 text-sm">✔ Passwords match</p>
             )}
             {passwordsMismatch && (
-              <p className="text-red-600 text-sm">✖ Passwords do not match</p>
+              <p className="text-red-500 text-sm">✖ Passwords do not match</p>
             )}
 
             {/* Button */}
@@ -159,6 +195,8 @@ const ForgotPassword = () => {
               className={`w-full flex items-center justify-center gap-2 rounded-md py-3 font-semibold transition duration-300 ${
                 passwordsMatch && isStrongPassword
                   ? "bg-[#09C3A1] hover:bg-[#07a589] text-white"
+                  : darkMode
+                  ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
             >
@@ -166,7 +204,7 @@ const ForgotPassword = () => {
             </button>
           </form>
 
-          <p className="text-center text-gray-600 mt-5">
+          <p className={`text-center mt-5 ${darkMode ? "text-slate-400" : "text-gray-600"}`}>
             Remembered your password?{" "}
             <Link to="/login" className="text-[#09C3A1] font-semibold">
               Login
@@ -174,7 +212,7 @@ const ForgotPassword = () => {
           </p>
         </div>
       </div>
-      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+      <ToastContainer position="top-right" autoClose={3000} theme={darkMode ? "dark" : "light"} />
     </div>
   );
 };

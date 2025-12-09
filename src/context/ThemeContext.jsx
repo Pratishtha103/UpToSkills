@@ -2,14 +2,40 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(() => {
+const getInitialTheme = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
     const saved = localStorage.getItem("darkMode");
-    return saved === "true";
-  });
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+    const initial = saved === null ? Boolean(prefersDark) : saved === "true";
+
+    if (initial) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    return initial;
+  } catch {
+    return false;
+  }
+};
+
+export const ThemeProvider = ({ children }) => {
+  const [darkMode, setDarkMode] = useState(getInitialTheme);
 
   useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
+    if (typeof window === "undefined") return;
+
+    try {
+      localStorage.setItem("darkMode", String(darkMode));
+    } catch {
+      // ignore storage failures (private mode, etc.)
+    }
+
     if (darkMode) {
       document.documentElement.classList.add("dark");
     } else {

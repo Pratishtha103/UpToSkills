@@ -135,7 +135,7 @@ export default function InterviewGallery() {
           darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
         }`}
       >
-        <div className="pt-20 px-4 max-w-[1200px] mx-auto">
+        <div className="pt-20 px-4 pb-10 max-w-[1200px] mx-auto">
           <h1
             className={`text-2xl font-bold mb-4 ${
               darkMode ? "text-white" : "text-gray-900"

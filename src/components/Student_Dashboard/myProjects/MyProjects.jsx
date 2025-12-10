@@ -154,7 +154,7 @@ function MyProjects() {
                 >
                   <h3 className="text-xl font-semibold mb-2">No Projects Yet</h3>
                   <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
-                    You haven't submitted any projects yet.
+                    You haven't submitted any projects yet. 
                   </p>
                 </motion.div>
               ) : (

@@ -146,7 +146,7 @@ const MentorCard = ({ mentor, onAskDelete, isDarkMode }) => {
 /* ------------------------- MAIN COMPONENT ------------------------- */
 export default function Mentors({ isDarkMode }) {
   const [mentors, setMentors] = useState([]);
-  const [deleteId, setDeleteId] = useState(null); // store ID for popup
+  const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -155,7 +155,6 @@ export default function Mentors({ isDarkMode }) {
 
   const fetchMentors = async () => {
     try {
-      setSearching(true);
       setLoading(true);
       const token = localStorage.getItem("token");
 
@@ -164,13 +163,14 @@ export default function Mentors({ isDarkMode }) {
       });
 
       const payload = res.data;
-      let data = Array.isArray(payload) ? payload : payload?.data || payload?.mentors || [];
+      const data = Array.isArray(payload)
+        ? payload
+        : payload?.data || payload?.mentors || [];
 
       setMentors(data);
     } catch (err) {
       console.error("Error fetching mentors", err);
     } finally {
-      setSearching(false);
       setLoading(false);
     }
   };
@@ -179,36 +179,18 @@ export default function Mentors({ isDarkMode }) {
     fetchMentors();
   }, []);
 
-  /* OPEN POPUP INSTEAD OF ALERT */
-  const askDelete = (id) => {
-    setDeleteId(id);
-  };
-
-  /* CONFIRM DELETE */
-  const deleteMentor = async () => {
-    if (!deleteId) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE}/api/mentors/${deleteId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      setMentors((prev) => prev.filter((m) => m.id !== deleteId));
-    } catch (err) {
-      console.error("Delete failed", err);
-    } finally {
-      setDeleteId(null);
-    }
-  };
-
+  /* FILTERING FIXED */
   const filtered = mentors.filter((m) => {
     const s = searchTerm.toLowerCase();
-    const name = (m.full_name || "").toLowerCase();
-    const expertise = Array.isArray(m.expertise_domains)
-      ? m.expertise_domains.join(", ").toLowerCase()
-      : (m.expertise_domains || "").toLowerCase();
-    return name.includes(s) || expertise.includes(s);
+
+    return (
+      (m.full_name || "").toLowerCase().includes(s) ||
+      (m.email || "").toLowerCase().includes(s) ||
+      (Array.isArray(m.expertise_domains)
+        ? m.expertise_domains.join(", ").toLowerCase()
+        : (m.expertise_domains || "").toLowerCase()
+      ).includes(s)
+    );
   });
 
   return (
@@ -223,6 +205,7 @@ export default function Mentors({ isDarkMode }) {
 
       <br />
 
+      {/* SEARCH BOX */}
       <div
         className={`p-4 shadow-lg rounded-xl mb-8 border transition-all 
         ${isDarkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-200"}`}
@@ -248,19 +231,22 @@ export default function Mentors({ isDarkMode }) {
         </div>
       </div>
 
+      {/* LOADING */}
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center text-gray-300">No mentors found.</div>
+        <div className="text-center py-10 text-gray-400 text-lg">
+          No mentors found.
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((m) => (
             <MentorCard
               key={m.id}
               mentor={m}
-              onAskDelete={askDelete}
+              onAskDelete={setDeleteId}
               isDarkMode={isDarkMode}
             />
           ))}
@@ -272,7 +258,19 @@ export default function Mentors({ isDarkMode }) {
         <DeleteConfirmModal
           isDarkMode={isDarkMode}
           onClose={() => setDeleteId(null)}
-          onConfirm={deleteMentor}
+          onConfirm={async () => {
+            const token = localStorage.getItem("token");
+            try {
+              await axios.delete(`${API_BASE}/api/mentors/${deleteId}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+              });
+
+              setMentors((prev) => prev.filter((m) => m.id !== deleteId));
+            } catch (err) {
+              console.error("Delete failed", err);
+            }
+            setDeleteId(null);
+          }}
         />
       )}
     </section>

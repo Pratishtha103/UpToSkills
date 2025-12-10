@@ -116,7 +116,7 @@ const skillBadgesRoutes = require('./routes/skillBadges');
 const coursesRoutes = require('./routes/courses.route');
 const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
-
+const studentProjectsRoutes = require('./routes/studentProjects');
 
 // ✅ MIDDLEWARE SETUP FIRST (CRITICAL for req.body to work)
 app.use(cors({
@@ -176,33 +176,65 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 });
 
+// ========================================
+// ROUTE MOUNTING - ORGANIZED & CLEAN
+// ========================================
 
-// Mount routes in proper order (AFTER forgot-password route)
+// Authentication routes
 app.use('/api/auth', authRoutes);
+
+// User profile routes
 app.use('/api', userProfileRoutes);
+
+// ✅ PROJECT ROUTES (CONSOLIDATED)
+// Primary endpoint: /api/projects (handles all student project operations)
 app.use('/api/projects', projectsRoutes);
+// Alternative endpoint: /api/student-projects (for listing with search)
+app.use('/api/student-projects', studentProjectsRoutes);
+
+// Mentor & Project Management
 app.use('/api/mentor_projects', mentorProjectRoutes);
 app.use('/api/mentorreviews', mentorReviewRoutes);
+
+// Company Routes
 app.use('/api/company-profiles', companyProfilesRoutes);
+app.use('/api/companies', companiesRouter);
+app.use('/api/searchcompanies', searchCompaniesRouter);
+
+// Content Routes
 app.use('/api/testimonials', testimonialsRouter);
 app.use('/api/stats', statsRoutes);
+
+// Education Routes
+app.use('/api/courses', coursesRoutes);
+app.use('/api/assigned-programs', require('./routes/assignedPrograms'));
+
+// Student & Mentor Routes
 app.use('/api/students', studentsRoutes);
 app.use('/api/searchStudents', searchStudent);
 app.use('/api/mentors', mentorsRoutes);
-app.use('/api/form', formRoute);
-app.use('/api/skill-badges', skillBadgesRoutes);
-app.use('/api/courses', coursesRoutes);
-// Assigned programs route (assign/lookup programs to mentors)
-app.use('/api/assigned-programs', require('./routes/assignedPrograms'));
-app.use('/api/interviews', interviewRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use("/api/enrollments", require("./routes/enrollments"));
-app.use('/api/companies', companiesRouter);
-app.use('/api/searchcompanies', searchCompaniesRouter);
-app.use('/api/searchproject', searchProjectRoutes);
-// Add this line with other routes (around line 20-30)
-app.use('/api/student-projects', require('./routes/studentProjects'));
 
+// Interview Routes
+app.use('/api/interviews', interviewRoutes);
+
+// Skills & Badges
+app.use('/api/skill-badges', skillBadgesRoutes);
+
+// Form & Contact Routes
+app.use('/api/form', formRoute);
+
+// Notification Routes
+app.use('/api/notifications', notificationRoutes);
+
+// Enrollment Routes
+app.use('/api/enrollments', require("./routes/enrollments"));
+
+// Search Routes
+app.use('/api/searchproject', searchProjectRoutes);
+
+// ========================================
+// HEALTH CHECK & ERROR HANDLING
+// ========================================
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -236,4 +268,9 @@ app.use((err, req, res, next) => {
 httpServer.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+    console.log(`📋 Available Routes:`);
+    console.log(`   - POST /api/projects - Submit new project`);
+    console.log(`   - GET /api/projects/:id - Get project by ID`);
+    console.log(`   - GET /api/student-projects - List all student projects`);
+    console.log(`   - DELETE /api/projects/:id - Delete project`);
 });

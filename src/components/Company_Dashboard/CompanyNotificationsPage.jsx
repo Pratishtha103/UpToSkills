@@ -17,30 +17,36 @@ const ICON_MAP = {
 };
 
 const CompanyNotificationsPage = ({ isDarkMode: propIsDarkMode } = {}) => {
+
+  // This controls dark mode on the page
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof propIsDarkMode !== "undefined") return propIsDarkMode;
+
     try {
       if (typeof window !== "undefined") {
         if (document.documentElement.classList.contains("dark")) return true;
         return localStorage.getItem("isDarkMode") === "true";
       }
     } catch (e) {}
+
     return false;
   });
   const [recipientId, setRecipientId] = useState(() => deriveRecipientFromStorage());
 
   useEffect(() => {
+    // Update when parent gives isDarkMode
     if (typeof propIsDarkMode !== "undefined") {
       setIsDarkMode(propIsDarkMode);
       return;
     }
 
+    // Update dark mode if changed from another tab
     const onStorage = (e) => {
       if (e.key === "isDarkMode") setIsDarkMode(e.newValue === "true");
     };
     window.addEventListener("storage", onStorage);
 
-    // also observe class changes to <html> (fallback)
+    // Update when HTML class changes
     const obs = new MutationObserver(() => {
       setIsDarkMode(document.documentElement.classList.contains("dark"));
     });

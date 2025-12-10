@@ -526,6 +526,7 @@ export default function SearchStudents() {
             )}
 
             {showFiltersPanel && (
+                // Filters panel dropdown
               <div ref={filtersPanelRef} className="absolute right-0 mt-3 w-full sm:w-80 z-30">
                 <div className={`rounded-lg p-4 shadow-lg border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                   <div className="flex items-center gap-2 mb-2"><Filter className={`w-4 h-4 ${darkMode ? "text-blue-400" : "text-primary"}`}/><h4 className={`font-semibold text-sm ${darkMode ? "text-gray-100" : "text-gray-900"}`}>Filters</h4></div>
@@ -548,6 +549,7 @@ export default function SearchStudents() {
           {loading ? (
             <div className="flex justify-center items-center py-12"><Loader className="w-8 h-8 animate-spin text-primary"/></div>
           ) : filteredStudents.length > 0 ? (
+            // Candidates grid
             <div className="p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
                 {(() => {
@@ -562,10 +564,11 @@ export default function SearchStudents() {
                       const dedupeKey = email ? `email:${email}` : (phone ? `phone:${phone}` : (primaryId ? `id:${String(primaryId)}` : `name:${nameKey}`));
                       if (!dedupeKey || seen.has(dedupeKey)) continue;
                       seen.add(dedupeKey);
-
                       const id = primaryId || `student-${idx}`;
-                    const doms = (()=>{ try{ if (Array.isArray(s.domains_of_interest)) return s.domains_of_interest; if (typeof s.domains_of_interest === 'string'){ const t = s.domains_of_interest.trim(); if (!t) return []; if (t.startsWith('[')) return JSON.parse(t); return t.split(/[,|]/).map(d=>d.trim()); } return []; } catch { return []; } })();
+                      const doms = (()=>{ try{ if (Array.isArray(s.domains_of_interest)) return s.domains_of_interest; if (typeof s.domains_of_interest === 'string'){ const t = s.domains_of_interest.trim(); if (!t) return []; if (t.startsWith('[')) return JSON.parse(t); return t.split(/[,|]/).map(d=>d.trim()); } return []; } catch { return []; } })();
+
                     const inferredDomain = (Array.isArray(doms) && doms[0]) || s.domain || s.domains || s.track || s.course || s.ai_skill_summary || '';
+                    // Format student data to pass to StudentCard
                     const formatted = {
                       id,
                       full_name: s.full_name || s.student_name || s.profile_full_name || s.name || 'Unknown',
@@ -580,7 +583,7 @@ export default function SearchStudents() {
                       created_at: s.created_at,
                       __raw: s,
                     };
-
+                      // Push StudentCard component for this student
                     nodes.push(
                       <StudentCard key={id} student={formatted} interviews={interviews} onViewProfile={()=>fetchStudentDetails(id)} onContact={()=>fetchStudentDetails(id)} delay={nodes.length*0.06} />
                     );
@@ -590,6 +593,7 @@ export default function SearchStudents() {
               </div>
             </div>
           ) : (
+            //No studnets Message
             <div className="text-center py-12 text-gray-600 dark:text-gray-300">{searchQuery?"No students found matching your search":"No students available"}</div>
           )}
         </div>

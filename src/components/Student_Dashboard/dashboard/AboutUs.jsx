@@ -267,9 +267,13 @@ import { FaLinkedin, FaPhone, FaEnvelope, FaUsers } from "react-icons/fa";
 import { useTheme } from "../../../context/ThemeContext";
 
 export default function AboutUs() {
+  // Sidebar open/close state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Dark mode from Theme context
   const { darkMode: isDarkMode } = useTheme();
 
+  // Adjust sidebar visibility based on screen width
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) setIsSidebarOpen(false);
@@ -286,12 +290,12 @@ export default function AboutUs() {
         isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
-      {/* Sidebar */}
+      {/* Sidebar component */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      {/* Main content */}
+      {/* Main content area */}
       <div className="flex-1 flex flex-col transition-all duration-300">
-        {/* Header */}
+        {/* Header component with menu toggle */}
         <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         {/* Page Content */}
@@ -309,31 +313,26 @@ export default function AboutUs() {
                   : "bg-white border-gray-200"
               }`}
             >
+              {/* Header with icon */}
               <div className="flex items-center gap-3 mb-6">
                 <FaUsers className="text-orange-500 text-3xl" />
                 <h1 className="text-3xl font-bold">About UptoSkill</h1>
               </div>
 
-              <p
-                className={`mb-6 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
+              {/* Intro paragraph */}
+              <p className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                 Empowering students to build skills, collaborate, and grow
                 through real-world projects and personalized mentorship.
               </p>
 
+              {/* Mission and Values Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Mission Section */}
                 <div>
                   <h2 className="text-orange-500 font-semibold text-xl mb-3">
                     Our Mission
                   </h2>
-                  <p
-                    className={`mb-4 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
+                  <p className={`mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                     UptoSkill connects ambitious students with professional
                     mentors, enabling hands-on project experience, valuable
                     insights, and growth-oriented learning opportunities.
@@ -342,24 +341,13 @@ export default function AboutUs() {
                   <h3 className="text-lg font-semibold mb-2">
                     What students can do
                   </h3>
-                  <ul
-                    className={`list-disc list-inside space-y-2 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
+                  <ul className={`list-disc list-inside space-y-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                     <li>Collaborate with experienced mentors on real projects.</li>
                     <li>Gain feedback to improve technical and soft skills.</li>
-                    <li>
-                      Build an impressive portfolio with industry-level
-                      guidance.
-                    </li>
+                    <li>Build an impressive portfolio with industry-level guidance.</li>
                   </ul>
-                  <hr
-                    className={`my-4 ${
-                      isDarkMode ? "border-gray-600" : "border-gray-300"
-                    }`}
-                  />
-                  {/* REMOVED: "We believe in practical learning and teamwork." paragraph here */}
+
+                  <hr className={`my-4 ${isDarkMode ? "border-gray-600" : "border-gray-300"}`} />
                 </div>
 
                 {/* Values Section */}
@@ -367,29 +355,17 @@ export default function AboutUs() {
                   <h2 className="text-orange-500 font-semibold text-xl mb-3">
                     Values & Approach
                   </h2>
-                  <p
-                    className={`mb-4 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
+                  <p className={`mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                     We value experiential learning that drives growth. UptoSkill
                     is designed to make student learning interactive,
                     collaborative, and career-focused.
                   </p>
 
-                  <div
-                    className={`p-4 rounded-xl transition-colors ${
-                      isDarkMode ? "bg-gray-700/60" : "bg-gray-100"
-                    }`}
-                  >
+                  <div className={`p-4 rounded-xl transition-colors ${isDarkMode ? "bg-gray-700/60" : "bg-gray-100"}`}>
                     <h3 className="font-semibold text-orange-400 mb-1">
                       Why students choose UptoSkill
                     </h3>
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
+                    <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                       UptoSkill empowers students to explore new domains, get
                       guidance from experts, and build a strong foundation for
                       their future careers.
@@ -407,38 +383,27 @@ export default function AboutUs() {
               <h2 className="text-3xl font-bold mt-2 mb-4">
                 We’re here to Help You
               </h2>
-              {/* REMOVED: "Got a project in mind?" paragraph here */}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                {/* REMOVED: LinkedIn Contact Block here */}
-                
-                {/* Phone */}
+                {/* Phone Contact */}
                 <a
                   href="tel:+919319772294"
                   className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
-                    isDarkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
+                    isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
                   }`}
                 >
                   <FaPhone className="text-orange-500 mx-auto mb-4" size={40} />
                   <h3 className="text-lg font-semibold mb-2">Phone Us 24/7:</h3>
-                  <p
-                    className={`${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
+                  <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                     +91 (931) 977 2294
                   </p>
                 </a>
 
-                {/* Email */}
+                {/* Email Contact */}
                 <a
                   href="mailto:info@uptoskills.com"
                   className={`rounded-2xl shadow-lg p-6 text-center border transition-all hover:shadow-xl hover:border-orange-500 ${
-                    isDarkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
+                    isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
                   }`}
                 >
                   <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />

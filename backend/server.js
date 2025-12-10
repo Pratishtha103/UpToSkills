@@ -73,15 +73,15 @@ io.on('connection', (socket) => {
     });
 });
 
-// Scheduled cleanup: remove notifications that have been read and are older than 7 weeks.
+// Scheduled cleanup: purge read notifications older than 7 days.
 // Unread notifications are retained indefinitely.
 const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // run once per day
 async function cleanupOldReadNotifications() {
     try {
         const res = await pool.query(
-            `DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '7 weeks' RETURNING id`);
+            `DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '7 days' RETURNING id`);
         if (res && res.rowCount) {
-            console.log(`🧹 Cleaned up ${res.rowCount} read notification(s) older than 7 weeks`);
+            console.log(`🧹 Cleaned up ${res.rowCount} read notification(s) older than 7 days`);
         } else {
             console.log('🧹 Notification cleanup ran: no old read notifications found');
         }

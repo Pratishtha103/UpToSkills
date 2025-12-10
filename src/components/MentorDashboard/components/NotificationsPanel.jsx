@@ -8,12 +8,14 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 🔄 Fetch notifications every time panel is opened
   useEffect(() => {
     if (isOpen) {
       fetchNotifications();
     }
   }, [isOpen]);
 
+  // 📦 Load notifications + unread count
   const fetchNotifications = async () => {
     try {
       setLoading(true);
@@ -29,12 +31,12 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
       const user = JSON.parse(userJson);
       const mentorId = user.id;
 
-      // Fetch notifications
+      // 👉 API: Fetch all notifications
       const response = await axios.get(
         `http://localhost:5000/api/notifications?role=mentor&recipientId=${mentorId}`
       );
 
-      // Fetch unread count
+      // 👉 API: Fetch unread count
       const countResponse = await axios.get(
         `http://localhost:5000/api/notifications/count?role=mentor&recipientId=${mentorId}`
       );
@@ -54,45 +56,56 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
     }
   };
 
+  // ☑️ Mark one notification as read
   const handleMarkAsRead = async (notificationId) => {
     try {
       await axios.patch(
         `http://localhost:5000/api/notifications/${notificationId}/read`
       );
+
+      // Update UI
       setNotifications(
         notifications.map((notif) =>
           notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
+
       setUnreadCount(Math.max(0, unreadCount - 1));
     } catch (err) {
       console.error("Error marking notification as read:", err);
     }
   };
 
+  // ☑️ Mark ALL notifications as read
   const handleMarkAllAsRead = async () => {
     try {
       const userJson = localStorage.getItem("user");
       const user = JSON.parse(userJson);
+
       await axios.patch(
         `http://localhost:5000/api/notifications/read-all?role=mentor&recipientId=${user.id}`
       );
-      setNotifications(
-        notifications.map((notif) => ({ ...notif, is_read: true }))
-      );
+
+      setNotifications(notifications.map((notif) => ({ ...notif, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error("Error marking all notifications as read:", err);
     }
   };
 
+  // ❌ Delete one notification
   const handleDelete = async (notificationId) => {
     try {
       await axios.delete(
         `http://localhost:5000/api/notifications/${notificationId}`
       );
+
       const deletedNotif = notifications.find((n) => n.id === notificationId);
+
+      // Update UI
       setNotifications(notifications.filter((n) => n.id !== notificationId));
+
+      // Reduce unread count if needed
       if (!deletedNotif.is_read) {
         setUnreadCount(Math.max(0, unreadCount - 1));
       }
@@ -107,13 +120,10 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
         isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      ></div>
+      {/* 🔘 Background overlay */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
 
-      {/* Panel */}
+      {/* 📌 Slide-in notification panel */}
       <div
         className={`absolute right-0 top-0 h-full w-96 shadow-lg transition-transform duration-300 flex flex-col ${
           isDarkMode ? "bg-gray-800" : "bg-white"
@@ -128,25 +138,27 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
           <div className="flex items-center gap-2">
             <Bell className="w-6 h-6 text-blue-500" />
             <h2 className="text-xl font-bold">Notifications</h2>
+
+            {/* 🔴 Unread badge */}
             {unreadCount > 0 && (
               <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                 {unreadCount}
               </span>
             )}
           </div>
+
+          {/* Close button */}
           <button
             onClick={onClose}
             className={`p-1 rounded-lg transition-colors ${
-              isDarkMode
-                ? "hover:bg-gray-700"
-                : "hover:bg-gray-100"
+              isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
             }`}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Actions */}
+        {/* Mark all as read button */}
         {unreadCount > 0 && (
           <div className="px-4 py-2 border-b">
             <button
@@ -161,10 +173,12 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
+            // Spinner
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
           ) : error ? (
+            // Error message
             <div className="p-4">
               <div
                 className={`flex items-start gap-3 p-3 rounded-lg ${
@@ -178,11 +192,13 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
               </div>
             </div>
           ) : notifications.length === 0 ? (
+            // No notifications
             <div className="flex flex-col items-center justify-center py-12 px-4">
               <Bell className="w-12 h-12 opacity-30 mb-3" />
               <p className="text-center text-sm">No notifications yet</p>
             </div>
           ) : (
+            // Notification cards
             <div className="p-3 space-y-2">
               {notifications.map((notif) => (
                 <div
@@ -197,7 +213,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
                       : "bg-blue-50 border-blue-200"
                   }`}
                 >
-                  {/* Notification Header */}
+                  {/* Title + Delete */}
                   <div className="flex items-start justify-between mb-1">
                     <h4 className="font-semibold text-sm flex-1">
                       {notif.title}
@@ -205,16 +221,14 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
                     <button
                       onClick={() => handleDelete(notif.id)}
                       className={`p-0.5 rounded transition-colors flex-shrink-0 ${
-                        isDarkMode
-                          ? "hover:bg-gray-600"
-                          : "hover:bg-gray-200"
+                        isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-200"
                       }`}
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
-                  {/* Notification Message */}
+                  {/* Message */}
                   <p
                     className={`text-xs mb-2 ${
                       isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -224,11 +238,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
                   </p>
 
                   {/* Timestamp */}
-                  <p
-                    className={`text-xs mb-2 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-500"
-                    }`}
-                  >
+                  <p className="text-xs mb-2 text-gray-500">
                     {new Date(notif.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
@@ -238,7 +248,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
                     })}
                   </p>
 
-                  {/* Actions */}
+                  {/* Mark as read button */}
                   <div className="flex gap-2">
                     {!notif.is_read && (
                       <button

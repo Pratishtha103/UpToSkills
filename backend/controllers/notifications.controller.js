@@ -1,6 +1,7 @@
 const pool = require("../config/database");
 
 const ALLOWED_ROLES = new Set(["student", "mentor", "admin", "company"]);
+const READ_RETENTION_DAYS = 7;
 
 const mapRowToNotification = (row) => ({
   id: row.id,
@@ -47,12 +48,15 @@ exports.listNotifications = async (req, res, next) => {
       whereClause = "role = $1 AND (recipient_id IS NULL OR recipient_id = $2)";
     }
 
+    params.push(READ_RETENTION_DAYS);
+    const retentionParamIndex = params.length;
     params.push(normalizedLimit);
 
     const query = `
       SELECT *
       FROM notifications
       WHERE ${whereClause}
+        AND (is_read = FALSE OR created_at >= NOW() - $${retentionParamIndex} * INTERVAL '1 day')
       ORDER BY created_at DESC
       LIMIT $${params.length}
     `;

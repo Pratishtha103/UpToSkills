@@ -191,7 +191,7 @@ export default function InterviewGallery() {
   return (
     <>
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
-      <div className="pt-20 px-4 max-w-[1200px] mx-auto">
+      <div className="pt-20 px-4 pb-10 max-w-[1200px] mx-auto">
         <h1 className={`text-2xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>Upcoming Interviews ({interviews.length})</h1>
 
         <div className="grid gap-4">
@@ -282,13 +282,13 @@ export default function InterviewGallery() {
           </DialogContent>
         </Dialog>
       </div>
-      <Footer/>
+      {/* <Footer/> */}
     </div>
-     {/* <footer
-    className="w-full  bg-gray-100 text-gray-700 border-t border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
-  >
-    <p>© 2025 Uptoskills. Built by learners.</p>
-  </footer> */}
+    <footer
+      className={`w-full  text-center py-4 text-sm transition-colors duration-300 border-t ${darkMode ? "bg-gray-900 text-gray-300 border-gray-700" : "bg-gray-100 text-gray-700 border-gray-300"}`}
+    >
+      <p>© 2025 Uptoskills. Built by learners.</p>
+    </footer>
     </>
   );
 }

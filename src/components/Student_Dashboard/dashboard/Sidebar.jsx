@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import {
   LayoutDashboard,
   User,
@@ -13,13 +12,9 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  FaLinkedin,
-  FaInstagram,
-  FaYoutube,
-  FaTrophy,
-} from "react-icons/fa";
- 
+import { FaLinkedin, FaInstagram, FaYoutube, FaTrophy } from "react-icons/fa";
+
+// Define sidebar items for student role
 const sidebarItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "profile", label: "Edit Profile", icon: User, path: "/dashboard/edit-profile" },
@@ -31,8 +26,8 @@ const sidebarItems = [
   { id: "aboutUs", label: "About Us", icon: Info, path: "/dashboard/aboutus" },
 ];
 
+// Mentor-specific sidebar items
 const mentorSidebarItems = [
-
   { id: "projectShowcase", label: "Project Showcase", path: "/mentor-dashboard/project-showcase", icon: Book },
 ];
 
@@ -40,33 +35,28 @@ export default function Sidebar({ isOpen = false, setIsOpen = () => {} }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("dashboard");
-const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-// ROLE CHECK — only show sidebar for students
-const user = JSON.parse(localStorage.getItem("user"));
-const role = user?.role?.toLowerCase();
+  // Get user role from localStorage and only render sidebar for students
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role?.toLowerCase();
+  if (role !== "student") return null; // hide sidebar for other roles
 
-if (role !== "student") {
-  return null; // hide sidebar for others
-}
-
-
+  // Update active item based on current location
   useEffect(() => {
-  // remove trailing slash
-  const cleanPath = location.pathname.replace(/\/+$/, "").toLowerCase();
+    const cleanPath = location.pathname.replace(/\/+$/, "").toLowerCase();
+    const currentItem = sidebarItems.find(
+      item => cleanPath === item.path.replace(/\/+$/, "").toLowerCase()
+    );
+    if (currentItem) setActiveItem(currentItem.id);
+  }, [location.pathname]);
 
-  const currentItem = sidebarItems.find(item =>
-    cleanPath === item.path.replace(/\/+$/, "").toLowerCase()
-  );
-
-  if (currentItem) setActiveItem(currentItem.id);
-}, [location.pathname]);
-
+  // Handle screen resizing for responsive sidebar
   useEffect(() => {
     const checkScreen = () => {
       const desktop = window.innerWidth >= 1024;
       setIsDesktop(desktop);
-      if (desktop) setIsOpen(true);
+      if (desktop) setIsOpen(true); // keep sidebar open on desktop
     };
     checkScreen();
     window.addEventListener("resize", checkScreen);
@@ -75,21 +65,23 @@ if (role !== "student") {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
+  // Logout function clears localStorage and navigates to login
   const handleLogout = () => {
     const lastRole = localStorage.getItem("role") || "student";
     localStorage.clear();
     navigate("/login", { state: { role: lastRole } });
   };
 
+  // Handle click on sidebar items
   const handleItemClick = (item) => {
     setActiveItem(item.id); 
     navigate(item.path); 
-    if (!isDesktop) setIsOpen(false);
+    if (!isDesktop) setIsOpen(false); // auto-close sidebar on mobile
   };
 
   return (
     <>
-  
+      {/* Overlay for mobile sidebar */}
       <AnimatePresence>
         {!isDesktop && isOpen && (
           <motion.div
@@ -104,13 +96,14 @@ if (role !== "student") {
         )}
       </AnimatePresence>
 
+      {/* Sidebar container */}
       <motion.aside
         className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-2xl z-50 overflow-hidden transition-colors duration-300"
         initial={{ x: -264 }}
         animate={{ x: isOpen ? 0 : -264 }}
         transition={{ duration: 0.3 }}
       >
-        
+        {/* Close button for mobile sidebar */}
         <AnimatePresence>
           {isOpen && !isDesktop && (
             <motion.button
@@ -129,13 +122,13 @@ if (role !== "student") {
         </AnimatePresence>
 
         <div className="flex flex-col h-full pt-16">
-          {/* Navigation */}
+          {/* Navigation items */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-1">
               {sidebarItems.map((item, index) => (
                 <motion.button
                   key={item.id}
-                  onClick={() => handleItemClick(item)} 
+                  onClick={() => handleItemClick(item)}
                   className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ease-out relative overflow-hidden group cursor-pointer select-none ${
                     activeItem === item.id
                       ? "bg-blue-600 text-white shadow-lg"
@@ -143,14 +136,11 @@ if (role !== "student") {
                   }`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: index * 0.03,
-                    duration: 0.3,
-                    ease: "easeOut",
-                  }}
+                  transition={{ delay: index * 0.03, duration: 0.3, ease: "easeOut" }}
                   whileHover={{ x: 8, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
+                  {/* Item icon */}
                   <item.icon
                     className={`w-6 h-6 transition-all duration-200 ${
                       activeItem === item.id
@@ -158,6 +148,7 @@ if (role !== "student") {
                         : "text-gray-600 dark:text-gray-300"
                     }`}
                   />
+                  {/* Item label */}
                   <span
                     className={`font-semibold transition-all ${
                       activeItem === item.id
@@ -172,12 +163,13 @@ if (role !== "student") {
             </div>
           </nav>
 
-          {/* Footer */}
+          {/* Sidebar footer with social links and logout */}
           <div className="p-4 border-t">
             <p className="font-semibold text-sm mb-2 text-center text-gray-500">
               Connect With Us
             </p>
             <div className="flex justify-center gap-4 mb-3">
+              {/* Social Icons */}
               <FaLinkedin
                 size={22}
                 className="cursor-pointer hover:text-[#0A66C2] transition"
@@ -207,6 +199,7 @@ if (role !== "student") {
               />
             </div>
 
+            {/* Logout button */}
             <motion.button
               onClick={handleLogout}
               className="w-full text-red-500 flex items-center justify-center gap-2 p-2 rounded-lg transition-all"

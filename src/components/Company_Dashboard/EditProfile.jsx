@@ -33,6 +33,7 @@ export default function EditProfile() {
     FETCH PROFILE
   -------------------------------------------------- */
   useEffect(() => {
+    // fetch company profile data on load
     const fetchProfile = async () => {
       try {
         const res = await axios.get(

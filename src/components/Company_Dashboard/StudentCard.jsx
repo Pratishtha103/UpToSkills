@@ -326,8 +326,6 @@ export default function StudentCard({
   };
 
   const domainList = getDomainList(student);
-  // =======================================================================
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

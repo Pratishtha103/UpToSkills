@@ -6,6 +6,7 @@ import Footer from "../../MentorDashboard/components/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Predefined domain list for mentors
 const predefinedDomains = [
   "AI & Machine Learning",
   "Data Science",
@@ -19,10 +20,18 @@ const predefinedDomains = [
 ];
 
 const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
+
+  // Sidebar state (open/close)
   const [isOpen, setIsOpen] = useState(true);
+
+  // Loading states
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Confirmation popup visibility
   const [showConfirmation, setShowConfirmation] = useState(false);
+
+  // Local form state
   const [formData, setFormData] = useState({
     full_name: "",
     contact_number: "",
@@ -35,14 +44,18 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   const token = localStorage.getItem("token");
 
-  // Fetch profile from backend
+  // Fetch mentor profile from backend
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
+
       const res = await axios.get("http://localhost:5000/api/mentor/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = res.data?.data || {};
+
+      // Set form data from backend response
       setFormData({
         full_name: data.profile_full_name || data.full_name || "",
         contact_number: data.contact_number || "",
@@ -52,6 +65,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         expertise_domains: data.expertise_domains || [],
         others_domain: data.others_domain || "",
       });
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to load mentor profile.");
@@ -60,24 +74,27 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     }
   }, [token]);
 
+  // Fetch profile on mount
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  // Save profile, accepting empty fields
+  // Save profile to backend (after confirmation)
   const saveProfile = async () => {
     try {
       setSaving(true);
       setShowConfirmation(false);
 
-      // Trim string fields and prepare payload
+      // Cleaned payload to send
       const payload = {
         full_name: (formData.full_name || '').trim(),
         contact_number: (formData.contact_number || '').trim(),
         linkedin_url: (formData.linkedin_url || '').trim(),
         github_url: (formData.github_url || '').trim(),
         about_me: (formData.about_me || '').trim(),
-        expertise_domains: Array.isArray(formData.expertise_domains) ? formData.expertise_domains : [],
+        expertise_domains: Array.isArray(formData.expertise_domains)
+          ? formData.expertise_domains
+          : [],
         others_domain: (formData.others_domain || '').trim(),
       };
 
@@ -93,7 +110,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
       if (res.data?.success) {
         toast.success("Profile updated successfully!");
-        fetchProfile(); // refresh latest values
+        fetchProfile(); // Refresh UI
       } else {
         toast.error(res.data?.message || "Failed to update profile.");
       }
@@ -105,13 +122,16 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     }
   };
 
+  // Handle simple input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Toggle domains from predefined list
   const handleDomainToggle = (domain) => {
     const exists = formData.expertise_domains.includes(domain);
+
     setFormData({
       ...formData,
       expertise_domains: exists
@@ -120,20 +140,16 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     });
   };
 
+  // Show confirmation modal when clicking save
   const handleSaveButtonClick = (e) => {
     e.preventDefault();
     setShowConfirmation(true);
   };
 
-  const handleConfirmSave = () => {
-    saveProfile();
-  };
+  const handleConfirmSave = () => saveProfile();
+  const handleCancelConfirm = () => setShowConfirmation(false);
 
-  const handleCancelConfirm = () => {
-    setShowConfirmation(false);
-  };
-
-  // Check if profile is completed - ALL fields must be filled
+  // Profile is considered "Completed" only if all required fields are filled
   const isProfileCompleted =
     formData.full_name &&
     formData.contact_number &&
@@ -147,19 +163,28 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
+
+      {/* Sidebar */}
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
+
+      {/* Main Dashboard Area */}
       <div className="flex-1 flex flex-col transition-all duration-300">
+
+        {/* Header / Top Navigation */}
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
 
-        {/* Main Content */}
+        {/* Main Content Area */}
         <main className="flex-1 pt-16 p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            {/* Local ToastContainer to guarantee visibility on this page */}
+
+            {/* Toast Notifications */}
             <ToastContainer position="top-right" autoClose={3000} newestOnTop style={{ zIndex: 99999 }} />
+
+            {/* Page Title */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Mentor Profile
@@ -171,13 +196,20 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
               )}
             </div>
 
+            {/* Loading animation while fetching */}
             {loading ? (
               <div className="flex justify-center items-center h-40">
                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
+
+              // Form Start
               <form className="space-y-6" onSubmit={handleSaveButtonClick}>
+
+                {/* Grid for two-column layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  {/* Full Name */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
                       Full Name
@@ -192,6 +224,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     />
                   </div>
 
+                  {/* Contact Number */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
                       Contact Number
@@ -206,6 +239,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     />
                   </div>
 
+                  {/* LinkedIn URL */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
                       LinkedIn URL
@@ -220,6 +254,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     />
                   </div>
 
+                  {/* GitHub URL */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
                       GitHub URL
@@ -234,6 +269,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     />
                   </div>
 
+                  {/* About Me */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium dark:text-white">
                       About Me
@@ -249,10 +285,13 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                   </div>
                 </div>
 
+                {/* Expertise Domains */}
                 <div>
                   <h3 className="text-lg font-semibold mb-3 dark:text-white">
                     Expertise Domains
                   </h3>
+
+                  {/* Domain Buttons */}
                   <div className="flex flex-wrap gap-2">
                     {predefinedDomains.map((domain) => (
                       <button
@@ -270,6 +309,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     ))}
                   </div>
 
+                  {/* Custom Domain Input */}
                   <input
                     type="text"
                     name="others_domain"
@@ -280,10 +320,12 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                   />
                 </div>
 
+                {/* Profile completion + Save Button */}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700 dark:text-white">
                     Profile Completed: {isProfileCompleted}
                   </span>
+
                   <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition"
@@ -295,52 +337,74 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
             )}
           </div>
         </main>
+
+        {/* Footer */}
         <Footer />
       </div>
 
-      {/* ✅ CONFIRMATION POPUP - CENTERED */}
+      {/* Confirmation Popup */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <div className={`rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}>
-            {/* Header */}
+
+          <div
+            className={`rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all ${
+              isDarkMode ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            {/* Warning Icon */}
             <div className="flex items-center justify-center mb-4">
               <div className="text-4xl">⚠️</div>
             </div>
 
             {/* Title */}
-            <h3 className={`text-xl font-semibold text-center mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
+            <h3
+              className={`text-xl font-semibold text-center mb-4 ${
+                isDarkMode ? "text-white" : "text-gray-800"
+              }`}
+            >
               Confirm Profile Update
             </h3>
 
-            {/* Details */}
-            <div className={`mb-6 p-4 rounded-lg ${
-              isDarkMode ? "bg-gray-700" : "bg-gray-50"
-            }`}>
-              <p className={`text-sm mb-3 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}>
+            {/* Confirmation Details */}
+            <div
+              className={`mb-6 p-4 rounded-lg ${
+                isDarkMode ? "bg-gray-700" : "bg-gray-50"
+              }`}
+            >
+              <p
+                className={`text-sm mb-3 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 <strong>Name:</strong> {formData.full_name || "Not provided"}
               </p>
-              <p className={`text-sm mb-3 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}>
+
+              <p
+                className={`text-sm mb-3 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 <strong>Contact:</strong> {formData.contact_number || "Not provided"}
               </p>
-              <p className={`text-sm ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}>
-                <strong>Domains:</strong> {formData.expertise_domains.length > 0 ? formData.expertise_domains.join(", ") : "Not provided"}
+
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                <strong>Domains:</strong>{" "}
+                {formData.expertise_domains.length > 0
+                  ? formData.expertise_domains.join(", ")
+                  : "Not provided"}
               </p>
             </div>
 
-            {/* Message */}
-            <p className={`text-center text-sm mb-6 ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}>
+            {/* Confirmation Message */}
+            <p
+              className={`text-center text-sm mb-6 ${
+                isDarkMode ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
               Are you sure you want to save these changes?
             </p>
 
@@ -356,6 +420,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
               >
                 Cancel
               </button>
+
               <button
                 onClick={handleConfirmSave}
                 className="px-6 py-2 rounded-md font-medium bg-green-600 text-white hover:bg-green-700 transition"

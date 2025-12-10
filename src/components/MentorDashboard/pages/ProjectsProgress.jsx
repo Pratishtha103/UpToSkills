@@ -1,9 +1,11 @@
 // src/pages/ProjectsProgress.jsx
+
 import React from "react";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 
+// Static student progress data (mock data for UI display)
 const students = [
   {
     name: "Angat Mali",
@@ -45,15 +47,17 @@ const students = [
 const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
   return (
     <div className="mt-14 flex">
-      {/* Header with dark mode props */}
+
+      {/* 🔹 Top Header (includes dark mode toggle) */}
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-  {/* Sidebar */}
-  <Sidebar isDarkMode={isDarkMode} />
+      {/* 🔹 Sidebar Navigation */}
+      <Sidebar isDarkMode={isDarkMode} />
 
-      {/* Main Content */}
+      {/* 🔹 Main dashboard area */}
       <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
-        {/* Page Header */}
+
+        {/* ---- Page Title + Subtitle ---- */}
         <div className="text-center mb-10 p-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Track Assigned Students and Progress
@@ -64,9 +68,11 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
           </p>
         </div>
 
-        {/* Table */}
+        {/* ---- Students Progress Table ---- */}
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 mx-8 transition-colors">
           <table className="w-full text-left text-gray-900 dark:text-gray-200">
+
+            {/* Table Header */}
             <thead>
               <tr className="border-b border-gray-300 dark:border-gray-600">
                 <th className="py-3 px-4">Student</th>
@@ -74,12 +80,15 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
                 <th className="py-3 px-4">Progress</th>
               </tr>
             </thead>
+
+            {/* Table Body – renders student rows */}
             <tbody>
               {students.map((student, index) => (
                 <tr
                   key={index}
                   className="border-b last:border-none border-gray-300 dark:border-gray-600"
                 >
+                  {/* ---- Student Info with Avatar ---- */}
                   <td className="py-4 px-4 flex items-center">
                     <img
                       src={student.avatar}
@@ -93,7 +102,11 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
                       </p>
                     </div>
                   </td>
+
+                  {/* ---- Project Name ---- */}
                   <td className="py-4 px-4">{student.project}</td>
+
+                  {/* ---- Progress Bar ---- */}
                   <td className="py-4 px-4">
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                       <div
@@ -101,6 +114,8 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
                         style={{ width: `${student.progress}%` }}
                       ></div>
                     </div>
+
+                    {/* Progress % below bar */}
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                       {student.progress}%
                     </p>
@@ -108,13 +123,15 @@ const ProjectsProgress = ({ isDarkMode, setIsDarkMode }) => {
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
 
-        {/* Footer */}
+        {/* ---- Footer ---- */}
         <div className="mt-auto">
           <Footer />
         </div>
+
       </div>
     </div>
   );

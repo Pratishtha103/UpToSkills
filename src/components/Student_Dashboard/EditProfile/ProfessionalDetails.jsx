@@ -2,11 +2,16 @@ import React from 'react';
 
 const ProfessionalDetails = () => {
   return (
+    // Section container for professional details of the student
     <section className="mb-10">
+      {/* Section heading */}
       <h2 className="text-xl font-semibold mb-6 text-gray-900 border-b border-gray-200 pb-2">
         Professional Details
       </h2>
+
+      {/* Row 1: LinkedIn and GitHub links */}
       <div className="flex gap-4 mb-5">
+        {/* LinkedIn input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">LinkedIn link</label>
           <input
@@ -15,6 +20,8 @@ const ProfessionalDetails = () => {
             className="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {/* GitHub input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Github link</label>
           <input
@@ -25,7 +32,9 @@ const ProfessionalDetails = () => {
         </div>
       </div>
 
+      {/* Row 2: Internship status and company name */}
       <div className="flex gap-4 mb-5">
+        {/* Internship input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Internship</label>
           <input
@@ -34,6 +43,8 @@ const ProfessionalDetails = () => {
             className="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {/* Company name input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Company name</label>
           <input
@@ -43,7 +54,9 @@ const ProfessionalDetails = () => {
         </div>
       </div>
 
+      {/* Row 3: Duration and skills used */}
       <div className="flex gap-4">
+        {/* Duration input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Duration</label>
           <input
@@ -51,6 +64,8 @@ const ProfessionalDetails = () => {
             className="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {/* Skills used input */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Skills You Used</label>
           <input

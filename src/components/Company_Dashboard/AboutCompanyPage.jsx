@@ -7,17 +7,17 @@ import Footer from "../../components/AboutPage/Footer";
 export default function AboutCompanyPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      {/* Content */}
-      {/* <div className="flex-grow pt-20 px-2 sm:px-4 py-6 max-w-[1650px] mx-auto"> */}
+      {/* Main content area */}
       <div className="flex-grow pt-20 px-2 sm:px-4 py-6 w-full">
 
+        {/* Card for About section */}
         <motion.div
           className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Header */}
+          {/* Header with icon and title */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-[#FB923C] text-white shadow-md">
@@ -35,9 +35,9 @@ export default function AboutCompanyPage() {
             <BriefcaseIcon className="w-8 h-8 text-orange-500" />
           </div>
 
-          {/* Mission + Values */}
+          {/* Mission and Values section in two columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Mission Section */}
+            {/* Mission */}
             <section>
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-orange-500 pl-3">
                 Our Mission
@@ -50,6 +50,7 @@ export default function AboutCompanyPage() {
                 all from a single, straightforward dashboard.
               </p>
 
+              {/* Extra info about company */}
               <div className="mt-6 border-t pt-6 text-sm text-gray-600 dark:text-gray-400">
                 <p>
                   Founded with the goal of making early-career hiring efficient and fair, UptoSkill blends
@@ -68,7 +69,7 @@ export default function AboutCompanyPage() {
               </ul>
             </section>
 
-            {/* Values Section */}
+            {/* Values */}
             <section>
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 border-l-4 border-orange-400 pl-3">
                 Values & Approach
@@ -79,6 +80,7 @@ export default function AboutCompanyPage() {
                 overhead so companies can focus on interviewing and mentoring.
               </p>
 
+              {/* Target audience card */}
               <div className="mt-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
                 <h4 className="flex items-center gap-2 font-semibold text-gray-800 dark:text-white">
                   <Target className="w-4 h-4" /> Who should use UptoSkill
@@ -92,24 +94,24 @@ export default function AboutCompanyPage() {
           </div>
         </motion.div>
 
-        {/* Distinct Contact Info Section */}
+        {/* Contact info section */}
          <section className="mt-12 mb-12 text-center">
           <p className="text-orange-500 text-3xl font-bold uppercase tracking-wide mb-3">
             Our Contacts
           </p>
 
-          <h2 className="  font-normal text-gray-900 text-lg dark:text-white mb-6">
+          <h2 className="font-normal text-gray-900 text-lg dark:text-white mb-6">
             We're here to Help You
           </h2>
-
 
           <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Reach out to us anytime — our team is happy to assist you with inquiries, collaborations, or support.
           </p>
 
+          {/* Phone and Email cards */}
           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-5xl mx-auto">
      
-            {/* Phone Section */}
+            {/* Phone */}
             <a href="tel:+919319772294">
               <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-transform">
                 <FaPhone className="text-[#F97316] mx-auto mb-4" size={40} />
@@ -122,7 +124,7 @@ export default function AboutCompanyPage() {
               </div>
             </a>
 
-            {/* Mail Section */}
+            {/* Email */}
             <a
               href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=DmwnWrRpctPQbXNFtntrNcJqHZhhCzgrmTlQmCzbLtpmfMxDWlctnGFFgpGsCfrDMfkFmDBTtkRV"
               target="_blank"

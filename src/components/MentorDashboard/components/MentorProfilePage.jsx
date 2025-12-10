@@ -116,7 +116,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto px-8 py-6">
+        <main className="flex-1 overflow-y-auto px-8 py-8">
           <div className="max-w-6xl mx-auto">
             
             <h1 className="text-2xl font-bold mb-6 mt-12 text-gray-800 dark:text-white">

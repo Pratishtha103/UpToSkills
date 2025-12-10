@@ -112,7 +112,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
         <main className="flex-1 overflow-y-auto px-8 py-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+            <h1 className="text-2xl font-bold mb-6 mt-14 text-gray-800 dark:text-white">
               Your Profile
             </h1>
 

@@ -4,9 +4,10 @@ import { OrbitControls } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import * as THREE from 'three';
 
+// Floating 3D elements with rotation and subtle vertical movement
 function FloatingElements() {
   const groupRef = useRef(null);
-  
+
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.2;
@@ -16,28 +17,22 @@ function FloatingElements() {
 
   return (
     <group ref={groupRef}>
-      {/* Central hiring icon representation */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.3, 32, 32]} />
         <meshStandardMaterial color="#3B82F6" />
       </mesh>
-      
-      {/* Orbiting elements representing students/candidates */}
       <mesh position={[1.2, 0, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.15, 16, 16]} />
         <meshStandardMaterial color="#F97316" />
       </mesh>
-      
       <mesh position={[-1.2, 0.3, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.2, 0.2, 0.2]} />
         <meshStandardMaterial color="#10B981" />
       </mesh>
-      
       <mesh position={[0.6, 1, 0.6]} castShadow receiveShadow>
         <sphereGeometry args={[0.12, 16, 16]} />
         <meshStandardMaterial color="#8B5CF6" />
       </mesh>
-      
       <mesh position={[-0.8, -0.7, -0.5]} castShadow receiveShadow>
         <boxGeometry args={[0.15, 0.15, 0.15]} />
         <meshStandardMaterial color="#EF4444" />
@@ -46,6 +41,7 @@ function FloatingElements() {
   );
 }
 
+// 3D Scene setup with lights and controls
 function Scene() {
   return (
     <>
@@ -75,6 +71,7 @@ function Scene() {
   );
 }
 
+// Main component rendering the animated 3D hiring visualization
 export default function HiringAnimation3D() {
   return (
     <motion.div 

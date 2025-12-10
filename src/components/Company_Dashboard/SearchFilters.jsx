@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../Company_Dashboard/ui/button';
 import { Filter, RotateCcw } from 'lucide-react';
 
+// List of domains for the domain filter dropdown
 const domains = [
   'All Domains',
   'Web Development',
@@ -19,14 +20,14 @@ const domains = [
 ];
 
 export default function SearchFilters({
-  filters,
-  onFilterChange,
-  onClearFilters,
-  nameSuggestions = [],
-  showNameSuggestions = false,
-  onNameFocus,
-  onNameBlur,
-  onNameSuggestionSelect,
+  filters, // Current filter values
+  onFilterChange, // Callback when a filter changes
+  onClearFilters, // Callback to clear all filters
+  nameSuggestions = [], // Suggestions for name input
+  showNameSuggestions = false, // Whether to show suggestions dropdown
+  onNameFocus, // Callback when name input is focused
+  onNameBlur, // Callback when name input loses focus
+  onNameSuggestionSelect, // Callback when a suggestion is selected
 }) {
   return (
     <motion.div
@@ -35,12 +36,16 @@ export default function SearchFilters({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <Filter className="w-5 h-5 text-primary" />
         <h3 className="font-semibold text-foreground">Filter Students</h3>
       </div>
 
+      {/* Filter inputs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        {/* Name filter */}
         <div className='flex items-center gap-2 relative'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
             Name:
@@ -54,6 +59,7 @@ export default function SearchFilters({
             className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Enter name"
           />
+          {/* Suggestions dropdown */}
           {showNameSuggestions && nameSuggestions.length > 0 && (
             <div className="absolute top-full left-0 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-56 overflow-auto z-20">
               {nameSuggestions.map((suggestion) => (
@@ -62,7 +68,7 @@ export default function SearchFilters({
                   key={suggestion}
                   className="w-full text-left px-3 py-2 text-sm hover:bg-primary/10"
                   onMouseDown={(e) => {
-                    e.preventDefault();
+                    e.preventDefault(); // Prevent losing focus
                     onNameSuggestionSelect?.(suggestion);
                   }}
                 >
@@ -72,6 +78,8 @@ export default function SearchFilters({
             </div>
           )}
         </div>
+
+        {/* Domain filter */}
         <div className='flex items-center gap-2'>
           <label className="text-sm font-medium text-muted-foreground mb-2 block">
             Domain:
@@ -90,6 +98,7 @@ export default function SearchFilters({
           </Select>
         </div>
 
+        {/* Clear filters button */}
         <div className="flex items-end">
           <Button
             variant="outline"
@@ -100,6 +109,7 @@ export default function SearchFilters({
             Clear Filters
           </Button>
         </div>
+
       </div>
     </motion.div>
   );

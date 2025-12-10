@@ -43,6 +43,7 @@ export default function StudentProfileModal({
   student: initialStudent = null,
   fetchFresh = false,
 }) {
+  // State: student data and loading status
   const [student, setStudent] = useState(initialStudent);
   const [loading, setLoading] = useState(false);
   const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -59,7 +60,7 @@ export default function StudentProfileModal({
           const parsed = JSON.parse(trimmed);
           return Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
         } catch {
-          // fallthrough to comma split
+          // fallback to comma split
         }
       }
       // comma separated
@@ -73,6 +74,11 @@ export default function StudentProfileModal({
     return [String(raw)];
   };
 
+  /**
+   * Fetch fresh student data if requested
+   * Merges backend details with initial student object
+   * Dispatches a global event 'student:updated' with key info
+   */
   useEffect(() => {
     setStudent(initialStudent);
 
@@ -80,7 +86,6 @@ export default function StudentProfileModal({
       const fetchProfile = async () => {
         setLoading(true);
         try {
-          // Use the richer details endpoint which returns profile, projects, badges, enrollments, attendance, stats
           const res = await fetch(`${API_BASE}/api/students/${initialStudent.id}/details`, {
             credentials: "include",
             headers: { Accept: "application/json" },
@@ -120,6 +125,7 @@ export default function StudentProfileModal({
 
           setStudent((prev) => {
             const merged = { ...(prev || {}), ...mapped };
+            // dispatch global event for any listener components
             try {
               window.dispatchEvent(new CustomEvent('student:updated', { detail: {
                 id: merged.id,
@@ -147,6 +153,8 @@ export default function StudentProfileModal({
 
   // Safe guard: ensure student object exists
   const s = student || {};
+
+  // Generate initials from full name
   const initials = (s.full_name || "US")
     .split(" ")
     .filter(Boolean)
@@ -158,16 +166,17 @@ export default function StudentProfileModal({
   const joinedDate = s.created_at ? new Date(s.created_at).toLocaleDateString() : "—";
   const updatedDate = s.updated_at ? new Date(s.updated_at).toLocaleDateString() : null;
 
-  // Prevent background scrolling while modal is open
+  /**
+   * Prevent background scrolling while modal is open
+   * Also handles scrollbar compensation to avoid layout shift
+   */
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     const prevPaddingRight = document.body.style.paddingRight;
 
-    // hide body overflow to prevent background scroll
     document.body.style.overflow = "hidden";
 
-    // compensate for scrollbar width to avoid layout shift
     const scrollBarComp = window.innerWidth - document.documentElement.clientWidth;
     if (scrollBarComp > 0) {
       document.body.style.paddingRight = `${scrollBarComp}px`;
@@ -179,16 +188,17 @@ export default function StudentProfileModal({
     };
   }, [open]);
 
+  // Modal JSX structure
   const modal = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* backdrop */}
+      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* modal */}
+      {/* Modal container */}
       <motion.div
         role="dialog"
         aria-modal="true"
@@ -198,7 +208,7 @@ export default function StudentProfileModal({
         transition={{ duration: 0.18 }}
       >
         <div className="p-6 max-h-[calc(90vh-64px)] overflow-auto">
-          {/* header */}
+          {/* Header: initials, name, domain, joined/updated dates */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center text-white font-semibold text-xl">
@@ -217,6 +227,7 @@ export default function StudentProfileModal({
               </div>
             </div>
 
+            {/* Close button */}
             <div className="flex items-start gap-2">
               <Button variant="ghost" size="sm" onClick={onClose} className="p-2">
                 <X className="w-5 h-5" />
@@ -224,7 +235,7 @@ export default function StudentProfileModal({
             </div>
           </div>
 
-          {/* Additional sections: Badges, Enrollments, Attendance (projects moved below details) */}
+          {/* Stats, badges, enrollments, attendance */}
           <div className="mt-6">
             {/* Stats row */}
             <div className="flex items-center gap-4 mb-4">
@@ -234,14 +245,10 @@ export default function StudentProfileModal({
               <div className="font-medium">{(s.stats && s.stats.totalBadges) ?? (s.badges ? s.badges.length : 0)}</div>
               <div className="text-sm text-muted-foreground ml-4">Enrollments:</div>
               <div className="font-medium">{(s.stats && s.stats.totalEnrollments) ?? (s.enrollments ? s.enrollments.length : 0)}</div>
-              {/* Attendance display intentionally commented out per design request
-              {s.stats && s.stats.attendanceRate != null && (
-                <div className="ml-auto text-sm text-muted-foreground">Attendance: <span className="font-medium">{s.stats.attendanceRate}%</span></div>
-              )}
-              */}
+              {/* Attendance intentionally commented out */}
             </div>
 
-            {/* Badges */}
+            {/* Badges section */}
             {Array.isArray(s.badges) && s.badges.length > 0 && (
               <div className="mb-4">
                 <div className="text-xs font-semibold text-muted-foreground mb-2">Skill Badges</div>
@@ -287,21 +294,18 @@ export default function StudentProfileModal({
             )}
           </div>
 
-          {/* body */}
+          {/* Main body: left (contact/metadata) and right (AI summary, why hire, links) */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
             {/* LEFT: basic contact and metadata */}
             <div className="space-y-4">
-              {/* Location removed per design: use profile modal details instead */}
-
+              {/* Email */}
               <div className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-muted-foreground mt-1" />
                 <div>
                   <div className="text-xs font-semibold text-muted-foreground">Email</div>
                   <div className="text-sm">
                     {s.email ? (
-                      <a href={`mailto:${s.email}`} className="underline">
-                        {s.email}
-                      </a>
+                      <a href={`mailto:${s.email}`} className="underline">{s.email}</a>
                     ) : (
                       "Not available"
                     )}
@@ -309,15 +313,14 @@ export default function StudentProfileModal({
                 </div>
               </div>
 
+              {/* Phone */}
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-muted-foreground mt-1" />
                 <div>
                   <div className="text-xs font-semibold text-muted-foreground">Phone</div>
                   <div className="text-sm">
                     {s.phone || s.contact_number ? (
-                      <a href={`tel:${s.phone || s.contact_number}`} className="underline">
-                        {s.phone || s.contact_number}
-                      </a>
+                      <a href={`tel:${s.phone || s.contact_number}`} className="underline">{s.phone || s.contact_number}</a>
                     ) : (
                       "Not available"
                     )}
@@ -325,6 +328,7 @@ export default function StudentProfileModal({
                 </div>
               </div>
 
+              {/* Domains / badges */}
               <div>
                 <div className="text-xs font-semibold text-muted-foreground mb-2">Domains / Badges</div>
                 <div className="flex flex-wrap gap-2">
@@ -332,14 +336,13 @@ export default function StudentProfileModal({
                     <Badge variant="outline">No domains</Badge>
                   ) : (
                     (s.domains_of_interest || []).map((d, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs">
-                        {d}
-                      </Badge>
+                      <Badge key={i} variant="secondary" className="text-xs">{d}</Badge>
                     ))
                   )}
                 </div>
               </div>
 
+              {/* Profile status */}
               <div>
                 <div className="text-xs font-semibold text-muted-foreground mb-2">Profile status</div>
                 <div className="text-sm">{s.profile_completed ? "Completed" : "Incomplete"}</div>
@@ -380,6 +383,8 @@ export default function StudentProfileModal({
               </div>
             </div>
           </div>
+
+          {/* Loading indicator */}
           {loading && (
             <div className="mt-4 text-sm text-muted-foreground flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -387,7 +392,7 @@ export default function StudentProfileModal({
             </div>
           )}
 
-          {/* Projects (displayed after the details) */}
+          {/* Projects section displayed after main details */}
           {Array.isArray(s.projects) && s.projects.length > 0 && (
             <div className="mt-6">
               <div className="text-xs font-semibold text-muted-foreground mb-3">Projects</div>
@@ -409,5 +414,6 @@ export default function StudentProfileModal({
     </div>
   );
 
+  // Render via portal only if modal is open
   return open ? createPortal(modal, document.body) : null;
 }

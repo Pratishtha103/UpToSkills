@@ -32,7 +32,7 @@ export default function Project({ isDarkMode }) {
     isDarkMode ? root.classList.add("dark") : root.classList.remove("dark");
   }, [isDarkMode]);
 
-  // Fetch all projects with student details
+  // Fetch all projects
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -56,30 +56,26 @@ export default function Project({ isDarkMode }) {
     }
   };
 
-  // Filter projects by search term
+  // Filter logic
   const filteredProjects = projects.filter((proj) => {
     const search = searchTerm.toLowerCase();
     return (
       proj.title?.toLowerCase().includes(search) ||
       proj.full_name?.toLowerCase().includes(search) ||
-     // proj.email?.toLowerCase().includes(search) ||
       proj.tech_stack?.toLowerCase().includes(search)
     );
   });
 
-  // View project details
   const viewProjectDetails = (project) => {
     setSelectedProject(project);
     setShowDetailsModal(true);
   };
 
-  // Delete project
   const handleDelete = async (id) => {
     try {
       const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
         method: "DELETE",
       });
-
       const data = await res.json();
 
       if (data.success) {
@@ -133,7 +129,7 @@ export default function Project({ isDarkMode }) {
         </div>
       </div>
 
-      {/* Search Bar */}
+      {/* ---------------- SEARCH BAR (FIXED & WORKING) ---------------- */}
       <div
         className={`p-4 shadow-md rounded-lg border transition-colors duration-300 ${
           isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
@@ -141,9 +137,21 @@ export default function Project({ isDarkMode }) {
       >
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          
+
+          <input
+            type="text"
+            placeholder="Search by title, student name, or tech stack..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`w-full pl-12 pr-4 py-2 rounded-lg outline-none transition-colors ${
+              isDarkMode
+                ? "bg-gray-900 text-white placeholder-gray-500 border border-gray-700"
+                : "bg-gray-50 text-gray-900 placeholder-gray-500 border border-gray-300"
+            }`}
+          />
         </div>
       </div>
+      {/* -------------------------------------------------------------- */}
 
       {/* Projects Grid */}
       {loading ? (
@@ -207,7 +215,8 @@ export default function Project({ isDarkMode }) {
   );
 }
 
-// Project Card Component
+
+// ---------------------- Project Card Component ----------------------
 function ProjectCard({ project, isDarkMode, onViewDetails, onDelete, formatDate }) {
   return (
     <div
@@ -238,7 +247,6 @@ function ProjectCard({ project, isDarkMode, onViewDetails, onDelete, formatDate 
           <User className="w-4 h-4 text-indigo-500" />
           <span className="font-semibold text-sm">{project.full_name || "Unknown"}</span>
         </div>
-        
       </div>
 
       {/* Tech Stack */}
@@ -291,7 +299,8 @@ function ProjectCard({ project, isDarkMode, onViewDetails, onDelete, formatDate 
   );
 }
 
-// Project Details Modal
+
+// ---------------------- Project Details Modal ----------------------
 function ProjectDetailsModal({ project, isDarkMode, onClose, formatDate }) {
   return (
     <div
@@ -327,6 +336,7 @@ function ProjectDetailsModal({ project, isDarkMode, onClose, formatDate }) {
 
         {/* Modal Content */}
         <div className="p-6 space-y-6">
+
           {/* Student Information */}
           <div className={`p-4 rounded-lg ${
             isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -335,16 +345,18 @@ function ProjectDetailsModal({ project, isDarkMode, onClose, formatDate }) {
               <User className="w-5 h-5 text-indigo-500" />
               Student Information
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
                 <p className="font-semibold">{project.full_name || "Not provided"}</p>
               </div>
-             
+
             </div>
           </div>
 
-          {/* Project Description */}
+          {/* Description */}
           <div>
             <h3 className="text-lg font-bold mb-2">Description</h3>
             <p className={`leading-relaxed ${
@@ -354,7 +366,7 @@ function ProjectDetailsModal({ project, isDarkMode, onClose, formatDate }) {
             </p>
           </div>
 
-          {/* Technology Stack */}
+          {/* Tech Stack */}
           <div>
             <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
               <Code className="w-5 h-5 text-indigo-500" />
@@ -410,13 +422,15 @@ function ProjectDetailsModal({ project, isDarkMode, onClose, formatDate }) {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
 
-// Delete Confirmation Modal
+
+// ---------------------- Delete Confirmation Modal ----------------------
 function DeleteConfirmModal({ isDarkMode, onConfirm, onCancel }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -433,7 +447,7 @@ function DeleteConfirmModal({ isDarkMode, onConfirm, onCancel }) {
         <p className={`text-sm mb-8 text-center ${
           isDarkMode ? "text-gray-300" : "text-gray-600"
         }`}>
-          This action cannot be undone. The project will be permanently removed from the database.
+          This action cannot be undone. The project will be permanently removed.
         </p>
 
         <div className="flex gap-3">
@@ -447,6 +461,7 @@ function DeleteConfirmModal({ isDarkMode, onConfirm, onCancel }) {
           >
             Cancel
           </button>
+
           <button
             onClick={onConfirm}
             className="flex-1 px-4 py-3 rounded-lg font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors"
@@ -454,6 +469,7 @@ function DeleteConfirmModal({ isDarkMode, onConfirm, onCancel }) {
             Delete
           </button>
         </div>
+
       </div>
     </div>
   );

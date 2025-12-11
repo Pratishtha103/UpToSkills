@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Sun, Moon } from "lucide-react";
-import logo from "../../assets/UptoSkills.png";
-import darkLogo from "../../assets/UptoSkills.png";
-import { useTheme } from "../../context/ThemeContext";
+import logo from "../../assets/logo.jpg";
+
+//import logo from "../../assets/logo.jpg";
 
 const Header = () => {
   const { darkMode, toggleDarkMode } = useTheme();
@@ -16,7 +15,7 @@ const Header = () => {
           <img
             src={darkMode ? darkLogo : logo}
             alt="Uptoskills Logo"
-            className="w-44 h-12 transition-transform hover:scale-110"
+            className="w-48 h-16 transition-transform hover:scale-110"
           />
         </Link>
 

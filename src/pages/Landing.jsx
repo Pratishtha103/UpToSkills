@@ -340,8 +340,8 @@ export default function Landing() {
           {/* Logo switches automatically based on theme */}
           <img
             src={darkMode ? darkLogo : logo}
-            alt="UptoSkills logo"
-            className="h-10 transition-transform hover:scale-110 cursor-pointer"
+            alt="Upto To Skills logo"
+            className="h-16 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
 

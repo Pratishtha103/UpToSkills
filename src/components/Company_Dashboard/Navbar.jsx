@@ -41,11 +41,11 @@ export default function Navbar({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/" className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-48 h-16 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo} // Switch logo based on theme
                 alt="UptoSkill Logo"
-                className="object-contain w-28 h-10"
+                className="object-contain w-full h-full"
               />
             </Link>
           </motion.div>

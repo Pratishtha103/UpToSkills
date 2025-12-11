@@ -39,7 +39,7 @@ export default function AdminNavbar({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/" className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-48 h-16 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"

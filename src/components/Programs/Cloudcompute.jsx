@@ -520,9 +520,7 @@ const Cloudcompute = () => {
                 </div>
                 <div>
                   <label className={labelTextClass}>Course</label>
-                  <select name="course" value={formData.course} onChange={handleChange} className={selectClass}>
-                    <option value="cloud-computing">Cloud Computing</option>
-                  </select>
+                  <div className={selectClass}>Cloud Computing</div>
                 </div>
               </div>
               <button

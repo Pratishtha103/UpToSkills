@@ -520,9 +520,7 @@ const Datascience = () => {
                 </div>
                 <div>
                   <label className={labelTextClass}>Course</label>
-                  <select name="course" value={formData.course} onChange={handleChange} className={selectClass}>
-                    <option value="data-science">Data Science</option>
-                  </select>
+                  <div className={selectClass}>Data Science</div>
                 </div>
               </div>
               <button

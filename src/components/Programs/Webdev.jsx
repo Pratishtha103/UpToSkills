@@ -606,9 +606,7 @@ const Webdev = () => {
                         </div>
                         <div>
                           <label className={labelTextClass}>Course</label>
-                          <select name="course" value={formData.course} onChange={handleChange} className={selectClass}>
-                            <option value={formData.course}>{course?.title}</option>
-                          </select>
+                          <div className={selectClass}>{course?.title}</div>
                         </div>
                       </div>
                       <button

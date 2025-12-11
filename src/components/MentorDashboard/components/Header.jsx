@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 // Custom UI button
 import { Button } from "../../Company_Dashboard/ui/button";
 // Logos for light/dark mode
-import logo from "../../../assets/logo.jpg";
-import darkLogo from "../../../assets/darkLogo.jpg";
+import logo from "../../../assets/logo.png";
+import darkLogo from "../../../assets/logo.png";
 // Router Link
 import { Link } from "react-router-dom";
 

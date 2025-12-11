@@ -11,11 +11,7 @@ import Footer from "../../MentorDashboard/components/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-<<<<<<< Updated upstream
 // Predefined domain list for mentors
-=======
-// Predefined list of expertise domains (checkbox like selection)
->>>>>>> Stashed changes
 const predefinedDomains = [
   "AI & Machine Learning",
   "Data Science",
@@ -30,31 +26,20 @@ const predefinedDomains = [
 
 // Main Component
 const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
-<<<<<<< Updated upstream
 
   // Sidebar state (open/close)
   const [isOpen, setIsOpen] = useState(true);
 
   // Loading states
-=======
-  // Sidebar open/close state
-  const [isOpen, setIsOpen] = useState(true);
-
-  // Loading state when fetching profile
->>>>>>> Stashed changes
   const [loading, setLoading] = useState(true);
 
   // Saving state when submitting profile changes
   const [saving, setSaving] = useState(false);
 
-<<<<<<< Updated upstream
   // Confirmation popup visibility
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Local form state
-=======
-  // Form data for all mentor profile fields
->>>>>>> Stashed changes
   const [formData, setFormData] = useState({
     full_name: "",
     contact_number: "",
@@ -71,25 +56,15 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   // Fetch mentor profile from backend
   const fetchProfile = useCallback(async () => {
     try {
-<<<<<<< Updated upstream
       setLoading(true);
 
-=======
-      setLoading(true); //start loading
-
-      // API call to fetch mentor's profile
->>>>>>> Stashed changes
       const res = await axios.get("http://localhost:5000/api/mentor/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = res.data?.data || {};
 
-<<<<<<< Updated upstream
       // Set form data from backend response
-=======
-      // Setting fetched data into form fields
->>>>>>> Stashed changes
       setFormData({
         full_name: data.profile_full_name || data.full_name || "",
         contact_number: data.contact_number || "",
@@ -108,11 +83,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     }
   }, [token]);
 
-<<<<<<< Updated upstream
   // Fetch profile on mount
-=======
-  // useEffect calls fetchProfile only once when page loads
->>>>>>> Stashed changes
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
@@ -125,7 +96,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
       // Cleaned payload to send
       const payload = {
-<<<<<<< Updated upstream
         full_name: (formData.full_name || '').trim(),
         contact_number: (formData.contact_number || '').trim(),
         linkedin_url: (formData.linkedin_url || '').trim(),
@@ -135,17 +105,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
           ? formData.expertise_domains
           : [],
         others_domain: (formData.others_domain || '').trim(),
-=======
-        full_name: (formData.full_name || "").trim(),
-        contact_number: (formData.contact_number || "").trim(),
-        linkedin_url: (formData.linkedin_url || "").trim(),
-        github_url: (formData.github_url || "").trim(),
-        about_me: (formData.about_me || "").trim(),
-        expertise_domains: Array.isArray(formData.expertise_domains)
-          ? formData.expertise_domains
-          : [],
-        others_domain: (formData.others_domain || "").trim(),
->>>>>>> Stashed changes
       };
 
       console.log("Sending mentor profile payload:", payload);
@@ -221,22 +180,14 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   return (
     <div className={`flex h-screen ${isDarkMode ? "dark" : ""}`}>
-<<<<<<< Updated upstream
 
       {/* Sidebar */}
-=======
-      {/* Sidebar Component */}
->>>>>>> Stashed changes
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
 
       {/* Main Dashboard Area */}
       <div className="flex-1 flex flex-col transition-all duration-300">
-<<<<<<< Updated upstream
 
         {/* Header / Top Navigation */}
-=======
-        {/* Top Header */}
->>>>>>> Stashed changes
         <Header
           onMenuClick={() => setIsOpen(!isOpen)}
           isDarkMode={isDarkMode}
@@ -246,21 +197,11 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         {/* Main Content Area */}
         <main className="flex-1 pt-16 p-6 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-<<<<<<< Updated upstream
 
             {/* Toast Notifications */}
             <ToastContainer position="top-right" autoClose={3000} newestOnTop style={{ zIndex: 99999 }} />
 
             {/* Page Title */}
-=======
-            {/* Local ToastContainer to guarantee visibility on this page */}
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              newestOnTop
-              style={{ zIndex: 99999 }}
-            />
->>>>>>> Stashed changes
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Mentor Profile
@@ -273,11 +214,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
               )}
             </div>
 
-<<<<<<< Updated upstream
             {/* Loading animation while fetching */}
-=======
-            {/* Loading spinner while fetching profile */}
->>>>>>> Stashed changes
             {loading ? (
               <div className="flex justify-center items-center h-40">
                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -286,15 +223,10 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
               // Form Start
               <form className="space-y-6" onSubmit={handleSaveButtonClick}>
-<<<<<<< Updated upstream
 
                 {/* Grid for two-column layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-=======
-                {/* Form fields grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
->>>>>>> Stashed changes
                   {/* Full Name */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
@@ -309,10 +241,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                   {/* Contact Number */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
@@ -342,10 +270,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                   {/* GitHub URL */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
@@ -360,10 +284,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                   {/* About Me */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium dark:text-white">
@@ -379,22 +299,14 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     />
                   </div>
                 </div>
-<<<<<<< Updated upstream
 
                 {/* Expertise Domains */}
-=======
-                {/* Expertise Domain Selection */}
->>>>>>> Stashed changes
                 <div>
                   <h3 className="text-lg font-semibold mb-3 dark:text-white">
                     Expertise Domains
                   </h3>
 
-<<<<<<< Updated upstream
                   {/* Domain Buttons */}
-=======
-                  {/* Domain buttons */}
->>>>>>> Stashed changes
                   <div className="flex flex-wrap gap-2">
                     {predefinedDomains.map((domain) => (
                       <button
@@ -412,11 +324,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                     ))}
                   </div>
 
-<<<<<<< Updated upstream
                   {/* Custom Domain Input */}
-=======
-                  {/* Custom domain input */}
->>>>>>> Stashed changes
                   <input
                     type="text"
                     name="others_domain"
@@ -427,12 +335,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                   />
                 </div>
 
-<<<<<<< Updated upstream
                 {/* Profile completion + Save Button */}
-=======
-                {/* Footer: Profile completion indicator + Save button */}
-
->>>>>>> Stashed changes
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700 dark:text-white">
                     Profile Completed: {isProfileCompleted}
@@ -450,11 +353,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
           </div>
         </main>
 
-<<<<<<< Updated upstream
         {/* Footer */}
-=======
-        {/* Footer Component */}
->>>>>>> Stashed changes
         <Footer />
       </div>
 

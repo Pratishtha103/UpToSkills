@@ -168,27 +168,6 @@ export default function EditProfile() {
   -------------------------------------------------- */
   return (
     <>
-<<<<<<< Updated upstream
-      {/* Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-[380px] text-center">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Message</h2>
-
-            <p className="text-gray-700 dark:text-gray-300 mb-6">{popupMessage}</p>
-
-            <button
-              onClick={() => setShowPopup(false)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
-
-=======
->>>>>>> Stashed changes
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow flex justify-center items-start p-6">
           <div className="w-full max-w-2xl bg-white dark:bg-gray-900 dark:text-white shadow-lg rounded-xl p-8 mt-10">
@@ -196,16 +175,11 @@ export default function EditProfile() {
               {formData.companyName ? "Edit Company Profile" : "Add Company Profile"}
             </h2>
 
-<<<<<<< Updated upstream
-            <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-
-=======
             <form
               onSubmit={handleSubmit}
               className="space-y-6"
               encType="multipart/form-data"
             >
->>>>>>> Stashed changes
               {/* Company Name */}
               <div>
                 <label className="block font-semibold mb-2">
@@ -336,14 +310,11 @@ export default function EditProfile() {
           © 2025 Uptoskills. Built by learners.
         </footer>
       </div>
-<<<<<<< Updated upstream
-=======
       <footer
         className="w-full mt-2 text-gray-700   dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "
       >
         <p>© 2025 Uptoskills. Built by learners.</p>
       </footer>
->>>>>>> Stashed changes
     </>
   );
 }

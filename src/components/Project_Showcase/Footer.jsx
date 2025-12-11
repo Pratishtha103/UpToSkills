@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-import { useTheme } from "../../context/ThemeContext";
-=======
 import React from "react";
 import {
   FaTwitter,
@@ -10,7 +7,6 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 
->>>>>>> Stashed changes
 
 const Footer = ({ isDarkMode: propIsDarkMode }) => {
   const { darkMode: contextDarkMode } = useTheme();

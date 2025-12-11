@@ -16,22 +16,14 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
   const [loading, setLoading] = useState(true); // Shows loading spinner when fetching
   const [error, setError] = useState(null); // Stores any fetch errors
 
-<<<<<<< Updated upstream
   // 🔄 Fetch notifications every time panel is opened
-=======
-  //  Whenever the notification panel opens, fetch notifications
->>>>>>> Stashed changes
   useEffect(() => {
     if (isOpen) {
       fetchNotifications();
     }
   }, [isOpen]);
 
-<<<<<<< Updated upstream
   // 📦 Load notifications + unread count
-=======
-  // Fetch all notifications and unread count from backend
->>>>>>> Stashed changes
   const fetchNotifications = async () => {
     try {
       setLoading(true);
@@ -74,44 +66,27 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
       setLoading(false);
     }
   };
-<<<<<<< Updated upstream
 
   // ☑️ Mark one notification as read
-=======
-  // Mark a single notification as read
->>>>>>> Stashed changes
   const handleMarkAsRead = async (notificationId) => {
     try {
       await axios.patch(
         `http://localhost:5000/api/notifications/${notificationId}/read`
       );
-<<<<<<< Updated upstream
 
       // Update UI
-=======
-      // Update notification in state
->>>>>>> Stashed changes
       setNotifications(
         notifications.map((notif) =>
           notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
-<<<<<<< Updated upstream
-
-=======
-      // Reduce unread count
->>>>>>> Stashed changes
       setUnreadCount(Math.max(0, unreadCount - 1));
     } catch (err) {
       console.error("Error marking notification as read:", err);
     }
   };
 
-<<<<<<< Updated upstream
   // ☑️ Mark ALL notifications as read
-=======
-  // Mark ALL notifications as read
->>>>>>> Stashed changes
   const handleMarkAllAsRead = async () => {
     try {
       const userJson = localStorage.getItem("user");
@@ -120,47 +95,27 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
       await axios.patch(
         `http://localhost:5000/api/notifications/read-all?role=mentor&recipientId=${user.id}`
       );
-<<<<<<< Updated upstream
 
       setNotifications(notifications.map((notif) => ({ ...notif, is_read: true })));
-=======
-      // Mark all as read in local state
-      setNotifications(
-        notifications.map((notif) => ({ ...notif, is_read: true }))
-      );
-      // Reset unread counter
->>>>>>> Stashed changes
       setUnreadCount(0);
     } catch (err) {
       console.error("Error marking all notifications as read:", err);
     }
   };
-<<<<<<< Updated upstream
 
   // ❌ Delete one notification
-=======
-  // DELETE a specific notification
->>>>>>> Stashed changes
   const handleDelete = async (notificationId) => {
     try {
       await axios.delete(
         `http://localhost:5000/api/notifications/${notificationId}`
       );
 
-<<<<<<< Updated upstream
       const deletedNotif = notifications.find((n) => n.id === notificationId);
 
       // Update UI
       setNotifications(notifications.filter((n) => n.id !== notificationId));
 
       // Reduce unread count if needed
-=======
-      // Find deleted notification to adjust unread count if needed
-      const deletedNotif = notifications.find((n) => n.id === notificationId);
-      // Remove from UI
-      setNotifications(notifications.filter((n) => n.id !== notificationId));
-      // If deleted notification was unread, reduce unread count
->>>>>>> Stashed changes
       if (!deletedNotif.is_read) {
         setUnreadCount(Math.max(0, unreadCount - 1));
       }
@@ -177,11 +132,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
           : "opacity-0 pointer-events-none"
       }`}
     >
-<<<<<<< Updated upstream
       {/* 🔘 Background overlay */}
-=======
-      {/* Backdrop */}
->>>>>>> Stashed changes
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
 
       {/* 📌 Slide-in notification panel */}
@@ -199,22 +150,14 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
           <div className="flex items-center gap-2">
             <Bell className="w-6 h-6 text-blue-500" />
             <h2 className="text-xl font-bold">Notifications</h2>
-<<<<<<< Updated upstream
 
             {/* 🔴 Unread badge */}
-=======
-            {/* Unread counter bubble */}
->>>>>>> Stashed changes
             {unreadCount > 0 && (
               <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                 {unreadCount}
               </span>
             )}
           </div>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
           {/* Close button */}
           <button
             onClick={onClose}
@@ -225,12 +168,8 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-<<<<<<< Updated upstream
 
         {/* Mark all as read button */}
-=======
-        {/* ------------------- Mark All as Read ------------------- */}{" "}
->>>>>>> Stashed changes
         {unreadCount > 0 && (
           <div className="px-4 py-2 border-b">
             <button
@@ -250,11 +189,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
           ) : error ? (
-<<<<<<< Updated upstream
             // Error message
-=======
-            // Error message UI
->>>>>>> Stashed changes
             <div className="p-4">
               <div
                 className={`flex items-start gap-3 p-3 rounded-lg ${
@@ -274,11 +209,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
               <p className="text-center text-sm">No notifications yet</p>
             </div>
           ) : (
-<<<<<<< Updated upstream
             // Notification cards
-=======
-            // Notifications list UI
->>>>>>> Stashed changes
             <div className="p-3 space-y-2">
               {notifications.map((notif) => (
                 <div

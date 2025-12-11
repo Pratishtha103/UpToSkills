@@ -1,8 +1,11 @@
+
+
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.jpg";
-
-//import logo from "../../assets/logo.jpg";
+import { Sun, Moon } from "lucide-react";
+import logo from "../../assets/logo.png";
+import darkLogo from "../../assets/logo.png";
+import { useTheme } from "../../context/ThemeContext";
 
 const Header = () => {
   const { darkMode, toggleDarkMode } = useTheme();

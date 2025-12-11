@@ -12,16 +12,10 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   // Sidebar open/close state
   const [isOpen, setIsOpen] = useState(true);
 
-<<<<<<< Updated upstream
   // Stores fetched mentor profile data
   const [userData, setUserData] = useState(null);
 
   // Loading & error states
-=======
-  // Fetched user data state
-  const [userData, setUserData] = useState(null);
-  // Loading and error states
->>>>>>> Stashed changes
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   // Toggles sidebar visibility
@@ -47,32 +41,17 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         // Fetch stored basic user details
         const storedUser = JSON.parse(localStorage.getItem("user")) || {};
         const storedUsername = localStorage.getItem("username");
-<<<<<<< Updated upstream
 
         // API call for mentor profile
         const res = await axios.get("http://localhost:5000/api/mentor/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-=======
-        // API request: Fetch mentor profile
-        const res = await axios.get(
-          "http://localhost:5000/api/mentor/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        // Extracting data from response
->>>>>>> Stashed changes
         const d = res.data?.data || {};
 
         console.log("Fetched mentor profile data:", d);
-<<<<<<< Updated upstream
 
         // Check if profile is complete
-=======
-        // Check if mandatory fields are filled or not
->>>>>>> Stashed changes
         const isProfileComplete =
           (d.profile_full_name || d.mentor_name || "").trim() !== "" &&
           (d.contact_number || "").trim() !== "" &&
@@ -80,11 +59,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
           d.expertise_domains.length > 0 &&
           (d.mentor_email || "").trim() !== "";
 
-<<<<<<< Updated upstream
         // Build final user object
-=======
-        // Prepare clean formatted userData object
->>>>>>> Stashed changes
         const newUserData = {
           username:
             d.username ||
@@ -95,7 +70,6 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
             "",
 
           email: d.mentor_email || storedUser.email || "",
-<<<<<<< Updated upstream
           full_name: d.profile_full_name || d.mentor_name || storedUser.name || "",
           contact_number: d.contact_number || "",
           linkedin_url: d.linkedin_url || "",
@@ -103,29 +77,11 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
           domains_of_interest: Array.isArray(d.expertise_domains)
             ? d.expertise_domains
             : [],
-=======
-
-          full_name:
-            d.profile_full_name || d.mentor_name || storedUser.name || "",
-
-          contact_number: d.contact_number || "",
-          linkedin_url: d.linkedin_url || "",
-          github_url: d.github_url || "",
-
-          domains_of_interest: Array.isArray(d.expertise_domains)
-            ? d.expertise_domains
-            : [],
-
->>>>>>> Stashed changes
           others_domain: d.others_domain || "",
           profile_completed: Boolean(isProfileComplete),
         };
 
         console.log("Setting user data:", newUserData);
-<<<<<<< Updated upstream
-=======
-        // Store new data in component state
->>>>>>> Stashed changes
 
         setUserData(newUserData);
       } catch (err) {
@@ -135,19 +91,11 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         setLoading(false); // Hide loader
       }
     };
-<<<<<<< Updated upstream
 
     // Initial call on component mount
     fetchProfile();
 
     // Refresh data when user returns to tab
-=======
-    // Call fetch function when component loads
-    fetchProfile();
-
-    // Auto-refresh profile when user returns to tab
-    // Useful for updated profiles after editing
->>>>>>> Stashed changes
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         fetchProfile();
@@ -166,20 +114,10 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
       {/* Sidebar */}
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isDarkMode={isDarkMode} />
 
-<<<<<<< Updated upstream
       {/* Main Section */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? "" : "ml-20"}`}>
         
         {/* Header */}
-=======
-      {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isOpen ? "" : "ml-20"
-        }`}
-      >
-        {/* Header Component */}
->>>>>>> Stashed changes
         <Header
           onMenuClick={toggleSidebar}
           isDarkMode={isDarkMode}
@@ -196,20 +134,11 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
             </h1>
             {/* Loader */}
 
-<<<<<<< Updated upstream
             {/* Loading, Error & Data Rendering */}
             {loading && <p className="text-gray-600 dark:text-gray-400">Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
 
             {/* User Profile Info */}
-=======
-            {loading && (
-              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-            )}
-            {/* Error Message */}
-            {error && <p className="text-red-500">{error}</p>}
-            {/* Only show data when loaded */}
->>>>>>> Stashed changes
             {!loading && userData && (
               <>
                 {/* Account Info Section */}
@@ -261,11 +190,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                         </div>
                       ))}
 
-<<<<<<< Updated upstream
                       {/* Custom domain */}
-=======
-                      {/* Other domains */}
->>>>>>> Stashed changes
                       {userData.others_domain && (
                         <div className="flex items-center">
                           <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
@@ -275,12 +200,8 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                         </div>
                       )}
                     </div>
-<<<<<<< Updated upstream
 
                     {/* Edit Button */}
-=======
-                    {/* Edit Profile Button */}
->>>>>>> Stashed changes
                     <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <button
                         onClick={() =>
@@ -302,12 +223,8 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     </div>
   );
 };
-<<<<<<< Updated upstream
 
 // Info text component
-=======
-// Reusable Info Component (Label + Text)
->>>>>>> Stashed changes
 const Info = ({ label, value }) => (
   <div>
     <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -319,12 +236,7 @@ const Info = ({ label, value }) => (
   </div>
 );
 
-<<<<<<< Updated upstream
 // Link component for GitHub/LinkedIn
-=======
-// Reusable Link Info Component (Clickable URL)
-
->>>>>>> Stashed changes
 const LinkInfo = ({ label, url }) => (
   <div>
     <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">

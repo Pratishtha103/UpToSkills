@@ -15,6 +15,10 @@ function MyProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 NEW STATES FOR DELETE POPUP
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+
   const studentId =
     localStorage.getItem("id") ||
     localStorage.getItem("studentId") ||
@@ -66,45 +70,56 @@ function MyProjects() {
     setShowForm(false);
   };
 
-  const handleDeleteProject = async (projectId) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+  // OPEN DELETE POPUP
+  const openDeletePopup = (projectId) => {
+    setProjectToDelete(projectId);
+    setShowDeletePopup(true);
+  };
+
+  // CONFIRM DELETE
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/projects/${projectId}`,
+        `http://localhost:5000/api/projects/${projectToDelete}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       if (res.ok) {
-        setProjects(projects.filter(p => p.id !== projectId));
+        setProjects(projects.filter(p => p.id !== projectToDelete));
       }
     } catch (err) {
       console.error("Error deleting project:", err);
     }
+
+    setShowDeletePopup(false);
+    setProjectToDelete(null);
   };
 
   return (
-    <div className={`flex min-h-screen transition-all duration-300 ${
-      darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-    }`}>
+    <div
+      className={`flex min-h-screen transition-all duration-300 ${
+        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+      }`}
+    >
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
 
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${
-        isOpen ? "lg:ml-64" : "ml-0"
-      }`}>
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          isOpen ? "lg:ml-64" : "ml-0"
+        }`}
+      >
         <Header onMenuClick={toggleSidebar} />
 
         <div className="flex-grow pt-24 px-4 sm:px-6 py-6">
           <div className="max-w-6xl mx-auto">
-            {/* Header Section */}
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold">My Projects</h1>
-              
             </div>
 
             {/* Show Form */}
@@ -123,17 +138,23 @@ function MyProjects() {
             <div>
               {loading ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className={`animate-spin rounded-full h-12 w-12 border-t-4 ${darkMode ? "border-blue-400" : "border-blue-500"}`}></div>
+                  <div
+                    className={`animate-spin rounded-full h-12 w-12 border-t-4 ${
+                      darkMode ? "border-blue-400" : "border-blue-500"
+                    }`}
+                  ></div>
                 </div>
               ) : projects.length === 0 && !showForm ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`text-center py-12 rounded-lg border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-gray-50"}`}
+                  className={`text-center py-12 rounded-lg border-2 border-dashed ${
+                    darkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-gray-50"
+                  }`}
                 >
                   <h3 className="text-xl font-semibold mb-2">No Projects Yet</h3>
                   <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
-                    You haven't submitted any projects yet. Click "Add New Project" to get started!
+                    You haven't submitted any projects yet. 
                   </p>
                 </motion.div>
               ) : (
@@ -144,7 +165,9 @@ function MyProjects() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`rounded-lg shadow-lg overflow-hidden transition-all hover:shadow-xl flex flex-col ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"}`}
+                      className={`rounded-lg shadow-lg overflow-hidden flex flex-col ${
+                        darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"
+                      }`}
                     >
                       {/* Card Header */}
                       <div className={`p-6 ${darkMode ? "bg-gray-700" : "bg-gradient-to-r from-blue-50 to-indigo-50"}`}>
@@ -153,12 +176,13 @@ function MyProjects() {
                           {project.description}
                         </p>
 
-                        {/* Tech Stack */}
                         <div className="flex flex-wrap gap-2 mb-3">
                           {project.tech_stack?.split(",").slice(0, 3).map((tech, i) => (
                             <span
                               key={i}
-                              className={`text-xs px-2 py-1 rounded-full ${darkMode ? "bg-gray-600 text-gray-200" : "bg-blue-100 text-blue-700"}`}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                darkMode ? "bg-gray-600 text-gray-200" : "bg-blue-100 text-blue-700"
+                              }`}
                             >
                               {tech.trim()}
                             </span>
@@ -166,9 +190,8 @@ function MyProjects() {
                         </div>
                       </div>
 
-                      {/* Card Body - Grows to fill space */}
+                      {/* Card Body */}
                       <div className="p-6 flex-grow">
-                        {/* Contributions */}
                         {project.contributions && (
                           <div className="mb-4">
                             <p className={`text-xs font-semibold mb-1 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
@@ -180,34 +203,28 @@ function MyProjects() {
                           </div>
                         )}
 
-                        {/* Open Source Badge */}
                         {project.is_open_source && (
-                          <div className="mb-4">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              ✓ Open Source
-                            </span>
-                          </div>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            ✓ Open Source
+                          </span>
                         )}
 
-                        {/* Links */}
-                        <div className="flex flex-col gap-2">
-                          {project.github_pr_link && (
-                            <a
-                              href={project.github_pr_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium truncate"
-                            >
-                              → View on GitHub
-                            </a>
-                          )}
-                        </div>
+                        {project.github_pr_link && (
+                          <a
+                            href={project.github_pr_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium truncate mt-2 block"
+                          >
+                            → View on GitHub
+                          </a>
+                        )}
                       </div>
 
-                      {/* Card Footer - Always at bottom */}
+                      {/* Card Footer */}
                       <div className={`px-6 py-4 border-t ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
                         <button
-                          onClick={() => handleDeleteProject(project.id)}
+                          onClick={() => openDeletePopup(project.id)}
                           className="w-full px-3 py-2 rounded text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition"
                         >
                           🗑️ Delete
@@ -220,6 +237,45 @@ function MyProjects() {
             </div>
           </div>
         </div>
+
+        {/* DELETE CONFIRMATION POPUP */}
+        {showDeletePopup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className={`rounded-2xl p-8 w-full max-w-md shadow-xl ${
+                darkMode
+                  ? "bg-gray-900 border border-gray-700 text-white"
+                  : "bg-white border border-gray-300 text-gray-900"
+              }`}
+            >
+              <h3 className="text-2xl font-bold mb-4">Delete Project?</h3>
+              <p className={`mb-6 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+                Are you sure you want to delete this project? This action cannot be undone.
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeletePopup(false)}
+                  className={`px-4 py-2 rounded-lg font-semibold ${
+                    darkMode ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  }`}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 rounded-lg font-semibold bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         <Footer />
       </div>

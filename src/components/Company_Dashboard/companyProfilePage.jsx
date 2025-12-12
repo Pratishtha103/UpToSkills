@@ -54,21 +54,19 @@ const CompanyProfilePage = () => {
 
   return (
     <div
-      className={`flex h-screen transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`flex h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+        }`}
     >
       {isOpen && <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />}
 
       <div
-        className={`flex-1 flex flex-col overflow-hidden ${
-          isOpen ? "lg:ml-64" : "ml-0"
-        }`}
+        className={`flex-1 flex flex-col overflow-hidden ${isOpen ? "lg:ml-64" : "ml-0"
+          }`}
       >
         <Header onMenuClick={toggleSidebar} />
 
         <div className="flex-1 overflow-y-auto scrollbar-hide pt-20 p-6 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-          
+
           {/* ✅ BACK BUTTON */}
           <motion.button
             onClick={() => navigate(-1)}
@@ -108,32 +106,29 @@ const CompanyProfilePage = () => {
               <div className="flex w-full justify-center">
                 <div className="grid grid-cols-1 gap-6">
                   <div className="dark:bg-gray-900 rounded-3xl shadow-xl p-8 w-full max-w-4xl border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-2xl">
-                    
+
                     {/* Card Header */}
                     <div className="border-b border-gray-100 dark:border-gray-800 pb-4 mb-3 flex items-center justify-between">
                       <h1 className="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
                         Company Profile
                       </h1>
-                      <BriefcaseIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                    </div>
-
-                    <div className="space-y-8">
-                      
+                      {/* <BriefcaseIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" /> */}
+                                          <div className="space-y-8">
                       {/* Logo */}
                       {companyData.logo_url && (
                         <section>
                           <div className="flex flex-col items-center gap-3">
-                            {companyData.username && (
+                            {/* {companyData.username && (
                               <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
                                 {companyData.username}
                               </h3>
-                            )}
+                            )} */}
                             <div className="flex justify-center py-1 rounded-full">
                               <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-full dark:bg-gray-900 shadow-md hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] transition-all duration-300">
                                 <img
                                   src={`http://localhost:5000${companyData.logo_url}`}
                                   alt={`${companyData.name || companyData.company_name || "Company"} Logo`}
-                                  className="h-28 w-28 object-cover rounded-full"
+                                  className="object-cover rounded-full h-16 w-full"
                                   loading="lazy"
                                 />
                               </div>
@@ -141,7 +136,13 @@ const CompanyProfilePage = () => {
                           </div>
                         </section>
                       )}
+                    </div>
+                    </div>
 
+
+
+                    {/* Card Sections */}
+                    <div className="space-y-8">
                       {/* Basic Info */}
                       <section>
                         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4 border-l-4 border-blue-500 pl-3">
@@ -150,11 +151,12 @@ const CompanyProfilePage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                           <Info label="Company Name :- " value={companyData.name || companyData.company_name} defaultText="N/A" />
+                          <Info label="Username :- " value={companyData.username} defaultText="N/A" />
                           <Info label="Industry :- " value={companyData.industry} defaultText="N/A" />
                           <Info label="Website :- " value={companyData.website} defaultText="Not provided" isLink={true} />
                           <Info label="Contact Email :- " value={companyData.email} defaultText="Not provided" isLink={true} linkPrefix="mailto:" />
                           <Info label="Phone Number :- " value={companyData.phone} defaultText="Not provided" isLink={true} linkPrefix="tel:" />
-                          <Info label="General Contact :- " value={companyData.contact} defaultText="Not provided" />
+                          {/* <Info label="General Contact :- " value={companyData.contact} defaultText="Not provided" /> */}
                         </div>
                       </section>
 

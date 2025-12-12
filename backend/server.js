@@ -123,11 +123,13 @@ app.use(cors({
     origin: ALLOWED_ORIGINS,
     credentials: true
 }));
+// Serve uploads folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 app.post('/api/forgot-password', async (req, res) => {
     console.log('🔑 Forgot password route hit');

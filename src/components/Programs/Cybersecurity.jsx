@@ -587,9 +587,7 @@ const Cybersecurity = () => {
                 </div>
                 <div>
                   <label className={labelTextClass}>Course</label>
-                  <select name="course" value={formData.course} onChange={handleChange} className={selectClass}>
-                    <option value="cyber-security">Cyber Security</option>
-                  </select>
+                  <div className={selectClass}>Cyber Security</div>
                 </div>
               </div>
               <button

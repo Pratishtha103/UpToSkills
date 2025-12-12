@@ -1,8 +1,13 @@
+// Importing  React hooks and libraries
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+
+// Importing UI Components
 import Sidebar from "../../MentorDashboard/components/Sidebar";
 import Header from "../../MentorDashboard/components/Header";
 import Footer from "../../MentorDashboard/components/Footer";
+
+// Toast messages for success/error alerts
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,6 +24,7 @@ const predefinedDomains = [
   "DevOps",
 ];
 
+// Main Component
 const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   // Sidebar state (open/close)
@@ -26,6 +32,8 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
 
   // Loading states
   const [loading, setLoading] = useState(true);
+
+  // Saving state when submitting profile changes
   const [saving, setSaving] = useState(false);
 
   // Confirmation popup visibility
@@ -42,6 +50,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     others_domain: "",
   });
 
+  // Getting token from localStorage to authenticate API calls
   const token = localStorage.getItem("token");
 
   // Fetch mentor profile from backend
@@ -98,16 +107,18 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         others_domain: (formData.others_domain || '').trim(),
       };
 
-      console.log('Sending mentor profile payload:', payload);
+      console.log("Sending mentor profile payload:", payload);
 
+      // API call to update profile
       const res = await axios.post(
         "http://localhost:5000/api/mentor/profile",
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('Mentor profile response:', res.data);
+      console.log("Mentor profile response:", res.data);
 
+      // Show success or failure message
       if (res.data?.success) {
         toast.success("Profile updated successfully!");
         fetchProfile(); // Refresh UI
@@ -115,8 +126,13 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         toast.error(res.data?.message || "Failed to update profile.");
       }
     } catch (err) {
-      console.error('Mentor profile save error:', err.response?.data || err.message);
-      toast.error(err.response?.data?.message || "Network error while saving profile.");
+      console.error(
+        "Mentor profile save error:",
+        err.response?.data || err.message
+      );
+      toast.error(
+        err.response?.data?.message || "Network error while saving profile."
+      );
     } finally {
       setSaving(false);
     }
@@ -125,6 +141,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   // Handle simple input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Spread previous formData and update only changed field
     setFormData({ ...formData, [name]: value });
   };
 
@@ -135,8 +152,8 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     setFormData({
       ...formData,
       expertise_domains: exists
-        ? formData.expertise_domains.filter((d) => d !== domain)
-        : [...formData.expertise_domains, domain],
+        ? formData.expertise_domains.filter((d) => d !== domain) // Remove selected domain
+        : [...formData.expertise_domains, domain], // Add selected domain
     });
   };
 
@@ -189,6 +206,7 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Mentor Profile
               </h2>
+              {/* Saving indicator */}
               {saving && (
                 <span className="text-sm text-gray-500 dark:text-gray-300 italic">
                   Saving...
@@ -223,7 +241,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-
                   {/* Contact Number */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
@@ -253,7 +270,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-
                   {/* GitHub URL */}
                   <div>
                     <label className="block text-sm font-medium dark:text-white">
@@ -268,7 +284,6 @@ const MentorEditProfilePage = ({ isDarkMode, setIsDarkMode }) => {
                       className="w-full mt-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                     />
                   </div>
-
                   {/* About Me */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium dark:text-white">

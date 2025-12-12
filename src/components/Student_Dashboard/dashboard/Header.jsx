@@ -3,8 +3,8 @@ import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
 import NotificationCenter from "../../Notifications/NotificationCenter";
-import logo from "../../../assets/UptoSkills.png";
-import darkLogo from "../../../assets/UptoSkills.png";
+import logo from "../../../assets/logo.png";
+import darkLogo from "../../../assets/logo.png";
 import { Link } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
 
@@ -45,11 +45,11 @@ export default function Header({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/" className="w-28 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-48 h-16 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={darkMode ? darkLogo : logo} // Switch logo based on theme
                 alt="UptoSkill Logo"
-                className="object-contain w-36 h-25"
+                className="object-contain w-full h-full"
               />
             </Link>
           </motion.div>

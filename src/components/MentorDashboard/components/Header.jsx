@@ -1,18 +1,31 @@
-// Header.jsx
+// Import motion for animations
 import { motion } from "framer-motion";
+// Import icons
 import { User, Sun, Moon, Menu } from "lucide-react";
+// For navigation
 import { useNavigate } from "react-router-dom";
+// Custom UI button
 import { Button } from "../../Company_Dashboard/ui/button";
-import logo from "../../../assets/UptoSkills.png";
-import darkLogo from "../../../assets/UptoSkills.png";
+// Logos for light/dark mode
+import logo from "../../../assets/logo.png";
+import darkLogo from "../../../assets/logo.png";
+// Router Link
 import { Link } from "react-router-dom";
-import NotificationCenter from "../../Notifications/NotificationCenter";
-import { useTheme } from "../../../context/ThemeContext";
 
+// Notification icon + panel
+import NotificationCenter from "../../Notifications/NotificationCenter";
+// Theme context hook (dark/light mode)
+import { useTheme } from "../../../context/ThemeContext";
+// Header Component
+// Contains: sidebar toggle, theme toggle, notifications, user menu
 export default function Header({ onMenuClick }) {
+   // Router navigation
   const navigate = useNavigate();
+  
+  // Extract darkMode + function from ThemeContext
   const { darkMode: isDarkMode, toggleDarkMode: toggleTheme } = useTheme();
 
+  // When profile icon clicked → navigate to profile page
   const handleProfileClick = () => navigate("/mentor-dashboard/profile");
 
   // Menu toggle helper
@@ -25,15 +38,19 @@ export default function Header({ onMenuClick }) {
   };
 
   return (
+     // Navbar UI
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 ${
         isDarkMode ? "bg-gray-900 text-white" : "bg-white/60 text-gray-900"
       } backdrop-blur-lg border-b border-border shadow-xl transition-all duration-300`}
+            // Initial animation (slide-down)
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
+            // Safari/WebKit compatibility for blur
       style={{ WebkitBackdropFilter: "blur(16px)" }}
     >
+        {/* Navbar Main Container */}
       <div className="flex items-center justify-between px-4 sm:px-6 py-4 pb-1">
         {/* Left: Hamburger + Logo */}
         <div className="flex items-center gap-3">
@@ -56,11 +73,11 @@ export default function Header({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/" className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-48 h-16 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo}
                 alt="UptoSkill Logo"
-                className="object-contain w-25 h-10"
+                className="object-contain w-full h-full"
               />
             </Link>
           </motion.div>

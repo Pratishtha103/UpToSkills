@@ -1,8 +1,13 @@
+// Importing React and its hooks
 import React, { useEffect, useState } from "react";
+// Axios for making API requests
 import axios from "axios";
+// Sidebar and Header components
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
+// MentorProfilePage Component
+// Displays profile data of mentor (fetched using token)
 const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   // Sidebar open/close state
   const [isOpen, setIsOpen] = useState(true);
@@ -13,9 +18,10 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
   // Loading & error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  // Toggles sidebar visibility
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
+  // Fetch mentor profile data when page loads (useEffect runs once)
   useEffect(() => {
     // Fetch mentor profile from backend
     const fetchProfile = async () => {
@@ -23,12 +29,14 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         setLoading(true);
         setError("");
 
+        // Get token from localStorage
         const token = localStorage.getItem("token");
         if (!token) {
           setError("No token found. Please log in again.");
           setLoading(false);
           return;
         }
+        // Get user details stored locally (fallbacks)
 
         // Fetch stored basic user details
         const storedUser = JSON.parse(localStorage.getItem("user")) || {};
@@ -80,7 +88,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
         console.error("Error fetching mentor profile:", err);
         setError("Failed to load profile. Please try again.");
       } finally {
-        setLoading(false);
+        setLoading(false); // Hide loader
       }
     };
 
@@ -95,6 +103,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Cleanup on unmount
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
@@ -114,6 +123,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
         />
+        {/* Main Content Area */}
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto px-8 py-8">
@@ -122,6 +132,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
             <h1 className="text-2xl font-bold mb-6 mt-12 text-gray-800 dark:text-white">
               Your Profile
             </h1>
+            {/* Loader */}
 
             {/* Loading, Error & Data Rendering */}
             {loading && <p className="text-gray-600 dark:text-gray-400">Loading...</p>}

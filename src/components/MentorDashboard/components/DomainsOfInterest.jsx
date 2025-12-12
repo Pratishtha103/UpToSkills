@@ -1,5 +1,6 @@
 import React from 'react';
 
+// List of  domain options shown as checkboxes
 const DOMAIN_OPTIONS = [
   'Web Development',
   'Full Stack Development',
@@ -26,6 +27,8 @@ const DomainsOfInterest = ({ selectedDomains = [], onChange, othersValue = '' })
 
   return (
     <div className="domains-container p-4 bg-white rounded shadow">
+       
+      {/* Section Title */}
       <h3 className="text-lg font-semibold mb-4">Domains of Interest</h3>
 
       {/* Domain Checkboxes */}

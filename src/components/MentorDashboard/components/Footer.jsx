@@ -1,7 +1,10 @@
 import React from "react";
 import { useTheme } from "../../../context/ThemeContext";
 
+// Footer component definition
 const Footer = () => {
+
+     // Accessing the darkMode value from the ThemeContext
     const { darkMode } = useTheme();
     
     return (
@@ -13,4 +16,5 @@ const Footer = () => {
     );
 };
 
+// Exporting the Footer component for use in other parts of the app
 export default Footer;

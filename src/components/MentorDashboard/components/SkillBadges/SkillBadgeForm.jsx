@@ -207,11 +207,8 @@ const SkillBadgeForm = () => {
         isDarkMode={isDarkMode}
       />
 
-      <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isOpen ? "lg:ml-64" : "ml-0"
-        }`}
-      >
+      <div className="flex-1 flex flex-col transition-all duration-300">
+      
         <Header onMenuClick={toggleSidebar} />
 
         <main className="min-h-screen flex items-center justify-center px-4 py-10 pt-24">

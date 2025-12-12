@@ -1,12 +1,20 @@
+// Importing React and required hooks
 import React, { useState, useEffect } from "react";
+// Axios for API requests
 import axios from "axios";
+// Icons from lucide-react
 import { Bell, X, Check, AlertCircle } from "lucide-react";
 
+//  Notifications Panel Component
+//  - isDarkMode: Enables dark theme styling
+//  - isOpen: Controls visibility of notification panel
+//  - onClose: Function to close the panel
 const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Component State
+  const [notifications, setNotifications] = useState([]); // Stores all notifications
+  const [unreadCount, setUnreadCount] = useState(0); // Stores total unread notifications
+  const [loading, setLoading] = useState(true); // Shows loading spinner when fetching
+  const [error, setError] = useState(null); // Stores any fetch errors
 
   // 🔄 Fetch notifications every time panel is opened
   useEffect(() => {
@@ -21,7 +29,9 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
       setLoading(true);
       setError(null);
 
+      // / Get user info from localStorage
       const userJson = localStorage.getItem("user");
+      // If user record missing
       if (!userJson) {
         setError("User information not found");
         setLoading(false);
@@ -41,10 +51,11 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
         `http://localhost:5000/api/notifications/count?role=mentor&recipientId=${mentorId}`
       );
 
+      // If notifications successfully fetched, update state
       if (response.data.success) {
         setNotifications(response.data.data);
       }
-
+      // If unread count successfully fetched, update count
       if (countResponse.data.success) {
         setUnreadCount(countResponse.data.data.total);
       }
@@ -69,7 +80,6 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
           notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
-
       setUnreadCount(Math.max(0, unreadCount - 1));
     } catch (err) {
       console.error("Error marking notification as read:", err);
@@ -113,11 +123,13 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
       console.error("Error deleting notification:", err);
     }
   };
-
+  // UI RENDERING SECTION
   return (
     <div
       className={`fixed inset-0 z-50 transition-opacity duration-300 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        isOpen
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
       }`}
     >
       {/* 🔘 Background overlay */}
@@ -146,7 +158,6 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
               </span>
             )}
           </div>
-
           {/* Close button */}
           <button
             onClick={onClose}
@@ -169,9 +180,9 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
             </button>
           </div>
         )}
-
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto">
+          {/* Loading state */}
           {loading ? (
             // Spinner
             <div className="flex items-center justify-center py-8">
@@ -218,6 +229,7 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
                     <h4 className="font-semibold text-sm flex-1">
                       {notif.title}
                     </h4>
+                    {/* Delete notification */}
                     <button
                       onClick={() => handleDelete(notif.id)}
                       className={`p-0.5 rounded transition-colors flex-shrink-0 ${
@@ -269,5 +281,5 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
     </div>
   );
 };
-
+// Export component
 export default NotificationsPanel;

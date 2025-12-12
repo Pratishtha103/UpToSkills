@@ -1,6 +1,8 @@
+// Importing  modules and components
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
+// Importing all pages used inside Mentor Dashboard routes
 import MentorDashboardPage from "../pages/MentorDashboardPage";
 import ProjectsProgress from "../pages/ProjectsProgress";
 import OpenSourceContributions from "../pages/OpenSourceContributions";
@@ -9,10 +11,11 @@ import MultiStudent from "../pages/MultiStudent";
 import MentorProfilePage from "../components/MentorProfilePage";
 import MentorEditProfilePage from "./MentorEditProfilePage";
 
+// Main component that handles all mentor dashboard routes
 export default function MentorDashboardRoutes() {
 
   /* ---------------------------------------------------------
-     🌙 DARK MODE STATE  
+     DARK MODE STATE  
      - Stored at the route/layout level
      - Passed to all pages so theme stays consistent
   --------------------------------------------------------- */
@@ -20,10 +23,12 @@ export default function MentorDashboardRoutes() {
     localStorage.getItem("darkMode") === "true"
   );
 
+  
   return (
+     // All mentor dashboard routes are wrapped inside <Routes>
     <Routes>
       {/* -----------------------------------------------
-          🏠 Main Mentor Dashboard (Default Landing Page)
+           Main Mentor Dashboard (Default Landing Page)
       ----------------------------------------------- */}
       <Route
         index
@@ -36,7 +41,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          📊 Projects Progress Page
+           Projects Progress Page
       ----------------------------------------------- */}
       <Route
         path="projects-progress"
@@ -49,7 +54,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          🌐 Open Source Contributions Page
+           Open Source Contributions Page
       ----------------------------------------------- */}
       <Route
         path="open-source-contributions"
@@ -62,7 +67,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          📝 Feedback Page
+           Feedback Page
       ----------------------------------------------- */}
       <Route
         path="feedback"
@@ -75,7 +80,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          👥 Multi-Student Management Page
+           Multi-Student Management Page
       ----------------------------------------------- */}
       <Route
         path="multi-student"
@@ -88,7 +93,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          👤 Mentor Profile Page
+           Mentor Profile Page
       ----------------------------------------------- */}
       <Route
         path="profile"
@@ -101,7 +106,7 @@ export default function MentorDashboardRoutes() {
       />
 
       {/* -----------------------------------------------
-          ✏️ Edit Mentor Profile Page
+          Edit Mentor Profile Page
       ----------------------------------------------- */}
       <Route
         path="edit-profile"

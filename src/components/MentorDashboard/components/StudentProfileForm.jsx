@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+// This component handles the student profile form.
+// It receives formData (initial values), setFormData (to update parent), and onSubmit (final submit handler)
 const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
   // Local state mirrors parent formData for immediate UI updates
   const [localData, setLocalData] = useState({
@@ -48,6 +50,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
     }
   }, [formData]);
 
+  // Handles all input changes, including checkbox handling
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
@@ -71,6 +74,8 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       });
       return;
     }
+    // Validate 10-digit contact number
+
     if (
       !localData.contact_number ||
       !/^[0-9]{10}$/.test(localData.contact_number)
@@ -82,6 +87,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       });
       return;
     }
+    // Validate LinkedIn URL format
     if (
       localData.linkedin_url &&
       !/^https?:\/\/(www\.)?linkedin\.com\/.*$/.test(localData.linkedin_url)
@@ -93,6 +99,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       });
       return;
     }
+    // Validate GitHub URL format
     if (
       localData.github_url &&
       !/^https?:\/\/(www\.)?github\.com\/.*$/.test(localData.github_url)
@@ -104,6 +111,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       });
       return;
     }
+    // Ensure "Why Hire Me" section is not empty
     if (!localData.why_hire_me) {
       openPopup({
         title: "Missing Information",
@@ -112,6 +120,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       });
       return;
     }
+    // / Ensure AI skill summary is not empty
     if (!localData.ai_skill_summary) {
       openPopup({
         title: "Missing Information",
@@ -121,7 +130,7 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
       return;
     }
 
-    // Send the final validated data back to parent
+    // If all validations pass, send data back to parent
     onSubmit(localData);
 
     // ✅ Confirmation message after successful validation
@@ -142,6 +151,8 @@ const StudentProfileForm = ({ formData, setFormData, onSubmit }) => {
         return "border-blue-500";
     }
   };
+
+  // UI Rendering Section
 
   return (
     <>

@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { User, Sun, Moon, Menu } from "lucide-react";
 import { Button } from "../Company_Dashboard/ui/button";
-import logo from "../../assets/UptoSkills.png";
+import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-import darkLogo from "../../assets/UptoSkills.png";
+import darkLogo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
 import NotificationCenter from "../Notifications/NotificationCenter";
 import { useTheme } from "../../context/ThemeContext";
@@ -41,11 +41,11 @@ export default function Navbar({ onMenuClick }) {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/" className="w-36 h-9 rounded-xl flex items-center justify-center relative overflow-hidden">
+            <Link to="/" className="w-48 h-16 rounded-xl flex items-center justify-center relative overflow-hidden">
               <img
                 src={isDarkMode ? darkLogo : logo} // Switch logo based on theme
                 alt="UptoSkill Logo"
-                className="object-contain w-28 h-10"
+                className="object-contain w-full h-full"
               />
             </Link>
           </motion.div>

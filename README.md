@@ -601,10 +601,7 @@
 
 -Fix the image dimension in login page
 
--Push the previous task
-
 -Make the logo in about , contact page as in home page, Company : Border in the logo must be removed , Admin Panel : The logo size same as other pages
 
 -Name of all the files and folders must be in the camel case 
 
--Add the previous task to the main branch

@@ -1,14 +1,50 @@
 // Imports the  image for the mentor section from the assets directory
 import mentorimg from "../../../assets//mentor_illustration.png";
 
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+
 function WelcomeSection() {
-  // 🔹 Fetch mentor info from localStorage
-  const mentorData = JSON.parse(localStorage.getItem("mentor"));
+  const initialName = useMemo(() => {
+    // 🔹 Fallback mentor info from localStorage
+    try {
+      const mentorData = JSON.parse(localStorage.getItem("mentor"));
+      if (mentorData?.name) return mentorData.name;
+    } catch {
+      // ignore parse errors
+    }
+    return "Mentor";
+  }, []);
 
+  const [mentorName, setMentorName] = useState(initialName);
 
+  useEffect(() => {
+    let isMounted = true;
 
-  // Extracts the mentor's name from the data; defaults to "Mentor" if the name is not available
-  const mentorName = mentorData && mentorData.name ? mentorData.name : "Mentor";
+    const loadMentorName = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get("http://localhost:5000/api/mentor/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const d = res.data?.data || {};
+        const name = (d.profile_full_name || d.mentor_name || "").trim();
+        if (isMounted && name) setMentorName(name);
+      } catch (err) {
+        // Non-fatal; keep localStorage fallback name
+        console.warn("Welcome mentor fetch failed:", err);
+      }
+    };
+
+    loadMentorName();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // /Renders the main structure of the welcome section
   return (

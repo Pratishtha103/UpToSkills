@@ -1,6 +1,7 @@
 // src/components/MentorDashboard/components/SkillBadges/SkillBadgeForm.jsx
 
 import React, { useState } from "react";
+import axios from "axios";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import Footer from "../Footer";
@@ -65,10 +66,10 @@ const SkillBadgeForm = () => {
     const fetchStudents = async () => {
       setLoadingStudents(true);
       try {
-        const response = await fetch(
+        const res = await axios.get(
           "http://localhost:5000/api/students/autocomplete"
         );
-        const data = await response.json();
+        const data = res.data;
         // Map the response to match expected format (name -> full_name)
         if (Array.isArray(data)) {
           const mappedStudents = data.map((student) => ({
@@ -154,18 +155,20 @@ const SkillBadgeForm = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/skill-badges", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/skill-badges",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const data = await response.json();
+      const data = res.data;
 
-      if (response.ok && data.success) {
+      if (data?.success) {
         setSubmissionStatus("success");
         setFormData({
           student_name: "",

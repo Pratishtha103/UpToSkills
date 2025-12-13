@@ -20,43 +20,62 @@ const MentorDashboardPage = () => {
   const [assignedProgramsCount, setAssignedProgramsCount] = useState(0);
 
   useEffect(() => {
-    // Get token from localStorage for authenticated API calls
-    const token = localStorage.getItem('token');
-    const headers = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    let isMounted = true;
 
-    // Fetch total number of students
-    axios
-      .get("http://localhost:5000/api/students/count", headers)
-      .then((res) => setTotalStudents(res.data.totalStudents))
-      .catch((err) => console.error("Error fetching students:", err));
+    const loadDashboardCounts = async () => {
+      // Get token from localStorage for authenticated API calls
+      const token = localStorage.getItem("token");
+      const axiosConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
 
-    // Fetch total number of mentors
-    axios
-      .get("http://localhost:5000/api/mentors/count", headers)
-      .then((res) => setTotalMentors(res.data.totalMentors))
-      .catch((err) => console.error("Error fetching mentors:", err));
+      try {
+        const [studentsRes, mentorsRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/students/count", axiosConfig),
+          axios.get("http://localhost:5000/api/mentors/count", axiosConfig),
+        ]);
 
-    // Fetch assigned programs for current logged-in mentor
-    const currentUser = localStorage.getItem("user");
+        if (isMounted) {
+          setTotalStudents(studentsRes.data?.totalStudents ?? 0);
+          setTotalMentors(mentorsRes.data?.totalMentors ?? 0);
+        }
+      } catch (err) {
+        console.error("Error fetching dashboard counts:", err);
+      }
 
-    if (currentUser) {
+      // Fetch assigned programs for current logged-in mentor
+      const currentUser = localStorage.getItem("user");
+      if (!currentUser) return;
+
       try {
         const user = JSON.parse(currentUser);
-        const mentorId = user.id;
+        const mentorId = user?.id;
+        if (!mentorId) return;
 
-        axios
-          .get(`http://localhost:5000/api/assigned-programs/mentor/${mentorId}`)
-          .then((res) => {
-            // Ensure API returned an array before counting
-            if (res.data.success && Array.isArray(res.data.data)) {
-              setAssignedProgramsCount(res.data.data.length);
-            }
-          })
-          .catch((err) => console.error("Error fetching assigned programs:", err));
+        const res = await axios.get(
+          `http://localhost:5000/api/assigned-programs/mentor/${mentorId}`,
+          axiosConfig
+        );
+
+        if (isMounted) {
+          // Ensure API returned an array before counting
+          if (res.data?.success && Array.isArray(res.data?.data)) {
+            setAssignedProgramsCount(res.data.data.length);
+          } else {
+            setAssignedProgramsCount(0);
+          }
+        }
       } catch (err) {
-        console.error("Error parsing user from localStorage:", err);
+        console.error("Error fetching assigned programs:", err);
+        if (isMounted) setAssignedProgramsCount(0);
       }
-    }
+    };
+
+    loadDashboardCounts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Dashboard cards configuration

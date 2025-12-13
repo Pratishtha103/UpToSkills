@@ -1,9 +1,45 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const WS_BASE = process.env.REACT_APP_WS_URL || API_BASE;
 const MAX_NOTIFICATIONS = 200;
+
+const normalizeNotification = (raw) => {
+  if (!raw || typeof raw !== "object") return null;
+  const id = raw.id ?? raw.notificationId ?? raw._id;
+  if (id === undefined || id === null) return null;
+
+  const createdAt = raw.createdAt ?? raw.created_at ?? raw.timestamp ?? raw.created;
+  const isRead =
+    typeof raw.isRead === "boolean"
+      ? raw.isRead
+      : typeof raw.is_read === "boolean"
+        ? raw.is_read
+        : Boolean(raw.read_at || raw.readAt);
+
+  return {
+    ...raw,
+    id,
+    createdAt,
+    isRead,
+    title: raw.title ?? raw.subject ?? "Notification",
+    message: raw.message ?? raw.body ?? "",
+    link: raw.link ?? raw.url ?? null,
+  };
+};
+
+const normalizeNotifications = (items) =>
+  (Array.isArray(items) ? items : [])
+    .map(normalizeNotification)
+    .filter(Boolean);
+
+const buildAuthHeaders = () => {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const sortNotifications = (items) =>
   [...items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -41,20 +77,18 @@ export default function useRealtimeNotifications({
         query.append("recipientId", recipientId);
       }
 
-      const response = await fetch(`${API_BASE}/api/notifications?${query.toString()}`, {
-        signal: controller.signal,
-      });
+      const { data: payload } = await axios.get(
+        `${API_BASE}/api/notifications?${query.toString()}`,
+        {
+          signal: controller.signal,
+          headers: {
+            ...buildAuthHeaders(),
+          },
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`Failed to load notifications (${response.status})`);
-      }
-
-      const payload = await response.json();
-      if (!payload?.data) {
-        throw new Error("Malformed notifications response");
-      }
-
-      setNotifications(sortNotifications(payload.data).slice(0, limit));
+      const normalized = normalizeNotifications(payload?.data);
+      setNotifications(sortNotifications(normalized).slice(0, limit));
     } catch (err) {
       if (err.name !== "AbortError") {
         setError(err);
@@ -65,9 +99,11 @@ export default function useRealtimeNotifications({
   }, [role, recipientId, limit, enabled]);
 
   const upsertNotification = useCallback((incoming) => {
+    const normalized = normalizeNotification(incoming);
+    if (!normalized) return;
     setNotifications((prev) => {
       const map = new Map(prev.map((item) => [item.id, item]));
-      map.set(incoming.id, incoming);
+      map.set(normalized.id, normalized);
       return sortNotifications(Array.from(map.values())).slice(0, MAX_NOTIFICATIONS);
     });
   }, []);
@@ -145,17 +181,16 @@ export default function useRealtimeNotifications({
       applyReadState([notificationId]);
 
       try {
-        const response = await fetch(`${API_BASE}/api/notifications/${notificationId}/read`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ role, recipientId: recipientId || null }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to mark notification ${notificationId} as read`);
-        }
+        await axios.patch(
+          `${API_BASE}/api/notifications/${notificationId}/read`,
+          { role, recipientId: recipientId || null },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...buildAuthHeaders(),
+            },
+          }
+        );
       } catch (err) {
         setError(err);
       }
@@ -170,17 +205,16 @@ export default function useRealtimeNotifications({
     applyReadState(ids);
 
     try {
-      const response = await fetch(`${API_BASE}/api/notifications/read-all`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role, recipientId: recipientId || null }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to mark notifications as read");
-      }
+      await axios.patch(
+        `${API_BASE}/api/notifications/read-all`,
+        { role, recipientId: recipientId || null },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...buildAuthHeaders(),
+          },
+        }
+      );
     } catch (err) {
       setError(err);
     }

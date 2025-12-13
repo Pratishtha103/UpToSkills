@@ -38,22 +38,52 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
         return;
       }
 
-      const user = JSON.parse(userJson);
-      const mentorId = user.id;
+      let mentorId;
+      try {
+        const user = JSON.parse(userJson);
+        mentorId = user?.id;
+      } catch (parseErr) {
+        console.error("Error parsing user:", parseErr);
+        setError("User information is invalid");
+        return;
+      }
+
+      if (!mentorId) {
+        setError("User information not found");
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      const axiosConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+
+      const normalize = (notif) => {
+        if (!notif) return notif;
+        return {
+          ...notif,
+          // Backend returns camelCase (isRead/createdAt). UI expects snake_case.
+          is_read: typeof notif.is_read === "boolean" ? notif.is_read : Boolean(notif.isRead),
+          created_at: notif.created_at || notif.createdAt,
+        };
+      };
 
       // 👉 API: Fetch all notifications
       const response = await axios.get(
-        `http://localhost:5000/api/notifications?role=mentor&recipientId=${mentorId}`
+        `http://localhost:5000/api/notifications?role=mentor&recipientId=${mentorId}`,
+        axiosConfig
       );
 
       // 👉 API: Fetch unread count
       const countResponse = await axios.get(
-        `http://localhost:5000/api/notifications/count?role=mentor&recipientId=${mentorId}`
+        `http://localhost:5000/api/notifications/count?role=mentor&recipientId=${mentorId}`,
+        axiosConfig
       );
 
       // If notifications successfully fetched, update state
       if (response.data.success) {
-        setNotifications(response.data.data);
+        const list = Array.isArray(response.data.data) ? response.data.data : [];
+        setNotifications(list.map(normalize));
       }
       // If unread count successfully fetched, update count
       if (countResponse.data.success) {
@@ -70,17 +100,24 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
   // ☑️ Mark one notification as read
   const handleMarkAsRead = async (notificationId) => {
     try {
+      const token = localStorage.getItem("token");
+      const axiosConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+
       await axios.patch(
-        `http://localhost:5000/api/notifications/${notificationId}/read`
+        `http://localhost:5000/api/notifications/${notificationId}/read`,
+        undefined,
+        axiosConfig
       );
 
       // Update UI
-      setNotifications(
-        notifications.map((notif) =>
+      setNotifications((prev) =>
+        prev.map((notif) =>
           notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
-      setUnreadCount(Math.max(0, unreadCount - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
       console.error("Error marking notification as read:", err);
     }
@@ -90,13 +127,30 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
   const handleMarkAllAsRead = async () => {
     try {
       const userJson = localStorage.getItem("user");
-      const user = JSON.parse(userJson);
+      if (!userJson) return;
 
+      let userId;
+      try {
+        const user = JSON.parse(userJson);
+        userId = user?.id;
+      } catch {
+        return;
+      }
+      if (!userId) return;
+
+      const token = localStorage.getItem("token");
+      const axiosConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+
+      // Backend expects body: { role, recipientId }
       await axios.patch(
-        `http://localhost:5000/api/notifications/read-all?role=mentor&recipientId=${user.id}`
+        "http://localhost:5000/api/notifications/read-all",
+        { role: "mentor", recipientId: userId },
+        axiosConfig
       );
 
-      setNotifications(notifications.map((notif) => ({ ...notif, is_read: true })));
+      setNotifications((prev) => prev.map((notif) => ({ ...notif, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error("Error marking all notifications as read:", err);
@@ -106,19 +160,24 @@ const NotificationsPanel = ({ isDarkMode, isOpen, onClose }) => {
   // ❌ Delete one notification
   const handleDelete = async (notificationId) => {
     try {
+      const token = localStorage.getItem("token");
+      const axiosConfig = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : undefined;
+
       await axios.delete(
-        `http://localhost:5000/api/notifications/${notificationId}`
+        `http://localhost:5000/api/notifications/${notificationId}`,
+        axiosConfig
       );
 
-      const deletedNotif = notifications.find((n) => n.id === notificationId);
-
-      // Update UI
-      setNotifications(notifications.filter((n) => n.id !== notificationId));
-
-      // Reduce unread count if needed
-      if (!deletedNotif.is_read) {
-        setUnreadCount(Math.max(0, unreadCount - 1));
-      }
+      // Update UI + Reduce unread count if needed
+      setNotifications((prev) => {
+        const deletedNotif = prev.find((n) => n.id === notificationId);
+        if (deletedNotif && !deletedNotif.is_read) {
+          setUnreadCount((u) => Math.max(0, u - 1));
+        }
+        return prev.filter((n) => n.id !== notificationId);
+      });
     } catch (err) {
       console.error("Error deleting notification:", err);
     }

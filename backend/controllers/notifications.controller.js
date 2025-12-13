@@ -233,3 +233,57 @@ exports.markAllRead = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.deleteNotification = async (req, res, next) => {
+  try {
+    const notificationId = req.params.id;
+    if (!notificationId) {
+      return res.status(400).json({
+        success: false,
+        message: "Notification id is required",
+      });
+    }
+
+    const deleteQuery = `
+      DELETE FROM notifications
+      WHERE id = $1
+      RETURNING *
+    `;
+
+    const { rows } = await pool.query(deleteQuery, [notificationId]);
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found",
+      });
+    }
+
+    const notification = mapRowToNotification(rows[0]);
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(notification.role).emit("notifications:deleted", {
+        role: notification.role,
+        recipientId: notification.recipientId || null,
+        id: notification.id,
+      });
+      if (notification.recipientId) {
+        io.to(`${notification.role}:${notification.recipientId}`).emit(
+          "notifications:deleted",
+          {
+            role: notification.role,
+            recipientId: notification.recipientId,
+            id: notification.id,
+          }
+        );
+      }
+    }
+
+    res.json({
+      success: true,
+      data: notification,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

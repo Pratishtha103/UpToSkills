@@ -22,7 +22,7 @@
 
 -Dashboard :Shift my project to main dashboard page
 
-- Homepage: program section loader , Footer consistent everywhere
+-Homepage: program section loader , Footer consistent everywhere
 
 # 2025-10-18
 

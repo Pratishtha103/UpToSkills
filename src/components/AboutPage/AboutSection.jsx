@@ -1,6 +1,6 @@
 // src/components/AboutSection.jsx
 import React from 'react';
-import Testimonials from './testimonials';
+import Testimonials from './Testimonials';
 import communityImpact from"../../assets/community2.png"
 import { useTheme } from "../../context/ThemeContext";
 

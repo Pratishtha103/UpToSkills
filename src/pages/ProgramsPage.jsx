@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Page Components
-import ProgramsSection from '../components/aboutPage/programsSection';
+import ProgramsSection from '../components/aboutPage/ProgramsSection';
 import Header from '../components/aboutPage/Header';
 import Chatbot from '../components/Contact_Page/Chatbot';
 

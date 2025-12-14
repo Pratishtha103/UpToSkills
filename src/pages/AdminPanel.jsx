@@ -12,23 +12,23 @@ import { motion } from "framer-motion";
 // Importing all admin-related UI components.
 // Each module is responsible for rendering its own section inside admin panel.
 import AdminNavbar from "../components/adminPanelDashboard/AdminNavbar";
-import AdminSidebar from "../components/adminPanelDashboard/adminSidebar";
-import DashboardMain from "../components/adminPanelDashboard/dashboardMain";
-import Students from "../components/adminPanelDashboard/students";
-import Company from "../components/adminPanelDashboard/company";
+import AdminSidebar from "../components/adminPanelDashboard/AdminSidebar";
+import DashboardMain from "../components/adminPanelDashboard/DashboardMain";
+import Students from "../components/adminPanelDashboard/Students";
+import Company from "../components/adminPanelDashboard/Company";
 import StudentsTable from "../components/adminPanelDashboard/studentsTable";
 import CompaniesTable from "../components/adminPanelDashboard/companiesTable";
-import MentorsTable from "../components/adminPanelDashboard/mentorsTable";
-import Mentors from "../components/adminPanelDashboard/mentors";
-import Project from "../components/adminPanelDashboard/project";
+import MentorsTable from "../components/adminPanelDashboard/MentorsTable";
+import Mentors from "../components/adminPanelDashboard/Mentors";
+import Project from "../components/adminPanelDashboard/Project";
 import Analytics from "../components/adminPanelDashboard/analytics";
 import MentorReview from "../components/adminPanelDashboard/mentorReview";
 import AdminNotifications from "../components/adminPanelDashboard/AdminNotifications";
-import ProgramsAdmin from "../components/adminPanelDashboard/programsAdmin";
-import Programs from "../components/adminPanelDashboard/programs";
-import Testimonials from "../components/adminPanelDashboard/testimonials";
+import ProgramsAdmin from "../components/adminPanelDashboard/ProgramsAdmin";
+import Programs from "../components/adminPanelDashboard/Programs";
+import Testimonials from "../components/adminPanelDashboard/Testimonials";
 import CoursesTable from "../components/adminPanelDashboard/coursesTable";
-import AssignedPrograms from "../components/adminPanelDashboard/assignedPrograms";
+import AssignedPrograms from "../components/adminPanelDashboard/AssignedPrograms";
 import { useTheme } from "../context/ThemeContext";
 
 function AdminPanel() {

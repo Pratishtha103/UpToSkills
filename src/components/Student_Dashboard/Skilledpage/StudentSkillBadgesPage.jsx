@@ -87,10 +87,7 @@ const StudentSkillBadgesPage = () => {
                 />
 
                 <div className="pt-24 px-4 sm:px-6 py-6 flex-1">
-                    <h1 className="text-3xl font-semibold mb-8 border-b pb-2 dark:border-gray-700">
-                        🎖️ Student Skill Badges
-                    </h1>
-
+                <h1 className="text-3xl font-bold mb-4 md:mb-8">🎖 Student Skill Badges</h1>
                     {loading ? (
                         <div className="flex justify-center items-center p-10">
                             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>

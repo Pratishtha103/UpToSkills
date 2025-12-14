@@ -10,7 +10,7 @@ const {
   searchStudents,
   searchStudentsByQuery,
   getStudentDetails
-} = require("../controllers/students.controller");
+} = require("../controllers/studentsController");
 
 // Middlewares
 const verifyToken = require("../middleware/auth");

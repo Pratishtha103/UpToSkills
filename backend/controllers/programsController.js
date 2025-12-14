@@ -1,7 +1,7 @@
 const pool = require('../config/database');
 const fs = require('fs');
 const path = require('path');
-const { createEnrollment, isStudentEnrolledInCourse } = require('./enrollment.controller');
+const { createEnrollment, isStudentEnrolledInCourse } = require('./enrollmentController');
 
 // Flip this on temporarily if you need to see the enrollment failures again.
 const programEnrollmentLogsEnabled = false;

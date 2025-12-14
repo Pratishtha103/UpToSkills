@@ -8,7 +8,7 @@ const {
   addSkillBadge,
   getStudentBadges,
   getAllStudents
-} = require("../controllers/skillBadges.controller");
+} = require("../controllers/skillBadgesController");
 
 const authMiddleware = require("../middleware/auth");
 

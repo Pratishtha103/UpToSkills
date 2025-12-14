@@ -7,7 +7,7 @@ const {
   markNotificationRead,
   markAllRead,
   deleteNotification,
-} = require("../controllers/notifications.controller");
+} = require("../controllers/notificationsController");
 
 router.get("/", listNotifications);
 router.get("/count", countNotifications);

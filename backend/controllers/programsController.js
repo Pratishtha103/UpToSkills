@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const fs = require('fs');
 const path = require('path');
 const { createEnrollment, isStudentEnrolledInCourse } = require('./enrollmentController');

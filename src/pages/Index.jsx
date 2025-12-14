@@ -24,7 +24,7 @@ import ContactModal from "../components/Company_Dashboard/ContactModal";
 
 // Shared Components
 import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
-import Footer from "../components/AboutPage/Footer";
+import Footer from "../components/aboutPage/Footer";
 
 // Valid view identifiers to prevent invalid state
 const VALID_VIEWS = new Set([

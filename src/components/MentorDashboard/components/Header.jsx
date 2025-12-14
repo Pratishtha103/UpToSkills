@@ -13,7 +13,7 @@ import darkLogo from "../../../assets/logo.png";
 import { Link } from "react-router-dom";
 
 // Notification icon + panel
-import NotificationCenter from "../../Notifications/NotificationCenter";
+import NotificationCenter from "../../notifications/NotificationCenter";
 // Theme context hook (dark/light mode)
 import { useTheme } from "../../../context/ThemeContext";
 // Header Component

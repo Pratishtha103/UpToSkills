@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { persistThemePreference, readStoredTheme } from "./lib/utils";
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/protectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 
 // Pages & Components
@@ -16,10 +16,10 @@ import MyProjects from './components/Student_Dashboard/myProjects/MyProjects'; /
 import AddProject from './components/Student_Dashboard/myProjects/AddProject'; // ✅ NEW: For adding projects
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
-import LoginForm from './pages/Login';
-import RegistrationForm from './pages/Register';
+import LoginForm from './pages/login';
+import RegistrationForm from './pages/register';
 import CompanyDashboardHome from "./pages/Index";
-import CompanyNotFound from "./pages/NotFound";
+import CompanyNotFound from "./pages/notFound";
 import ContactPage from './pages/ContactPage';
 import ProjectShowcasePage from './pages/ProjectShowcasePage';
 import MentorDashboardRoutes from './pages/MentorDashboardRoutes';
@@ -31,14 +31,14 @@ import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/S
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
 import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
-import ForgotPassword from "./pages/ForgotPassword";
-import Unauthorized from './pages/Unauthorized';
-import NotFound from './pages/NotFound';
+import ForgotPassword from "./pages/forgotPassword";
+import Unauthorized from './pages/unauthorized';
+import NotFound from './pages/notFound';
 
 // About Page Components
-import Header from './components/AboutPage/Header';
-import HeroSection from './components/AboutPage/HeroSection';
-import AboutSection from './components/AboutPage/AboutSection';
+import Header from './components/aboutPage/Header';
+import HeroSection from './components/aboutPage/heroSection';
+import AboutSection from './components/aboutPage/aboutSection';
 
 // Program Components
 import Webdev from './components/Programs/Webdev';

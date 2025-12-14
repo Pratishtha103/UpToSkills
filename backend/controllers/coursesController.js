@@ -1,5 +1,5 @@
 const pool = require('../config/database');
-
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const path = require('path');
 
 // --- Ensure table exists ---

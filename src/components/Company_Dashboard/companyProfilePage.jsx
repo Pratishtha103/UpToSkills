@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Navbar";
-import Footer from "../AboutPage/Footer";
+import Footer from "../aboutPage/Footer";
 import { useNavigate } from "react-router-dom";
 import { BriefcaseIcon } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";

@@ -1,6 +1,7 @@
 // backend/controllers/skillBadges.controller.js
 
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const { pushNotification, notifyAdmins } = require('../utils/notificationService');
 
 const addSkillBadge = async (req, res) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../AboutPage/Header';
+import Header from '../aboutPage/Header';
 import axios from 'axios';
 import './Loading.css';
 import { useTheme } from '../../context/ThemeContext';

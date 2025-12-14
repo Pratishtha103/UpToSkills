@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const { pushNotification, notifyAdmins } = require('../utils/notificationService');
 
 // Flip to true locally if you need the verbose enrollment logs again.

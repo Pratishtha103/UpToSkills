@@ -5,7 +5,7 @@ import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import darkLogo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
-import NotificationCenter from "../Notifications/NotificationCenter";
+import NotificationCenter from "../notifications/NotificationCenter";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar({ onMenuClick }) {

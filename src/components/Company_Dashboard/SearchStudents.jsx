@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft, Filter, RotateCcw, Clock, Trash2 } from "lucide-react";
-import Footer from "../AboutPage/Footer";
+import Footer from "../aboutPage/Footer";
 import { Button } from "./ui/button";
 import StudentCard from "./StudentCard";
 import { useTheme } from "../../context/ThemeContext";

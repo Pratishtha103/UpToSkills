@@ -1,4 +1,5 @@
 const pool = require("../config/database");
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 const ALLOWED_ROLES = new Set(["student", "mentor", "admin", "company"]);
 const READ_RETENTION_DAYS = 7;
@@ -238,10 +239,7 @@ exports.deleteNotification = async (req, res, next) => {
   try {
     const notificationId = req.params.id;
     if (!notificationId) {
-      return res.status(400).json({
-        success: false,
-        message: "Notification id is required",
-      });
+      return res.status(400).json({ success: false, message: 'Notification id is required' });
     }
 
     const deleteQuery = `
@@ -252,37 +250,28 @@ exports.deleteNotification = async (req, res, next) => {
 
     const { rows } = await pool.query(deleteQuery, [notificationId]);
     if (!rows.length) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
+      return res.status(404).json({ success: false, message: 'Notification not found' });
     }
 
     const notification = mapRowToNotification(rows[0]);
 
-    const io = req.app.get("io");
+    const io = req.app.get('io');
     if (io) {
-      io.to(notification.role).emit("notifications:deleted", {
+      io.to(notification.role).emit('notifications:deleted', {
         role: notification.role,
         recipientId: notification.recipientId || null,
         id: notification.id,
       });
       if (notification.recipientId) {
-        io.to(`${notification.role}:${notification.recipientId}`).emit(
-          "notifications:deleted",
-          {
-            role: notification.role,
-            recipientId: notification.recipientId,
-            id: notification.id,
-          }
-        );
+        io.to(`${notification.role}:${notification.recipientId}`).emit('notifications:deleted', {
+          role: notification.role,
+          recipientId: notification.recipientId,
+          id: notification.id,
+        });
       }
     }
 
-    res.json({
-      success: true,
-      data: notification,
-    });
+    res.json({ success: true, data: notification });
   } catch (error) {
     next(error);
   }

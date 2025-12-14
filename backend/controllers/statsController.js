@@ -1,5 +1,6 @@
 // controllers/stats.controller.js
 const pool = require("../config/database");
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 /**
  * tryCount - tries to count rows from a list of candidate table names.

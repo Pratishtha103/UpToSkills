@@ -3,7 +3,37 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { User, Eye, X, Users, Search, Loader2 } from "lucide-react";
 
-const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
+/* ----------------------- DELETE CONFIRM POPUP ----------------------- */
+const DeleteConfirmModal = ({ onClose, onConfirm, isDarkMode }) => (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div
+      className={`p-6 rounded-xl shadow-xl w-[90%] max-w-md border 
+      ${isDarkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+    >
+      <h2 className="text-xl font-bold mb-4 text-center">Confirm Delete</h2>
+      <p className="text-center mb-6">Are you sure you want to delete this mentor?</p>
+
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={onConfirm}
+          className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+        >
+          Yes, Delete
+        </button>
+        <button
+          onClick={onClose}
+          className={`px-5 py-2 rounded-lg border 
+          ${isDarkMode ? "border-gray-600 text-white hover:bg-gray-700" : "border-gray-400 hover:bg-gray-100"}`}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+/* ---------------------------- MENTOR CARD ---------------------------- */
+const MentorCard = ({ mentor, onAskDelete, isDarkMode }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const expertiseText = Array.isArray(mentor.expertise_domains)
@@ -12,12 +42,10 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
 
   return (
     <>
-      {/* CARD */}
       <div
         className={`rounded-xl shadow-lg hover:shadow-xl p-6 transition-all border
         ${isDarkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-900"}`}
       >
-        {/* TOP */}
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600">
             <User className="w-6 h-6 text-white" />
@@ -26,9 +54,7 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start gap-2">
               <div className="min-w-0 flex-1">
-                <h3 className="text-xl font-bold break-words">
-                  {mentor.full_name}
-                </h3>
+                <h3 className="text-xl font-bold break-words">{mentor.full_name}</h3>
 
                 <p className={`text-sm mt-1 break-words ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
                   {expertiseText}
@@ -39,11 +65,9 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
                 </p>
               </div>
 
-              {/* View Details */}
               <button
                 onClick={() => setShowDetails(true)}
-                className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900
-                transition text-blue-600 dark:text-blue-400"
+                className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition text-blue-600 dark:text-blue-400"
               >
                 <Eye className="w-5 h-5" />
               </button>
@@ -54,7 +78,7 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
         {/* DELETE BUTTON */}
         <div className={`flex justify-end mt-4 pt-4 border-t ${isDarkMode ? "border-gray-700" : "border-gray-300"}`}>
           <button
-            onClick={() => onDelete(mentor.id)}
+            onClick={() => onAskDelete(mentor.id)}
             className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg"
           >
             Delete
@@ -65,7 +89,7 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
       {/* DETAILS MODAL */}
       {showDetails && (
         <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           onClick={() => setShowDetails(false)}
         >
           <div
@@ -73,10 +97,9 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
             className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl border
             ${isDarkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-900"}`}
           >
-            {/* HEADER */}
             <div
               className={`sticky top-0 p-6 border-b flex justify-between items-center
-              ${isDarkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200"}`}
+              ${isDarkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"}`}
             >
               <h2 className="text-2xl font-bold">Mentor Details</h2>
               <button
@@ -87,7 +110,6 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
               </button>
             </div>
 
-            {/* BODY */}
             <div className="p-6 space-y-4">
               <p><strong>Name:</strong> {mentor.full_name}</p>
               <p><strong>Email:</strong> {mentor.email}</p>
@@ -97,11 +119,7 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
               {mentor.linkedin_url && (
                 <p>
                   <strong>LinkedIn:</strong>{" "}
-                  <a
-                    href={mentor.linkedin_url}
-                    className="text-blue-400 underline break-all"
-                    target="_blank"
-                  >
+                  <a href={mentor.linkedin_url} className="text-blue-400 underline break-all" target="_blank" rel="noreferrer">
                     View Profile
                   </a>
                 </p>
@@ -110,11 +128,7 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
               {mentor.github_url && (
                 <p>
                   <strong>GitHub:</strong>{" "}
-                  <a
-                    href={mentor.github_url}
-                    className="text-blue-400 underline break-all"
-                    target="_blank"
-                  >
+                  <a href={mentor.github_url} className="text-blue-400 underline break-all" target="_blank" rel="noreferrer">
                     View Profile
                   </a>
                 </p>
@@ -129,8 +143,10 @@ const MentorCard = ({ mentor, onDelete, isDarkMode }) => {
   );
 };
 
+/* ------------------------- MAIN COMPONENT ------------------------- */
 export default function Mentors({ isDarkMode }) {
   const [mentors, setMentors] = useState([]);
+  const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -139,7 +155,6 @@ export default function Mentors({ isDarkMode }) {
 
   const fetchMentors = async () => {
     try {
-      setSearching(true);
       setLoading(true);
       const token = localStorage.getItem("token");
 
@@ -148,16 +163,14 @@ export default function Mentors({ isDarkMode }) {
       });
 
       const payload = res.data;
-      let data =
-        Array.isArray(payload)
-          ? payload
-          : payload?.data || payload?.mentors || [];
+      const data = Array.isArray(payload)
+        ? payload
+        : payload?.data || payload?.mentors || [];
 
       setMentors(data);
     } catch (err) {
       console.error("Error fetching mentors", err);
     } finally {
-      setSearching(false);
       setLoading(false);
     }
   };
@@ -166,26 +179,18 @@ export default function Mentors({ isDarkMode }) {
     fetchMentors();
   }, []);
 
-  const deleteMentor = async (id) => {
-    if (!window.confirm("Delete this mentor?")) return;
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE}/api/mentors/${id}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      setMentors((prev) => prev.filter((m) => m.id !== id));
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
-  };
-
+  /* FILTERING FIXED */
   const filtered = mentors.filter((m) => {
     const s = searchTerm.toLowerCase();
-    const name = (m.full_name || "").toLowerCase();
-    const expertise = Array.isArray(m.expertise_domains)
-      ? m.expertise_domains.join(", ").toLowerCase()
-      : (m.expertise_domains || "").toLowerCase();
-    return name.includes(s) || expertise.includes(s);
+
+    return (
+      (m.full_name || "").toLowerCase().includes(s) ||
+      (m.email || "").toLowerCase().includes(s) ||
+      (Array.isArray(m.expertise_domains)
+        ? m.expertise_domains.join(", ").toLowerCase()
+        : (m.expertise_domains || "").toLowerCase()
+      ).includes(s)
+    );
   });
 
   return (
@@ -193,7 +198,6 @@ export default function Mentors({ isDarkMode }) {
       className={`p-6 min-h-screen transition-all duration-300 
       ${isDarkMode ? "bg-[#0f172a] text-white" : "bg-gray-50 text-gray-900"}`}
     >
-      {/* TITLE */}
       <div className="text-4xl font-extrabold flex items-center gap-3">
         <Users className="w-8 h-8 text-indigo-500" />
         Manage Mentors
@@ -201,15 +205,13 @@ export default function Mentors({ isDarkMode }) {
 
       <br />
 
-      {/* SEARCH BAR BOX */}
+      {/* SEARCH BOX */}
       <div
         className={`p-4 shadow-lg rounded-xl mb-8 border transition-all 
         ${isDarkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-200"}`}
       >
         <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"
-          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
 
           <input
             type="text"
@@ -235,7 +237,7 @@ export default function Mentors({ isDarkMode }) {
           <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center text-gray-300">
+        <div className="text-center py-10 text-gray-400 text-lg">
           No mentors found.
         </div>
       ) : (
@@ -244,11 +246,32 @@ export default function Mentors({ isDarkMode }) {
             <MentorCard
               key={m.id}
               mentor={m}
-              onDelete={deleteMentor}
+              onAskDelete={setDeleteId}
               isDarkMode={isDarkMode}
             />
           ))}
         </div>
+      )}
+
+      {/* DELETE POPUP */}
+      {deleteId && (
+        <DeleteConfirmModal
+          isDarkMode={isDarkMode}
+          onClose={() => setDeleteId(null)}
+          onConfirm={async () => {
+            const token = localStorage.getItem("token");
+            try {
+              await axios.delete(`${API_BASE}/api/mentors/${deleteId}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+              });
+
+              setMentors((prev) => prev.filter((m) => m.id !== deleteId));
+            } catch (err) {
+              console.error("Delete failed", err);
+            }
+            setDeleteId(null);
+          }}
+        />
       )}
     </section>
   );

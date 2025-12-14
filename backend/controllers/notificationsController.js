@@ -1,6 +1,8 @@
 const pool = require("../config/database");
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 const ALLOWED_ROLES = new Set(["student", "mentor", "admin", "company"]);
+const READ_RETENTION_DAYS = 7;
 
 const mapRowToNotification = (row) => ({
   id: row.id,
@@ -47,12 +49,15 @@ exports.listNotifications = async (req, res, next) => {
       whereClause = "role = $1 AND (recipient_id IS NULL OR recipient_id = $2)";
     }
 
+    params.push(READ_RETENTION_DAYS);
+    const retentionParamIndex = params.length;
     params.push(normalizedLimit);
 
     const query = `
       SELECT *
       FROM notifications
       WHERE ${whereClause}
+        AND (is_read = FALSE OR created_at >= NOW() - $${retentionParamIndex} * INTERVAL '1 day')
       ORDER BY created_at DESC
       LIMIT $${params.length}
     `;
@@ -225,6 +230,48 @@ exports.markAllRead = async (req, res, next) => {
       success: true,
       data: { ids },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteNotification = async (req, res, next) => {
+  try {
+    const notificationId = req.params.id;
+    if (!notificationId) {
+      return res.status(400).json({ success: false, message: 'Notification id is required' });
+    }
+
+    const deleteQuery = `
+      DELETE FROM notifications
+      WHERE id = $1
+      RETURNING *
+    `;
+
+    const { rows } = await pool.query(deleteQuery, [notificationId]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    const notification = mapRowToNotification(rows[0]);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(notification.role).emit('notifications:deleted', {
+        role: notification.role,
+        recipientId: notification.recipientId || null,
+        id: notification.id,
+      });
+      if (notification.recipientId) {
+        io.to(`${notification.role}:${notification.recipientId}`).emit('notifications:deleted', {
+          role: notification.role,
+          recipientId: notification.recipientId,
+          id: notification.id,
+        });
+      }
+    }
+
+    res.json({ success: true, data: notification });
   } catch (error) {
     next(error);
   }

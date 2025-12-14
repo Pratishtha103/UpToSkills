@@ -6,12 +6,14 @@ const {
   createNotification,
   markNotificationRead,
   markAllRead,
-} = require("../controllers/notifications.controller");
+  deleteNotification,
+} = require("../controllers/notificationsController");
 
 router.get("/", listNotifications);
 router.get("/count", countNotifications);
 router.post("/", createNotification);
 router.patch("/:id/read", markNotificationRead);
 router.patch("/read-all", markAllRead);
+router.delete("/:id", deleteNotification);
 
 module.exports = router;

@@ -12,7 +12,8 @@ import Landing from './pages/Landing';
 import Student_Dashboard from "./pages/Student_Dashboard";
 import EditProfilePage from './components/Student_Dashboard/EditProfile/EditProfilePage';
 import UserProfilePage from './components/Student_Dashboard/UserProfilePage';
-import ProjectSubmission from './components/Student_Dashboard/myProjects/MyProjects'; // ✅ RENAMED for clarity
+import MyProjects from './components/Student_Dashboard/myProjects/MyProjects'; // ✅ For viewing projects
+import AddProject from './components/Student_Dashboard/myProjects/AddProject'; // ✅ NEW: For adding projects
 import SkillBadgeForm from './components/MentorDashboard/components/SkillBadges/SkillBadgeForm';
 import NotificationsPage from './components/Student_Dashboard/NotificationsPage/NotificationsPage';
 import LoginForm from './pages/Login';
@@ -29,15 +30,15 @@ import CompanyProfilePage from './components/Company_Dashboard/companyProfilePag
 import StudentSkillBadgesPage from "./components/Student_Dashboard/Skilledpage/StudentSkillBadgesPage";
 import Dashboard_Project from './components/Student_Dashboard/dashboard/Dashboard_Project';
 import AboutUs from "./components/Student_Dashboard/dashboard/AboutUs";
-import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms"; // ✅ Keep this one
+import MyPrograms from "./components/Student_Dashboard/dashboard/MyPrograms";
 import ForgotPassword from "./pages/ForgotPassword";
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 
 // About Page Components
-import Header from './components/AboutPage/Header';
-import HeroSection from './components/AboutPage/HeroSection';
-import AboutSection from './components/AboutPage/AboutSection';
+import Header from './components/aboutPage/Header';
+import HeroSection from './components/aboutPage/HeroSection';
+import AboutSection from './components/aboutPage/AboutSection';
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -115,21 +116,21 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ✅ FIXED: Add Project route uses ProjectSubmission (with form) */}
+            {/* ✅ FIXED: Add Project route - shows ProjectSubmissionForm */}
             <Route path="/dashboard/add-project" element={
               <ProtectedRoute allowedRoles={["student"]}>
-                <ProjectSubmission />
+                <AddProject />
               </ProtectedRoute>
             } />
 
-            {/* ✅ FIXED: My Projects also uses ProjectSubmission */}
+            {/* ✅ FIXED: My Projects route - shows list of submitted projects */}
             <Route path="/dashboard/my-projects" element={
               <ProtectedRoute allowedRoles={["student"]}>
-                <ProjectSubmission />
+                <MyProjects />
               </ProtectedRoute>
             } />
 
-            {/* ✅ FIXED: My Programs uses the correct component from dashboard folder */}
+            {/* My Programs uses the correct component */}
             <Route path="/dashboard/my-programs" element={
               <ProtectedRoute allowedRoles={["student"]}>
                 <MyPrograms />

@@ -310,31 +310,35 @@ const Students = ({ isDarkMode }) => {
                     isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
                   }`}
                 >
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="flex items-start gap-4 mb-4">
                     <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex-shrink-0">
                       <User className="w-6 h-6 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-bold truncate">{student.full_name}</h3>
+                    <div className="flex-1 min-w-0">
+                      {/* Flexible row that wraps when name is too long */}
+                      <div className="flex items-start justify-between gap-2 flex-wrap mb-2">
+                        <h3 className="text-xl font-bold break-words flex-shrink min-w-0">
+                          {student.full_name}
+                        </h3>
+                        
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span
+                            className={`px-2 py-0.5 text-xs font-semibold rounded-full whitespace-nowrap ${
+                              isCurrentlyActive ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {currentStatus}
+                          </span>
 
-                        <span
-                          className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                            isCurrentlyActive ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {currentStatus}
-                        </span>
-
-                        {/* Eye icon button next to name (opens modal) */}
-                        <button
-                          onClick={() => fetchStudentDetails(student.id)}
-                          className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400 ml-1"
-                          title="View Details"
-                          aria-label={`View details for ${student.full_name}`}
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
+                          <button
+                            onClick={() => fetchStudentDetails(student.id)}
+                            className="p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors text-blue-600 dark:text-blue-400"
+                            title="View Details"
+                            aria-label={`View details for ${student.full_name}`}
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
 
                       <p className="text-sm line-clamp-2">

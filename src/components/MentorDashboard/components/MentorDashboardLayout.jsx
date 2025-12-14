@@ -1,6 +1,8 @@
+// Importing  modules and components
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
+// Importing all pages used inside Mentor Dashboard routes
 import MentorDashboardPage from "../pages/MentorDashboardPage";
 import ProjectsProgress from "../pages/ProjectsProgress";
 import OpenSourceContributions from "../pages/OpenSourceContributions";
@@ -9,15 +11,25 @@ import MultiStudent from "../pages/MultiStudent";
 import MentorProfilePage from "../components/MentorProfilePage";
 import MentorEditProfilePage from "./MentorEditProfilePage";
 
+// Main component that handles all mentor dashboard routes
 export default function MentorDashboardRoutes() {
 
-  // ✅ Dark Mode State kept at the layout level
+  /* ---------------------------------------------------------
+     DARK MODE STATE  
+     - Stored at the route/layout level
+     - Passed to all pages so theme stays consistent
+  --------------------------------------------------------- */
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
 
+  
   return (
+     // All mentor dashboard routes are wrapped inside <Routes>
     <Routes>
+      {/* -----------------------------------------------
+           Main Mentor Dashboard (Default Landing Page)
+      ----------------------------------------------- */}
       <Route
         index
         element={
@@ -28,6 +40,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+           Projects Progress Page
+      ----------------------------------------------- */}
       <Route
         path="projects-progress"
         element={
@@ -38,6 +53,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+           Open Source Contributions Page
+      ----------------------------------------------- */}
       <Route
         path="open-source-contributions"
         element={
@@ -48,6 +66,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+           Feedback Page
+      ----------------------------------------------- */}
       <Route
         path="feedback"
         element={
@@ -58,6 +79,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+           Multi-Student Management Page
+      ----------------------------------------------- */}
       <Route
         path="multi-student"
         element={
@@ -68,6 +92,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+           Mentor Profile Page
+      ----------------------------------------------- */}
       <Route
         path="profile"
         element={
@@ -78,6 +105,9 @@ export default function MentorDashboardRoutes() {
         }
       />
 
+      {/* -----------------------------------------------
+          Edit Mentor Profile Page
+      ----------------------------------------------- */}
       <Route
         path="edit-profile"
         element={

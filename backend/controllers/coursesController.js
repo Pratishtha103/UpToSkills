@@ -1,5 +1,5 @@
 const pool = require('../config/database');
-
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const path = require('path');
 
 // --- Ensure table exists ---
@@ -96,7 +96,7 @@ const enrollStudent = async (req, res) => {
 
   try {
     // Import enrollment functions
-    const { createEnrollment } = require('./enrollment.controller');
+    const { createEnrollment } = require('./enrollmentController');
     
     // Create enrollment using the new enrollment system
     const enrollment = await createEnrollment(studentId, id, 'active', {

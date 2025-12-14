@@ -273,8 +273,6 @@ const roleThemes = {
                                   <a
                                     className="inline-flex items-center gap-1 font-medium text-indigo-600 hover:underline dark:text-indigo-400"
                                     href={notification.link}
-                                    target="_blank"
-                                    rel="noreferrer"
                                     onClick={(event) => event.stopPropagation()}
                                   >
                                     Open

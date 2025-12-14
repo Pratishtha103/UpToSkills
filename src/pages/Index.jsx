@@ -24,7 +24,7 @@ import ContactModal from "../components/Company_Dashboard/ContactModal";
 
 // Shared Components
 import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
-import Footer from "../components/AboutPage/Footer";
+import Footer from "../components/aboutPage/Footer";
 
 // Valid view identifiers to prevent invalid state
 const VALID_VIEWS = new Set([
@@ -449,7 +449,7 @@ export default function Index() {
   // ---- Notifications Page ----
   if (currentView === "notifications") {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -472,7 +472,7 @@ export default function Index() {
   // ---- Search Students ----
   if (currentView === "search") {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -495,7 +495,7 @@ export default function Index() {
   // ---- Edit Profile Page ----
   if (currentView === "edit-profile") {
     return (
-      <div className="flex min-h-screen dark:bg-gray-900 dark:text-white">
+      <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -518,7 +518,7 @@ export default function Index() {
   // ---- Interviews Page ----
   if (currentView === "interviews") {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -537,7 +537,7 @@ export default function Index() {
   // ---- About Company ----
   if (currentView === "about-us") {
     return (
-      <div className="flex min-h-screen dark:bg-gray-900">
+      <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -561,7 +561,7 @@ export default function Index() {
   // MAIN DASHBOARD VIEW
   // ============================================================
   return (
-    <div className="flex min-h-screen dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
       <Sidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}

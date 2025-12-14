@@ -4,7 +4,7 @@
 // import { motion } from "framer-motion";
 // import { useNavigate } from "react-router-dom";
 // import Chatbot from "../components/Contact_Page/Chatbot";
-// import logo from "../assets/UptoSkills.png";
+// import logo from "../assets/logo.png";
 
 // export default function Landing() {
 //   const navigate = useNavigate();
@@ -237,8 +237,8 @@ import { useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 
 import Chatbot from "../components/Contact_Page/Chatbot";
-import logo from "../assets/UptoSkills.png";
-import darkLogo from "../assets/UptoSkills.png";
+import logo from "../assets/logo.png";
+import darkLogo from "../assets/logo.png";
 
 // Global theme provider for Dark/Light mode
 import { useTheme } from "../context/ThemeContext";
@@ -340,8 +340,8 @@ export default function Landing() {
           {/* Logo switches automatically based on theme */}
           <img
             src={darkMode ? darkLogo : logo}
-            alt="UptoSkills logo"
-            className="h-10 transition-transform hover:scale-110 cursor-pointer"
+            alt="Upto To Skills logo"
+            className="h-16 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../AboutPage/Header'
+import Header from '../aboutPage/Header'
 import { useTheme } from '../../context/ThemeContext';
 
 const Thankyou = () => {

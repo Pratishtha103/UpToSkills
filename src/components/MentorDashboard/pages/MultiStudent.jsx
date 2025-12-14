@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -14,20 +15,24 @@ const MultiStudent = ({ isDarkMode, setIsDarkMode }) => {
   // Fetch ALL students (includes github, linkedin, why hire me, etc.)
   // ------------------------------------
   useEffect(() => {
-    fetch("http://localhost:5000/api/students")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.data)) {
+    const loadStudents = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/students");
+        const data = res.data;
+        if (data?.success && Array.isArray(data?.data)) {
           setStudents(data.data);
         } else {
           setStudents([]);
         }
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Fetch error:", err);
+        setStudents([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadStudents();
   }, []);
 
   // Carousel Controls

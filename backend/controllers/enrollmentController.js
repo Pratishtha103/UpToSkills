@@ -1,5 +1,9 @@
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const { pushNotification, notifyAdmins } = require('../utils/notificationService');
+
+// Flip to true locally if you need the verbose enrollment logs again.
+const enrollmentDebugLogsEnabled = false;
 
 // Validation functions
 const validateStudentExists = async (studentId) => {
@@ -37,7 +41,9 @@ const checkDuplicateEnrollment = async (studentId, courseId) => {
 
 // Database operations
 const createEnrollment = async (studentId, courseId, status = 'active', options = {}) => {
-  console.log('Creating enrollment:', { studentId, courseId, status });
+  if (enrollmentDebugLogsEnabled) {
+    console.log('Creating enrollment:', { studentId, courseId, status });
+  }
 
   const client = await pool.connect();
   const { io = null, actorRole = 'system', actorId = null } = options || {};
@@ -45,28 +51,42 @@ const createEnrollment = async (studentId, courseId, status = 'active', options 
   try {
     await client.query('BEGIN');
 
-    console.log('Validating student exists:', studentId);
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Validating student exists:', studentId);
+    }
     const student = await validateStudentExists(studentId);
-    console.log('Student exists:', Boolean(student));
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Student exists:', Boolean(student));
+    }
     if (!student) {
       throw new Error('Student not found');
     }
 
-    console.log('Validating course exists:', courseId);
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Validating course exists:', courseId);
+    }
     const course = await validateCourseExists(courseId);
-    console.log('Course exists:', Boolean(course));
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Course exists:', Boolean(course));
+    }
     if (!course) {
       throw new Error('Course not found');
     }
 
-    console.log('Checking for duplicate enrollment');
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Checking for duplicate enrollment');
+    }
     const isDuplicate = await checkDuplicateEnrollment(studentId, courseId);
-    console.log('Is duplicate:', isDuplicate);
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Is duplicate:', isDuplicate);
+    }
     if (isDuplicate) {
       throw new Error('Student already enrolled in this course');
     }
 
-    console.log('Creating enrollment record');
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Creating enrollment record');
+    }
     const result = await client.query(
       `INSERT INTO enrollments (student_id, course_id, status, enrolled_at)
        VALUES ($1, $2, $3, NOW()) RETURNING *`,
@@ -74,7 +94,9 @@ const createEnrollment = async (studentId, courseId, status = 'active', options 
     );
 
     const enrollment = result.rows[0];
-    console.log('Enrollment record created:', enrollment);
+    if (enrollmentDebugLogsEnabled) {
+      console.log('Enrollment record created:', enrollment);
+    }
 
     await client.query('COMMIT');
 
@@ -120,7 +142,9 @@ const createEnrollment = async (studentId, courseId, status = 'active', options 
 
     return enrollment;
   } catch (error) {
-    console.error('Error in createEnrollment:', error);
+    if (enrollmentDebugLogsEnabled) {
+      console.error('Error in createEnrollment:', error);
+    }
     await client.query('ROLLBACK');
     throw error;
   } finally {

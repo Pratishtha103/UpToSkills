@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST, 

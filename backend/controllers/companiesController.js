@@ -1,5 +1,6 @@
 //backend/controllers/companies.controller.js
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 const getCompanies = async (req, res) => {
   try {

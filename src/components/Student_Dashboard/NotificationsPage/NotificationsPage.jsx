@@ -6,7 +6,7 @@ import Header from "../dashboard/Header";
 import Sidebar from "../dashboard/Sidebar";
 import { useTheme } from "../../../context/ThemeContext";
 import useRealtimeNotifications from "@/hooks/useRealtimeNotifications";
-import { deriveRecipientFromStorage } from "@/components/Notifications/NotificationCenter";
+import { deriveRecipientFromStorage } from "@/components/notifications/NotificationCenter";
 
 const NotificationsPage = () => {
   const { darkMode } = useTheme();

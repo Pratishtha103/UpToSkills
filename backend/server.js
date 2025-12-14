@@ -73,15 +73,15 @@ io.on('connection', (socket) => {
     });
 });
 
-// Scheduled cleanup: remove notifications that have been read and are older than 7 weeks.
+// Scheduled cleanup: purge read notifications older than 7 days.
 // Unread notifications are retained indefinitely.
 const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // run once per day
 async function cleanupOldReadNotifications() {
     try {
         const res = await pool.query(
-            `DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '7 weeks' RETURNING id`);
+            `DELETE FROM notifications WHERE is_read = TRUE AND created_at < NOW() - INTERVAL '7 days' RETURNING id`);
         if (res && res.rowCount) {
-            console.log(`🧹 Cleaned up ${res.rowCount} read notification(s) older than 7 weeks`);
+            console.log(`🧹 Cleaned up ${res.rowCount} read notification(s) older than 7 days`);
         } else {
             console.log('🧹 Notification cleanup ran: no old read notifications found');
         }
@@ -100,34 +100,36 @@ setTimeout(() => {
 const userProfileRoutes = require('./routes/userProfile');
 const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
-const mentorProjectRoutes = require('./routes/mentor_projects');
+const mentorProjectRoutes = require('./routes/mentorProjects');
 const mentorReviewRoutes = require('./routes/mentorReviews');
-const companyProfilesRoutes = require('./routes/companyProfiles.route');
+const companyProfilesRoutes = require('./routes/companyProfilesRoute');
 const statsRoutes = require("./routes/stats");
 const testimonialsRouter = require("./routes/testimonials");
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
-const companiesRouter = require("./routes/companies.route");
-const searchCompaniesRouter = require("./routes/searchcompanies");
-const searchProjectRoutes = require('./routes/searchproject');
+const companiesRouter = require("./routes/companiesRoute");
+const searchCompaniesRouter = require("./routes/searchCompanies");
+const searchProjectRoutes = require('./routes/searchProject');
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
-const coursesRoutes = require('./routes/courses.route');
+const coursesRoutes = require('./routes/coursesRoute');
 const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
-
+const studentProjectsRoutes = require('./routes/studentProjects');
 
 // ✅ MIDDLEWARE SETUP FIRST (CRITICAL for req.body to work)
 app.use(cors({
     origin: ALLOWED_ORIGINS,
     credentials: true
 }));
+// Serve uploads folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 app.post('/api/forgot-password', async (req, res) => {
     console.log('🔑 Forgot password route hit');
@@ -176,33 +178,65 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 });
 
+// ========================================
+// ROUTE MOUNTING - ORGANIZED & CLEAN
+// ========================================
 
-// Mount routes in proper order (AFTER forgot-password route)
+// Authentication routes
 app.use('/api/auth', authRoutes);
+
+// User profile routes
 app.use('/api', userProfileRoutes);
+
+// ✅ PROJECT ROUTES (CONSOLIDATED)
+// Primary endpoint: /api/projects (handles all student project operations)
 app.use('/api/projects', projectsRoutes);
+// Alternative endpoint: /api/student-projects (for listing with search)
+app.use('/api/student-projects', studentProjectsRoutes);
+
+// Mentor & Project Management
 app.use('/api/mentor_projects', mentorProjectRoutes);
 app.use('/api/mentorreviews', mentorReviewRoutes);
+
+// Company Routes
 app.use('/api/company-profiles', companyProfilesRoutes);
+app.use('/api/companies', companiesRouter);
+app.use('/api/searchcompanies', searchCompaniesRouter);
+
+// Content Routes
 app.use('/api/testimonials', testimonialsRouter);
 app.use('/api/stats', statsRoutes);
+
+// Education Routes
+app.use('/api/courses', coursesRoutes);
+app.use('/api/assigned-programs', require('./routes/assignedPrograms'));
+
+// Student & Mentor Routes
 app.use('/api/students', studentsRoutes);
 app.use('/api/searchStudents', searchStudent);
 app.use('/api/mentors', mentorsRoutes);
-app.use('/api/form', formRoute);
-app.use('/api/skill-badges', skillBadgesRoutes);
-app.use('/api/courses', coursesRoutes);
-// Assigned programs route (assign/lookup programs to mentors)
-app.use('/api/assigned-programs', require('./routes/assignedPrograms'));
-app.use('/api/interviews', interviewRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use("/api/enrollments", require("./routes/enrollments"));
-app.use('/api/companies', companiesRouter);
-app.use('/api/searchcompanies', searchCompaniesRouter);
-app.use('/api/searchproject', searchProjectRoutes);
-// Add this line with other routes (around line 20-30)
-app.use('/api/student-projects', require('./routes/studentProjects'));
 
+// Interview Routes
+app.use('/api/interviews', interviewRoutes);
+
+// Skills & Badges
+app.use('/api/skill-badges', skillBadgesRoutes);
+
+// Form & Contact Routes
+app.use('/api/form', formRoute);
+
+// Notification Routes
+app.use('/api/notifications', notificationRoutes);
+
+// Enrollment Routes
+app.use('/api/enrollments', require("./routes/enrollments"));
+
+// Search Routes
+app.use('/api/searchproject', searchProjectRoutes);
+
+// ========================================
+// HEALTH CHECK & ERROR HANDLING
+// ========================================
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -236,4 +270,9 @@ app.use((err, req, res, next) => {
 httpServer.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+    console.log(`📋 Available Routes:`);
+    console.log(`   - POST /api/projects - Submit new project`);
+    console.log(`   - GET /api/projects/:id - Get project by ID`);
+    console.log(`   - GET /api/student-projects - List all student projects`);
+    console.log(`   - DELETE /api/projects/:id - Delete project`);
 });

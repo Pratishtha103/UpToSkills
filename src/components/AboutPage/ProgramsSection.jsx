@@ -16,7 +16,6 @@ const ProgramsSection = () => {
         // Optional: simulate loading delay to test shimmer
         // await new Promise(res => setTimeout(res, 1500));
         setCourses(response.data);
-        console.log(courses);
 
         setError(null);
       } catch (err) {

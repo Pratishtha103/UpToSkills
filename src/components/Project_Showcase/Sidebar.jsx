@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import logo from "../../assets/UptoSkills.png";
-import darkLogo from "../../assets/UptoSkills.png";
+import logo from "../../assets/logo.png";
+import darkLogo from "../../assets/logo.png";
 import { useTheme } from "../../context/ThemeContext";
 
 function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {
@@ -78,7 +78,7 @@ function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {
         <img
           src={darkMode ? darkLogo : logo}
           alt="Uptoskills Logo"
-          className="w-32 sm:w-36 md:w-40 mx-auto mb-6"
+          className="w-40 sm:w-44 md:w-48 mx-auto mb-6"
         />
       </div>
 

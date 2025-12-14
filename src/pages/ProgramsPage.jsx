@@ -1,8 +1,8 @@
 import React from 'react';
 
 // Page Components
-import ProgramsSection from '../components/AboutPage/ProgramsSection';
-import Header from '../components/AboutPage/Header';
+import ProgramsSection from '../components/aboutPage/ProgramsSection';
+import Header from '../components/aboutPage/Header';
 import Chatbot from '../components/Contact_Page/Chatbot';
 
 // Theme context (handles dark/light mode styling)

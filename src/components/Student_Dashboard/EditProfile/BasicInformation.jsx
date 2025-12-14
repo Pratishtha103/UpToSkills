@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 
 const BasicInformation = () => {
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null); // Ref to trigger hidden file input
 
+  // Trigger file input click when "Select files" button is clicked
   const openFileDialog = (event) => {
     event.stopPropagation();
     if (fileInputRef.current) {
@@ -10,6 +11,7 @@ const BasicInformation = () => {
     }
   };
 
+  // Trigger file input click when upload area is clicked
   const handleUploadAreaClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -18,9 +20,12 @@ const BasicInformation = () => {
 
   return (
     <section className="mb-10">
+      {/* Section Title */}
       <h2 className="text-xl font-semibold mb-6 text-gray-900 border-b border-gray-200 pb-2">
         Basic Information
       </h2>
+
+      {/* First Name & Last Name */}
       <div className="flex gap-4 mb-5">
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">First Name</label>
@@ -40,7 +45,9 @@ const BasicInformation = () => {
         </div>
       </div>
 
+      {/* Gender & File Upload */}
       <div className="flex gap-4 mb-5">
+        {/* Gender selection */}
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Gender</label>
           <div className="flex gap-6 mt-2">
@@ -54,16 +61,23 @@ const BasicInformation = () => {
             </label>
           </div>
         </div>
+
+        {/* File Upload Area */}
         <div
           className="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 cursor-pointer"
           onClick={handleUploadAreaClick}
         >
+          {/* Hidden file input */}
           <input type="file" ref={fileInputRef} className="hidden" />
+
+          {/* Upload Icon */}
           <div className="text-gray-400 mb-3">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="mx-auto">
               <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
             </svg>
           </div>
+
+          {/* Instructions */}
           <p className="mb-3 text-gray-500">Drop your files to upload</p>
           <button
             type="button"
@@ -75,6 +89,7 @@ const BasicInformation = () => {
         </div>
       </div>
 
+      {/* Date of Birth */}
       <div className="flex gap-4 mb-5">
         <div className="flex-1">
           <label className="block mb-2 font-medium text-gray-700">Date of Birth</label>
@@ -86,6 +101,7 @@ const BasicInformation = () => {
         </div>
       </div>
 
+      {/* Class & Section */}
       <div className="flex gap-4">
         <div className="flex-1">
           <select

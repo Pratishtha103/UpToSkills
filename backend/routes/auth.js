@@ -51,6 +51,27 @@ router.post("/check-username", async (req, res) => {
   }
 });
 
+// API to verify if a student email already exists in the platform
+router.post("/check-email", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !validateEmail(email)) {
+      return res.status(400).json({ registered: false, message: "Valid email is required" });
+    }
+
+    const { rows } = await pool.query(
+      "SELECT id FROM students WHERE LOWER(email)=LOWER($1)",
+      [email]
+    );
+
+    return res.json({ registered: rows.length > 0 });
+  } catch (error) {
+    console.error("Email check error:", error);
+    return res.status(500).json({ registered: false, message: "Unable to verify email right now" });
+  }
+});
+
 // ---------------- REGISTER ----------------
 router.post('/register', async (req, res) => {
   try {

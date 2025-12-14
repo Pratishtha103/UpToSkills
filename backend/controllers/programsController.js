@@ -1,6 +1,34 @@
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 const fs = require('fs');
 const path = require('path');
+const { createEnrollment, isStudentEnrolledInCourse } = require('./enrollmentController');
+
+// Flip this on temporarily if you need to see the enrollment failures again.
+const programEnrollmentLogsEnabled = false;
+
+const buildCourseLookupVariants = (value = '') => {
+  const raw = (value || '').toString().trim();
+  if (!raw) return [];
+
+  const lower = raw.toLowerCase();
+  const spaced = lower.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const hyphenated = spaced.replace(/\s+/g, '-');
+
+  return Array.from(new Set([lower, spaced, hyphenated])).filter(Boolean);
+};
+
+const findCourseByInput = async (rawCourse) => {
+  const variants = buildCourseLookupVariants(rawCourse);
+  if (!variants.length) return null;
+
+  const { rows } = await pool.query(
+    `SELECT id, title FROM courses WHERE LOWER(title) = ANY($1::text[]) LIMIT 1`,
+    [variants]
+  );
+
+  return rows[0] || null;
+};
 
 const createProgram = async (req, res) => {
   const { name, email, phone, education, programexp, course,date,time } = req.body;
@@ -40,20 +68,20 @@ const createProgram = async (req, res) => {
       [name, email, phone, education, programexp, course, resumePath, req.file?.buffer || null, req.file?.mimetype || null, req.file?.originalname || null,date,time]
     );
 
-    console.log('Program application created:', result.rows[0]);
+    // console.log('Program application created:', result.rows[0]);
 
     // Now create enrollment record
     try {
-      console.log('=== STARTING ENROLLMENT PROCESS ===');
-      console.log('Course title from form:', course);
+      // console.log('=== STARTING ENROLLMENT PROCESS ===');
+      // console.log('Course title from form:', course);
       
-      // Find course by title
-      const courseResult = await pool.query('SELECT id, title FROM courses WHERE title ILIKE $1', [course]);
-      console.log('Course search result:', courseResult.rows);
+      // Find course by title or slug-equivalent
+      const courseRecord = await findCourseByInput(course);
+      // console.log('Course search result:', courseRecord);
       
-      if (courseResult.rows.length > 0) {
-        const courseId = courseResult.rows[0].id;
-        console.log('✅ Found course ID:', courseId, 'for title:', courseResult.rows[0].title);
+      if (courseRecord) {
+        const courseId = courseRecord.id;
+        // console.log('✅ Found course ID:', courseId, 'for title:', courseRecord.title);
 
         // Find or create student by email
         let studentResult = await pool.query('SELECT id, full_name, email FROM students WHERE email = $1', [email]);
@@ -61,27 +89,26 @@ const createProgram = async (req, res) => {
 
         if (studentResult.rows.length === 0) {
           // Create new student record
-          console.log('📝 Creating new student for email:', email);
+          // console.log('📝 Creating new student for email:', email);
           const newStudentResult = await pool.query(
             'INSERT INTO students (full_name, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING id',
             [name, email, phone, 'temp_password_' + Date.now()]
           );
           studentId = newStudentResult.rows[0].id;
-          console.log('✅ Created new student with ID:', studentId);
+          // console.log('✅ Created new student with ID:', studentId);
         } else {
           studentId = studentResult.rows[0].id;
-          console.log('✅ Found existing student with ID:', studentId, 'email:', studentResult.rows[0].email);
+          // console.log('✅ Found existing student with ID:', studentId, 'email:', studentResult.rows[0].email);
         }
 
         // Create enrollment
-        console.log('📚 Creating enrollment for student:', studentId, 'course:', courseId);
-        const { createEnrollment } = require('./enrollment.controller');
+        // console.log('📚 Creating enrollment for student:', studentId, 'course:', courseId);
         const enrollment = await createEnrollment(studentId, courseId, 'active', {
           io: req.app?.get('io'),
           actorRole: 'program_form',
           actorId: studentId,
         });
-        console.log('✅ ENROLLMENT CREATED SUCCESSFULLY:', enrollment);
+        // console.log('✅ ENROLLMENT CREATED SUCCESSFULLY:', enrollment);
 
         res.json({ 
           success: true, 
@@ -90,10 +117,10 @@ const createProgram = async (req, res) => {
           message: 'Program application and enrollment created successfully'
         });
       } else {
-        console.log('❌ Course not found for title:', course);
-        console.log('Checking all available courses...');
+        // console.log('❌ Course not found for title:', course);
+        // console.log('Checking all available courses...');
         const allCourses = await pool.query('SELECT id, title FROM courses LIMIT 10');
-        console.log('Available courses:', allCourses.rows);
+        // console.log('Available courses:', allCourses.rows);
         
         res.json({ 
           success: true, 
@@ -106,8 +133,10 @@ const createProgram = async (req, res) => {
         });
       }
     } catch (enrollmentError) {
-      console.error('❌ ENROLLMENT CREATION FAILED:', enrollmentError);
-      console.error('Error stack:', enrollmentError.stack);
+      if (programEnrollmentLogsEnabled) {
+        console.error('❌ ENROLLMENT CREATION FAILED:', enrollmentError);
+        console.error('Error stack:', enrollmentError.stack);
+      }
       // Still return success for program creation even if enrollment fails
       res.json({ 
         success: true, 
@@ -120,6 +149,35 @@ const createProgram = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Database error' });
+  }
+};
+
+const checkDuplicateProgramEnrollment = async (req, res) => {
+  try {
+    const { email, course } = req.body || {};
+
+    if (!email || !course) {
+      return res.status(400).json({ success: false, message: 'Email and course are required' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const studentResult = await pool.query('SELECT id FROM students WHERE LOWER(email) = $1', [normalizedEmail]);
+
+    if (studentResult.rows.length === 0) {
+      return res.json({ success: true, enrolled: false, reason: 'student_not_found' });
+    }
+
+    const courseRecord = await findCourseByInput(course);
+
+    if (!courseRecord) {
+      return res.json({ success: true, enrolled: false, reason: 'course_not_found' });
+    }
+
+    const isEnrolled = await isStudentEnrolledInCourse(studentResult.rows[0].id, courseRecord.id);
+    return res.json({ success: true, enrolled: isEnrolled });
+  } catch (error) {
+    console.error('Program duplicate check failed:', error);
+    return res.status(500).json({ success: false, message: 'Unable to check enrollment right now' });
   }
 };
 
@@ -146,4 +204,4 @@ const getProgramById = async (req, res) => {
   }
 };
 
-module.exports = { createProgram, getPrograms, getProgramById };
+module.exports = { createProgram, getPrograms, getProgramById, checkDuplicateProgramEnrollment };

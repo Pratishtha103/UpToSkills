@@ -1,4 +1,12 @@
-import { useTheme } from "../../context/ThemeContext";
+import React from "react";
+import {
+  FaTwitter,
+  FaFacebookF,
+  FaLinkedinIn,
+  FaInstagram,
+  FaYoutube,
+} from "react-icons/fa";
+
 
 const Footer = ({ isDarkMode: propIsDarkMode }) => {
   const { darkMode: contextDarkMode } = useTheme();

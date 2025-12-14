@@ -597,8 +597,8 @@ function InterviewsSection() {
             alert('No candidate id or name available to view profile');
             return;
           }
-          const res = await fetch(`http://localhost:5000/api/students/search?q=${encodeURIComponent(name)}`);
-          const json = await res.json();
+          const res = await axios.get(`http://localhost:5000/api/students/search?q=${encodeURIComponent(name)}`);
+          const json = res.data;
           const rows = json?.data ?? [];
           if (Array.isArray(rows) && rows.length > 0) {
             const first = rows[0];

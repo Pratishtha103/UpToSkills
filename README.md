@@ -3,6 +3,7 @@
 This document outlines the folder structure of the UpToSkills project.
 
 ├───.gitignore
+
 ├───components.json
 
 ├───config-overrides.js

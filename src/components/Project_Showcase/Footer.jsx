@@ -6,7 +6,7 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
-
+import { useTheme } from "../../context/ThemeContext";
 
 const Footer = ({ isDarkMode: propIsDarkMode }) => {
   const { darkMode: contextDarkMode } = useTheme();

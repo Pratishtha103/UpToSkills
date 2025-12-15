@@ -2,7 +2,7 @@ import React from "react";
 import { BriefcaseIcon, Users, Target } from "lucide-react";
 import { motion } from "framer-motion";
 import { FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
-import Footer from "../../components/aboutPage/Footer";
+import Footer from "../../components/AboutPage/Footer";
 
 export default function AboutCompanyPage() {
   return (

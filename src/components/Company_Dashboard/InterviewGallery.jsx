@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../Company_Dashboard/ui/dialog";
-import Footer from "../aboutPage/Footer";
+import Footer from "../AboutPage/Footer";
 import { useTheme } from "../../context/ThemeContext";
 
 const statusColors = {

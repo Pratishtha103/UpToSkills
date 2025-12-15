@@ -4,7 +4,7 @@ import { Button } from "../Company_Dashboard/ui/button";
 import logo from "../../assets/logo.png";
 import darkLogo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
-import NotificationCenter from "../notifications/NotificationCenter";
+import NotificationCenter from "../Notifications/NotificationCenter";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function AdminNavbar({ onMenuClick }) {

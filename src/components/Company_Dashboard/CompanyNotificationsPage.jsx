@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import useRealtimeNotifications from "../../hooks/useRealtimeNotifications";
-import { deriveRecipientFromStorage } from "../notifications/NotificationCenter";
+import { deriveRecipientFromStorage } from "../Notifications/NotificationCenter";
 import { Button } from "./ui/button";
 
 const ICON_MAP = {

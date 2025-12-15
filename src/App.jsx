@@ -36,9 +36,9 @@ import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 
 // About Page Components
-import Header from './components/aboutPage/Header';
-import HeroSection from './components/aboutPage/HeroSection';
-import AboutSection from './components/aboutPage/AboutSection';
+import Header from './components/AboutPage/Header';
+import HeroSection from './components/AboutPage/HeroSection';
+import AboutSection from './components/AboutPage/AboutSection';
 
 // Program Components
 import Webdev from './components/Programs/Webdev';
@@ -137,7 +137,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            <Route path="/dashboard/notifications" element={
+            <Route path="/dashboard/Notifications" element={
               <ProtectedRoute allowedRoles={["student"]}>
                 <NotificationsPage />
               </ProtectedRoute>

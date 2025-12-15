@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { User, Sun, Moon, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Company_Dashboard/ui/button";
-import NotificationCenter from "../../notifications/NotificationCenter";
+import NotificationCenter from "../../Notifications/NotificationCenter";
 import logo from "../../../assets/logo.png";
 import darkLogo from "../../../assets/logo.png";
 import { Link } from "react-router-dom";

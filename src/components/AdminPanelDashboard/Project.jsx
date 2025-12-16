@@ -447,6 +447,7 @@ function DeleteConfirmModal({ isDarkMode, onConfirm, onCancel }) {
         <p className={`text-sm mb-8 text-center ${
           isDarkMode ? "text-gray-300" : "text-gray-600"
         }`}>
+          
           This action cannot be undone. The project will be permanently removed.
         </p>
 

@@ -18,7 +18,7 @@ const Header = () => {
           <img
             src={darkMode ? darkLogo : logo}
             alt="Uptoskills Logo"
-            className="w-48 h-16 transition-transform hover:scale-110"
+            className="w-56 h-16 transition-transform hover:scale-110 cursor-pointer"
           />
         </Link>
 

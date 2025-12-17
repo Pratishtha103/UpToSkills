@@ -78,7 +78,7 @@ function Sidebar({ isSidebarVisible, setIsSidebarVisible }) {
         <img
           src={darkMode ? darkLogo : logo}
           alt="Uptoskills Logo"
-          className="w-40 sm:w-44 md:w-48 mx-auto mb-6"
+          className="w-48 h-16 mx-auto mb-6"
         />
       </div>
 

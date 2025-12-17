@@ -37,7 +37,7 @@ export default function Navbar({ onMenuClick }) {
 
           {/* Logo */}
           <motion.div
-            className="flex items-center gap-2 rounded-2xl bg-white/70 px-3 py-1 shadow-sm ring-1 ring-white/60 backdrop-blur dark:bg-slate-900/70 dark:ring-slate-800/80"
+            className="flex items-center gap-2 "
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >

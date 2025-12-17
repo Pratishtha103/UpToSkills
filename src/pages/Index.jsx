@@ -567,6 +567,9 @@ export default function Index() {
         setIsOpen={setIsSidebarOpen}
         onItemClick={handleSidebarClick}
       />
+    
+
+
 
       <div
         className={`flex-1 flex flex-col ${

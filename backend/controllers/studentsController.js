@@ -1,5 +1,6 @@
 // backend/controllers/students.controller.js
 const pool = require('../config/database');
+const { fetchExternal, fetchInternal } = require('../utils/apiClient');
 
 /**
  * ✅ Fetch latest students (safe for use from frontend)
@@ -292,10 +293,82 @@ const getStudentDetails = async (req, res) => {
   }
 };
 
+/**
+ * Example: Fetch data from an external API
+ * Use this pattern when calling third-party services
+ */
+const fetchExternalStudentData = async (req, res) => {
+  try {
+    const { externalId } = req.params;
+    
+    // Example: Fetch from external API (LinkedIn, GitHub, etc.)
+    const externalData = await fetchExternal(
+      `https://api.example.com/users/${externalId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.EXTERNAL_API_KEY}`,
+        },
+      }
+    );
+    
+    return res.status(200).json({ success: true, data: externalData });
+  } catch (err) {
+    console.error('fetchExternalStudentData error:', err);
+    return res.status(err.status || 500).json({ 
+      success: false, 
+      message: err.message || 'Failed to fetch external data' 
+    });
+  }
+};
+
+/**
+ * Example: Call another internal microservice
+ * Use this pattern for service-to-service communication
+ */
+const syncStudentWithService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get student from local DB
+    const result = await pool.query('SELECT * FROM students WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+    
+    const student = result.rows[0];
+    
+    // Sync with another internal service (e.g., analytics, notifications)
+    const syncResult = await fetchInternal('/analytics/track-student', {
+      method: 'POST',
+      data: {
+        studentId: student.id,
+        email: student.email,
+        action: 'profile_sync',
+      },
+    });
+    
+    return res.status(200).json({ 
+      success: true, 
+      data: student,
+      syncStatus: syncResult 
+    });
+  } catch (err) {
+    console.error('syncStudentWithService error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Sync failed',
+      error: err.message 
+    });
+  }
+};
+
 module.exports = {
   getStudents,
   getStudentById,
   searchStudents,
   searchStudentsByQuery,
   getStudentDetails,
+  fetchExternalStudentData,
+  syncStudentWithService,
 };

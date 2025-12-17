@@ -4,7 +4,7 @@ const {
   getEnrollmentsByStudentId, 
   getEnrollmentsByCourseId,
   isStudentEnrolledInCourse 
-} = require('../controllers/enrollment.controller');
+} = require('../controllers/enrollmentController');
 
 const router = express.Router();
 

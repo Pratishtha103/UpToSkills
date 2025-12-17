@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 // Axios for making API requests
 import axios from "axios";
 // Sidebar and Header components
+import Footer from "./Footer";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -219,6 +220,7 @@ const MentorProfilePage = ({ isDarkMode, setIsDarkMode }) => {
             )}
           </div>
         </main>
+         <Footer/>
       </div>
     </div>
   );

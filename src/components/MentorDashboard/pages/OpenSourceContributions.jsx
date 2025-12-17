@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -18,22 +19,26 @@ function OpenSourceContributions({ isDarkMode, setIsDarkMode }) {
     if (!mentorId) return;
 
     // Fetch all mentor projects
-    fetch("http://localhost:5000/api/mentor_projects")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
+    const loadProjects = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/mentor_projects");
+        const data = res.data;
+        if (data?.success && Array.isArray(data?.data)) {
           // Filter projects which belong to the logged-in mentor
-          const myProjects = data.data.filter(
-            (proj) => proj.mentor_id === mentorId
-          );
+          const myProjects = data.data.filter((proj) => proj.mentor_id === mentorId);
           setProjects(myProjects);
+        } else {
+          setProjects([]);
         }
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error fetching projects:", err);
+        setProjects([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadProjects();
   }, [mentorId]);
 
   return (

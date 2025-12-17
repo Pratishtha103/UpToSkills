@@ -1,5 +1,6 @@
 // src/components/Company_Dashboard/StudentProfileModal.jsx
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import {
@@ -86,16 +87,11 @@ export default function StudentProfileModal({
       const fetchProfile = async () => {
         setLoading(true);
         try {
-          const res = await fetch(`${API_BASE}/api/students/${initialStudent.id}/details`, {
-            credentials: "include",
+          const res = await axios.get(`${API_BASE}/api/students/${initialStudent.id}/details`, {
+            withCredentials: true,
             headers: { Accept: "application/json" },
           });
-          if (!res.ok) {
-            const text = await res.text().catch(() => "");
-            throw new Error(`Failed to fetch profile details: ${res.status} ${text}`);
-          }
-          const json = await res.json();
-          const payload = json?.data ?? json;
+          const payload = res.data?.data ?? res.data;
 
           // payload expected shape: { profile, projects, badges, enrollments, attendance, stats }
           const profile = payload.profile || {};

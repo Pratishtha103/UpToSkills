@@ -275,7 +275,7 @@ export default function EditProfile() {
               </div>
 
               {/* Contact */}
-              <div>
+              {/* <div>
                 <label className="block font-semibold mb-2">Contact Info</label>
                 <input
                   type="text"
@@ -284,7 +284,7 @@ export default function EditProfile() {
                   onChange={handleChange}
                   className="w-full border rounded-lg px-4 py-2 dark:bg-gray-800"
                 />
-              </div>
+              </div> */}
 
               {/* Submit */}
               <button
@@ -306,9 +306,9 @@ export default function EditProfile() {
           </div>
         </main>
 
-        <footer className="w-full mt-2 text-center text-gray-700 dark:text-gray-300 py-4 text-sm">
+        {/* <footer className="w-full mt-2 text-center text-gray-700 dark:text-gray-300 py-4 text-sm">
           © 2025 Uptoskills. Built by learners.
-        </footer>
+        </footer> */}
       </div>
       <footer
         className="w-full mt-2 text-gray-700   dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 text-center py-4 text-sm transition-colors duration-300 "

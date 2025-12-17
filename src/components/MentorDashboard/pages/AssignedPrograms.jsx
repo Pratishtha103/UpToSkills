@@ -16,56 +16,73 @@ const AssignedPrograms = ({ isDarkMode, setIsDarkMode }) => {
 
   // Fetch assigned programs when component loads
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchAssignedPrograms = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get logged-in user from localStorage
+        const userJson = localStorage.getItem("user");
+        if (!userJson) {
+          if (isMounted) setError("User information not found. Please log in again.");
+          return;
+        }
+
+        let mentorId;
+        try {
+          const user = JSON.parse(userJson);
+          mentorId = user?.id;
+        } catch (parseErr) {
+          console.error("Error parsing user from localStorage:", parseErr);
+          if (isMounted) setError("User information is invalid. Please log in again.");
+          return;
+        }
+
+        if (!mentorId) {
+          if (isMounted) setError("Mentor ID not found. Please log in again.");
+          return;
+        }
+
+        // Optional token header (endpoint currently works without it, but keeps requests consistent)
+        const token = localStorage.getItem("token");
+        const axiosConfig = token
+          ? { headers: { Authorization: `Bearer ${token}` } }
+          : undefined;
+
+        const response = await axios.get(
+          `http://localhost:5000/api/assigned-programs/mentor/${mentorId}`,
+          axiosConfig
+        );
+
+        if (!isMounted) return;
+
+        if (response.data?.success && Array.isArray(response.data?.data)) {
+          setPrograms(response.data.data);
+        } else {
+          setPrograms([]);
+          setError("Failed to load assigned programs.");
+        }
+      } catch (err) {
+        console.error("Error fetching assigned programs:", err);
+        if (!isMounted) return;
+        setPrograms([]);
+        setError(
+          err.response?.data?.message ||
+            "Failed to load assigned programs. Please try again."
+        );
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
     fetchAssignedPrograms();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  // Fetch programs assigned to the mentor
-  const fetchAssignedPrograms = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Get logged-in user from localStorage
-      const userJson = localStorage.getItem("user");
-      if (!userJson) {
-        setError("User information not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
-
-      const user = JSON.parse(userJson);
-      const mentorId = user.id;
-
-      // Safety check for mentor ID
-      if (!mentorId) {
-        setError("Mentor ID not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
-
-      // API Request → fetch assigned programs
-      const response = await axios.get(
-        `http://localhost:5000/api/assigned-programs/mentor/${mentorId}`
-      );
-
-      // API Success Validation
-      if (response.data.success && Array.isArray(response.data.data)) {
-        setPrograms(response.data.data);
-      } else {
-        setError("Failed to load assigned programs.");
-      }
-    } catch (err) {
-      console.error("Error fetching assigned programs:", err);
-
-      // Handle server or network errors
-      setError(
-        err.response?.data?.message ||
-          "Failed to load assigned programs. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div

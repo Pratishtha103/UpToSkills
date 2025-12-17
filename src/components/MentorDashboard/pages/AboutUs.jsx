@@ -32,7 +32,7 @@ export default function AboutUs() {
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       <Sidebar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-      <div className="pt-20 px-2 sm:px-4 py-6 mx-auto w-full dark:text-white dark:bg-gray-900">
+      <div className="pt-20 px-2 sm:px-4  mx-auto w-full dark:text-white dark:bg-gray-900">
 
         {/* 🌟 MAIN ABOUT CARD */}
         <motion.div
@@ -126,7 +126,7 @@ export default function AboutUs() {
         <div className="mt-16 border-t border-gray-300 dark:border-gray-700 pt-14"></div>
 
         {/* 📞 CONTACT SECTION */}
-        <section className="w-full mx-auto text-center">
+        <section className="w-full mx-auto text-center mb-10">
 
           <p className="text-orange-500 text-4xl font-semibold uppercase">Our Contacts</p>
           <h2 className="text-xl mt-2 dark:text-white">
@@ -154,18 +154,14 @@ export default function AboutUs() {
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition h-full">
                 <FaEnvelope className="text-orange-500 mx-auto mb-4" size={40} />
                 <h3 className="text-xl font-semibold mb-2">Mail Us 24/7:</h3>
-                <p className="text-gray-600">info@uptoskills.com</p>
+                <p className="text-gray-700 dark:text-gray-300">info@uptoskills.com</p>
               </div>
             </a>
           </div>
         </section>
 
         {/* © Footer Section */}
-        <footer className="text-center pt-12 border-t border-gray-200 dark:border-gray-800">
-          <p className="text-gray-600 dark:text-gray-400">
-            © 2024 UptoSkill. Transforming lives through mentorship.
-          </p>
-        </footer>
+        <Footer/>
 
       </div>
     </div>

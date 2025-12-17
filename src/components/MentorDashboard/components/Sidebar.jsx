@@ -247,11 +247,8 @@ const Sidebar = ({
       {/* MAIN CONTENT ON RIGHT SIDE */}
 
       <div
-        className={`transition-all duration-300 ${
-          isOpen && isDesktop ? "ml-64" : "ml-0"
-        } ${
-          isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-        }`}
+        className={`transition-all duration-300 ${isOpen ? "ml-64" : "ml-0"}
+        } ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
       >
         {children}
       </div>

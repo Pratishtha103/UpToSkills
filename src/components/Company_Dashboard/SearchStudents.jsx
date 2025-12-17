@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import axios from "axios";
 import { Search, Loader, User, Phone, Linkedin, Github, ArrowLeft, Filter, RotateCcw, Clock, Trash2 } from "lucide-react";
 import Footer from "../AboutPage/Footer";
 import { Button } from "./ui/button";
@@ -125,8 +126,8 @@ export default function SearchStudents() {
     const run = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/students/all-students");
-        const data = await res.json();
+        const res = await axios.get("http://localhost:5000/api/students/all-students");
+        const data = res.data;
         const rows = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
         if (!mounted) return;
         // Debug: inspect duplicates returned by the API (grouped by normalized name)
@@ -181,8 +182,8 @@ export default function SearchStudents() {
     let mounted = true;
     const run = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/interviews');
-        const data = await res.json();
+        const res = await axios.get('http://localhost:5000/api/interviews');
+        const data = res.data;
         const rows = Array.isArray(data) ? data : (data?.data || []);
         if (!mounted) return;
         setInterviews(rows);
@@ -293,8 +294,8 @@ export default function SearchStudents() {
     if (!id) return;
     try {
       setDetailsLoading(true);
-      const res = await fetch(`http://localhost:5000/api/students/${id}/details`);
-      const data = await res.json();
+      const res = await axios.get(`http://localhost:5000/api/students/${id}/details`);
+      const data = res.data;
       if (data?.success) {
         const payload = data.data || {};
         const profile = payload.profile || {};

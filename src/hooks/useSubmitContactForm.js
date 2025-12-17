@@ -1,5 +1,6 @@
 // src/hooks/useSubmitForm.js
 import { useState } from "react";
+import axios from "axios";
 
 const useSubmitContactForm = () => {
   const [loading, setLoading] = useState(false);
@@ -12,25 +13,19 @@ const useSubmitContactForm = () => {
     setResponse(null);
 
     try {
-      const res = await fetch(url, {
-        method: "POST",
+      const { data: json } = await axios.post(url, data, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
-
-      const json = await res.json();
-
-
-
-      if (!res.ok) {
-        throw new Error(json.message || "Submission failed");
-      }
 
       setResponse(json);
     } catch (err) {
-      setError(err.message);
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Submission failed";
+      setError(message);
     } finally {
       setLoading(false);
     }

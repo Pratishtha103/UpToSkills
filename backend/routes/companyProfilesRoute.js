@@ -10,7 +10,7 @@ const {
   addCompanyProfile,
   updateCompanyProfile,
   getMyCompanyProfile
-} = require('../controllers/companyProfiles.controller');
+} = require('../controllers/companyProfilesController');
 
 // Logged-in company profile
 router.get('/me', verifyToken, getMyCompanyProfile);

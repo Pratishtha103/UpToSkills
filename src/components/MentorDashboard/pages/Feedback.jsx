@@ -1,9 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 
 const Feedback = ({ isDarkMode, setIsDarkMode }) => {
+    const [students, setStudents] = useState([]);
+    const [loadingStudents, setLoadingStudents] = useState(true);
+    const [studentsError, setStudentsError] = useState(null);
+    const [selectedStudent, setSelectedStudent] = useState("");
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadStudents = async () => {
+            setLoadingStudents(true);
+            setStudentsError(null);
+            try {
+                // Uses same source as mentor skill badge autocomplete
+                const res = await axios.get("http://localhost:5000/api/students/autocomplete");
+                const data = Array.isArray(res.data) ? res.data : [];
+                if (!isMounted) return;
+
+                setStudents(data);
+                if (!selectedStudent && data.length > 0) {
+                    setSelectedStudent(data[0].name);
+                }
+            } catch (err) {
+                console.error("Error fetching students:", err);
+                if (!isMounted) return;
+                setStudents([]);
+                setStudentsError("Failed to load students.");
+            } finally {
+                if (isMounted) setLoadingStudents(false);
+            }
+        };
+
+        loadStudents();
+
+        return () => {
+            isMounted = false;
+        };
+        // selectedStudent intentionally not a dependency to avoid resetting user choice
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="mt-14 flex min-h-screen">
             <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
@@ -26,11 +67,23 @@ const Feedback = ({ isDarkMode, setIsDarkMode }) => {
                             <label className="text-lg font-medium mb-2 md:mb-0">Student</label>
                             <select
                                 className="border border-gray-300 rounded-md px-4 py-2 w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                                defaultValue="Badaas Ravi Kumar"
+                                value={selectedStudent}
+                                onChange={(e) => setSelectedStudent(e.target.value)}
+                                disabled={loadingStudents || !!studentsError}
                             >
-                                <option>Badaas Ravi Kumar</option>
-                                <option>Mahesh Bagul</option>
-                                <option>Ashwini Sharma</option>
+                                {loadingStudents ? (
+                                    <option value="">Loading students...</option>
+                                ) : studentsError ? (
+                                    <option value="">{studentsError}</option>
+                                ) : students.length === 0 ? (
+                                    <option value="">No students found</option>
+                                ) : (
+                                    students.map((s) => (
+                                        <option key={s.id} value={s.name}>
+                                            {s.name}
+                                        </option>
+                                    ))
+                                )}
                             </select>
                         </div>
 

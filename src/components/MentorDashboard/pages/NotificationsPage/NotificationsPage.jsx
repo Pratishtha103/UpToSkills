@@ -5,7 +5,7 @@ import "./NotificationPage.css";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import useRealtimeNotifications from "@/hooks/useRealtimeNotifications";
-import { deriveRecipientFromStorage } from "@/components/Notifications/NotificationCenter";
+import { deriveRecipientFromStorage } from "@/components/notifications/NotificationCenter";
 
 const NotificationsPage = ({ isDarkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(true);

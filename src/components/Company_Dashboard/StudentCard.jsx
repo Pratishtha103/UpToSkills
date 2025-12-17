@@ -1,5 +1,6 @@
 // src/components/Company_Dashboard/StudentCard.jsx
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { createPortal } from 'react-dom';
 import { motion } from "framer-motion";
 import { Badge } from "../Company_Dashboard/ui/badge";
@@ -131,9 +132,8 @@ export default function StudentCard({
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(url, { credentials: "include" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const res = await axios.get(url, { withCredentials: true });
+        const data = res.data;
         const found = data?.data ?? data?.student ?? data;
         if (!found) throw new Error("No student data returned");
 
@@ -228,9 +228,8 @@ export default function StudentCard({
     const checkScheduled = async () => {
       try {
         if (!student) return;
-        const res = await fetch(`${API_BASE}/api/interviews`);
-        if (!res.ok) return;
-        const data = await res.json();
+        const res = await axios.get(`${API_BASE}/api/interviews`);
+        const data = res.data;
         const list = Array.isArray(data) ? data : (data?.data || []);
         processList(list);
       } catch (err) { /* ignore */ }
@@ -448,18 +447,15 @@ export default function StudentCard({
                           const token = localStorage.getItem('token');
                           const headers = { 'Content-Type': 'application/json' };
                           if (token) headers['Authorization'] = `Bearer ${token}`;
-                          const res = await fetch(`${API_BASE}/api/interviews`, {
-                            method: 'POST',
-                            headers,
-                            body: JSON.stringify({ candidateId: student.id || student.student_id || studentId || null, candidateName: displayName, position: schedule.position, date: schedule.date, time: schedule.time })
-                          });
+                          const res = await axios.post(`${API_BASE}/api/interviews`, {
+                            candidateId: student.id || student.student_id || studentId || null,
+                            candidateName: displayName,
+                            position: schedule.position,
+                            date: schedule.date,
+                            time: schedule.time
+                          }, { headers });
 
-                          if (!res.ok) {
-                            const text = await res.text();
-                            throw new Error(text || 'Failed to schedule');
-                          }
-
-                          const created = await res.json();
+                          const created = res.data;
                           console.debug('Interview created response:', created);
                           toast.success(`Interview scheduled — ${displayName}`);
                           // mark card as scheduled so UI reflects state immediately

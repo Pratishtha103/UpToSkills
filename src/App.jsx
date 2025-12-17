@@ -137,7 +137,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            <Route path="/dashboard/notifications" element={
+            <Route path="/dashboard/Notifications" element={
               <ProtectedRoute allowedRoles={["student"]}>
                 <NotificationsPage />
               </ProtectedRoute>

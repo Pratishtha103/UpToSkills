@@ -1,6 +1,6 @@
 const express = require('express');
 const pool = require('../config/database');
-const { createEnrollment } = require('../controllers/enrollment.controller');
+const { createEnrollment } = require('../controllers/enrollmentController');
 
 const router = express.Router();
 

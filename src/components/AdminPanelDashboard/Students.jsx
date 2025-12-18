@@ -566,7 +566,7 @@ const Students = ({ isDarkMode }) => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Profile Status</p>
-                          <p className={font-semibold `${studentDetails.profile.profile_completed ? "text-green-500" : "text-yellow-500"}`}>
+                          <p className={`font-semibold ${studentDetails.profile.profile_completed ? "text-green-500" : "text-yellow-500"}`}>
                             {studentDetails.profile.profile_completed ? "Completed" : "Incomplete"}
                           </p>
                         </div>

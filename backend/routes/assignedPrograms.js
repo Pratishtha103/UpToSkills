@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
+const { pushNotification, notifyAdmins } = require("../utils/notificationService");
 
 // -----------------------------------------------
 // GET all program assignments
@@ -81,37 +82,33 @@ router.post("/", async (req, res) => {
       WHERE pa.id = $1
     `, [result.rows[0].id]);
 
-    // Create notification for the mentor
+    // Create notifications using centralized service so sockets are emitted as well
     const programData = assignmentData.rows[0];
-    await pool.query(
-      `INSERT INTO notifications (role, recipient_id, recipient_role, notification_type, title, message, link, metadata)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        'mentor',
-        mentor_id,
-        'mentor',
-        'program_assigned',
-        'New Program Assigned',
-        `You have been assigned a new program: ${programData.program_name}. Start mentoring students now!`,
-        '/mentor-dashboard/assigned-programs',
-        JSON.stringify({ program_id: course_id, program_name: programData.program_name, mentor_name: programData.mentor_name })
-      ]
+    const io = req.app.get('io');
+
+    // Mentor notification - dedupe: avoid creating duplicate notifications for same mentor+program
+    const dedupeRes = await pool.query(
+      `SELECT id FROM notifications WHERE role = $1 AND recipient_id = $2 AND notification_type = $3 AND (metadata->>'program_id') = $4 LIMIT 1`,
+      ['mentor', mentor_id, 'program_assigned', String(course_id)]
     );
 
-    // Create notification for all admins
-    await pool.query(
-      `INSERT INTO notifications (role, recipient_role, notification_type, title, message, link, metadata)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        'admin',
-        'admin',
-        'program_assigned',
-        'Program Assigned to Mentor',
-        `Program "${programData.program_name}" has been assigned to mentor ${programData.mentor_name}`,
-        '/admin-dashboard/assigned_programs',
-        JSON.stringify({ program_id: course_id, program_name: programData.program_name, mentor_id: mentor_id, mentor_name: programData.mentor_name })
-      ]
-    );
+    if (dedupeRes.rowCount === 0) {
+      await pushNotification({
+        role: 'mentor',
+        recipientRole: 'mentor',
+        recipientId: mentor_id,
+        type: 'program_assigned',
+        title: 'New program assigned to you',
+        message: `You have been assigned a new program: ${programData.program_name}. Start mentoring students now!`,
+        link: '/mentor-dashboard/assigned-programs',
+        metadata: { program_id: course_id, program_name: programData.program_name, mentor_name: programData.mentor_name },
+        io,
+      });
+    } else {
+      console.log('Skipping duplicate mentor notification for program', course_id, 'mentor', mentor_id);
+    }
+
+    // Admin notification removed to avoid duplicate/linked admin message
 
     res.status(201).json({ 
       success: true, 

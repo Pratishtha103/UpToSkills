@@ -1,6 +1,7 @@
 //backend/controllers/companies.controller.js
 const pool = require('../config/database');
 const { fetchExternal, fetchInternal } = require('../utils/apiClient');
+const { notifyAdmins } = require('../utils/notificationService');
 
 const getCompanies = async (req, res) => {
   try {
@@ -29,6 +30,22 @@ const deleteCompany = async (req, res) => {
 
     if (result.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Company not found" });
+    }
+
+    // Notify admins about deletion (best-effort)
+    try {
+      const deleted = result.rows[0] || {};
+      const io = req.app.get('io');
+      const label = deleted.company_name || deleted.username || deleted.email || `ID ${deleted.id}`;
+      await notifyAdmins({
+        title: 'Company removed',
+        message: `Company ${label} was deleted by an admin.`,
+        type: 'company_deleted',
+        metadata: { company: deleted },
+        io,
+      });
+    } catch (notifyErr) {
+      console.error('Failed to notify admins about company deletion:', notifyErr && notifyErr.message ? notifyErr.message : notifyErr);
     }
 
     res.json({ success: true, message: "Company removed successfully" });

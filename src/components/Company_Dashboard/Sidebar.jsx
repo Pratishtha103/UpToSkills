@@ -93,7 +93,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
 
       {/* Sidebar container */}
       <motion.aside
-        className={`fixed top-0 left-0 h-full w-64 shadow-2xl z-40 overflow-hidden border-r transition-colors duration-300 ${darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"}`}
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 shadow-2xl z-40 overflow-hidden border-r transition-colors duration-300 ${darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"}`}
         initial={{ x: -264 }} // Initial position offscreen
         animate={{ x: isOpen ? 0 : -264 }} // Slide in/out animation
         transition={{ duration: 0.25 }}
@@ -108,7 +108,7 @@ export default function Sidebar({ isOpen = true, setIsOpen = () => {}, onItemCli
           </button>
         )}
 
-        <div className="flex flex-col h-full pt-16">
+        <div className="flex flex-col h-full pt-2.5">
           {/* Sidebar menu */}
           <nav className="flex-1 pt-6 px-4">
             <div className="space-y-2">

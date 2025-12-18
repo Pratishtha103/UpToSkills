@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/database");
 const verifyToken = require("../middleware/auth");
+const { notifyAdmins } = require("../utils/notificationService");
 
 /*==========================================================
  🟢 TOTAL MENTORS COUNT  (NO TOKEN REQUIRED)
@@ -78,6 +79,11 @@ router.delete("/:id", verifyToken, async (req, res) => {
     // 1️⃣ Delete details first
     await client.query("DELETE FROM mentor_details WHERE mentor_id = $1", [id]);
 
+    // 1.5️⃣ Nullify or detach any dependent records that reference this mentor
+    // Some deployments may have FK constraints that prevent deleting a mentor
+    // if rows exist in `mentor_projects`. To be safe, set those mentor_id values to NULL.
+    await client.query("UPDATE mentor_projects SET mentor_id = NULL WHERE mentor_id = $1", [id]);
+
     // 2️⃣ Delete mentor record
     const result = await client.query(
       "DELETE FROM mentors WHERE id = $1 RETURNING *",
@@ -93,6 +99,23 @@ router.delete("/:id", verifyToken, async (req, res) => {
     }
 
     await client.query("COMMIT");
+
+    // Notify admins about deletion (best-effort; don't block on errors)
+    try {
+      const deletedMentor = result.rows[0] || {};
+      const io = req.app.get('io');
+      const mentorLabel = deletedMentor.full_name || deletedMentor.username || deletedMentor.email || `ID ${id}`;
+
+      await notifyAdmins({
+        title: 'Mentor removed',
+        message: `Mentor ${mentorLabel} was deleted by an admin.`,
+        type: 'mentor_deleted',
+        metadata: { mentor_id: id, mentor: deletedMentor },
+        io,
+      });
+    } catch (notifyErr) {
+      console.error('Failed to notify admins about mentor deletion:', notifyErr && notifyErr.message ? notifyErr.message : notifyErr);
+    }
 
     res.json({
       success: true,

@@ -106,9 +106,32 @@ setTimeout(() => {
   setInterval(cleanupOldReadNotifications, CLEANUP_INTERVAL_MS);
 }, 1000);
 
+/* ================= ROUTE IMPORTS ================= */
+const userProfileRoutes = require('./routes/userProfile');
+const testimonialsRouter = require('./routes/testimonials');
+const authRoutes = require('./routes/auth');
+const projectsRoutes = require('./routes/projects');
+const mentorProjectRoutes = require('./routes/mentorProjects');
+const mentorReviewRoutes = require('./routes/mentorReviews');
+const companyProfilesRoutes = require('./routes/companyProfilesRoute');
+const statsRoutes = require('./routes/stats');
+const studentsRoutes = require('./routes/students');
+const mentorsRoutes = require('./routes/mentors');
+const companiesRouter = require('./routes/companiesRoute');
+const searchCompaniesRouter = require('./routes/searchcompanies');
+const searchProjectRoutes = require('./routes/searchproject');
+const searchStudent = require('./routes/searchStudents');
+const formRoute = require('./routes/formRoutes');
+const skillBadgesRoutes = require('./routes/skillBadges');
+const coursesRoutes = require('./routes/coursesRoute');
+const interviewRoutes = require('./routes/interviews');
+const notificationRoutes = require('./routes/notifications');
+const studentProjectsRoutes = require('./routes/studentProjects');
+
 /* ================= MIDDLEWARE ================= */
 app.use(
   cors({
+
     origin: ALLOWED_ORIGINS,
     credentials: true,
   })

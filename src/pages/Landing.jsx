@@ -341,7 +341,7 @@ export default function Landing() {
           <img
             src={darkMode ? darkLogo : logo}
             alt="Upto To Skills logo"
-            className="h-16 transition-transform hover:scale-110 cursor-pointer"
+            className="h-16  w-56 transition-transform hover:scale-110 cursor-pointer"
             onClick={() => navigate("/")}
           />
 

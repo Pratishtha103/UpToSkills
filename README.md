@@ -167,30 +167,30 @@ This document outlines the folder structure of the UpToSkills project.
 │   └───uptoskills_logo.png
 
 └───src\
+
+|    ├───App.css
     
-    ├───App.css
-    
-    ├───App.jsx
-    
-    ├───index.css
-    
-    ├───index.js
-    
-    ├───assets\
-    
-    │   ├───bgc.jpeg
-    
-    │   ├───boy2.png
-    
-    │   ├───buisness.jpeg
-    
-    │   ├───community2.png
-    
-    │   ├───darkLogo.jpg
-    
-    │   ├───her0Section.jpeg
-    
-    │   ├───hero.jpg
+|    ├───App.jsx
+
+|    ├───index.css
+
+|    ├───index.js
+
+|    ├───assets\
+
+|   │   ├───bgc.jpeg
+
+|   │   ├───boy2.png
+
+|   │   ├───buisness.jpeg
+ 
+|   │   ├───community2.png
+ 
+|   │   ├───darkLogo.jpg
+ 
+|   │   ├───her0Section.jpeg
+ 
+|   │   ├───hero.jpg
     
     │   ├───login-new.jpg
     

@@ -203,30 +203,24 @@ const Students = ({ isDarkMode }) => {
 
       const details = data.data;
 
-      // 2) Attempt to fetch interviews for this student to compute interview count
-      // Try multiple likely endpoints; fallback to 0
-      let interviewsCount = 0;
-      try {
-        // Common query param style
-        let ivRes = await fetch(`http://localhost:5000/api/interviews?studentId=${studentId}`, { headers });
-        if (!ivRes.ok) {
-          // try another pattern
-          ivRes = await fetch(`http://localhost:5000/api/interviews/student/${studentId}`, { headers });
-        }
-        if (ivRes.ok) {
-          const ivData = await ivRes.json();
-          // ivData might be an object { success, data } or array
-          if (Array.isArray(ivData)) interviewsCount = ivData.length;
-          else if (ivData?.success && Array.isArray(ivData.data)) interviewsCount = ivData.data.length;
-          else if (Array.isArray(ivData?.data)) interviewsCount = ivData.data.length;
-        } else {
-          // no interviews endpoint or none scheduled -> interviewsCount stays 0
-          interviewsCount = 0;
-        }
-      } catch (ivErr) {
-        console.warn("Interview fetch failed or endpoint not available:", ivErr);
-        interviewsCount = 0;
-      }
+     // 2) Fetch interview count PER STUDENT (CORRECT)
+let interviewsCount = 0;
+
+try {
+  const countRes = await fetch(
+    `http://localhost:5000/api/admin/interviews/count/${studentId}`,
+    { headers }
+  );
+
+  if (countRes.ok) {
+    const countData = await countRes.json();
+    interviewsCount = countData?.count ?? 0;
+  }
+} catch (err) {
+  console.warn("Failed to fetch interview count:", err);
+  interviewsCount = 0;
+}
+
 
       // Attach interviewsCount into details.stats (safe merge)
       const mergedDetails = {

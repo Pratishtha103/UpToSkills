@@ -101,14 +101,24 @@ router.post('/register', async (req, res) => {
           ? "mentors"
           : "students";
 
-    // Check existing email
+    // Check existing email globally across accounts (prevents reuse of deactivated emails)
     const emailCheck = await pool.query(
-      `SELECT * FROM ${tableName} WHERE email=$1`,
+      `
+        SELECT source FROM (
+          SELECT 'students' AS source, id, status FROM students WHERE LOWER(email)=LOWER($1)
+          UNION ALL
+          SELECT 'mentors' AS source, id, NULL::text FROM mentors WHERE LOWER(email)=LOWER($1)
+          UNION ALL
+          SELECT 'companies' AS source, id, NULL::text FROM companies WHERE LOWER(email)=LOWER($1)
+        ) t
+        LIMIT 1
+      `,
       [email]
     );
 
-    if (emailCheck.rows.length > 0)
+    if (emailCheck.rows.length > 0) {
       return res.status(400).json({ success: false, message: 'Email already exists' });
+    }
 
     // GLOBAL USERNAME CHECK
     if (await isUsernameTaken(username)) {
@@ -225,6 +235,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: "Incorrect email/username or password" });
 
     const user = userResult.rows[0];
+
+    // Check if student account is deactivated
+    if (normalizedRole === "student" && user.status === "Inactive") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been deactivated. Please contact the administrator."
+      });
+    }
 
     // Compare Password
     const isMatch = await bcrypt.compare(password, user.password);

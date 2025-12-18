@@ -114,24 +114,13 @@ const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
 const mentorProjectRoutes = require('./routes/mentorProjects');
 const mentorReviewRoutes = require('./routes/mentorReviews');
-<<<<<<< HEAD
 const companyProfilesRoutes = require('./routes/companyProfilesRoute');
-const statsRoutes = require("./routes/stats");
-const testimonialsRouter = require("./routes/testimonials");
-const studentsRoutes = require('./routes/students');
-const mentorsRoutes = require('./routes/mentors');
-const companiesRouter = require("./routes/companiesRoute");
-const searchCompaniesRouter = require("./routes/searchCompanies");
-const searchProjectRoutes = require('./routes/searchProject');
-=======
-const companyProfilesRoutes = require('./routes/companyProfiles.route');
 const statsRoutes = require('./routes/stats');
 const studentsRoutes = require('./routes/students');
 const mentorsRoutes = require('./routes/mentors');
-const companiesRouter = require('./routes/companies.route');
+const companiesRouter = require('./routes/companiesRoute');
 const searchCompaniesRouter = require('./routes/searchcompanies');
 const searchProjectRoutes = require('./routes/searchproject');
->>>>>>> c44882b (testimonials)
 const searchStudent = require('./routes/searchStudents');
 const formRoute = require('./routes/formRoutes');
 const skillBadgesRoutes = require('./routes/skillBadges');
@@ -143,18 +132,8 @@ const studentProjectsRoutes = require('./routes/studentProjects');
 /* ================= MIDDLEWARE ================= */
 app.use(
   cors({
+
     origin: ALLOWED_ORIGINS,
-<<<<<<< HEAD
-    credentials: true
-}));
-// Serve uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use('/uploads', cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-
-=======
     credentials: true,
   })
 );
@@ -163,7 +142,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
->>>>>>> c44882b (testimonials)
 
 /* ================= AUTH & USER ================= */
 app.use('/api/auth', authRoutes);

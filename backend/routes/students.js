@@ -44,6 +44,15 @@ router.delete("/:id", verifyToken, async (req, res) => {
   try {
     await client.query("BEGIN");
 
+    // Delete dependent user details first to avoid FK constraint violations
+    await client.query("DELETE FROM user_details WHERE student_id = $1", [id]);
+    // Delete other dependent rows that may reference this student
+    await client.query("DELETE FROM student_badges WHERE student_id = $1", [id]);
+    await client.query("DELETE FROM project_assignments WHERE student_id = $1", [id]);
+    await client.query("DELETE FROM projects WHERE student_id = $1", [id]);
+    await client.query("DELETE FROM attendance WHERE student_id = $1", [id]);
+    await client.query("DELETE FROM enrollments WHERE student_id = $1", [id]);
+
     const result = await client.query(
       "DELETE FROM students WHERE id = $1 RETURNING *",
       [id]

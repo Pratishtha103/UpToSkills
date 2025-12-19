@@ -13,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../Company_Dashboard/ui/dialog";
-import Footer from "../AboutPage/Footer";
 import { useTheme } from "../../context/ThemeContext";
 
 const statusColors = {
@@ -129,17 +128,16 @@ export default function InterviewGallery() {
   };
 
   return (
-    <>
-      <div
-        className={`min-h-screen transition-colors duration-300 ${
-          darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+    <div
+      className={`flex flex-col min-h-screen transition-colors duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
         }`}
-      >
+    >
+      {/* ================= MAIN CONTENT ================= */}
+      <main className="flex-grow">
         <div className="pt-20 px-4 pb-10 max-w-[1200px] mx-auto">
           <h1
-            className={`text-2xl font-bold mb-4 ${
-              darkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Upcoming Interviews ({interviews.length})
           </h1>
@@ -154,11 +152,10 @@ export default function InterviewGallery() {
             {interviews.map((interview) => (
               <Card
                 key={interview.id}
-                className={`p-4 flex flex-col rounded-2xl ${
-                  darkMode
+                className={`p-4 flex flex-col rounded-2xl ${darkMode
                     ? "bg-gray-800 border-gray-700"
                     : "bg-white border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                   <div className="flex items-center gap-4">
@@ -191,11 +188,10 @@ export default function InterviewGallery() {
                     </div>
 
                     <Badge
-                      className={`${
-                        statusColors[
-                          (interview.status || "scheduled").toLowerCase()
+                      className={`${statusColors[
+                        (interview.status || "scheduled").toLowerCase()
                         ]
-                      } capitalize`}
+                        } capitalize`}
                     >
                       {interview.status}
                     </Badge>
@@ -223,7 +219,7 @@ export default function InterviewGallery() {
             ))}
           </div>
 
-          {/* Edit Dialog */}
+          {/* ================= EDIT DIALOG ================= */}
           <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
             <DialogContent>
               <DialogHeader>
@@ -266,12 +262,15 @@ export default function InterviewGallery() {
                 <Button variant="outline" onClick={() => setIsEditOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={saveEdit}>Save</Button>
+                <Button type="button" onClick={saveEdit}>
+                  Save
+                </Button>
+
               </div>
             </DialogContent>
           </Dialog>
 
-          {/* Delete Dialog */}
+          {/* ================= DELETE DIALOG ================= */}
           <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
             <DialogContent>
               <DialogHeader>
@@ -294,18 +293,17 @@ export default function InterviewGallery() {
             </DialogContent>
           </Dialog>
         </div>
+      </main>
 
-        {/* Footer */}
-        <footer
-          className={`w-full text-center py-4 text-sm transition-colors duration-300 border-t ${
-            darkMode
-              ? "bg-gray-900 text-gray-300 border-gray-700"
-              : "bg-gray-100 text-gray-700 border-gray-300"
+      {/* ================= FOOTER ================= */}
+      <footer
+        className={`w-full text-center py-4 text-sm border-t transition-colors duration-300 ${darkMode
+            ? "bg-gray-900 text-gray-300 border-gray-700"
+            : "bg-gray-100 text-gray-700 border-gray-300"
           }`}
-        >
-          <p>© 2025 Uptoskills. Built by learners.</p>
-        </footer>
-      </div>
-    </>
+      >
+        <p>© 2025 Uptoskills. Built by learners.</p>
+      </footer>
+    </div>
   );
 }

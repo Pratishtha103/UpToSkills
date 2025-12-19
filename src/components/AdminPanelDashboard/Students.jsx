@@ -150,27 +150,45 @@ const Students = ({ isDarkMode }) => {
       setIsDeactivating(studentId);
       closeConfirmModal();
       
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setStudents((current) =>
-        current.map((s) => (s.id === studentId ? { ...s, status: newStatus } : s))
-      );
-      toast.success(`Successfully set ${studentName} status to ${newStatus}.`);
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const headers = token
+        ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
 
-      // Notify admins about status change
-      try {
-        await fetch("http://localhost:5000/api/notifications", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            role: "admin",
-            type: "status-change",
-            title: "Student status updated",
-            message: `${studentName} status changed to ${newStatus} (id: ${studentId}).`,
-            metadata: { entity: "student", id: studentId, status: newStatus },
-          }),
-        });
-      } catch (notifErr) {
-        console.error("Failed to create notification:", notifErr);
+      // Call the backend API to update status in database
+      const res = await fetch(`${API_BASE_URL}/${studentId}/status`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        setStudents((current) =>
+          current.map((s) => (s.id === studentId ? { ...s, status: newStatus } : s))
+        );
+        toast.success(`Successfully set ${studentName} status to ${newStatus}.`);
+
+        // Notify admins about status change
+        try {
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "status-change",
+              title: "Student status updated",
+              message: `${studentName} status changed to ${newStatus} (id: ${studentId}).`,
+              metadata: { entity: "student", id: studentId, status: newStatus },
+            }),
+          });
+        } catch (notifErr) {
+          console.error("Failed to create notification:", notifErr);
+        }
+      } else {
+        toast.error(result.message || `Failed to change student status to ${newStatus}.`);
       }
     } catch (err) {
       console.error("Error updating status:", err);
@@ -393,8 +411,10 @@ try {
                       disabled={isDeactivating === student.id}
                       className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
                         isDeactivating === student.id
-                          ? "bg-blue-300 text-blue-800 cursor-not-allowed"
-                          : "bg-blue-500 text-white hover:bg-blue-600"
+                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          : isCurrentlyActive
+                            ? "bg-orange-500 text-white hover:bg-orange-600"
+                            : "bg-green-500 text-white hover:bg-green-600"
                       }`}
                     >
                       {isDeactivating === student.id ? "Updating..." : isCurrentlyActive ? "Deactivate" : "Activate"}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaTrash, FaPlus } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function AssignedPrograms({ isDarkMode }) {
   const [programs, setPrograms] = useState([]);
@@ -12,6 +14,29 @@ export default function AssignedPrograms({ isDarkMode }) {
   const [selectedProgram, setSelectedProgram] = useState('');
   const [selectedMentor, setSelectedMentor] = useState('');
   const [assignLoading, setAssignLoading] = useState(false);
+
+  // Modal states
+  const [validationModal, setValidationModal] = useState({
+    isOpen: false,
+    message: ''
+  });
+
+  const [successModal, setSuccessModal] = useState({
+    isOpen: false,
+    message: ''
+  });
+
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    message: ''
+  });
+
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    assignmentId: null,
+    programName: '',
+    mentorName: ''
+  });
 
   // Fetch all data on mount
   useEffect(() => {
@@ -68,9 +93,33 @@ export default function AssignedPrograms({ isDarkMode }) {
     setLoading(false);
   };
 
+  const closeValidationModal = () => {
+    setValidationModal({ isOpen: false, message: '' });
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, message: '' });
+  };
+
+  const closeErrorModal = () => {
+    setErrorModal({ isOpen: false, message: '' });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      assignmentId: null,
+      programName: '',
+      mentorName: ''
+    });
+  };
+
   const handleAssignProgram = async () => {
     if (!selectedProgram || !selectedMentor) {
-      alert('Please select both a program and a mentor');
+      setValidationModal({
+        isOpen: true,
+        message: 'Please select both a program and a mentor'
+      });
       return;
     }
 
@@ -85,37 +134,84 @@ export default function AssignedPrograms({ isDarkMode }) {
       }, { headers });
 
       if (response.data.success) {
-        alert('Program assigned successfully!');
+        setSuccessModal({
+          isOpen: true,
+          message: 'Program assigned successfully!'
+        });
         setAssignments([response.data.data, ...assignments]);
         setSelectedProgram('');
         setSelectedMentor('');
-        // Notifications are handled server-side by the assigned-programs endpoint.
-        // This prevents duplicate notifications and ensures realtime delivery via sockets.
+        
+        // Best-effort notifications: admin + mentor
+        try {
+          const programObj = programs.find(p => String(p.id) === String(selectedProgram));
+          const mentorObj = mentors.find(m => String(m.id) === String(selectedMentor));
+          const programTitle = programObj?.title || programObj?.name || `ID ${selectedProgram}`;
+          const mentorName = mentorObj?.full_name || mentorObj?.name || `ID ${selectedMentor}`;
+          const tokenForNotif = localStorage.getItem('token');
+          const notifHeaders = tokenForNotif ? { Authorization: `Bearer ${tokenForNotif}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+
+          // Admin notification
+          await axios.post('http://localhost:5000/api/notifications', {
+            role: 'admin',
+            type: 'assignment',
+            title: 'Program assigned',
+            message: `${programTitle} was assigned to ${mentorName}.`,
+            metadata: { entity: 'assigned-program', programId: selectedProgram, mentorId: selectedMentor }
+          }, { headers: notifHeaders });
+
+          // Mentor notification
+          await axios.post('http://localhost:5000/api/notifications', {
+            role: 'mentor',
+            recipientId: selectedMentor,
+            type: 'assignment',
+            title: 'New program assigned to you',
+            message: `You have been assigned the program: ${programTitle}.`,
+            metadata: { entity: 'assigned-program', programId: selectedProgram }
+          }, { headers: notifHeaders });
+        } catch (notifErr) {
+          console.error('Failed to create assignment notifications', notifErr);
+        }
       }
     } catch (err) {
       console.error('Error assigning program:', err);
-      alert(err.response?.data?.message || 'Failed to assign program');
+      setErrorModal({
+        isOpen: true,
+        message: err.response?.data?.message || 'Failed to assign program'
+      });
     } finally {
       setAssignLoading(false);
     }
   };
 
-  const handleRemoveAssignment = async (id) => {
-    if (!window.confirm('Are you sure you want to remove this assignment?')) {
-      return;
-    }
+  const handleRemoveAssignment = (assignment) => {
+    setConfirmModal({
+      isOpen: true,
+      assignmentId: assignment.id,
+      programName: assignment.program_name,
+      mentorName: assignment.mentor_name
+    });
+  };
 
+  const confirmRemoveAssignment = async () => {
+    const { assignmentId } = confirmModal;
+    
     try {
+      closeConfirmModal();
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      await axios.delete(`http://localhost:5000/api/assigned-programs/${id}`, { headers });
-      setAssignments(assignments.filter(a => a.id !== id));
-      alert('Assignment removed successfully!');
+      await axios.delete(`http://localhost:5000/api/assigned-programs/${assignmentId}`, { headers });
+      setAssignments(assignments.filter(a => a.id !== assignmentId));
+      setSuccessModal({
+        isOpen: true,
+        message: 'Assignment removed successfully!'
+      });
+      
       // Best-effort: notify admin and mentor about removal
       try {
         const token = localStorage.getItem('token');
         const headers = token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-        const removed = assignments.find(a => a.id === id) || null;
+        const removed = assignments.find(a => a.id === assignmentId) || null;
         const programName = removed?.program_name || removed?.program_title || `ID ${removed?.course_id || ''}`;
         const mentorId = removed?.mentor_id || removed?.mentorId || null;
 
@@ -125,7 +221,7 @@ export default function AssignedPrograms({ isDarkMode }) {
           type: 'assignment-removal',
           title: 'Program assignment removed',
           message: `${programName} assignment was removed.`,
-          metadata: { entity: 'assigned-program', id }
+          metadata: { entity: 'assigned-program', id: assignmentId }
         }, { headers });
 
         // Mentor notification if mentor id available
@@ -136,7 +232,7 @@ export default function AssignedPrograms({ isDarkMode }) {
             type: 'assignment-removal',
             title: 'Program assignment removed',
             message: `The program ${programName} assigned to you was removed.`,
-            metadata: { entity: 'assigned-program', id }
+            metadata: { entity: 'assigned-program', id: assignmentId }
           }, { headers });
         }
       } catch (notifErr) {
@@ -144,7 +240,10 @@ export default function AssignedPrograms({ isDarkMode }) {
       }
     } catch (err) {
       console.error('Error removing assignment:', err);
-      alert('Failed to remove assignment');
+      setErrorModal({
+        isOpen: true,
+        message: 'Failed to remove assignment'
+      });
     }
   };
 
@@ -188,8 +287,6 @@ export default function AssignedPrograms({ isDarkMode }) {
 
       {/* Assign Programs Section */}
       <section className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
-        
-
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           {/* Program Dropdown */}
           <div className="flex-1">
@@ -280,7 +377,7 @@ export default function AssignedPrograms({ isDarkMode }) {
                     <td className="px-6 py-4">{formatDate(assignment.assigned_on)}</td>
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => handleRemoveAssignment(assignment.id)}
+                        onClick={() => handleRemoveAssignment(assignment)}
                         className="flex items-center gap-1 px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
                       >
                         <FaTrash className="w-3 h-3" /> Remove
@@ -293,6 +390,188 @@ export default function AssignedPrograms({ isDarkMode }) {
           </table>
         </div>
       </section>
+
+      {/* Validation Modal */}
+      <AnimatePresence>
+        {validationModal.isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeValidationModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-xl shadow-2xl p-6 ${
+                isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
+                  <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">Validation Error</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {validationModal.message}
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={closeValidationModal}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                >
+                  OK
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {successModal.isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeSuccessModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-xl shadow-2xl p-6 ${
+                isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-green-100 dark:bg-green-900">
+                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">Success</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {successModal.message}
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={closeSuccessModal}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm bg-green-500 text-white hover:bg-green-600 transition-colors"
+                >
+                  OK
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Error Modal */}
+      <AnimatePresence>
+        {errorModal.isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeErrorModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-xl shadow-2xl p-6 ${
+                isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-red-100 dark:bg-red-900">
+                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">Error</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {errorModal.message}
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={closeErrorModal}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >
+                  OK
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {confirmModal.isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeConfirmModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-xl shadow-2xl p-6 ${
+                isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-red-100 dark:bg-red-900">
+                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">Confirm Removal</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Are you sure you want to remove the assignment of <strong>{confirmModal.programName}</strong> from <strong>{confirmModal.mentorName}</strong>?
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={closeConfirmModal}
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                    isDarkMode
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRemoveAssignment}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

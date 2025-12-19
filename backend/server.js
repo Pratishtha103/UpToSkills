@@ -129,10 +129,12 @@ const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
 const studentProjectsRoutes = require('./routes/studentProjects');
 
+// ✅ Admin interview count route
+const adminInterviewCountRoutes = require('./routes/adminInterviewCount');
+
 /* ================= MIDDLEWARE ================= */
 app.use(
   cors({
-
     origin: ALLOWED_ORIGINS,
     credentials: true,
   })
@@ -175,6 +177,9 @@ app.use('/api/mentors', mentorsRoutes);
 
 /* ================= INTERVIEWS ================= */
 app.use('/api/interviews', interviewRoutes);
+
+// ✅ Admin-only interview count route
+app.use('/api/admin/interviews', adminInterviewCountRoutes);
 
 /* ================= SKILLS ================= */
 app.use('/api/skill-badges', skillBadgesRoutes);

@@ -16,7 +16,9 @@ import {
   Linkedin,
   Mail,
   Phone,
+  AlertTriangle,
 } from "lucide-react";
+import { toast } from 'react-toastify';
 
 const API_BASE_URL = "http://localhost:5000/api/students";
 
@@ -30,13 +32,22 @@ const Students = ({ isDarkMode }) => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    type: '', // 'delete' or 'status'
+    studentId: null,
+    studentName: '',
+    currentStatus: '',
+  });
 
   const fetchAllStudents = useCallback(async () => {
     try {
       setLoading(true);
       const token =
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = token ? { Authorization:`Bearer ${token} `} : {};
       const res = await fetch(API_BASE_URL, { headers });
       const data = await res.json();
       if (data.success) setStudents(data.data || []);
@@ -52,22 +63,51 @@ const Students = ({ isDarkMode }) => {
     fetchAllStudents();
   }, [fetchAllStudents]);
 
+  const openConfirmModal = (type, studentId, studentName, currentStatus = '') => {
+    setConfirmModal({
+      isOpen: true,
+      type,
+      studentId,
+      studentName,
+      currentStatus,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      type: '',
+      studentId: null,
+      studentName: '',
+      currentStatus: '',
+    });
+  };
+
   const handleDelete = async (id) => {
     const studentToDelete = students.find((s) => s.id === id);
     const studentName = studentToDelete?.full_name || `ID ${id}`;
-    if (!window.confirm(`Are you sure you want to delete ${studentName}?`)) return;
+    
+    openConfirmModal('delete', id, studentName);
+  };
 
+  const confirmDelete = async () => {
+    const { studentId, studentName } = confirmModal;
+    
     try {
-      setIsDeleting(id);
+      setIsDeleting(studentId);
+      closeConfirmModal();
+      
       const token =
         typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const headers = token
         ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
         : { "Content-Type": "application/json" };
-      const res = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE", headers });
+      const res = await fetch(`${API_BASE_URL}/${studentId}`, { method: "DELETE", headers });
       const result = await res.json();
       if (result.success) {
-        setStudents((current) => current.filter((s) => s.id !== id));
+        setStudents((current) => current.filter((s) => s.id !== studentId));
+        toast.success(`${studentName} has been deleted successfully.`);
+        
         // Notify admins about this deletion
         try {
           await fetch("http://localhost:5000/api/notifications", {
@@ -77,19 +117,19 @@ const Students = ({ isDarkMode }) => {
               role: "admin",
               type: "deletion",
               title: "Student deleted",
-              message: `${studentName} was deleted (id: ${id}).`,
-              metadata: { entity: "student", id },
+              message: `${studentName} was deleted (id: ${studentId}).`,
+              metadata: { entity: "student", id: studentId },
             }),
           });
         } catch (notifErr) {
           console.error("Failed to create notification:", notifErr);
         }
       } else {
-        alert(result.message || "Failed to delete student");
+        toast.error(result.message || "Failed to delete student");
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting student");
+      toast.error("Error deleting student");
     } finally {
       setIsDeleting(null);
     }
@@ -97,11 +137,14 @@ const Students = ({ isDarkMode }) => {
 
   const handleDeactivate = async (id, currentStatus) => {
     const studentToUpdate = students.find((s) => s.id === id);
-    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
     const studentName = studentToUpdate?.full_name || `ID ${id}`;
 
-    if (!window.confirm(`Are you sure you want to change the status of ${studentName} to "${newStatus}"?`))
-      return;
+    openConfirmModal('status', id, studentName, currentStatus);
+  };
+
+  const confirmStatusChange = async () => {
+    const { studentId, studentName, currentStatus } = confirmModal;
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
 
     try {
       setIsDeactivating(id);
@@ -170,7 +213,7 @@ const Students = ({ isDarkMode }) => {
       const res = await fetch(`${API_BASE_URL}/${studentId}/details`, { headers });
       const data = await res.json();
       if (!data.success) {
-        alert("Failed to load student details");
+        toast.error("Failed to load student details");
         setSelectedStudent(null);
         setLoadingDetails(false);
         return;
@@ -178,30 +221,24 @@ const Students = ({ isDarkMode }) => {
 
       const details = data.data;
 
-      // 2) Attempt to fetch interviews for this student to compute interview count
-      // Try multiple likely endpoints; fallback to 0
-      let interviewsCount = 0;
-      try {
-        // Common query param style
-        let ivRes = await fetch(`http://localhost:5000/api/interviews?studentId=${studentId}`, { headers });
-        if (!ivRes.ok) {
-          // try another pattern
-          ivRes = await fetch(`http://localhost:5000/api/interviews/student/${studentId}`, { headers });
-        }
-        if (ivRes.ok) {
-          const ivData = await ivRes.json();
-          // ivData might be an object { success, data } or array
-          if (Array.isArray(ivData)) interviewsCount = ivData.length;
-          else if (ivData?.success && Array.isArray(ivData.data)) interviewsCount = ivData.data.length;
-          else if (Array.isArray(ivData?.data)) interviewsCount = ivData.data.length;
-        } else {
-          // no interviews endpoint or none scheduled -> interviewsCount stays 0
-          interviewsCount = 0;
-        }
-      } catch (ivErr) {
-        console.warn("Interview fetch failed or endpoint not available:", ivErr);
-        interviewsCount = 0;
-      }
+     // 2) Fetch interview count PER STUDENT (CORRECT)
+let interviewsCount = 0;
+
+try {
+  const countRes = await fetch(
+    `http://localhost:5000/api/admin/interviews/count/${studentId}`,
+    { headers }
+  );
+
+  if (countRes.ok) {
+    const countData = await countRes.json();
+    interviewsCount = countData?.count ?? 0;
+  }
+} catch (err) {
+  console.warn("Failed to fetch interview count:", err);
+  interviewsCount = 0;
+}
+
 
       // Attach interviewsCount into details.stats (safe merge)
       const mergedDetails = {
@@ -215,7 +252,7 @@ const Students = ({ isDarkMode }) => {
       setStudentDetails(mergedDetails);
     } catch (err) {
       console.error("Error fetching student details:", err);
-      alert("Error loading student details");
+      toast.error("Error loading student details");
       setSelectedStudent(null);
     } finally {
       setLoadingDetails(false);
@@ -227,7 +264,7 @@ const Students = ({ isDarkMode }) => {
     setStudentDetails(null);
   };
 
-  // ✅ FIXED: Search functionality using correct endpoint
+  // Search functionality using correct endpoint
   useEffect(() => {
     const timeout = setTimeout(async () => {
       const trimmedSearch = searchTerm.trim();
@@ -240,10 +277,9 @@ const Students = ({ isDarkMode }) => {
 
       try {
         setSearching(true);
-        // ✅ CHANGED: Use /search?q= instead of /search/:name
         const token =
           typeof window !== "undefined" ? localStorage.getItem("token") : null;
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = token ? { Authorization: `Bearer ${token} `} : {};
         const res = await fetch(
           `${API_BASE_URL}/search?q=${encodeURIComponent(trimmedSearch)}`,
           { headers }
@@ -403,6 +439,79 @@ const Students = ({ isDarkMode }) => {
         </div>
       </div>
 
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {confirmModal.isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeConfirmModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-xl shadow-2xl p-6 ${
+                isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`p-3 rounded-full ${
+                  confirmModal.type === 'delete' 
+                    ? 'bg-red-100 dark:bg-red-900' 
+                    : 'bg-blue-100 dark:bg-blue-900'
+                }`}>
+                  <AlertTriangle className={`w-6 h-6 ${
+                    confirmModal.type === 'delete' 
+                      ? 'text-red-600 dark:text-red-400' 
+                      : 'text-blue-600 dark:text-blue-400'
+                  }`} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">
+                    {confirmModal.type === 'delete' 
+                      ? 'Confirm Deletion' 
+                      : 'Confirm Status Change'}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {confirmModal.type === 'delete' 
+                      ? `Are you sure you want to delete ${confirmModal.studentName}? This action cannot be undone.`
+                      : `Are you sure you want to change the status of ${confirmModal.studentName} to "${confirmModal.currentStatus === "Active" ? "Inactive" : "Active"}"?`
+                    }
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={closeConfirmModal}
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                    isDarkMode
+                      ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmModal.type === 'delete' ? confirmDelete : confirmStatusChange}
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm text-white transition-colors ${
+                    confirmModal.type === 'delete'
+                      ? 'bg-red-500 hover:bg-red-600'
+                      : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
+                >
+                  {confirmModal.type === 'delete' ? 'Delete' : 'Confirm'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Student Details Modal */}
       <AnimatePresence>
         {selectedStudent && (
@@ -530,7 +639,6 @@ const Students = ({ isDarkMode }) => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Enrollments</p>
                       </div>
                       <div className={`p-4 rounded-lg text-center ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                        {/* show interview count (1 or 0) */}
                         <p className="text-2xl font-bold text-orange-500">{studentDetails.stats.interviewsCount ?? 0}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Interview</p>
                       </div>

@@ -147,34 +147,52 @@ const Students = ({ isDarkMode }) => {
     const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
 
     try {
-      setIsDeactivating(studentId);
-      closeConfirmModal();
-      
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setStudents((current) =>
-        current.map((s) => (s.id === studentId ? { ...s, status: newStatus } : s))
-      );
-      toast.success(`Successfully set ${studentName} status to ${newStatus}.`);
+      setIsDeactivating(id);
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const headers = token
+        ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
 
-      // Notify admins about status change
-      try {
-        await fetch("http://localhost:5000/api/notifications", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            role: "admin",
-            type: "status-change",
-            title: "Student status updated",
-            message: `${studentName} status changed to ${newStatus} (id: ${studentId}).`,
-            metadata: { entity: "student", id: studentId, status: newStatus },
-          }),
-        });
-      } catch (notifErr) {
-        console.error("Failed to create notification:", notifErr);
+      const res = await fetch(`${API_BASE_URL}/${id}/status`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => null);
+        throw new Error(errBody || `Request failed with status ${res.status}`);
+      }
+
+      const result = await res.json().catch(() => null);
+      if (result && result.success) {
+        // Refresh list from server to ensure persisted state (avoids cache/optimistic drift)
+        await fetchAllStudents();
+        alert(`Successfully set ${studentName} status to ${result.data?.status || newStatus}.`);
+
+        // Notify admins about status change (best-effort)
+        try {
+          await fetch("http://localhost:5000/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "admin",
+              type: "status-change",
+              title: "Student status updated",
+              message: `${studentName} status changed to ${result.data?.status || newStatus} (id: ${id}).`,
+              metadata: { entity: "student", id, status: result.data?.status || newStatus },
+            }),
+          });
+        } catch (notifErr) {
+          console.error("Failed to create notification:", notifErr);
+        }
+      } else {
+        alert((result && result.message) || `Failed to change student status to ${newStatus}.`);
       }
     } catch (err) {
       console.error("Error updating status:", err);
-      toast.error(`Failed to change student status to ${newStatus}.`);
+      alert(`Failed to change student status to ${newStatus}. ${err.message || ''}`);
     } finally {
       setIsDeactivating(null);
     }

@@ -35,6 +35,54 @@ router.get("/count", async (req, res) => {
 });
 
 /*==========================================================
+ 🔄 UPDATE STUDENT STATUS (ACTIVATE/DEACTIVATE)
+==========================================================*/
+router.patch("/:id/status", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status || !["Active", "Inactive"].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid status. Must be 'Active' or 'Inactive'",
+    });
+  }
+
+  try {
+    // Check if status column exists, if not add it
+    const columnCheck = await pool.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'students' AND column_name = 'status'
+    `);
+    
+    if (columnCheck.rows.length === 0) {
+      await pool.query(`ALTER TABLE students ADD COLUMN status VARCHAR(20) DEFAULT 'Active'`);
+    }
+
+    const result = await pool.query(
+      "UPDATE students SET status = $1 WHERE id = $2 RETURNING id, full_name, email, status",
+      [status, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Student status updated to ${status}`,
+      data: result.rows[0],
+    });
+  } catch (err) {
+    console.error("❌ Error updating student status:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+/*==========================================================
  🔴 DELETE STUDENT  (TOKEN REQUIRED)
 ==========================================================*/
 router.delete("/:id", verifyToken, async (req, res) => {
@@ -43,15 +91,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
   try {
     await client.query("BEGIN");
-
-    // Delete dependent user details first to avoid FK constraint violations
-    await client.query("DELETE FROM user_details WHERE student_id = $1", [id]);
-    // Delete other dependent rows that may reference this student
-    await client.query("DELETE FROM student_badges WHERE student_id = $1", [id]);
-    await client.query("DELETE FROM project_assignments WHERE student_id = $1", [id]);
-    await client.query("DELETE FROM projects WHERE student_id = $1", [id]);
-    await client.query("DELETE FROM attendance WHERE student_id = $1", [id]);
-    await client.query("DELETE FROM enrollments WHERE student_id = $1", [id]);
 
     const result = await client.query(
       "DELETE FROM students WHERE id = $1 RETURNING *",

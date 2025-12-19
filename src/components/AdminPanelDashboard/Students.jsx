@@ -192,7 +192,7 @@ const Students = ({ isDarkMode }) => {
       }
     } catch (err) {
       console.error("Error updating status:", err);
-      toast.error(`Failed to change student status to ${newStatus}.`);
+      alert(`Failed to change student status to ${newStatus}. ${err.message || ''}`);
     } finally {
       setIsDeactivating(null);
     }

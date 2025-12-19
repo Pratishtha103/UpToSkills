@@ -117,6 +117,7 @@ await pool.query(`
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(15) NOT NULL,
         password TEXT NOT NULL,
+        status VARCHAR(20) DEFAULT 'Active',
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);

@@ -8,27 +8,33 @@ const { fetchExternal, fetchInternal } = require('../utils/apiClient');
  */
 const getStudents = async (req, res) => {
   try {
-  const query = `
-  SELECT
-    s.id,
-    s.username,
-    COALESCE(u.full_name, s.full_name) AS full_name,
-    s.email,
-    COALESCE(u.contact_number, s.phone) AS contact_number,
-    u.linkedin_url,
-    u.github_url,
-    u.why_hire_me,
-    u.ai_skill_summary,
-    u.domains_of_interest,
-    u.others_domain,
-    u.profile_completed,
-    s.created_at
-  FROM students s
-  LEFT JOIN user_details u ON s.id = u.student_id
-  ORDER BY s.created_at DESC;
-`;
+    // Check if status column exists
+    const columnCheck = await pool.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'students' AND column_name = 'status'
+    `);
+    const hasStatusColumn = columnCheck.rows.length > 0;
 
-
+    const query = `
+    SELECT
+      s.id,
+      s.username,
+      COALESCE(u.full_name, s.full_name) AS full_name,
+      s.email,
+      COALESCE(u.contact_number, s.phone) AS contact_number,
+      u.linkedin_url,
+      u.github_url,
+      u.why_hire_me,
+      u.ai_skill_summary,
+      u.domains_of_interest,
+      u.others_domain,
+      u.profile_completed,
+      s.created_at
+      ${hasStatusColumn ? ", COALESCE(s.status, 'Active') AS status" : ", 'Active' AS status"}
+    FROM students s
+    LEFT JOIN user_details u ON s.id = u.student_id
+    ORDER BY s.created_at DESC;
+  `;
 
     const result = await pool.query(query);
     return res.status(200).json({ success: true, data: result.rows });

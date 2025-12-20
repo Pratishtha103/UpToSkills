@@ -108,9 +108,10 @@ setTimeout(() => {
 }, 1000);
 
 /* ================= ROUTE IMPORTS ================= */
+const authRoutes = require('./routes/auth');
+const forgotPasswordRoutes = require('./routes/forgotPassword');
 const userProfileRoutes = require('./routes/userProfile');
 const testimonialsRouter = require('./routes/testimonials');
-const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
 const mentorProjectRoutes = require('./routes/mentorProjects');
 const mentorReviewRoutes = require('./routes/mentorReviews');
@@ -129,8 +130,14 @@ const interviewRoutes = require('./routes/interviews');
 const notificationRoutes = require('./routes/notifications');
 const studentProjectsRoutes = require('./routes/studentProjects');
 
-// ✅ Admin interview count route
-const adminInterviewCountRoutes = require('./routes/adminInterviewCount');
+// ✅ Admin interview count route (only require if file exists)
+let adminInterviewCountRoutes;
+try {
+  adminInterviewCountRoutes = require('./routes/adminInterviewCount');
+} catch (err) {
+  console.warn('⚠ adminInterviewCount route file not found, skipping...');
+  adminInterviewCountRoutes = null;
+}
 
 /* ================= MIDDLEWARE ================= */
 app.use(
@@ -147,6 +154,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 /* ================= AUTH & USER ================= */
 app.use('/api/auth', authRoutes);
+app.use('/api', forgotPasswordRoutes);  // ✅ This registers POST /api/forgot-password
 app.use('/api', userProfileRoutes);
 
 /* ================= PROJECT ROUTES ================= */
@@ -178,8 +186,10 @@ app.use('/api/mentors', mentorsRoutes);
 /* ================= INTERVIEWS ================= */
 app.use('/api/interviews', interviewRoutes);
 
-// ✅ Admin-only interview count route
-app.use('/api/admin/interviews', adminInterviewCountRoutes);
+// ✅ Admin-only interview count route (only register if file exists)
+if (adminInterviewCountRoutes) {
+  app.use('/api/admin/interviews', adminInterviewCountRoutes);
+}
 
 /* ================= SKILLS ================= */
 app.use('/api/skill-badges', skillBadgesRoutes);

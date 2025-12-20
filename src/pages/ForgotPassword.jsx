@@ -6,43 +6,31 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTheme } from "../context/ThemeContext";
 
-// ===========================================
-// ForgotPassword Component
-// Handles password reset with validation,
-// toast notifications, password strength checking,
-// and redirect after success.
-// ===========================================
 const ForgotPassword = () => {
-
   // ===============================
   // STATE MANAGEMENT
   // ===============================
 
-  // Password visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Input fields state
-  const [email, setEmail] = useState(""); 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Navigation hook to redirect after success
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useTheme();
 
   // ===============================
   // PASSWORD VALIDATION RULES
-  // Strong password = must pass all checks
   // ===============================
 
-  const hasUpperCase = /[A-Z]/.test(password);              // At least 1 uppercase letter
-  const hasLowerCase = /[a-z]/.test(password);              // At least 1 lowercase letter
-  const hasNumber = /\d/.test(password);                    // At least 1 number
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password); // At least 1 special character
-  const isMinLength = password.length >= 8;                 // Minimum 8 characters
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isMinLength = password.length >= 8;
 
-  // Combined strong password check
   const isStrongPassword =
     hasUpperCase &&
     hasLowerCase &&
@@ -50,45 +38,71 @@ const ForgotPassword = () => {
     hasSpecialChar &&
     isMinLength;
 
-  // Password match logic
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   const passwordsMismatch = password !== confirmPassword && confirmPassword.length > 0;
 
   // ===============================
-  // SUBMIT HANDLER
-  // Called when user resets password
+  // VALIDATION CHECKS
   // ===============================
+
+  const isEmailValid = email.trim().length > 0;
+  const isFormValid = isEmailValid && passwordsMatch && isStrongPassword;
+
+  // ===============================
+  // SUBMIT HANDLER
+  // ===============================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation: Passwords must match
+    // Client-side validation
+    if (!isEmailValid) {
+      toast.error("Please enter your email or username");
+      return;
+    }
+
     if (!passwordsMatch) {
       toast.error("Passwords do not match!");
       return;
     }
 
-    // Validation: Password must be strong
     if (!isStrongPassword) {
       toast.error("Password must be 8+ chars with uppercase, lowercase, number & special char!");
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      // Making POST request to backend
       const response = await axios.post("http://localhost:5000/api/forgot-password", {
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
+      }, {
+        timeout: 10000,
       });
 
-      if (response.status === 200) {
+      if (response.data.success) {
         toast.success("Password reset successfully!");
-
-        // Redirect user after success
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to reset password. Please try again.");
+      
+      if (error.response?.status === 404) {
+        toast.error(error.response.data.message || "User not found. Check your email/username.");
+      } else if (error.response?.status === 400) {
+        toast.error(error.response.data.message || "Invalid input. Please check your details.");
+      } else if (error.request) {
+        toast.error("No response from server. Please check your connection.");
+      } else {
+        toast.error("Failed to reset password. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -98,6 +112,7 @@ const ForgotPassword = () => {
         darkMode ? "bg-[#020817] text-gray-100" : "bg-[#F9FAFB] text-gray-900"
       }`}
     >
+      {/* Theme Toggle Button */}
       <button
         onClick={toggleDarkMode}
         className={`absolute top-6 right-6 z-10 flex h-10 w-10 items-center justify-center rounded-full shadow-md transition-colors ${
@@ -110,12 +125,13 @@ const ForgotPassword = () => {
         {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </button>
 
+      {/* Main Container */}
       <div
         className={`flex rounded-2xl shadow-2xl overflow-hidden max-w-5xl w-full border transition-colors duration-300 ${
           darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100"
         }`}
       >
-        {/* Left Image */}
+        {/* Left Image Section */}
         <div
           className={`w-1/2 hidden md:flex items-center justify-center p-10 transition-colors duration-300 ${
             darkMode ? "bg-slate-950" : "bg-[#F5F9FF]"
@@ -128,9 +144,7 @@ const ForgotPassword = () => {
           />
         </div>
 
-        {/* ===================================== */}
-        {/* RIGHT SIDE FORM SECTION */}
-        {/* ===================================== */}
+        {/* Right Form Section */}
         <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
 
           {/* Title */}
@@ -142,28 +156,27 @@ const ForgotPassword = () => {
             Enter your registered email or username and new password
           </p>
 
-          {/* =========================== */}
-          {/* RESET PASSWORD FORM */}
-          {/* =========================== */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Reset Password Form */}
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
-            {/* Email Field */}
-            <input
-              type="email"
-              placeholder="Enter registered email-id or username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className={`w-full rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1] transition-colors ${
-                darkMode
-                  ? "bg-slate-800 border border-slate-700 text-white placeholder:text-slate-400"
-                  : "border border-gray-300 bg-white text-gray-900"
-              }`}
-            />
+            {/* Email/Username Field */}
+            <div>
+              <input
+                type="text"
+                placeholder="Enter registered email or username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className={`w-full rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#09C3A1] transition-colors ${
+                  darkMode
+                    ? "bg-slate-800 border border-slate-700 text-white placeholder:text-slate-400"
+                    : "border border-gray-300 bg-white text-gray-900"
+                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              />
+            </div>
 
-            {/* =========================== */}
-            {/* NEW PASSWORD FIELD */}
-            {/* =========================== */}
+            {/* New Password Field */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -171,27 +184,31 @@ const ForgotPassword = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`w-full rounded-md px-4 py-3 focus:outline-none
-                  ${isStrongPassword ? "border border-green-500" : ""}
-                  ${!isStrongPassword && password ? "border border-red-500" : ""}
-                  ${!password ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
-                  ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
+                disabled={isLoading}
+                autoComplete="new-password"
+                className={`w-full rounded-md px-4 py-3 focus:outline-none transition-colors ${
+                  isStrongPassword && password ? "border border-green-500 focus:ring-2 focus:ring-green-500" : ""
+                } ${
+                  !isStrongPassword && password ? "border border-red-500 focus:ring-2 focus:ring-red-500" : ""
+                } ${
+                  !password ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""
+                } ${
+                  darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"
+                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
               />
 
-              {/* Toggle password visibility */}
+              {/* Password visibility toggle */}
               <div
-                className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
-                  darkMode ? "text-slate-400" : "text-gray-500"
-                }`}
-                onClick={() => setShowPassword(!showPassword)}
+                className={`absolute inset-y-0 right-3 flex items-center ${
+                  isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                } ${darkMode ? "text-slate-400" : "text-gray-500"}`}
+                onClick={() => !isLoading && setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </div>
             </div>
 
-            {/* =========================== */}
-            {/* CONFIRM PASSWORD FIELD */}
-            {/* =========================== */}
+            {/* Confirm Password Field */}
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -199,76 +216,89 @@ const ForgotPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className={`w-full rounded-md px-4 py-3 focus:outline-none
-                  ${passwordsMatch ? "border border-green-500" : ""}
-                  ${passwordsMismatch ? "border border-red-500" : ""}
-                  ${!passwordsMatch && !passwordsMismatch ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""}
-                  ${darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"}`}
+                disabled={isLoading}
+                autoComplete="new-password"
+                className={`w-full rounded-md px-4 py-3 focus:outline-none transition-colors ${
+                  passwordsMatch && confirmPassword ? "border border-green-500 focus:ring-2 focus:ring-green-500" : ""
+                } ${
+                  passwordsMismatch ? "border border-red-500 focus:ring-2 focus:ring-red-500" : ""
+                } ${
+                  !passwordsMatch && !passwordsMismatch ? (darkMode ? "border border-slate-700" : "border border-gray-300") : ""
+                } ${
+                  darkMode ? "bg-slate-800 text-white placeholder:text-slate-400" : "bg-white text-gray-900"
+                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
               />
 
-              {/* Toggle confirm-password visibility */}
+              {/* Confirm password visibility toggle */}
               <div
-                className={`absolute inset-y-0 right-3 flex items-center cursor-pointer ${
-                  darkMode ? "text-slate-400" : "text-gray-500"
-                }`}
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className={`absolute inset-y-0 right-3 flex items-center ${
+                  isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                } ${darkMode ? "text-slate-400" : "text-gray-500"}`}
+                onClick={() => !isLoading && setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </div>
             </div>
 
-            {/* =========================== */}
-            {/* PASSWORD STRENGTH MESSAGE */}
-            {/* =========================== */}
+            {/* Password Strength Indicator */}
             {password && (
-              <div className="space-y-1">
-                <p className={`text-sm ${isStrongPassword ? "text-green-500" : "text-red-500"}`}>
+              <div className="space-y-2">
+                <p className={`text-sm font-medium ${isStrongPassword ? "text-green-500" : "text-red-500"}`}>
                   {isStrongPassword ? "✔ Strong password" : "✖ Password too weak"}
                 </p>
-                <div className={`flex gap-1 text-xs ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
-                  <span>8+ chars</span>
-                  <span>ABC</span>
-                  <span>abc</span>
-                  <span>123</span>
-                  <span>@#$</span>
+                <div className={`grid grid-cols-5 gap-1 text-xs ${darkMode ? "text-slate-400" : "text-gray-500"}`}>
+                  <span className={`text-center ${isMinLength ? "text-green-500 font-bold" : ""}`}>8+</span>
+                  <span className={`text-center ${hasUpperCase ? "text-green-500 font-bold" : ""}`}>ABC</span>
+                  <span className={`text-center ${hasLowerCase ? "text-green-500 font-bold" : ""}`}>abc</span>
+                  <span className={`text-center ${hasNumber ? "text-green-500 font-bold" : ""}`}>123</span>
+                  <span className={`text-center ${hasSpecialChar ? "text-green-500 font-bold" : ""}`}>@#$</span>
                 </div>
               </div>
             )}
 
-            {/* Match/Mismatch messages */}
+            {/* Password Match Messages */}
             {passwordsMatch && (
-              <p className="text-green-500 text-sm">✔ Passwords match</p>
+              <p className="text-green-500 text-sm font-medium">✔ Passwords match</p>
             )}
             {passwordsMismatch && (
-              <p className="text-red-500 text-sm">✖ Passwords do not match</p>
+              <p className="text-red-500 text-sm font-medium">✖ Passwords do not match</p>
             )}
 
-            {/* =========================== */}
-            {/* RESET PASSWORD BUTTON */}
-            {/* =========================== */}
+            {/* Submit Button */}
             <button
               type="submit"
-              disabled={!passwordsMatch || !isStrongPassword}
+              disabled={!isFormValid || isLoading}
               className={`w-full flex items-center justify-center gap-2 rounded-md py-3 font-semibold transition duration-300 ${
-                passwordsMatch && isStrongPassword
-                  ? "bg-[#09C3A1] hover:bg-[#07a589] text-white"
+                isFormValid && !isLoading
+                  ? "bg-[#09C3A1] hover:bg-[#07a589] text-white cursor-pointer"
                   : darkMode
                   ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
             >
-              🔒 Reset Password
+              {isLoading ? (
+                <>
+                  <span className="inline-block animate-spin">⏳</span>
+                  Resetting...
+                </>
+              ) : (
+                <>
+                  🔒 Reset Password
+                </>
+              )}
             </button>
           </form>
 
+          {/* Login Link */}
           <p className={`text-center mt-5 ${darkMode ? "text-slate-400" : "text-gray-600"}`}>
             Remembered your password?{" "}
-            <Link to="/login" className="text-[#09C3A1] font-semibold">
+            <Link to="/login" className="text-[#09C3A1] font-semibold hover:underline">
               Login
             </Link>
           </p>
         </div>
       </div>
+
       <ToastContainer position="top-right" autoClose={3000} theme={darkMode ? "dark" : "light"} />
     </div>
   );

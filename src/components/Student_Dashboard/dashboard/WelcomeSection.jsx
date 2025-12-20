@@ -54,12 +54,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useTheme } from "../../../context/ThemeContext";
 
 function WelcomeSection() {
   const [name, setName] = useState("Learner");
   const location = useLocation();
-  const { darkMode } = useTheme();
+  // Use CSS `dark:` classes instead of JS-controlled class names here
 
   // Fetch user name from localStorage on mount or when route state changes
   useEffect(() => {
@@ -72,35 +71,19 @@ function WelcomeSection() {
   }, [location.state]);
 
   return (
-    <div
-      className={`welcome-section p-6 rounded-2xl mb-8 transition-all duration-300 flex items-center justify-between gap-6 ${
-        darkMode ? "bg-gray-800" : "bg-gray-100"
-      }`}
-    >
+    <div className="welcome-section p-6 rounded-2xl mb-8 transition-all duration-300 flex items-center justify-between gap-6 bg-gray-100 dark:bg-gray-800">
       {/* ---- Left side: Text content ---- */}
       <div className="welcome-content flex-1">
-        <h2
-          className={`text-3xl font-bold mb-2 transition-colors ${
-            darkMode ? "text-white" : "text-gray-800"
-          }`}
-        >
+        <h2 className="text-3xl font-bold mb-2 transition-colors text-gray-800 dark:text-white">
           Hey {name}!
         </h2>
 
-        <p
-          className={`text-base leading-relaxed mb-2 transition-colors ${
-            darkMode ? "text-gray-300" : "text-gray-700"
-          }`}
-        >
+        <p className="text-base leading-relaxed mb-2 transition-colors text-gray-700 dark:text-gray-300">
           Your learning journey continues — and so does your path to real-world opportunities.
           Earn badges, showcase projects, and get noticed by recruiters.
         </p>
 
-        <p
-          className={`font-medium transition-colors ${
-            darkMode ? "text-blue-400" : "text-blue-600"
-          }`}
-        >
+        <p className="font-medium transition-colors text-blue-600 dark:text-blue-400">
           Let's turn your effort into employment!
         </p>
       </div>

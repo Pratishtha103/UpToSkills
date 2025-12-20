@@ -7,8 +7,7 @@ import WelcomeSection from "../components/Student_Dashboard/dashboard/WelcomeSec
 import StatsGrid from "../components/Student_Dashboard/dashboard/StatsGrid";
 import Footer from "../components/Student_Dashboard/dashboard/Footer";
 
-// Global Theme Context
-import { useTheme } from "../context/ThemeContext";
+// Theme handled with CSS `dark:` classes; Header toggles theme internally.
 
 /* =====================================================================================
    STUDENT DASHBOARD PAGE
@@ -35,10 +34,7 @@ const StudentDashboard = () => {
   ------------------------------------------------------------------ */
   const [isMobile, setIsMobile] = useState(false);
 
-  /* ------------------------------------------------------------------
-     Theme context → Dark / Light mode
-  ------------------------------------------------------------------ */
-  const { darkMode, toggleDarkMode } = useTheme();
+    /* Theme handled via CSS `dark:` classes on root; Header toggles theme */
 
   /* ------------------------------------------------------------------
      Student ID saved at login → used for StatsGrid data fetching
@@ -70,11 +66,7 @@ const StudentDashboard = () => {
      PAGE LAYOUT
   ===================================================================================== */
   return (
-    <div
-      className={`flex min-h-screen transition-all duration-300 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-[#f8fafc] text-gray-900"
-      }`}
-    >
+    <div className="flex min-h-screen transition-all duration-300 bg-[#f8fafc] text-gray-900 dark:bg-gray-900 dark:text-white">
       {/* =========================== SIDEBAR =========================== 
           - Collapsible sidebar for navigation
           - Controlled by state + responsive rules
@@ -91,10 +83,7 @@ const StudentDashboard = () => {
             - Includes hamburger menu for mobile sidebar toggle
             - Includes dark mode toggle
         */}
-        <Header
-          onMenuClick={() => setSidebarVisible(!isSidebarVisible)}
-          toggleDarkMode={toggleDarkMode}
-        />
+        <Header onMenuClick={() => setSidebarVisible(!isSidebarVisible)} />
 
         {/* =========================== MAIN DASHBOARD CONTENT =========================== */}
         <div className="pt-24 px-4 sm:px-6 py-6 space-y-6 flex-grow">

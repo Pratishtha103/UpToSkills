@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -15,6 +16,7 @@ const MyCourses = () => {
   // Get studentId from localStorage to fetch user's courses
   const studentId = localStorage.getItem("studentId");
 
+  
   useEffect(() => {
     // Handle missing studentId gracefully
     if (!studentId) {
@@ -26,15 +28,14 @@ const MyCourses = () => {
     // Fetch courses for the logged-in student
     const fetchCourses = async () => {
       try {
-        const res = await fetch(
+        const res = await axios.get(
           `http://localhost:5000/api/enrollments/mycourses/${studentId}`
         );
 
-        const data = await res.json();
-        console.log("API Response:", data);
+        console.log("API Response:", res.data);
 
         // Set courses or empty array if none
-        setCourses(data.courses || []);
+        setCourses(res.data.courses || []);
       } catch (error) {
         console.error("❌ Error fetching courses:", error);
       } finally {

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useTheme } from "../../../context/ThemeContext";
 import { toast } from "react-toastify";
 
@@ -89,65 +90,56 @@ function ProjectSubmissionForm({ onProjectAdded }) {
       });
     }
 
+    
     try {
-      const response = await fetch("http://localhost:5000/api/projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        "http://localhost:5000/api/projects",
+        {
           ...formData,
           student_id: studentId,
-        }),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      const newProject = response.data;
+
+      // 🎉 SUCCESS TOAST
+      toast.success("Project submitted successfully! 🎉");
+
+      openModal({
+        title: "Success!",
+        message: "Your project has been submitted successfully!",
+        type: "success",
       });
 
-      if (response.ok) {
-        const newProject = await response.json();
+      setFormData({
+        student_email: studentEmail || "",
+        title: "",
+        description: "",
+        tech_stack: "",
+        contributions: "",
+        is_open_source: false,
+        github_pr_link: "",
+      });
 
-        // 🎉 SUCCESS TOAST
-        toast.success("Project submitted successfully! 🎉");
-
-        openModal({
-          title: "Success!",
-          message: "Your project has been submitted successfully!",
-          type: "success",
-        });
-
-        setFormData({
-          student_email: studentEmail || "",
-          title: "",
-          description: "",
-          tech_stack: "",
-          contributions: "",
-          is_open_source: false,
-          github_pr_link: "",
-        });
-
-        if (onProjectAdded) {
-          setTimeout(() => {
-            onProjectAdded(newProject.project || newProject);
-          }, 1000);
-        }
-      } else {
-        const err = await response.json();
-
-        toast.error("Submission failed ❌");
-
-        openModal({
-          title: "Submission Failed",
-          message: err.message || "Server error. Please try again later.",
-          type: "error",
-        });
+      if (onProjectAdded) {
+        setTimeout(() => {
+          onProjectAdded(newProject.project || newProject);
+        }, 1000);
       }
     } catch (error) {
       console.error(error);
 
-      toast.error("Network error ❌");
+      toast.error("Submission failed ❌");
 
       openModal({
-        title: "Network Error",
-        message: "Please check your connection and try again.",
+        title: "Submission Failed",
+        message: error.response?.data?.message || "Server error. Please try again later.",
         type: "error",
       });
     }

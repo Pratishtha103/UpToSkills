@@ -8,6 +8,7 @@ import { useTheme } from "../../../context/ThemeContext";
 import useRealtimeNotifications from "@/hooks/useRealtimeNotifications";
 import { deriveRecipientFromStorage } from "@/components/Notifications/NotificationCenter";
 
+
 const NotificationsPage = () => {
   const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);

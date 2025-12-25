@@ -7,6 +7,7 @@ import Footer from '../dashboard/Footer';
 import ProjectSubmissionForm from './ProjectSubmissionForm';
 import { useTheme } from '../../../context/ThemeContext';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 function MyProjects() {
   const { darkMode } = useTheme();
@@ -35,7 +36,7 @@ function MyProjects() {
 
     const fetchProjects = async () => {
       try {
-        const res = await fetch(
+        const res = await axios.get(
           `http://localhost:5000/api/projects/assigned/${studentId}`,
           {
             headers: {
@@ -45,13 +46,10 @@ function MyProjects() {
           }
         );
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.data)) {
-            setProjects(data.data);
-          } else if (Array.isArray(data)) {
-            setProjects(data);
-          }
+        if (res.data.success && Array.isArray(res.data.data)) {
+          setProjects(res.data.data);
+        } else if (Array.isArray(res.data)) {
+          setProjects(res.data);
         }
       } catch (err) {
         console.error("Error fetching projects:", err);
@@ -81,17 +79,14 @@ function MyProjects() {
     if (!projectToDelete) return;
 
     try {
-      const res = await fetch(
+      await axios.delete(
         `http://localhost:5000/api/projects/${projectToDelete}`,
         {
-          method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      if (res.ok) {
-        setProjects(projects.filter(p => p.id !== projectToDelete));
-      }
+      setProjects(projects.filter(p => p.id !== projectToDelete));
     } catch (err) {
       console.error("Error deleting project:", err);
     }

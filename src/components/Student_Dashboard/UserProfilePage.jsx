@@ -20,6 +20,7 @@ const UserProfilePage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   // Fetch user profile data 

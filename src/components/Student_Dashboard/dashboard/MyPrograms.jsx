@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -21,6 +22,7 @@ const MyPrograms = () => {
     localStorage.getItem("studentId") ||
     localStorage.getItem("userId");
 
+    
   // Auth token for protected API endpoints
   const token = localStorage.getItem("token");
 
@@ -35,7 +37,7 @@ const MyPrograms = () => {
     // Fetch enrolled programs for the logged-in student
     const fetchPrograms = async () => {
       try {
-        const res = await fetch(
+        const res = await axios.get(
           `http://localhost:5000/api/enrollments/mycourses/${studentId}`,
           {
             headers: {
@@ -45,13 +47,9 @@ const MyPrograms = () => {
           }
         );
 
-        if (!res.ok) throw new Error("Failed to fetch courses");
-
-        const data = await res.json();
-
         // Set programs if valid data, otherwise empty array
-        if (Array.isArray(data.courses)) {
-          setPrograms(data.courses);
+        if (Array.isArray(res.data.courses)) {
+          setPrograms(res.data.courses);
         } else {
           setPrograms([]);
         }

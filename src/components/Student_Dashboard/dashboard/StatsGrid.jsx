@@ -25,6 +25,7 @@ function StatsGrid({ studentId }) {
     });
   };
 
+  
   // Get student ID
   const effectiveStudentId =
     studentId || localStorage.getItem("id") || localStorage.getItem("studentId");

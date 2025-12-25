@@ -1,6 +1,6 @@
 import { FaCode, FaGithub } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../../context/ThemeContext";
 
 const ProjectCard = ({ project, onClick, isDarkMode: propIsDarkMode }) => {
   const { darkMode: contextDarkMode } = useTheme();

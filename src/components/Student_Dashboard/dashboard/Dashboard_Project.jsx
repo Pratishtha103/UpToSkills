@@ -1,11 +1,12 @@
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Footer from "../../Project_Showcase/Footer";
-import ProjectModal from "../../Project_Showcase/ProjectModal";
+import Footer from "./Footer";
+import ProjectModal from "../myProjects/ProjectModal";
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import ProjectCard from '../../Project_Showcase/ProjectCard';
+import ProjectCard from '../myProjects/ProjectCard';
 import { useTheme } from "../../../context/ThemeContext";
+import axios from "axios";
 
 const Dashboard_Project = () => {
     const { darkMode } = useTheme(); // Get current theme (dark/light) from context
@@ -31,25 +32,23 @@ const Dashboard_Project = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const projects = await fetch("http://localhost:5000/api/projects")
-                    .then((res) => {
-                        setLoading(false); // Stop loading once response received
-                        return res.json().then((data) => {
-                            if (data.success) {
-                                setProjects(data.data); // Set projects data
-                            } else {
-                                setProjects([]); // Set empty array if no data
-                            }
-                        })
-                    })
-                const data = await projects.json();
-                console.log(data); // Debug: log fetched data
+                const res = await axios.get("http://localhost:5000/api/projects");
+                setLoading(false); // Stop loading once response received
+                
+                if (res.data.success) {
+                    setProjects(res.data.data); // Set projects data
+                } else {
+                    setProjects([]); // Set empty array if no data
+                }
+                
+                console.log(res.data); // Debug: log fetched data
             } catch (err) {
                 console.error("Failed to fetch projects:", err); // Log any fetch errors
+                setLoading(false);
             }
         };
         fetchProjects();
-    }, [])
+    }, []);
 
     return (
         <div
@@ -96,14 +95,17 @@ const Dashboard_Project = () => {
                             // Show message if no projects are available
                             <div className="col-span-full flex items-center justify-center min-h-[300px]">
                                 <div className="text-center">
-                                    <h3 className={`text-lg font-medium mb-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>No Projects</h3>
+                                    <h3 className={`text-lg font-medium mb-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>No Projects Found</h3>
+                                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                                        Check back later for new projects!
+                                    </p>
                                 </div>
                             </div>
                         ) : (
                             // Map over projects and render ProjectCard for each
                             projects.map((proj, idx) => (
                                 <ProjectCard
-                                    key={idx}
+                                    key={proj.id || idx}
                                     project={proj}
                                     onClick={() => setSelectedProject(proj)} // Open modal on click
                                     isDarkMode={darkMode}
@@ -123,10 +125,10 @@ const Dashboard_Project = () => {
                 </div>
 
                 {/* Footer component */}
-                <Footer isDarkMode={darkMode} />
+                <Footer />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Dashboard_Project;

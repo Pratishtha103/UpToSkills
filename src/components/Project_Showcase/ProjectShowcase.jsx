@@ -1,7 +1,7 @@
 // ProjectShowcase.jsx - IMPROVED VERSION
 import { useState, useEffect } from "react";
-import ProjectCard from "./ProjectCard";
-import ProjectModal from "./ProjectModal";
+import ProjectCard from "../Student_Dashboard/myProjects/ProjectCard";
+import ProjectModal from "../Student_Dashboard/myProjects/ProjectModal";
 import { motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
 

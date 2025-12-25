@@ -36,6 +36,7 @@ const EditProfilePage = () => {
     });
   };
 
+  
   const closePopup = () => {
     setPopup((prev) => ({ ...prev, isOpen: false }));
   };
@@ -124,18 +125,32 @@ const EditProfilePage = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(fullData),
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/profile",
+        fullData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const result = await response.json();
-
-      if (response.status === 401) {
+      if (response.data.success) {
+        openPopup({
+          title: "Success",
+          message: "Profile saved successfully!",
+          type: "success",
+        });
+      } else {
+        openPopup({
+          title: "Error",
+          message: `Error saving profile: ${response.data.message}\nDetails: ${response.data.error}`,
+          type: "error",
+        });
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
         openPopup({
           title: "Session Expired",
           message: "Session expired. Please login again.",
@@ -146,20 +161,6 @@ const EditProfilePage = () => {
         return;
       }
 
-      if (result.success) {
-        openPopup({
-          title: "Success",
-          message: "Profile saved successfully!",
-          type: "success",
-        });
-      } else {
-        openPopup({
-          title: "Error",
-          message: `Error saving profile: ${result.message}\nDetails: ${result.error}`,
-          type: "error",
-        });
-      }
-    } catch (error) {
       openPopup({
         title: "Network Error",
         message: "Network error: Could not connect to server",
